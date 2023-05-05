@@ -34,7 +34,7 @@ class Key(Enum):
 WORKSPACE = 'dynamic_test_workspace_wrong_input'
 
 
-ALL_CASES = {frozenset([base_test.RestMethod, base_test.WithChunksDomain, base_test.CompressDomain])}
+ALL_CASES = frozenset([base_test.RestMethod, base_test.WithChunksDomain, base_test.CompressDomain])
 
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
@@ -67,7 +67,7 @@ TESTCASES = {
                      'path': 'ne_110m_admin_0_boundary_lines_land.shp',
                      },
         },
-        Key.MANDATORY_CASES: {frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
+        Key.MANDATORY_CASES: frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
@@ -105,7 +105,7 @@ TESTCASES = {
                      'path': 'ne_110m_admin_0_boundary_lines_land.shp',
                      },
         },
-        Key.MANDATORY_CASES: {},
+        Key.MANDATORY_CASES: None,
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
@@ -140,10 +140,8 @@ TESTCASES = {
                      ],
                      },
         },
-        Key.MANDATORY_CASES: {
-            frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE])
-        },
-        Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain, base_test.CompressDomain.TRUE])},
+        Key.MANDATORY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]),
+        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain, base_test.CompressDomain.TRUE]),
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
@@ -168,7 +166,7 @@ TESTCASES = {
             'message': 'Wrong combination of parameters',
             'data': 'Raster layers are not allowed to have QML style.',
         },
-        Key.MANDATORY_CASES: {frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
+        Key.MANDATORY_CASES: frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
@@ -196,8 +194,8 @@ TESTCASES = {
             'message': 'Wrong combination of parameters',
             'data': 'Raster layers are not allowed to have QML style.',
         },
-        Key.MANDATORY_CASES: {frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
-        Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain, base_test.CompressDomain])},
+        Key.MANDATORY_CASES: frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
+        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain, base_test.CompressDomain]),
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
@@ -224,8 +222,8 @@ TESTCASES = {
                      'file': '/layman_data_test/workspaces/{workspace}/layers/{publication_name}/input_file/{publication_name}.tif',
                      },
         },
-        Key.MANDATORY_CASES: {frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
-        Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain, base_test.CompressDomain])},
+        Key.MANDATORY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
+        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain, base_test.CompressDomain]),
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
@@ -267,7 +265,7 @@ TESTCASES = {
             'message': 'Unsupported CRS of data file',
             'data': {'found': None, 'supported_values': settings.INPUT_SRS_LIST},
         },
-        Key.MANDATORY_CASES: {frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
+        Key.MANDATORY_CASES: frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain]): {
@@ -291,7 +289,7 @@ TESTCASES = {
             'message': 'Unsupported CRS of data file',
             'data': {'found': None, 'supported_values': settings.INPUT_SRS_LIST},
         },
-        Key.MANDATORY_CASES: {},
+        Key.MANDATORY_CASES: None,
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain]): {
@@ -322,7 +320,7 @@ TESTCASES = {
             'message': 'Unsupported CRS of data file',
             'data': {'found': 'EPSG:2154', 'supported_values': settings.INPUT_SRS_LIST},
         },
-        Key.MANDATORY_CASES: {},
+        Key.MANDATORY_CASES: None,
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain]): {
@@ -346,7 +344,7 @@ TESTCASES = {
             'message': 'Unsupported CRS of data file',
             'data': {'found': 'EPSG:2154', 'supported_values': settings.INPUT_SRS_LIST},
         },
-        Key.MANDATORY_CASES: {},
+        Key.MANDATORY_CASES: None,
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain]): {
@@ -378,7 +376,7 @@ TESTCASES = {
                     'small_layer.geojson'],
                 'parameter': 'file'},
         },
-        Key.MANDATORY_CASES: {frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
+        Key.MANDATORY_CASES: frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
@@ -424,7 +422,7 @@ TESTCASES = {
                      ],
                      },
         },
-        Key.MANDATORY_CASES: {},
+        Key.MANDATORY_CASES: None,
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
@@ -475,8 +473,8 @@ TESTCASES = {
                      'found': ['Red', 'Green']
                      },
         },
-        Key.MANDATORY_CASES: {frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
-        Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain])},
+        Key.MANDATORY_CASES: frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
+        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain]),
         Key.SPECIFIC_CASES: {},
     },
     'epsg_4326_en': {
@@ -497,8 +495,8 @@ TESTCASES = {
             'code': 4,
             'data': {'found': None, 'supported_values': settings.INPUT_SRS_LIST},
         },
-        Key.MANDATORY_CASES: {},
-        Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
+        Key.MANDATORY_CASES: None,
+        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
         Key.SPECIFIC_CASES: {},
     },
     'map_schema_1_0_0': {
@@ -518,8 +516,8 @@ TESTCASES = {
                      'parameter': 'file',
                      'reason': 'Missing key `describedBy`'},
         },
-        Key.MANDATORY_CASES: {},
-        Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
+        Key.MANDATORY_CASES: None,
+        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
         Key.SPECIFIC_CASES: {},
     },
     'map_schema_3_0_0': {
@@ -539,8 +537,8 @@ TESTCASES = {
                      'parameter': 'file',
                      'reason': 'Invalid schema version'},
         },
-        Key.MANDATORY_CASES: {},
-        Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
+        Key.MANDATORY_CASES: None,
+        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
         Key.SPECIFIC_CASES: {},
     },
     'map_unsupported_crs': {
@@ -559,8 +557,8 @@ TESTCASES = {
             'data': {'found': 'EPSG:3030',
                      'supported_values': settings.INPUT_SRS_LIST},
         },
-        Key.MANDATORY_CASES: {},
-        Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
+        Key.MANDATORY_CASES: None,
+        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
         Key.SPECIFIC_CASES: {},
     },
     'layer_unsupported_overview_resampling': {
@@ -580,7 +578,7 @@ TESTCASES = {
                      'detail': {'found': 'no_overview_resampling',
                                 'supported_values': settings.OVERVIEW_RESAMPLING_METHOD_LIST}, },
         },
-        Key.MANDATORY_CASES: {},
+        Key.MANDATORY_CASES: None,
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {},
     },
@@ -599,7 +597,7 @@ TESTCASES = {
             'message': 'Wrong combination of parameters',
             'data': 'Vector layers do not support overview resampling.',
         },
-        Key.MANDATORY_CASES: {},
+        Key.MANDATORY_CASES: None,
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain]): {
@@ -629,7 +627,7 @@ TESTCASES = {
                 'unmatched_filenames': ['S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'],
             },
         },
-        Key.MANDATORY_CASES: {},
+        Key.MANDATORY_CASES: None,
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
@@ -668,8 +666,8 @@ TESTCASES = {
             'message': 'Wrong combination of parameters',
             'data': 'Parameter overview_resampling requires parameter file to be set.',
         },
-        Key.MANDATORY_CASES: {},
-        Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain, base_test.CompressDomain])},
+        Key.MANDATORY_CASES: None,
+        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain, base_test.CompressDomain]),
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
@@ -713,8 +711,8 @@ TESTCASES = {
                      'detail': 'Layer name too long (211), maximum allowed length is 210.',
                      },
         },
-        Key.MANDATORY_CASES: {},
-        Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain, base_test.CompressDomain])},
+        Key.MANDATORY_CASES: None,
+        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain, base_test.CompressDomain]),
         Key.SPECIFIC_CASES: {},
     },
     'map_name_211': {
@@ -732,8 +730,8 @@ TESTCASES = {
                      'detail': 'Map name too long (211), maximum allowed length is 210.',
                      },
         },
-        Key.MANDATORY_CASES: {},
-        Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
+        Key.MANDATORY_CASES: None,
+        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
         Key.SPECIFIC_CASES: {},
     },
     'wrong_time_regex': {
@@ -755,7 +753,7 @@ TESTCASES = {
                      'expected': 'Regular expression',
                      },
         },
-        Key.MANDATORY_CASES: {},
+        Key.MANDATORY_CASES: None,
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {},
     },
@@ -772,10 +770,8 @@ TESTCASES = {
             'code': 48,
             'data': 'Vector layers are not allowed to be combined with `time_regex` parameter.',
         },
-        Key.MANDATORY_CASES: {
-            frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
-        },
-        Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain, base_test.CompressDomain])},
+        Key.MANDATORY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
+        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain, base_test.CompressDomain]),
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
@@ -808,8 +804,8 @@ TESTCASES = {
                      'parameter': 'file',
                      },
         },
-        Key.MANDATORY_CASES: {},
-        Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain, base_test.CompressDomain])},
+        Key.MANDATORY_CASES: None,
+        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain, base_test.CompressDomain]),
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
@@ -846,8 +842,8 @@ TESTCASES = {
                      'parameter': 'file',
                      },
         },
-        Key.MANDATORY_CASES: {},
-        Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain, base_test.CompressDomain])},
+        Key.MANDATORY_CASES: None,
+        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain, base_test.CompressDomain]),
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
@@ -882,8 +878,8 @@ TESTCASES = {
                      'parameter': 'file',
                      },
         },
-        Key.MANDATORY_CASES: {},
-        Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain, base_test.CompressDomain.FALSE])},
+        Key.MANDATORY_CASES: None,
+        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain, base_test.CompressDomain.FALSE]),
         Key.SPECIFIC_CASES: {},
     },
     'different_rasters_time_regex': {
@@ -905,8 +901,8 @@ TESTCASES = {
                      'parameter': 'file',
                      },
         },
-        Key.MANDATORY_CASES: {},
-        Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain, base_test.CompressDomain])},
+        Key.MANDATORY_CASES: None,
+        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain, base_test.CompressDomain]),
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain]): {
                 Key.EXPECTED_EXCEPTION: {
@@ -934,8 +930,8 @@ TESTCASES = {
                      'parameter': 'file',
                      },
         },
-        Key.MANDATORY_CASES: {},
-        Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain, base_test.CompressDomain])},
+        Key.MANDATORY_CASES: None,
+        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain, base_test.CompressDomain]),
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.TRUE, base_test.CompressDomain]): {
                 Key.EXPECTED_EXCEPTION: {
@@ -963,7 +959,7 @@ TESTCASES = {
                 'parameter': 'file',
             },
         },
-        Key.MANDATORY_CASES: {},
+        Key.MANDATORY_CASES: None,
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
@@ -1002,8 +998,8 @@ TESTCASES = {
             'message': 'Wrong combination of parameters',
             'data': 'Parameter time_regex is allowed only in combination with files.',
         },
-        Key.MANDATORY_CASES: {frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
-        Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
+        Key.MANDATORY_CASES: frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
+        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
         Key.SPECIFIC_CASES: {},
     },
     'time_regex_with_non_data_file': {
@@ -1026,7 +1022,7 @@ TESTCASES = {
                 'parameter': 'file',
             },
         },
-        Key.MANDATORY_CASES: {},
+        Key.MANDATORY_CASES: None,
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
@@ -1066,8 +1062,8 @@ TESTCASES = {
                     '211_too_long_name_20220319_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.zip/211_too_long_name_20220319_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.tif'],
             },
         },
-        Key.MANDATORY_CASES: {},
-        Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod, base_test.WithChunksDomain, base_test.CompressDomain.FALSE])},
+        Key.MANDATORY_CASES: None,
+        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod, base_test.WithChunksDomain, base_test.CompressDomain.FALSE]),
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.FALSE]): {
                 Key.EXPECTED_EXCEPTION: {
@@ -1099,7 +1095,7 @@ TESTCASES = {
                 'unsafe_slugified_filenames': ['.20220316.tif'],
             },
         },
-        Key.MANDATORY_CASES: {},
+        Key.MANDATORY_CASES: None,
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
@@ -1130,7 +1126,7 @@ TESTCASES = {
                 'unsafe_slugified_filenames': ['річка_20220316.tif'],
             },
         },
-        Key.MANDATORY_CASES: {},
+        Key.MANDATORY_CASES: None,
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod, base_test.WithChunksDomain.TRUE, base_test.CompressDomain.TRUE]): {
@@ -1156,10 +1152,8 @@ TESTCASES = {
             'code': 53,
             'message': 'Error when publishing on GeoServer. It happens for example for raster files with wrong explicit CRS.',
         },
-        Key.MANDATORY_CASES: {
-            frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
-        },
-        Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain, base_test.CompressDomain])},
+        Key.MANDATORY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
+        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain, base_test.CompressDomain]),
         Key.SPECIFIC_CASES: {},
     },
     'duplicate_filename_differs_in_case': {
@@ -1188,8 +1182,8 @@ TESTCASES = {
                 },
             },
         },
-        Key.MANDATORY_CASES: {frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
-        Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod, base_test.WithChunksDomain, base_test.CompressDomain.FALSE])},
+        Key.MANDATORY_CASES: frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
+        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod, base_test.WithChunksDomain, base_test.CompressDomain.FALSE]),
         Key.SPECIFIC_CASES: {},
     },
     'duplicate_filename_differs_in_diacritics': {
@@ -1218,7 +1212,7 @@ TESTCASES = {
                 },
             },
         },
-        Key.MANDATORY_CASES: {frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
+        Key.MANDATORY_CASES: frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
         Key.RUN_ONLY_CASES: ALL_CASES,
         Key.SPECIFIC_CASES: {
             frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.TRUE]): {
@@ -1265,8 +1259,8 @@ TESTCASES = {
                 'expected': 'One of the parameters is filled.',
             },
         },
-        Key.MANDATORY_CASES: {},
-        Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
+        Key.MANDATORY_CASES: None,
+        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
         Key.SPECIFIC_CASES: {},
     },
     'file_and_external_table_uri': {
@@ -1291,8 +1285,8 @@ TESTCASES = {
                     'external_table_uri': 'postgresql://username:password@host:port/dbname?table=table_name&geo_column=geo_column_name',
                 }},
         },
-        Key.MANDATORY_CASES: {},
-        Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod, base_test.WithChunksDomain, base_test.CompressDomain.FALSE])},
+        Key.MANDATORY_CASES: None,
+        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod, base_test.WithChunksDomain, base_test.CompressDomain.FALSE]),
         Key.SPECIFIC_CASES: {},
     },
     'partial_external_table_uri': {
@@ -1316,8 +1310,8 @@ TESTCASES = {
                      },
                      },
         },
-        Key.MANDATORY_CASES: {},
-        Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
+        Key.MANDATORY_CASES: None,
+        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
         Key.SPECIFIC_CASES: {},
     },
     'crs_and_external_table_uri_post': {
@@ -1342,8 +1336,8 @@ TESTCASES = {
                     'file': [],
                 }},
         },
-        Key.MANDATORY_CASES: {},
-        Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
+        Key.MANDATORY_CASES: None,
+        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.POST, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
         Key.SPECIFIC_CASES: {},
     },
     'crs_and_external_table_uri_patch': {
@@ -1369,16 +1363,16 @@ TESTCASES = {
                     'file': [],
                 }},
         },
-        Key.MANDATORY_CASES: {},
-        Key.RUN_ONLY_CASES: {frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE])},
+        Key.MANDATORY_CASES: None,
+        Key.RUN_ONLY_CASES: frozenset([base_test.RestMethod.PATCH, base_test.WithChunksDomain.FALSE, base_test.CompressDomain.FALSE]),
         Key.SPECIFIC_CASES: {},
     },
 }
 
 
-def cases_to_simple_parametrizations(cases):
+def case_to_simple_parametrizations(case):
     result = set()
-    for case in cases:
+    if case is not None:
         dimensions_values = []
         for item in case:
             if inspect.isclass(item) \
@@ -1401,11 +1395,11 @@ def generate_test_cases():
         all_params = deepcopy(test_case_params)
         rest_args = all_params.pop(Key.REST_ARGS)
 
-        mandatory_cases = cases_to_simple_parametrizations(all_params.pop(Key.MANDATORY_CASES))
+        mandatory_cases = case_to_simple_parametrizations(all_params.pop(Key.MANDATORY_CASES))
         specific_types = {tc: EnumTestTypes.MANDATORY for tc in mandatory_cases}
 
-        run_only_cases = cases_to_simple_parametrizations(all_params.pop(Key.RUN_ONLY_CASES))
-        all_cases = cases_to_simple_parametrizations(ALL_CASES)
+        run_only_cases = case_to_simple_parametrizations(all_params.pop(Key.RUN_ONLY_CASES))
+        all_cases = case_to_simple_parametrizations(ALL_CASES)
         ignore_cases = all_cases.difference(run_only_cases)
         assert mandatory_cases <= run_only_cases, f"key={key}: mandatory cases is not subset of run-only cases"
         for case in ignore_cases:
@@ -1415,7 +1409,7 @@ def generate_test_cases():
         specific_params_def = all_params.pop(Key.SPECIFIC_CASES)
         specific_params = {}
         for parametrization_key, parametrization_value in specific_params_def.items():
-            cases = cases_to_simple_parametrizations({parametrization_key})
+            cases = case_to_simple_parametrizations(parametrization_key)
             for case in cases:
                 assert case not in specific_params
                 specific_params[case] = parametrization_value
