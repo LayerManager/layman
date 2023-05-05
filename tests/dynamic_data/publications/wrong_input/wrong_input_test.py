@@ -1437,10 +1437,7 @@ class TestPublication(base_test.TestSingleRestPublication):
 
         exp_exception = params[Key.EXPECTED_EXCEPTION]
         is_sync = exp_exception.pop('sync')
-        format_exception(exp_exception, {
-            'publication_name': publication.name,
-            'workspace': publication.workspace,
-        })
+        format_exception(exp_exception, publication)
         exception = pytest.raises(params[Key.EXCEPTION]) if is_sync else does_not_raise()
         with exception as exception_info:
             response = rest_method(publication, args=rest_args)
