@@ -4,7 +4,7 @@ from test_tools.data import wfs as data_wfs, SMALL_LAYER_NATIVE_CRS, SMALL_LAYER
 from tests import Publication, EnumTestTypes
 from tests.asserts.final import publication as asserts_publ
 from tests.asserts.final.publication import util as assert_publ_util
-from tests.dynamic_data import base_test
+from tests.dynamic_data import base_test, base_test_classes
 
 
 class StyleFileDomain(base_test.StyleFileDomainBase):
@@ -55,12 +55,11 @@ class TestRefresh(base_test.TestSingleRestPublication):
                                          }
                                          ) for key, params in TEST_CASES.items()]
 
-    def before_class(self):
-        self.import_external_table(INPUT_FILE_PATH, {
-            'schema': EXTERNAL_DB_SCHEMA,
-            'table': EXTERNAL_DB_TABLE,
-            'geometry_type': 'GEOMETRY',
-        }, scope='class')
+    external_tables_to_create = [base_test_classes.ExternalTableDef(file_path=INPUT_FILE_PATH,
+                                                                    db_schema=EXTERNAL_DB_SCHEMA,
+                                                                    db_table=EXTERNAL_DB_TABLE,
+                                                                    args={'geometry_type': 'GEOMETRY'},),
+                                 ]
 
     def test_refresh(self, layer: Publication, rest_args, parametrization: base_test.Parametrization):
         self.post_publication(layer, args=rest_args)
