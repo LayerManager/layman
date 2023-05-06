@@ -225,8 +225,7 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
                                                                     ),
                                  ]
 
-    def before_class(self):
-        process_client.ensure_reserved_username(self.workspace, headers=AUTHN_HEADERS)
+    usernames_to_reserve = [WORKSPACE]
 
     def test_new_attribute(self, layer: Publication, rest_args, params, parametrization):
         workspace = self.workspace
