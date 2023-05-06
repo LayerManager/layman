@@ -8,7 +8,7 @@ from test_tools import process_client, external_db
 from tests import Publication, EnumTestTypes, EnumTestKeys
 from tests.asserts.final import publication as asserts_publ
 from tests.asserts.final.publication import util as assert_util, geoserver as gs_asserts
-from tests.dynamic_data import base_test
+from tests.dynamic_data import base_test, base_test_classes
 from .. import common_publications
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
@@ -102,15 +102,13 @@ class TestLayer(base_test.TestSingleRestPublication):
                                          params=value,
                                          ) for key, value in TEST_CASES.items()]
 
-    def before_class(self):
-        self.import_external_table("sample/data/geometry-types/all.geojson", {
-            'schema': DB_SCHEMA,
-            'table': TABLE_POST,
-        }, scope='class')
-        self.import_external_table("sample/data/geometry-types/multipolygon.geojson", {
-            'schema': DB_SCHEMA,
-            'table': TABLE_PATCH,
-        }, scope='class')
+    external_tables_to_create = [base_test_classes.ExternalTableDef(file_path="sample/data/geometry-types/all.geojson",
+                                                                    db_schema=DB_SCHEMA,
+                                                                    db_table=TABLE_POST,),
+                                 base_test_classes.ExternalTableDef(file_path="sample/data/geometry-types/multipolygon.geojson",
+                                                                    db_schema=DB_SCHEMA,
+                                                                    db_table=TABLE_PATCH,),
+                                 ]
 
     def test_layer(self, layer: Publication, rest_args, params):
         """Parametrized using pytest_generate_tests"""

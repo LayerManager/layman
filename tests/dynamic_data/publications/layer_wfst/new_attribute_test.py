@@ -13,7 +13,7 @@ from test_tools.data import wfs as data_wfs
 from test_tools import process_client, external_db
 from tests import Publication, EnumTestTypes, PublicationValues
 from tests.asserts.final.publication import util as assert_publ_util
-from tests.dynamic_data import base_test
+from tests.dynamic_data import base_test, base_test_classes
 
 
 INPUT_FILE_PATH = 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson'
@@ -213,18 +213,20 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
         for key, params in TEST_CASES.items()
     ]
 
+    external_tables_to_create = [base_test_classes.ExternalTableDef(file_path=INPUT_FILE_PATH,
+                                                                    db_schema=EXTERNAL_DB_SCHEMA,
+                                                                    db_table=EXTERNAL_DB_TABLE,
+                                                                    args={'launder': True},
+                                                                    ),
+                                 base_test_classes.ExternalTableDef(file_path=INPUT_FILE_PATH,
+                                                                    db_schema=EXTERNAL_DB_SCHEMA,
+                                                                    db_table=EXTERNAL_DB_TABLE_2,
+                                                                    args={'launder': True},
+                                                                    ),
+                                 ]
+
     def before_class(self):
         process_client.ensure_reserved_username(self.workspace, headers=AUTHN_HEADERS)
-        self.import_external_table(INPUT_FILE_PATH, {
-            'schema': EXTERNAL_DB_SCHEMA,
-            'table': EXTERNAL_DB_TABLE,
-            'launder': True,
-        }, scope='class')
-        self.import_external_table(INPUT_FILE_PATH, {
-            'schema': EXTERNAL_DB_SCHEMA,
-            'table': EXTERNAL_DB_TABLE_2,
-            'launder': True,
-        }, scope='class')
 
     def test_new_attribute(self, layer: Publication, rest_args, params, parametrization):
         workspace = self.workspace

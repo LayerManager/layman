@@ -83,6 +83,7 @@ class ExternalTableDef:
     file_path: str = None
     db_schema: str = None
     db_table: str = None
+    args: dict = None
 
 
 EXTERNAL_TABLE_FOR_LAYERS_BY_USED_SERVERS = [ExternalTableDef(file_path=common_publications.INPUT_FILE_PATH,

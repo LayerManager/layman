@@ -5,7 +5,7 @@ import pytest
 from test_tools import process_client, external_db
 from tests import EnumTestTypes, Publication
 from tests.asserts.final.publication import util as asserts_util
-from tests.dynamic_data import base_test
+from tests.dynamic_data import base_test, base_test_classes
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
@@ -129,11 +129,10 @@ class TestLayer(base_test.TestSingleRestPublication):
 
     test_cases = generate_test_cases()
 
-    def before_class(self):
-        self.import_external_table(INPUT_FILE_PATH, {
-            'schema': EXTERNAL_DB_SCHEMA,
-            'table': EXTERNAL_DB_TABLE,
-        }, scope='class')
+    external_tables_to_create = [base_test_classes.ExternalTableDef(file_path=INPUT_FILE_PATH,
+                                                                    db_schema=EXTERNAL_DB_SCHEMA,
+                                                                    db_table=EXTERNAL_DB_TABLE,
+                                                                    )]
 
     @staticmethod
     def test_implicit_name(publication: Publication, rest_method, rest_args):

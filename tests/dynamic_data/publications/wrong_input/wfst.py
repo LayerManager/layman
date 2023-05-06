@@ -8,7 +8,7 @@ from test_tools.data import wfs as wfs_data
 from test_tools.util import assert_error
 from tests import Publication, EnumTestTypes
 from tests.asserts.final.publication import util as assert_publ_util
-from tests.dynamic_data import base_test
+from tests.dynamic_data import base_test, base_test_classes
 
 
 INPUT_FILE_PATH = 'sample/layman.layer/small_layer.geojson'
@@ -79,11 +79,12 @@ class TestWfst(base_test.TestSingleRestPublication):
                                          params=params,
                                          ) for key, params in TEST_CASES.items()]
 
+    external_tables_to_create = [base_test_classes.ExternalTableDef(file_path=INPUT_FILE_PATH,
+                                                                    db_schema=EXTERNAL_DB_SCHEMA,
+                                                                    db_table=EXTERNAL_DB_TABLE,),
+                                 ]
+
     def before_class(self):
-        self.import_external_table(INPUT_FILE_PATH, {
-            'schema': EXTERNAL_DB_SCHEMA,
-            'table': EXTERNAL_DB_TABLE,
-        }, scope='class')
         self.post_publication(EDITABLE_TABLE_LAYER, args={
             'external_table_uri': f"{external_db.URI_STR}?schema={EXTERNAL_DB_SCHEMA}&table={EXTERNAL_DB_TABLE}&geo_column=wkb_geometry",
         }, scope='class')

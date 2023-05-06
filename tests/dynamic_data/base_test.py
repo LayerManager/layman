@@ -207,6 +207,7 @@ class TestSingleRestPublication:
             self.import_external_table(table.file_path, {
                 'schema': table.db_schema,
                 'table': table.db_table,
+                **(table.args or {}),
             }, scope='class')
         self.before_class()
         yield
