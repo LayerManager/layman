@@ -70,8 +70,7 @@ class TestLayer(base_test.TestSingleRestPublication):
 
     external_tables_to_create = base_test_classes.EXTERNAL_TABLE_FOR_LAYERS_BY_USED_SERVERS
 
-    def before_class(self):
-        process_client.ensure_reserved_username(self.workspace, headers=AUTHN_HEADERS)
+    usernames_to_reserve = [WORKSPACE]
 
     def test_layer(self, layer, rest_args, params):
         """Parametrized using pytest_generate_tests"""

@@ -77,6 +77,8 @@ class TestSingleRestPublication:
 
     external_tables_to_create = []
 
+    usernames_to_reserve = []
+
     post_before_patch_scope = 'function'
 
     @classmethod
@@ -209,6 +211,9 @@ class TestSingleRestPublication:
                 'table': table.db_table,
                 **(table.args or {}),
             }, scope='class')
+        for username in self.usernames_to_reserve:
+            headers = process_client.get_authz_headers(username)
+            process_client.ensure_reserved_username(self.workspace, headers=headers)
         self.before_class()
         yield
         self.after_class(request)
