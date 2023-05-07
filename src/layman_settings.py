@@ -15,9 +15,9 @@ class EnumOriginalDataSource(Enum):
 
 
 class EnumWfsWmsStatus(Enum):
-    PREPARING = 'preparing'
-    AVAILABLE = 'available'
-    NOT_AVAILABLE = 'not_available'
+    PREPARING = 'PREPARING'
+    AVAILABLE = 'AVAILABLE'
+    NOT_AVAILABLE = 'NOT_AVAILABLE'
 
 
 LAYMAN_DATA_DIR = os.environ['LAYMAN_DATA_DIR']
