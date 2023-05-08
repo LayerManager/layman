@@ -124,6 +124,10 @@ with settings.LAYMAN_REDIS.pipeline() as pipe:
                             if crs_def.internal_srid:
                                 db_util.ensure_srid_definition(crs_def.internal_srid, crs_def.proj4text)
 
+                        logger.info(f'Change layers PREPARING wfs_wms_status to FAILED')
+                        from .layer.prime_db_schema.wfs_wms_status import set_after_restart
+                        set_after_restart()
+
                 pipe.multi()
                 pipe.set(LAYMAN_DEPS_ADJUSTED_KEY, 'done')
                 pipe.execute()
