@@ -46,6 +46,7 @@ def test_publication_basic():
                                          "write": {settings.RIGHTS_EVERYONE_ROLE, },
                                          },
                        'image_mosaic': False,
+                       'wfs_wms_status': settings.EnumWfsWmsStatus.AVAILABLE.value if publication_type == LAYER_TYPE else None,
                        }
             publications.insert_publication(username, db_info)
             pubs = publications.get_publication_infos(username, publication_type)
@@ -539,7 +540,9 @@ class TestWorldBboxFilter:
         for crs, values in crs_def.CRSDefinitions.items():
             layer = self.layer_prefix + '_' + crs.split(':')[1]
             prime_db_schema_client.post_workspace_publication(LAYER_TYPE, self.workspace, layer,
-                                                              geodata_type=settings.GEODATA_TYPE_VECTOR)
+                                                              geodata_type=settings.GEODATA_TYPE_VECTOR,
+                                                              wfs_wms_status=settings.EnumWfsWmsStatus.AVAILABLE.value,
+                                                              )
             bbox = values.max_bbox or values.default_bbox
             with app.app_context():
                 publications.set_bbox(self.workspace, LAYER_TYPE, layer, bbox, crs)
@@ -579,7 +582,9 @@ class TestExtremeCoordinatesFilter:
     def test_default_bbox_corner_filter(self, crs, crs_values, layer_suffix, x_coord_idx, y_coord_idx):
         name = self.name_prefix + '_' + crs.split(':')[1] + '_' + layer_suffix
         prime_db_schema_client.post_workspace_publication(self.publ_type, self.workspace, name,
-                                                          geodata_type=settings.GEODATA_TYPE_VECTOR)
+                                                          geodata_type=settings.GEODATA_TYPE_VECTOR,
+                                                          wfs_wms_status=settings.EnumWfsWmsStatus.AVAILABLE.value,
+                                                          )
         default_bbox = crs_values.default_bbox
         point_bbox = (
             default_bbox[x_coord_idx],

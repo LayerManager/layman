@@ -31,7 +31,9 @@
     ```
 ### Migrations and checks
 #### Schema migrations
+- [#528](https://github.com/LayerManager/layman/issues/528) Add new data type `enum_wfs_wms_status` and create new string column `wfs_wms_status` in `publications` table in prime DB schema.
 #### Data migrations
+- [#528](https://github.com/LayerManager/layman/issues/528) Fill column `wfs_wms_status` in `publications` table in prime DB schema. For layers set value `AVAILABLE` if fully available through WFS and WFS, otherwise `NOT_AVAILABLE`. Value is set to `null` for all existing maps. 
 ### Changes
 - [#528](https://github.com/LayerManager/layman/issues/528) Endpoints [GET Layers](doc/rest.md#get-layers) and [GET Workspace Layers](doc/rest.md#get-workspace-layers) returns new key `wfs_wms_status`.
 - [#765](https://github.com/LayerManager/layman/issues/765) Remove Liferay from dev stack, use [Wagtail CRX](https://docs.coderedcorp.com/wagtail-crx/) + [Django OAuth Toolkit](https://django-oauth-toolkit.readthedocs.io/en/latest/) as new OAuth2 provider (authorization server).

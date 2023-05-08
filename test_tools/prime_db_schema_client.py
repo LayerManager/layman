@@ -30,7 +30,7 @@ def ensure_user(workspace):
 
 
 def post_workspace_publication(publication_type, workspace, name, *, actor=None, access_rights=None, title=None,
-                               bbox=None, crs=None, style_type='sld', geodata_type=None):
+                               bbox=None, crs=None, style_type='sld', geodata_type=None, wfs_wms_status=None, ):
     assert (bbox is None) == (crs is None), f'bbox={bbox}, crs={crs}'
     access_rights = access_rights or {}
     default_access_rights = {settings.RIGHTS_EVERYONE_ROLE} if not actor else {actor}
@@ -47,7 +47,8 @@ def post_workspace_publication(publication_type, workspace, name, *, actor=None,
             'geodata_type': geodata_type,
             'style_type': style_type,
             'access_rights': access_rights,
-            'image_mosaic': False
+            'image_mosaic': False,
+            'wfs_wms_status': wfs_wms_status,
         })
         if bbox:
             publications.set_bbox(workspace, publication_type, name, bbox, crs)

@@ -24,7 +24,9 @@ def post_layer(workspace, layer, file_path):
     with layman.app_context():
         db.ensure_workspace(workspace)
         prime_db_schema_client.post_workspace_publication(LAYER_TYPE, workspace, layer,
-                                                          geodata_type=settings.GEODATA_TYPE_VECTOR)
+                                                          geodata_type=settings.GEODATA_TYPE_VECTOR,
+                                                          wfs_wms_status=settings.EnumWfsWmsStatus.AVAILABLE.value,
+                                                          )
         ensure_layer_input_file_dir(workspace, layer)
         db.import_layer_vector_file_to_internal_table(workspace, layer, file_path, None)
     yield workspace, layer
@@ -144,7 +146,9 @@ def test_abort_import_layer_vector_file():
 
     def abort_layer_import():
         prime_db_schema_client.post_workspace_publication(LAYER_TYPE, workspace, layername,
-                                                          geodata_type=settings.GEODATA_TYPE_VECTOR)
+                                                          geodata_type=settings.GEODATA_TYPE_VECTOR,
+                                                          wfs_wms_status=settings.EnumWfsWmsStatus.AVAILABLE.value,
+                                                          )
         with layman.app_context():
             table_name = db.get_internal_table_name(workspace, layername)
         process = db.import_layer_vector_file_to_internal_table_async(workspace, table_name, main_filepath,
