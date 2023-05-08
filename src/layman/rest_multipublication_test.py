@@ -114,10 +114,15 @@ class TestGetPublications:
         prime_db_schema_client.ensure_workspace(self.workspace1)
 
         for publ_type in process_client.PUBLICATION_TYPES:
-            geodata_type = 'vector' if publ_type == process_client.LAYER_TYPE else None
+            if publ_type == process_client.LAYER_TYPE:
+                geodata_type = 'vector'
+                wfs_wms_status = settings.EnumWfsWmsStatus.AVAILABLE.value
+            else:
+                geodata_type = None
+                wfs_wms_status = None
             for workspace, publ_name, publ_params in self.publications:
                 prime_db_schema_client.post_workspace_publication(publ_type, workspace, publ_name, **publ_params,
-                                                                  geodata_type=geodata_type)
+                                                                  geodata_type=geodata_type, wfs_wms_status=wfs_wms_status, )
         yield
         prime_db_schema_client.clear_workspaces([self.workspace1, self.workspace2])
 
