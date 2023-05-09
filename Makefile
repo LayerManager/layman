@@ -309,6 +309,9 @@ wagtail-build:
 wagtail-bash:
 	docker-compose -f docker-compose.deps.yml run --rm --entrypoint="bash" wagtail
 
+wagtail-exec:
+	docker-compose -f docker-compose.deps.yml exec wagtail bash
+
 wagtail-restart:
 	docker-compose -f docker-compose.deps.yml up --force-recreate --no-deps -d wagtail
 
