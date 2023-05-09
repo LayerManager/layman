@@ -218,7 +218,7 @@ in log of `layman_dev` container:
 docker logs -f layman_dev
 ```
 
-Then visit [http://localhost:8000/](http://localhost:8000/). You will see simple web client that interacts with [REST API](doc/rest.md).
+Then visit [http://localhost:8000/](http://localhost:8000/). You will see simple web client that interacts with [REST API](doc/rest.md). You can also log in with automatically provided Wagtail user `layman` and password `laymanpwd`.
 
 To stop running service run:
 ```bash
