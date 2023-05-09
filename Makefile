@@ -276,32 +276,8 @@ geoserver-exec:
 geoserver-ensure-authn:
 	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm --no-deps -u root layman_dev bash -c "cd src && python3 -B setup_geoserver.py"
 
-liferay-introspect:
-	curl 'http://localhost:8082/o/oauth2/introspect' --data 'client_id=id-353ab09c-f117-f2d5-d3a3-85cfb89e6746&client_secret=secret-d31a82c8-3e73-1058-e38a-f9191f7c2014&token=...'
-
-liferay-refresh:
-	curl 'http://localhost:8082/o/oauth2/token' --data 'grant_type=refresh_token&client_id=id-353ab09c-f117-f2d5-d3a3-85cfb89e6746&client_secret=secret-d31a82c8-3e73-1058-e38a-f9191f7c2014&refresh_token=...'
-
-liferay-userprofile:
-	curl -H "Authorization: Bearer ..." http://localhost:8082/api/jsonws/user/get-current-user
-
 get-current-user:
 	curl -H "Authorization: Bearer ..." http://localhost:8000/rest/current-user
-
-liferay-bash:
-	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml exec liferay bash
-
-liferay-export-settings:
-	rm -f deps/liferay/transit/*
-	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml exec liferay bash -c "cd data/hypersonic; cp lportal.log /etc/liferay/tmp/; cp lportal.properties /etc/liferay/tmp/; cp lportal.script /etc/liferay/tmp/"
-	rm -f deps/liferay/sample/hypersonic/*
-	mv -f deps/liferay/transit/* deps/liferay/sample/hypersonic/
-
-liferay-start:
-	docker-compose -f docker-compose.deps.yml up --force-recreate -d liferay
-
-liferay-stop:
-	docker-compose -f docker-compose.deps.yml stop liferay
 
 wagtail-build:
 	docker-compose -f docker-compose.deps.yml build wagtail

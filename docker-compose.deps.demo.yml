@@ -45,18 +45,6 @@ services:
       volumes:
         - redis-data:/data
 
-   liferay:
-      build:
-        context: deps/liferay/docker
-        dockerfile: Dockerfile
-      ports:
-        - 8082:8080
-      volumes:
-        - ./deps/liferay/transit:/etc/liferay/tmp # for copying files from within the container to host
-                                                  # https://github.com/docker/compose/issues/3270#issuecomment-206214034
-                                                  # ./deps/liferay/out must be owned by non-root
-        - ./deps/liferay/sample/hypersonic:/etc/liferay/mount/files/data/hypersonic
-
    micka:
       container_name: micka
       build:

@@ -12,9 +12,6 @@
 /deps/*/tmp
 /deps/*/log
 
-/deps/liferay/transit/*
-!/deps/liferay/transit/.gitkeep
-
 /.env*
 !/.env.demo
 !/.env.dev
