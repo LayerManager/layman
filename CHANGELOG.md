@@ -5,11 +5,12 @@
 ### Upgrade requirements
 - Change environment variable [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION):
   ```
-  LAYMAN_CLIENT_VERSION=d076d4d7f8d1b32ca2b167b64790a3034690f246
+  LAYMAN_CLIENT_VERSION=fbee452b481eb5a8a1125434d110bea5f13dc4e5
   ```
 - Rename environment variable `OAUTH2_LIFERAY_SECRET` to `OAUTH2_CLIENT_SECRET`.
 - Rename all environment variables `OAUTH2_LIFERAY_SECRET<n>` to `OAUTH2_CLIENT<n>_SECRET`. For example, variable `OAUTH2_LIFERAY_SECRET4` becomes `OAUTH2_CLIENT4_SECRET`.
 - Rename all other `OAUTH2_LIFERAY_<postfix>` environment variables to `OAUTH2_<postfix>`. For example, variable `OAUTH2_LIFERAY_AUTH_URL` becomes `OAUTH2_AUTH_URL`.
+- If you are using environment variable [`OAUTH2_CALLBACK_URL`](doc/env-settings.md#oauth2_callback_url), change only its URL path from `/client/authn/oauth2-liferay/callback` to `/client/authn/oauth2-provider/callback`. Keep protocol, domain, and port unchanged.
 - Stop using environment variable `LAYMAN_AUTHN_OAUTH2_PROVIDERS`, it has no effect to Layman anymore. There is exactly one OAuth2 provider Python module now, no need to set it.
 - Stop using HTTP header `AuthorizationIssUrl` when [authenticating by OAuth](doc/oauth2/index.md). The header has no effect to Layman anymore. There is exactly one OAuth2 provider now, no need to distinguish it. Now, the only distinguished HTTP header when authenticating by OAuth2 is `Authorization` header.
 - If you are running Layman with development settings
