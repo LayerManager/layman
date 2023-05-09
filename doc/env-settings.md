@@ -82,13 +82,13 @@ URL of LTC OAuth2 callback endpoint to be called after successful OAuth2 authori
 URL of OAuth2 Introspection endpoint.
 
 ### OAUTH2_INTROSPECTION_SUB_KEY
-Name of the key in OAuth2 introspection response whose value is OAuth2 subject (also known as "sub"). If not set or set to empty string, `sub` is used, that is suitable for Liferay. Value `username` is suitable for Wagtail.
+Name of the key in OAuth2 introspection response whose value is OAuth2 subject (also known as "sub"). Value `username` is suitable for Wagtail. If not set or set to empty string, `sub` is used, that is suitable option for Liferay.
 
 ### OAUTH2_USER_PROFILE_URL
 URL of User Profile endpoint used to obtain user's ID, name, email, etc.
 
 ### OAUTH2_SCOPE
-Comma-separated list of requested OAuth2 scopes. Value `liferay-json-web-services.everything.read.userprofile` is suitable for Liferay. Do not set this variable at all (not even to empty string) if you don't want to request scope; this is suitable option for Wagtail.
+Comma-separated list of requested OAuth2 scopes. Do not set this variable at all (not even to empty string) if you don't want to request scope; this is suitable option for Wagtail. Value `liferay-json-web-services.everything.read.userprofile` is suitable for Liferay.
 
 ### GRANT_CREATE_PUBLIC_WORKSPACE
 List of [users](models.md#user) and [roles](models.md#role) giving them permission to create new [public workspace](models.md#public-workspace). It must be subset of (or equal to) GRANT_PUBLISH_IN_PUBLIC_WORKSPACE.
