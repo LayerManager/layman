@@ -128,7 +128,7 @@ Check following environment variables of LTC:
 - OAUTH2_CLIENT_SECRET: **Client Secret** from authorization server
 - OAUTH2_AUTH_URL: URL of [Authorization Endpoint](https://tools.ietf.org/html/rfc6749#section-3.1), usually the same as the first URL from Layman's OAUTH2_AUTH_URLS
 - OAUTH2_TOKEN_URL: URL of [Token Endpoint](https://tools.ietf.org/html/rfc6749#section-3.2). In case of Django OAuth Toolkit (Wagtail), it's something like `<http or https>://<wagtail domain and port>/o/token`
-- OAUTH2_CALLBACK_URL: URL of [Redirection Endpoint](https://tools.ietf.org/html/rfc6749#section-3.1.2), the value is `<http or https>://<LTC domain, port, and path prefix>/auth/oauth2-liferay/callback`.
+- OAUTH2_CALLBACK_URL: URL of [Redirection Endpoint](https://tools.ietf.org/html/rfc6749#section-3.1.2), the value is `<http or https>://<LTC domain, port, and path prefix>/auth/oauth2-provider/callback`.
 - OAUTH2_USER_PROFILE_URL: URL of Layman's [GET Current User](../rest.md#get-current-user)
 
 ### Liferay Settings
