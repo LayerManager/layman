@@ -9,7 +9,6 @@
 | [qgis-server](https://docs.qgis.org/3.16/en/docs/server_manual/index.html) | 3.16 | GNU GPL v2 | jirikcz/qgis-server | prod-external | bin | to provide WMS endpoint |
 | [redis](https://redis.io/) | 4.0.11 | BSD 3-Clause | docker-library/redis | prod-external | bin | celery message broker, source of truth for server side |
 | [micka](https://github.com/hsrs-cz/Micka) | [v2020.014](https://github.com/hsrs-cz/Micka/releases/tag/v2020.014) | BSD 3-Clause | jirikcz/micka | prod-external | bin | to provide CSW endpoint |
-| [liferay portal](https://portal.liferay.dev/) | 7.1.3 | GNU GPL v2 | liferay/portal | opt | bin | as OAuth2 provider |
 | [Wagtail](https://wagtail.org/) + [extensions](#wagtail-extensions) | 4.2 | BSD 3-Clause | deps/wagtail/laymanportal/requirements.txt | opt | bin | as OAuth2 provider |
 
 
@@ -87,7 +86,6 @@
 | [docker.osgeo.org/geoserver](https://github.com/geoserver/docker) | GNU GPL v2 | docker-compose.yml | dev | bin | |
 | [jirikcz/qgis-server](https://github.com/LayerManager/docker-qgis-server) | GNU GPL v3 | docker-compose.yml | dev | bin | |
 | [layermanager/docker-postgis](https://github.com/layermanager/docker-postgis) | MIT | docker-compose.yml | dev | bin | |
-| [liferay/portal](https://github.com/docker-library/redis) | GNU GPL v2 | docker-compose.yml | opt | bin | |
 | [jirikcz/micka](https://github.com/LayerManager/docker-micka) | GNU GPL v3 | docker-compose.yml | prod-external | bin | |
 | [samtux/micka](https://github.com/samtux/docker-micka) | GNU GPL v3 | jirikcz/micka | prod-external | src | |
 | [docker-library/redis](https://github.com/docker-library/redis) | BSD 3-Clause | docker-compose.yml | prod | bin | |

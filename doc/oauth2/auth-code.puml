@@ -7,7 +7,7 @@ box "LTC Server"
     participant "Redirection\nEndpoint" as ltcsredir
 end box
 
-box "Liferay"
+box "Authorization Server"
 	participant "Authorization\nEndpoint" as lrauth
 	participant "Token\nEndpoint" as lrtoken
 end box

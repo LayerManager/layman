@@ -7,7 +7,7 @@ box "LTC Server"
 end box
 participant "Layman\nREST API" as layman
 
-box "Liferay"
+box "Authorization Server"
 	participant "Introspection\nEndpoint" as lris
 end box
 

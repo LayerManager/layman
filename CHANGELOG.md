@@ -33,6 +33,7 @@
 #### Data migrations
 ### Changes
 - [#528](https://github.com/LayerManager/layman/issues/528) Endpoints [GET Layers](doc/rest.md#get-layers) and [GET Workspace Layers](doc/rest.md#get-workspace-layers) returns new key `wfs_wms_status`.
+- [#765](https://github.com/LayerManager/layman/issues/765) Remove Liferay from dev stack, use [Wagtail CRX](https://docs.coderedcorp.com/wagtail-crx/) + [Django OAuth Toolkit](https://django-oauth-toolkit.readthedocs.io/en/latest/) as new OAuth2 provider (authorization server).
 - Upgrade Python dependencies
   - redis 4.5.1 -> 4.5.4
   - owslib 0.27.2 -> 0.28.1

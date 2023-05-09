@@ -12,7 +12,7 @@ Authentication (**authn**) is the process of obtaining and ensuring identity of 
 Authentication is performed by chain of zero or more authentication modules controlled by [LAYMAN_AUTHN_MODULES](env-settings.md#LAYMAN_AUTHN_MODULES) environment variable. When request comes to REST API, security system calls authentication modules one by one (one module at a time), until one module ensures user identity or until there is no module left. If no module ensured user`s identity, user is considered as **anonymous** user.
 
 Currently there is one optional authentication module:
-- **OAuth2** module [`layman.authn.oauth2`](../src/layman/authn/oauth2) with Liferay as authorization server. See separate [OAuth2 documentation](oauth2/index.md).
+- **OAuth2** module [`layman.authn.oauth2`](../src/layman/authn/oauth2), see separate [OAuth2 documentation](oauth2/index.md).
 
 There is also one internal authentication module:
 - **HTTP Header** module [`layman.authn.http_header`](../src/layman/authn/http_header). This module is required by Layman for internal purposes, so even if LAYMAN_AUTHN_MODULES does not contain `layman.authn.http_header` value, the value is appended automatically.

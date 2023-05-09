@@ -1,6 +1,6 @@
 # Authentication with OAuth2
 
-Layman is able to authenticate against [OAuth 2.0](https://oauth.net/2/) provider. [Liferay Portal](https://help.liferay.com/hc/en-us/articles/360018176491-OAuth-2-0) is currently the only supported OAuth2 provider, however supporting [other OAuth2 providers](https://en.wikipedia.org/wiki/List_of_OAuth_providers) (e.g. Google or Facebook) should be quite straightforward in future.
+Layman is able to authenticate against [OAuth 2.0](https://oauth.net/2/) provider. See [Authorization Server](#authorization-server) to get list of supported providers.
 
 
 ## Roles
@@ -31,8 +31,12 @@ From [RFC6749](https://tools.ietf.org/html/rfc6749#section-1.1):
 ### Layman
 Layman acts as *resource server*. On every request to REST API, Layman accepts OAuth2 [access token](https://tools.ietf.org/html/rfc6749#section-1.4) from a *client* and validates access token against *authorization server* to authenticate *resource owner* (i.e. end-user). The access token is validated token against *authorization server* by OAuth2 mechanism called [Token Introspection](https://oauth.net/2/token-introspection/) (RFC 7662). Furthermore, Layman is responsible for fetching user-related metadata from *authorization server* using provider-specific endpoint.
 
-### Liferay Portal
-[Liferay Portal](https://help.liferay.com/hc/en-us/articles/360018176491-OAuth-2-0) acts as *authorization server*.
+### Authorization Server
+There are currently two supported *authorization servers* (OAuth2 providers):
+- [Django OAuth2 Toolkit](https://django-oauth-toolkit.readthedocs.io/en/latest/) as plugin of [Wagtail CRX](https://docs.coderedcorp.com/wagtail-crx/), this is preferred option
+- [Liferay Portal](https://help.liferay.com/hc/en-us/articles/360018176491-OAuth-2-0)
+
+Supporting [other OAuth2 providers](https://en.wikipedia.org/wiki/List_of_OAuth_providers) (e.g. Google or Facebook) should be quite straightforward in the future.
 
 ### Layman Test Client
 [Layman Test Client](https://github.com/LayerManager/layman-test-client) (LTC) acts as *client*. It is responsible for
@@ -50,7 +54,7 @@ Although LTC is currently the only OAuth2 client for Layman, there is an intenti
 
 ## Communication
 ### Initial Authorization using Authorization Code
-[**Authorization Code**](https://oauth.net/2/grant-types/authorization-code/) grant flow between *client* and *authorization server* is described in [Liferay documentation](https://help.liferay.com/hc/en-us/articles/360018176511-Authorizing-Account-Access-with-OAuth2#authorization-code-flow).
+[**Authorization Code**](https://oauth.net/2/grant-types/authorization-code/) grant flow between *client* and *authorization server* is described in [Django OAuth Toolkit documentation](https://django-oauth-toolkit.readthedocs.io/en/latest/getting_started.html#authorization-code).
 
 Schema specific for LTC, distinguishing client side and server side of LTC:
 
@@ -86,7 +90,7 @@ Username is reserved by [PATCH Current User](../rest.md#patch-current-user). Use
 ### Refresh Access Token
 During end-user's session, *client* keeps both access tokens and refresh token. When access token expires or it's lifetime is close, *client* should use refresh token to generate new access token at [Token Endpoint](https://tools.ietf.org/html/rfc6749#section-3.2).
 
-Refreshing flow between *client* and *authorization server* is described in [Liferay issue](https://issues.liferay.com/browse/OAUTH2-167). In case of LTC, refreshing happens automatically on any request to Layman REST API if access token expired or it's lifetime is closer than 10 seconds.
+In case of LTC, refreshing happens automatically on any request to Layman REST API if access token expired, or it's lifetime is closer than 10 seconds.
 
 Schema specific for LTC:
 
@@ -106,6 +110,17 @@ To enable OAuth2 authentication in Layman, adjust following [environment setting
 - [OAUTH2_CALLBACK_URL](../env-settings.md#OAUTH2_CALLBACK_URL)
 
 Sample values for OAuth2 authentication can be found in [`layman_settings.py`](../../src/layman_settings.py).
+
+### Django OAuth Toolkit Settings
+Every *client* must be registered in Django OAuth Toolkit (Wagtail) as *application*, as described in [documentation](https://django-oauth-toolkit.readthedocs.io/en/latest/getting_started.html#oauth2-authorization-grants). For LTC, fill in following settings:
+- **Redirect URIs** must contain URL of OAuth2 [Redirection Endpoint](https://tools.ietf.org/html/rfc6749#section-3.1.2). In case of LTC, the value is the same as LTC setting OAUTH2_CALLBACK_URL.
+- **Client Type**: Confidential
+- **Authorization Grant Type**: Authorization Code
+- **Name**: layman-test-client
+- **Algorithm**: No OIDC support
+
+Furthermore, you need to provide endpoint `/profile` with user-related metadata. Implementation of such endpoint is available in file 
+[deps/wagtail/laymanportal/laymanportal/views.py](../../deps/wagtail/laymanportal/laymanportal/views.py).
 
 ### Liferay Settings
 Every *client* must be registered in Liferay as *application*, as described in [Liferay documentation](https://help.liferay.com/hc/en-us/articles/360018176491-OAuth-2-0#creating-an-application). For LTC, fill in following settings:
@@ -132,10 +147,10 @@ After registration, add **Client ID** and **Client Secret** pair to Layman's set
 
 ### Layman Test Client Settings
 Check following environment variables of LTC:
-- OAUTH2_CLIENT_ID: **Client ID** from Liferay
-- OAUTH2_CLIENT_SECRET: **Client Secret** from Liferay
+- OAUTH2_CLIENT_ID: **Client ID** from authorization server
+- OAUTH2_CLIENT_SECRET: **Client Secret** from authorization server
 - OAUTH2_AUTH_URL: URL of [Authorization Endpoint](https://tools.ietf.org/html/rfc6749#section-3.1), usually the same as the first URL from Layman's OAUTH2_AUTH_URLS
-- OAUTH2_TOKEN_URL: URL of [Token Endpoint](https://tools.ietf.org/html/rfc6749#section-3.2). In case of liferay, it's something like `<http or https>://<Liferay domain and port>/o/oauth2/token`
+- OAUTH2_TOKEN_URL: URL of [Token Endpoint](https://tools.ietf.org/html/rfc6749#section-3.2). In case of Django OAuth Toolkit (Wagtail), it's something like `<http or https>://<wagtail domain and port>/o/token`
 - OAUTH2_CALLBACK_URL: URL of [Redirection Endpoint](https://tools.ietf.org/html/rfc6749#section-3.1.2), the value is `<http or https>://<LTC domain, port, and path prefix>/auth/oauth2-liferay/callback`.
 - OAUTH2_USER_PROFILE_URL: URL of Layman's [GET Current User](../rest.md#get-current-user)
 

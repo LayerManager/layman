@@ -8,7 +8,7 @@ end box
 
 participant "Layman\nREST API" as layman
 
-box "Liferay"
+box "Authorization Server"
 	participant "Introspection\nEndpoint" as lris
 	participant "Token\nEndpoint" as lrtoken
 end box
@@ -21,7 +21,8 @@ activate ltcsproxy
 note over ltcsproxy
     If access token expired
     or its expiration time is close,
-    Proxy asks Liferay to refresh the token
+    Proxy asks Authorization Server
+    to refresh the token
     before any other action.
 end note
 
