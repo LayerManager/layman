@@ -87,6 +87,22 @@ Then visit [http://localhost/](http://localhost/). You will see simple web clien
 To stop running service, run `make stop-demo`.
 
 
+### Run demo with authentication
+
+By default, demo starts without [authentication provider](doc/security.md#authentication). You can publish layers and maps as anonymous user, but you can't log in nor publish any private data.
+
+To be able to use authentication and publish private data, follow these steps:
+- Stop demo instance by `make stop-demo`
+- Copy all  `OAUTH_*` environment variables from `.env.dev` to `.env` file.
+- In `.env` change environment variables:
+  ```
+  LAYMAN_AUTHN_MODULES=layman.authn.oauth2,layman.authn.http_header
+  OAUTH2_CALLBACK_URL=http://localhost/client/authn/oauth2-provider/callback
+  ```
+- Start demo with `make start-demo-full-with-optional-deps`
+
+Then you can log in with automatically provided Wagtail user `layman` and password `laymanpwd`.
+
 ## Configuration
 Layman's source code provides settings suitable for development, testing and demo purposes. Furthermore, there exists [`Makefile`](Makefile) with predefined commands for each purpose including starting all necessary services (both in background and foreground) and stoping it.
 
