@@ -122,6 +122,15 @@ Every *client* must be registered in Django OAuth Toolkit (Wagtail) as *applicat
 Furthermore, you need to provide endpoint `/profile` with user-related metadata. Implementation of such endpoint is available in file 
 [deps/wagtail/laymanportal/laymanportal/views.py](../../deps/wagtail/laymanportal/laymanportal/views.py).
 
+### Layman Test Client Settings
+Check following environment variables of LTC:
+- OAUTH2_CLIENT_ID: **Client ID** from authorization server
+- OAUTH2_CLIENT_SECRET: **Client Secret** from authorization server
+- OAUTH2_AUTH_URL: URL of [Authorization Endpoint](https://tools.ietf.org/html/rfc6749#section-3.1), usually the same as the first URL from Layman's OAUTH2_AUTH_URLS
+- OAUTH2_TOKEN_URL: URL of [Token Endpoint](https://tools.ietf.org/html/rfc6749#section-3.2). In case of Django OAuth Toolkit (Wagtail), it's something like `<http or https>://<wagtail domain and port>/o/token`
+- OAUTH2_CALLBACK_URL: URL of [Redirection Endpoint](https://tools.ietf.org/html/rfc6749#section-3.1.2), the value is `<http or https>://<LTC domain, port, and path prefix>/auth/oauth2-liferay/callback`.
+- OAUTH2_USER_PROFILE_URL: URL of Layman's [GET Current User](../rest.md#get-current-user)
+
 ### Liferay Settings
 Every *client* must be registered in Liferay as *application*, as described in [Liferay documentation](https://help.liferay.com/hc/en-us/articles/360018176491-OAuth-2-0#creating-an-application). For LTC, fill in following settings:
 - **Website URL** should point to application's home page, e.g. `http://localhost:3000/`.
@@ -144,15 +153,3 @@ By default, only Liferay users with Administrator role have enough privileges to
   - to open permissions, visit *Configuration > OAuth 2 Administration*, click on three dots for desired application and select *Permissions*
 
 After registration, add **Client ID** and **Client Secret** pair to Layman's setting OAUTH2_CLIENTS.
-
-### Layman Test Client Settings
-Check following environment variables of LTC:
-- OAUTH2_CLIENT_ID: **Client ID** from authorization server
-- OAUTH2_CLIENT_SECRET: **Client Secret** from authorization server
-- OAUTH2_AUTH_URL: URL of [Authorization Endpoint](https://tools.ietf.org/html/rfc6749#section-3.1), usually the same as the first URL from Layman's OAUTH2_AUTH_URLS
-- OAUTH2_TOKEN_URL: URL of [Token Endpoint](https://tools.ietf.org/html/rfc6749#section-3.2). In case of Django OAuth Toolkit (Wagtail), it's something like `<http or https>://<wagtail domain and port>/o/token`
-- OAUTH2_CALLBACK_URL: URL of [Redirection Endpoint](https://tools.ietf.org/html/rfc6749#section-3.1.2), the value is `<http or https>://<LTC domain, port, and path prefix>/auth/oauth2-liferay/callback`.
-- OAUTH2_USER_PROFILE_URL: URL of Layman's [GET Current User](../rest.md#get-current-user)
-
-
-
