@@ -40,11 +40,11 @@ class TableUri:
 
     @property
     def username(self):
-        return self._db_uri.username if self._db_uri else None
+        return parse.unquote(self._db_uri.username) if self._db_uri else None
 
     @property
     def password(self):
-        return self._db_uri.password if self._db_uri else None
+        return parse.unquote(self._db_uri.password) if self._db_uri else None
 
 
 PG_URI_STR = str()

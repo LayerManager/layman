@@ -48,6 +48,7 @@
   - owslib 0.27.2 -> 0.28.1
 - [#833](https://github.com/LayerManager/layman/issues/833) Make Timgen WMS requests more robust (handle WML errors, delayed retry, add timestamp to each request).
 - [#815](https://github.com/LayerManager/layman/issues/815) Propagate [`LAYMAN_PROXY_SERVER_NAME`](doc/env-settings.md#LAYMAN_PROXY_SERVER_NAME) value to GeoServer environment variable [GEOSERVER_CSRF_WHITELIST](https://docs.geoserver.org/latest/en/user/security/webadmin/csrf.html).
+- [#847](https://github.com/LayerManager/layman/issues/847) Fix publishing external table layers with `@` in the username or the password.
 
 ## v1.20.1
  2023-04-11
