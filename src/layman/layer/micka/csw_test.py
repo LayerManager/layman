@@ -18,13 +18,12 @@ from .csw import get_layer_info, delete_layer, get_metadata_uuid
 MICKA_PORT = 8020
 
 
-def create_server(port, env='development'):
+def create_server(port):
     server = Process(target=run, kwargs={
         'env_vars': {
             'CSW_GET_RESP_CODE': '500'
         },
         'app_config': {
-            'ENV': env,
             'SERVER_NAME': f"{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{port}",
             'SESSION_COOKIE_DOMAIN': f"{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{port}",
         },

@@ -13,13 +13,12 @@ PORT1 = 8020
 PORT2 = 8021
 
 
-def create_server(port, resp_code, env='development'):
+def create_server(port, resp_code):
     server = Process(target=run, kwargs={
         'env_vars': {
             'CSW_GET_RESP_CODE': str(resp_code)
         },
         'app_config': {
-            'ENV': env,
             'SERVER_NAME': f"{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{port}",
             'SESSION_COOKIE_DOMAIN': f"{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{port}",
         },
