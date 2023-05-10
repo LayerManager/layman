@@ -36,7 +36,6 @@ def oauth2_provider_mock():
         'env_vars': {
         },
         'app_config': {
-            'ENV': 'development',
             'SERVER_NAME': f"{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{OAUTH2_PROVIDER_MOCK_PORT}",
             'SESSION_COOKIE_DOMAIN': f"{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{OAUTH2_PROVIDER_MOCK_PORT}",
             'OAUTH2_USERS': {

@@ -14,18 +14,17 @@ PORT1 = 8031
 PORT2 = 8032
 
 
-def create_server(port, env='development'):
+def create_server(port, debug=True):
     server = Process(target=run, kwargs={
         'env_vars': {
         },
         'app_config': {
-            'ENV': env,
             'SERVER_NAME': f"{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{port}",
             'SESSION_COOKIE_DOMAIN': f"{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{port}",
         },
         'host': '0.0.0.0',
         'port': port,
-        'debug': True,  # preserve error log in HTTP responses
+        'debug': debug,  # preserve error log in HTTP responses
         'load_dotenv': False,
         'options': {
             'use_reloader': False,
@@ -48,7 +47,7 @@ def server():
 
 @pytest.fixture(scope="module")
 def server2():
-    server = create_server(PORT2, env='production')
+    server = create_server(PORT2, debug=False)
     server.start()
     time.sleep(1)
 
