@@ -216,13 +216,13 @@ String with public domain and optionally port, e.g. `<domain>` or `<domain>:<por
 ## Flask settings
 
 ### FLASK_APP
-See [Flask documentation](https://flask.palletsprojects.com/en/1.1.x/cli/#application-discovery).
+See [Flask documentation](https://flask.palletsprojects.com/en/2.3.x/cli/?highlight=flask_app#environment-variables-from-dotenv).
 
 ### FLASK_DEBUG
 See [Flask documentation](https://flask.palletsprojects.com/en/2.3.x/config/?highlight=flask_debug#DEBUG).
 
 ### FLASK_SECRET_KEY
-See [Flask documentation](https://flask.palletsprojects.com/en/1.1.x/config/#SECRET_KEY).
+See [Flask documentation](https://flask.palletsprojects.com/en/2.3.x/config/?highlight=secret_key#SECRET_KEY).
 
 ## Docker settings
 
