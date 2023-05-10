@@ -12,6 +12,11 @@
 - Rename all other `OAUTH2_LIFERAY_<postfix>` environment variables to `OAUTH2_<postfix>`. For example, variable `OAUTH2_LIFERAY_AUTH_URL` becomes `OAUTH2_AUTH_URL`.
 - If you are using environment variable [`OAUTH2_CALLBACK_URL`](doc/env-settings.md#oauth2_callback_url), change only its URL path from `/client/authn/oauth2-liferay/callback` to `/client/authn/oauth2-provider/callback`. Keep protocol, domain, and port unchanged.
 - Stop using environment variable `LAYMAN_AUTHN_OAUTH2_PROVIDERS`, it has no effect to Layman anymore. There is exactly one OAuth2 provider Python module now, no need to set it.
+- Stop using environment variable `FLASK_ENV`, it has no effect to Layman anymore.
+- If you used environment variable `FLASK_ENV` with value `development`, add new environment variable [`FLASK_DEBUG`](https://flask.palletsprojects.com/en/2.3.x/config/?highlight=flask_debug#DEBUG):
+  ```
+  FLASK_DEBUG=1
+  ```
 - Stop using HTTP header `AuthorizationIssUrl` when [authenticating by OAuth](doc/oauth2/index.md). The header has no effect to Layman anymore. There is exactly one OAuth2 provider now, no need to distinguish it. Now, the only distinguished HTTP header when authenticating by OAuth2 is `Authorization` header.
 - If you are running Layman with development settings
   - change values of environment variables:  
@@ -38,6 +43,7 @@
 - [#528](https://github.com/LayerManager/layman/issues/528) Endpoints [GET Layers](doc/rest.md#get-layers) and [GET Workspace Layers](doc/rest.md#get-workspace-layers) returns new key `wfs_wms_status`.
 - [#765](https://github.com/LayerManager/layman/issues/765) Remove Liferay from dev stack, use [Wagtail CRX](https://docs.coderedcorp.com/wagtail-crx/) + [Django OAuth Toolkit](https://django-oauth-toolkit.readthedocs.io/en/latest/) as new OAuth2 provider (authorization server).
 - Upgrade Python dependencies
+  - flask 2.2.2 -> 2.3.2
   - redis 4.5.1 -> 4.5.4
   - owslib 0.27.2 -> 0.28.1
 - [#833](https://github.com/LayerManager/layman/issues/833) Make Timgen WMS requests more robust (handle WML errors, delayed retry, add timestamp to each request).

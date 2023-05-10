@@ -218,8 +218,8 @@ String with public domain and optionally port, e.g. `<domain>` or `<domain>:<por
 ### FLASK_APP
 See [Flask documentation](https://flask.palletsprojects.com/en/1.1.x/cli/#application-discovery).
 
-### FLASK_ENV
-See [Flask documentation](https://flask.palletsprojects.com/en/1.1.x/config/#environment-and-debug-features).
+### FLASK_DEBUG
+See [Flask documentation](https://flask.palletsprojects.com/en/2.3.x/config/?highlight=flask_debug#DEBUG).
 
 ### FLASK_SECRET_KEY
 See [Flask documentation](https://flask.palletsprojects.com/en/1.1.x/config/#SECRET_KEY).

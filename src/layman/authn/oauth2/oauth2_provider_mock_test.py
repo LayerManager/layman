@@ -66,7 +66,7 @@ def test_mock():
     })
     assert response.status_code == 200
     resp_json = response.json()
-    assert resp_json['FLASK_ENV'] == 'development'
+    assert resp_json['FLASK_DEBUG'] == '1'
 
     url2 = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{PORT2}/rest/test-oauth2/user-profile"
     response = requests.get(url2, headers={
@@ -74,4 +74,4 @@ def test_mock():
     })
     assert response.status_code == 200
     resp_json = response.json()
-    assert resp_json['FLASK_ENV'] == 'production'
+    assert resp_json['FLASK_DEBUG'] == ''

@@ -168,7 +168,7 @@ def get():
         "timeZoneId": "UTC",
         "userId": "20139",
         "uuid": "4ef84411-749a-e617-6191-10e0c6a7147b",
-        "FLASK_ENV": current_app.config['ENV'],
+        "FLASK_DEBUG": "1" if current_app.config['ENV'] == 'development' else '',
     }
     result.update(current_app.config['OAUTH2_TOKEN_2_PROFILE'][access_token])
 
