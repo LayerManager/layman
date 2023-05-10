@@ -7,7 +7,7 @@ import requests
 from flask import url_for
 import pytest
 
-del sys.modules['layman']
+sys.modules.pop('layman', None)
 
 from layman import app, LaymanError
 from layman import settings
