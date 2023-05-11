@@ -49,6 +49,7 @@ services:
       environment:
         - GS_VERSION=2.21.2
         - SKIP_DEMO_DATA=true
+        - GEOSERVER_CSRF_WHITELIST=${LAYMAN_PROXY_SERVER_NAME}
       depends_on:
         - postgresql
         - nginx-qgis
