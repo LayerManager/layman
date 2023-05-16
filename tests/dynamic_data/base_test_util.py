@@ -5,6 +5,7 @@ from enum import Enum
 from typing import List, Iterable
 
 from tests import PublicationValues
+from . import base_test_classes
 from .base_test_classes import RestArgs, RestMethod, PublicationByDefinitionBase, Parametrization, RestArgDomain
 
 
@@ -106,7 +107,13 @@ def check_specific_parametrizations(rest_parametrization, specific_parametrizati
         assert len(sp_parametrization) == len(rest_parametrization), f"Specific parametrization must have same number of members as rest_paramertization, test_case={test_case_key}, attribute={attribute_name}, idx={idx}"
         for dimension in rest_parametrization:
             dimension_enum = get_dimension_enum(dimension)
-            param_values = [v for v in sp_parametrization if v in dimension_enum]
+            param_values = []
+            for parametrization_key in sp_parametrization:
+                if parametrization_key == dimension_enum:
+                    param_values.append(parametrization_key)
+                elif not (inspect.isclass(parametrization_key) and issubclass(parametrization_key, Enum)) \
+                        and parametrization_key in dimension_enum:
+                    param_values.append(parametrization_key)
             assert len(param_values) == 1, f"Specific parametrization must have exactly one value of dimension {dimension}. Found {len(param_values)} values. test_case={test_case_key}, attribute={attribute_name}, idx={idx}"
 
 

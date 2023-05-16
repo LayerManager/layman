@@ -14,7 +14,8 @@ from tests.asserts.final import publication as publication_asserts
 from tests.asserts.final.publication import util as assert_utils
 from tests.dynamic_data import base_test
 from tests.dynamic_data.base_test import RestMethod, WithChunksDomain, CompressDomain
-from .util import case_to_simple_parametrizations, format_exception
+from .util import format_exception
+from ...base_test_util import case_to_simple_parametrizations
 from .. import common_publications as publications
 
 
@@ -1305,15 +1306,6 @@ def generate_test_cases():
             assert case not in specific_types, f'key={key},\ncase={case},\nspecific_types={specific_types}'
             specific_types[case] = EnumTestTypes.IGNORE
 
-        specific_params_def = all_params.pop(Key.SPECIFIC_CASES)
-        specific_params = {}
-        for parametrization_key, parametrization_value in specific_params_def.items():
-            cases = case_to_simple_parametrizations(parametrization_key)
-            for case in cases:
-                assert case not in specific_params
-                specific_params[case] = parametrization_value
-        assert set(specific_params.keys()) <= run_only_cases, f"key={key}: specific param cases is not subset of run-only cases"
-
         post_before_patch_args = test_case_params.pop(Key.POST_BEFORE_PATCH_ARGS, {})
         publ_type = all_params.pop(Key.PUBLICATION_TYPE)
 
@@ -1330,7 +1322,7 @@ def generate_test_cases():
                                            specific_types=specific_types,
                                            rest_args=rest_args,
                                            params=all_params,
-                                           specific_params=specific_params,
+                                           specific_params=all_params.pop(Key.SPECIFIC_CASES),
                                            post_before_patch_args=post_before_patch_args,
                                            marks=[pytest.mark.xfail(reason="Not yet implemented.")]
                                            if test_case_params.get('xfail') else []

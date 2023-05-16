@@ -91,6 +91,15 @@ class TestSingleRestPublication:
 
         test_cases = []
         for input_test_case in cls.test_cases:
+
+            specific_params_def = input_test_case.specific_params
+            specific_params = {}
+            for parametrization_key, parametrization_value in specific_params_def.items():
+                cases = util.case_to_simple_parametrizations(parametrization_key)
+                for case in cases:
+                    assert case not in specific_params
+                    specific_params[case] = parametrization_value
+
             assert input_test_case.pytest_id is None  # Maybe enable it later
 
             for parametrization in parametrizations:
@@ -101,8 +110,8 @@ class TestSingleRestPublication:
 
                 publication_definition = parametrization.publication_definition
 
-                specific_params = copy.deepcopy(input_test_case.specific_params.get(parametrization.values_set, {}))
-                params = recursive_dict_update(copy.deepcopy(input_test_case.params), specific_params)
+                specific_params_values = copy.deepcopy(specific_params.get(parametrization.values_set, {}))
+                params = recursive_dict_update(copy.deepcopy(input_test_case.params), specific_params_values)
 
                 input_publication, workspace, publication_type = cls._get_input_publication_workspace_and_type(
                     input_test_case=input_test_case, params=params, publication_definition=publication_definition,
