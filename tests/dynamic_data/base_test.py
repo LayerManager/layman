@@ -91,6 +91,12 @@ class TestSingleRestPublication:
 
         test_cases = []
         for input_test_case in cls.test_cases:
+            specific_types = {}
+            for source_filter, test_type in input_test_case.specific_types.items():
+                filter_set = util.case_to_simple_parametrizations(source_filter)
+                for filter in filter_set:
+                    assert filter not in specific_types
+                    specific_types[filter] = test_type
 
             specific_params_def = input_test_case.specific_params
             specific_params = {}
@@ -103,8 +109,8 @@ class TestSingleRestPublication:
             assert input_test_case.pytest_id is None  # Maybe enable it later
 
             for parametrization in parametrizations:
-                test_type = input_test_case.specific_types.get(parametrization.values_set,
-                                                               input_test_case.type or EnumTestTypes.OPTIONAL)
+                test_type = specific_types.get(parametrization.values_set,
+                                               input_test_case.type or EnumTestTypes.OPTIONAL)
                 if test_type == EnumTestTypes.IGNORE:
                     continue
 
