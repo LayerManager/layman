@@ -71,7 +71,7 @@ JSON array of objects representing available layers with following structure:
 - **geodata_type**: String. Either `vector`, `raster`, or `unknown`. Value `unknown` is used if input files are zipped and still being uploaded.
 - - **file**:
   - *file_type*: **Deprecated**. Replaced by **geodata_type** at root level, contains same info.
-- **wfs_wms_status**: String. Either `available`, `preparing`, or `not_available`.
+- **wfs_wms_status**: String. Status of layer availability in WMS (and WFS in case of vector data) endpoints. Either `available`, `preparing`, or `not_available`.
 
 Headers:
 - **X-Total-Count**: Total number of layers available from the request, taking into account all filtering parameters except `limit` and `offset`. Example `"247"`.
