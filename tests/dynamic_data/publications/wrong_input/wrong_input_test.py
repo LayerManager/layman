@@ -1295,13 +1295,12 @@ def generate_test_cases():
         all_params = deepcopy(test_case_params)
         rest_args = all_params.pop(Key.REST_ARGS)
 
-        mandatory_cases = case_to_simple_parametrizations(all_params.pop(Key.MANDATORY_CASES))
-        specific_types = {tc: EnumTestTypes.MANDATORY for tc in mandatory_cases}
+        mandatory_cases = all_params.pop(Key.MANDATORY_CASES)
+        specific_types = {mandatory_cases: EnumTestTypes.MANDATORY} if mandatory_cases else {}
 
         run_only_cases = case_to_simple_parametrizations(all_params.pop(Key.RUN_ONLY_CASES))
         all_cases = case_to_simple_parametrizations(ALL_CASES)
         ignore_cases = all_cases.difference(run_only_cases)
-        assert mandatory_cases <= run_only_cases, f"key={key}: mandatory cases is not subset of run-only cases"
         for case in ignore_cases:
             assert case not in specific_types, f'key={key},\ncase={case},\nspecific_types={specific_types}'
             specific_types[case] = EnumTestTypes.IGNORE

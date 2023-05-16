@@ -34,8 +34,7 @@ PUBLICATIONS = {
             ],
         },
         'mandatory_cases': {
-            frozenset([CompressDomain.TRUE, base_test.WithChunksDomain.FALSE, ]),
-            frozenset([CompressDomain.TRUE, base_test.WithChunksDomain.TRUE, ]),
+            frozenset([CompressDomain.TRUE, base_test.WithChunksDomain, ]),
         },
         'specific_params': {
             frozenset([CompressDomain.TRUE, base_test.WithChunksDomain.TRUE, ]): {
@@ -81,8 +80,7 @@ PUBLICATIONS = {
         'specific_params': {},
         'ignored_cases': {
             frozenset([CompressDomain.FALSE, base_test.WithChunksDomain.TRUE, ]),
-            frozenset([CompressDomain.TRUE, base_test.WithChunksDomain.FALSE, ]),
-            frozenset([CompressDomain.TRUE, base_test.WithChunksDomain.TRUE, ]),
+            frozenset([CompressDomain.TRUE, base_test.WithChunksDomain, ]),
         },
     },
 }

@@ -37,8 +37,7 @@ TEST_CASES = {
         'exp_languages': {'eng'},
         'exp_scale_denominator': 10_000_000,
         'mandatory_cases': {
-            frozenset([base_test.RestMethod.POST]),
-            frozenset([base_test.RestMethod.PATCH]),
+            frozenset([base_test.RestMethod]),
         },
         'ignore_cases': {},
     },
@@ -101,8 +100,7 @@ TEST_CASES = {
         'exp_languages': {'eng', 'cze'},
         'exp_scale_denominator': 50_000_000,
         'mandatory_cases': {
-            frozenset([base_test.RestMethod.POST]),
-            frozenset([base_test.RestMethod.PATCH]),
+            frozenset([base_test.RestMethod]),
         },
         'ignore_cases': {},
     },
