@@ -1,27 +1,5 @@
-import inspect
-import itertools
-
 from tests import Publication
-from tests.dynamic_data import base_test, base_test_classes
-
-
-def case_to_simple_parametrizations(case):
-    result = set()
-    if case is not None:
-        dimensions_values = []
-        for item in case:
-            if inspect.isclass(item) \
-                    and (issubclass(item, base_test_classes.RestArgDomain)
-                         or issubclass(item, base_test_classes.RestMethod)
-                         or issubclass(item, base_test_classes.PublicationByDefinitionBase)):
-                dimensions_values.append(list(item))
-            else:
-                dimensions_values.append([item])
-        for parametrization in itertools.product(*dimensions_values):
-            parametrization = frozenset(parametrization)
-            assert parametrization not in result
-            result.add(parametrization)
-    return result
+from tests.dynamic_data import base_test
 
 
 def format_exception(exception_info: dict, publication: Publication, parametrization: base_test.Parametrization):

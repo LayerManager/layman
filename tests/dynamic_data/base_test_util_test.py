@@ -6,6 +6,7 @@ from tests import EnumTestTypes, PublicationValues
 from tests.dynamic_data.publications import common_publications
 from .base_test_classes import RestMethod, RestArgs, CompressDomain, PublicationByUsedServers, LayerByUsedServers, CompressDomainBase, TestCaseType, Parametrization, WithChunksDomain, StyleFileDomainBase, PublicationByDefinitionBase
 from . import base_test_util as util
+from .base_test_util import case_to_simple_parametrizations
 
 
 @pytest.mark.parametrize('dimension, exp_output', [
@@ -271,3 +272,42 @@ def test_rest_parametrization_to_parametrizations(rest_parametrization, exp_outp
 def test_parametrization_class_props(parametrization, exp_props):
     for prop_name, prop_value in exp_props.items():
         assert getattr(parametrization, prop_name) == prop_value, f"prop_name={prop_name}"
+
+
+@pytest.mark.parametrize('input, exp_result', [
+    pytest.param(None, set(), id='None'),
+    pytest.param(
+        frozenset([RestMethod, WithChunksDomain, CompressDomain]),
+        {
+            frozenset([RestMethod.POST, WithChunksDomain.FALSE, CompressDomain.FALSE]),
+            frozenset([RestMethod.POST, WithChunksDomain.TRUE, CompressDomain.FALSE]),
+            frozenset([RestMethod.POST, WithChunksDomain.FALSE, CompressDomain.TRUE]),
+            frozenset([RestMethod.POST, WithChunksDomain.TRUE, CompressDomain.TRUE]),
+            frozenset([RestMethod.PATCH, WithChunksDomain.FALSE, CompressDomain.FALSE]),
+            frozenset([RestMethod.PATCH, WithChunksDomain.TRUE, CompressDomain.FALSE]),
+            frozenset([RestMethod.PATCH, WithChunksDomain.FALSE, CompressDomain.TRUE]),
+            frozenset([RestMethod.PATCH, WithChunksDomain.TRUE, CompressDomain.TRUE]),
+        },
+        id='three_domains'),
+    pytest.param(
+        frozenset([RestMethod.POST, WithChunksDomain.TRUE, CompressDomain.FALSE]),
+        {frozenset([RestMethod.POST, WithChunksDomain.TRUE, CompressDomain.FALSE])},
+        id='three_values'),
+    pytest.param(
+        frozenset([RestMethod, WithChunksDomain.TRUE, CompressDomain.FALSE]),
+        {
+            frozenset([RestMethod.POST, WithChunksDomain.TRUE, CompressDomain.FALSE]),
+            frozenset([RestMethod.PATCH, WithChunksDomain.TRUE, CompressDomain.FALSE]),
+        },
+        id='two_values_one_domain'),
+    pytest.param(
+        frozenset([RestMethod, CompressDomain.FALSE]),
+        {
+            frozenset([RestMethod.POST, CompressDomain.FALSE]),
+            frozenset([RestMethod.PATCH, CompressDomain.FALSE]),
+        },
+        id='one_value_one_domain'),
+])
+def test_case_to_simple_parametrizations(input, exp_result):
+    result = case_to_simple_parametrizations(input)
+    assert result == exp_result
