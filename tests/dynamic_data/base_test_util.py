@@ -117,3 +117,22 @@ def rest_parametrization_to_parametrizations(rest_parametrization):
         dimensions_values.append(all_dim_values)
 
     return [Parametrization(vals) for vals in itertools.product(*dimensions_values)] or [Parametrization([])]
+
+
+def case_to_simple_parametrizations(case):
+    result = set()
+    if case is not None:
+        dimensions_values = []
+        for item in case:
+            if inspect.isclass(item) \
+                    and (issubclass(item, base_test_classes.RestArgDomain)
+                         or issubclass(item, base_test_classes.RestMethod)
+                         or issubclass(item, base_test_classes.PublicationByDefinitionBase)):
+                dimensions_values.append(list(item))
+            else:
+                dimensions_values.append([item])
+        for parametrization in itertools.product(*dimensions_values):
+            parametrization = frozenset(parametrization)
+            assert parametrization not in result
+            result.add(parametrization)
+    return result
