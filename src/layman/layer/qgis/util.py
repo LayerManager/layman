@@ -160,23 +160,30 @@ def get_layer_wms_crs_list_values(workspace, layer):
     return crs_list
 
 
-def get_qml_geometry_from_qml(qml):
-    symbol_to_geometry_type = {
-        'marker': 'Point',
-        'line': 'Line',
-        'fill': 'Polygon',
-    }
+def _get_qml_geometry_by_xpath(qml, xpath, translate_dict):
     symbol_types = {
-        str(attr_value) for attr_value in qml.xpath('/qgis/renderer-v2/symbols/symbol/@type')
+        str(attr_value) for attr_value in qml.xpath(xpath)
     }
     if not symbol_types:
         raise LaymanError(47, data=f'Symbol type not found in QML.')
     if len(symbol_types) > 1:
         raise LaymanError(47, data=f'Mixed symbol types in QML: {symbol_types}')
     symbol_type = next(iter(symbol_types))
-    if symbol_type not in symbol_to_geometry_type:
+    if symbol_type not in translate_dict:
         raise LaymanError(47, data=f'Unknown QGIS symbol type "{symbol_type}".')
-    result = symbol_to_geometry_type[symbol_type]
+    result = translate_dict[symbol_type]
+    return result
+
+
+def get_qml_geometry_from_qml(qml):
+    result = _get_qml_geometry_by_xpath(qml,
+                                        '/qgis/renderer-v2/symbols/symbol/@type',
+                                        {
+                                            'marker': 'Point',
+                                            'line': 'Line',
+                                            'fill': 'Polygon',
+                                        }
+                                        )
     return result
 
 
