@@ -1,3 +1,4 @@
+from lxml import etree as ET
 import pytest
 
 from layman import app, LaymanError
@@ -82,3 +83,13 @@ def test_geometry_types(layer, exp_db_types, qml_geometry_dict):
             assert diff_pixels == 0, f"thumbnail_path={thumbnail_path}, exp_file_path={exp_file_path}"
 
     process_client.delete_workspace_layer(workspace, layer)
+
+
+@pytest.mark.parametrize('qml_path, exp_qml_type', [
+    ('sample/style/small_layer.qml', 'Polygon'),
+])
+def test_get_qml_geometry_from_qml(qml_path, exp_qml_type):
+    parser = ET.XMLParser(remove_blank_text=True)
+    qml_xml = ET.parse(qml_path, parser=parser)
+    result = util.get_qml_geometry_from_qml(qml_xml)
+    assert result == exp_qml_type
