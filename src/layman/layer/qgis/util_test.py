@@ -87,6 +87,8 @@ def test_geometry_types(layer, exp_db_types, qml_geometry_dict):
 
 @pytest.mark.parametrize('qml_path, exp_qml_type', [
     ('sample/style/small_layer.qml', 'Polygon'),
+    ('sample/style/labels_without_symbols/KATASTRALNI_UZEMI_P.qml', 'Polygon'),
+    ('sample/style/labels_without_symbols/KATASTRALNI_UZEMI_L.qml', 'Line'),
 ])
 def test_get_qml_geometry_from_qml(qml_path, exp_qml_type):
     parser = ET.XMLParser(remove_blank_text=True)
