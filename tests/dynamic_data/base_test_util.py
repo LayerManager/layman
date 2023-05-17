@@ -143,3 +143,13 @@ def case_to_simple_parametrizations(case):
             assert parametrization not in result
             result.add(parametrization)
     return result
+
+
+def dict_keys_to_simple_parametrizations(source_dict):
+    result = {}
+    for key_case, value in source_dict.items():
+        key_set = case_to_simple_parametrizations(key_case)
+        for simple_key in key_set:
+            assert simple_key not in result
+            result[simple_key] = value
+    return result
