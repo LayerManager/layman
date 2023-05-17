@@ -91,20 +91,8 @@ class TestSingleRestPublication:
 
         test_cases = []
         for input_test_case in cls.test_cases:
-            specific_types = {}
-            for source_filter, test_type in input_test_case.specific_types.items():
-                filter_set = util.case_to_simple_parametrizations(source_filter)
-                for filter in filter_set:
-                    assert filter not in specific_types
-                    specific_types[filter] = test_type
-
-            specific_params_def = input_test_case.specific_params
-            specific_params = {}
-            for parametrization_key, parametrization_value in specific_params_def.items():
-                cases = util.case_to_simple_parametrizations(parametrization_key)
-                for case in cases:
-                    assert case not in specific_params
-                    specific_params[case] = parametrization_value
+            specific_types = util.dict_keys_to_simple_parametrizations(input_test_case.specific_types)
+            specific_params = util.dict_keys_to_simple_parametrizations(input_test_case.specific_params)
 
             assert input_test_case.pytest_id is None  # Maybe enable it later
 

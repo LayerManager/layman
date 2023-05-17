@@ -275,7 +275,7 @@ def test_parametrization_class_props(parametrization, exp_props):
 
 
 @pytest.mark.parametrize('input, exp_result', [
-    pytest.param(None, set(), id='None'),
+    pytest.param(None, set(), id='none'),
     pytest.param(
         frozenset([RestMethod, WithChunksDomain, CompressDomain]),
         {
@@ -311,3 +311,50 @@ def test_parametrization_class_props(parametrization, exp_props):
 def test_case_to_simple_parametrizations(input, exp_result):
     result = case_to_simple_parametrizations(input)
     assert result == exp_result
+
+
+@pytest.mark.parametrize('input, exp_result', [
+    pytest.param({}, {}, id='empty_directory'),
+    pytest.param(
+        {frozenset([RestMethod, WithChunksDomain, CompressDomain]): 1},
+        {
+            frozenset([RestMethod.POST, WithChunksDomain.FALSE, CompressDomain.FALSE]): 1,
+            frozenset([RestMethod.POST, WithChunksDomain.TRUE, CompressDomain.FALSE]): 1,
+            frozenset([RestMethod.POST, WithChunksDomain.FALSE, CompressDomain.TRUE]): 1,
+            frozenset([RestMethod.POST, WithChunksDomain.TRUE, CompressDomain.TRUE]): 1,
+            frozenset([RestMethod.PATCH, WithChunksDomain.FALSE, CompressDomain.FALSE]): 1,
+            frozenset([RestMethod.PATCH, WithChunksDomain.TRUE, CompressDomain.FALSE]): 1,
+            frozenset([RestMethod.PATCH, WithChunksDomain.FALSE, CompressDomain.TRUE]): 1,
+            frozenset([RestMethod.PATCH, WithChunksDomain.TRUE, CompressDomain.TRUE]): 1,
+        },
+        id='three_domains'),
+    pytest.param(
+        {frozenset([RestMethod, CompressDomain.FALSE]): True},
+        {
+            frozenset([RestMethod.POST, CompressDomain.FALSE]): True,
+            frozenset([RestMethod.PATCH, CompressDomain.FALSE]): True,
+        },
+        id='one_value_one_domain'),
+])
+def test_dict_keys_to_simple_parametrizations(input, exp_result):
+    result = util.dict_keys_to_simple_parametrizations(input)
+    assert result == exp_result
+
+
+@pytest.mark.parametrize('input', [
+    pytest.param(
+        {
+            frozenset([CompressDomain.FALSE]): True,
+            frozenset([CompressDomain]): True,
+        },
+        id='domain_and_value'),
+    pytest.param(
+        {
+            frozenset([RestMethod, CompressDomain.FALSE]): True,
+            frozenset([RestMethod.POST, CompressDomain]): True,
+        },
+        id='two_domains'),
+])
+def test_dict_keys_to_simple_parametrizations_raises(input):
+    with pytest.raises(AssertionError):
+        util.dict_keys_to_simple_parametrizations(input)
