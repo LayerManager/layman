@@ -165,7 +165,7 @@ def _get_qml_geometry_by_xpath(qml, xpath, translate_dict):
         str(attr_value) for attr_value in qml.xpath(xpath)
     }
     if not symbol_types:
-        raise LaymanError(47, data=f'Symbol type not found in QML.')
+        return None
     if len(symbol_types) > 1:
         raise LaymanError(47, data=f'Mixed symbol types in QML: {symbol_types}')
     symbol_type = next(iter(symbol_types))
@@ -176,14 +176,37 @@ def _get_qml_geometry_by_xpath(qml, xpath, translate_dict):
 
 
 def get_qml_geometry_from_qml(qml):
-    result = _get_qml_geometry_by_xpath(qml,
-                                        '/qgis/renderer-v2/symbols/symbol/@type',
-                                        {
-                                            'marker': 'Point',
-                                            'line': 'Line',
-                                            'fill': 'Polygon',
-                                        }
-                                        )
+    label_dict = {
+                    'LineGeometry': 'Line',
+                    'PolygonGeometry': 'Polygon',
+                }
+
+    for xpath, translate_dict in [
+        (
+                '/qgis/renderer-v2/symbols/symbol/@type',
+                {
+                    'marker': 'Point',
+                    'line': 'Line',
+                    'fill': 'Polygon',
+                }
+        ),
+        (
+                '/qgis/labeling/rules/rule/settings/placement/@layerType',
+                label_dict
+        ),
+        (
+                '/qgis/labeling/settings/placement/@layerType',
+                label_dict
+        ),
+    ]:
+        result = _get_qml_geometry_by_xpath(qml,
+                                            xpath,
+                                            translate_dict,
+                                            )
+        if result:
+            break
+    if not result:
+        raise LaymanError(47, data=f'Symbol type not found in QML.')
     return result
 
 
