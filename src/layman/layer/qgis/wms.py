@@ -71,9 +71,9 @@ def save_qgs_file(workspace, layer):
     db_schema = table_uri.schema
     layer_bbox = layer_bbox if not bbox_util.is_empty(layer_bbox) else crs_def.CRSDefinitions[crs].default_bbox
     qml = util.get_original_style_xml(workspace, layer)
-    qml_geometry = util.get_qml_geometry_from_qml(qml)
     conn_cur = db_util.get_connection_cursor(db_uri_str=table_uri.db_uri_str)
     db_types = db.get_geometry_types(db_schema, table_name, column_name=table_uri.geo_column, conn_cur=conn_cur)
+    qml_geometry = util.get_qml_geometry_from_qml(qml, db_types)
     db_cols = [
         col for col in db.get_all_column_infos(db_schema, table_name, conn_cur=conn_cur, omit_geometry_columns=True)
         if col.name != table_uri.primary_key_column
@@ -81,7 +81,7 @@ def save_qgs_file(workspace, layer):
     source_type = util.get_source_type(db_types, qml_geometry)
     column_srid = db.get_column_srid(db_schema, table_name, table_uri.geo_column, conn_cur=conn_cur)
     layer_qml = util.fill_layer_template(layer, uuid, layer_bbox, crs, qml, source_type, db_cols, table_uri,
-                                         column_srid)
+                                         column_srid, db_types)
     qgs_str = util.fill_project_template(layer, uuid, layer_qml, crs, settings.LAYMAN_OUTPUT_SRS_LIST,
                                          layer_bbox, source_type, table_uri, column_srid)
     with open(get_layer_file_path(workspace, layer), "w", encoding="utf-8") as qgs_file:

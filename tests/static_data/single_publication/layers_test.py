@@ -221,13 +221,13 @@ def test_fill_project_template(workspace, publ_type, publication):
             col for col in layer_db.get_all_column_infos(workspace, table_name)
             if col.name not in ['wkb_geometry', 'ogc_fid']
         ]
-    qml_geometry = qgis_util.get_qml_geometry_from_qml(qml_xml)
+    qml_geometry = qgis_util.get_qml_geometry_from_qml(qml_xml, db_types)
     source_type = qgis_util.get_source_type(db_types, qml_geometry)
     with app.app_context():
         column_srid = layer_db.get_column_srid(table_uri.schema, table_uri.table, table_uri.geo_column)
     with app.app_context():
         layer_qml_str = qgis_util.fill_layer_template(publication, layer_uuid, layer_bbox, layer_crs, qml_xml,
-                                                      source_type, db_cols, table_uri, column_srid)
+                                                      source_type, db_cols, table_uri, column_srid, db_types)
     layer_qml = ET.fromstring(layer_qml_str.encode('utf-8'), parser=parser)
     if exp_min_scale is not None:
         assert layer_qml.attrib['minScale'] == exp_min_scale

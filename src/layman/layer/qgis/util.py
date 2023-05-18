@@ -57,13 +57,13 @@ def get_layer_original_style_stream(workspace, layer):
     return result
 
 
-def fill_layer_template(layer, uuid, native_bbox, crs, qml_xml, source_type, attrs_to_ensure, table_uri, column_srid):
+def fill_layer_template(layer, uuid, native_bbox, crs, qml_xml, source_type, attrs_to_ensure, table_uri, column_srid, db_types):
     db_schema = table_uri.schema
     table_name = table_uri.table
     geo_column = table_uri.geo_column
     layer_name = layer
     wkb_type = source_type
-    qml_geometry = get_qml_geometry_from_qml(qml_xml)
+    qml_geometry = get_qml_geometry_from_qml(qml_xml, db_types)
 
     template_path = get_layer_template_path()
     with open(template_path, 'r', encoding="utf-8") as template_file:
@@ -175,28 +175,29 @@ def _get_qml_geometry_by_xpath(qml, xpath, translate_dict):
     return result
 
 
-def get_qml_geometry_from_qml(qml):
+def _get_qml_geometry_from_qml(qml):
     label_dict = {
-                    'LineGeometry': 'Line',
-                    'PolygonGeometry': 'Polygon',
-                }
+        'LineGeometry': 'Line',
+        'PolygonGeometry': 'Polygon',
+        'UnknownGeometry': 'Unknown',
+    }
 
     for xpath, translate_dict in [
         (
-                '/qgis/renderer-v2/symbols/symbol/@type',
-                {
-                    'marker': 'Point',
-                    'line': 'Line',
-                    'fill': 'Polygon',
-                }
+            '/qgis/renderer-v2/symbols/symbol/@type',
+            {
+                'marker': 'Point',
+                'line': 'Line',
+                'fill': 'Polygon',
+            }
         ),
         (
-                '/qgis/labeling/rules/rule/settings/placement/@layerType',
-                label_dict
+            '/qgis/labeling/rules/rule/settings/placement/@layerType',
+            label_dict
         ),
         (
-                '/qgis/labeling/settings/placement/@layerType',
-                label_dict
+            '/qgis/labeling/settings/placement/@layerType',
+            label_dict
         ),
     ]:
         result = _get_qml_geometry_by_xpath(qml,
@@ -208,6 +209,15 @@ def get_qml_geometry_from_qml(qml):
     if not result:
         raise LaymanError(47, data=f'Symbol type not found in QML.')
     return result
+
+
+def get_qml_geometry_from_qml(qml, db_types):
+    qml_geometry = _get_qml_geometry_from_qml(qml)
+    if qml_geometry == 'Unknown' and ("ST_Point" in db_types or "ST_MultiPoint" in db_types or len(db_types) == 0):
+        qml_geometry = "Point"
+    if qml_geometry not in {"Point", "Line", "Polygon"}:
+        raise LaymanError(47, data=f'Unknown QGIS geometry type "{qml_geometry}". Geometries in DB: {db_types}.')
+    return qml_geometry
 
 
 def get_source_type(db_types, qml_geometry):
