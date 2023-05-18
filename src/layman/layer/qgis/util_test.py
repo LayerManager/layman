@@ -74,7 +74,7 @@ def test_geometry_types(layer, exp_db_types, qml_geometry_dict):
                 old_qml_style_name = new_qml_style_name
             with app.app_context():
                 qml = util.get_original_style_xml(workspace, layer)
-            found_qml_geometry = util.get_qml_geometry_from_qml(qml)
+            found_qml_geometry = util.get_qml_geometry_from_qml(qml, db_types=[])
             assert found_qml_geometry == qml_geometry
             exp_file_path = f'/code/sample/data/geometry-types/{new_qml_style_name}.png'
             with app.app_context():
@@ -89,9 +89,47 @@ def test_geometry_types(layer, exp_db_types, qml_geometry_dict):
     ('sample/style/small_layer.qml', 'Polygon'),
     ('sample/style/labels_without_symbols/KATASTRALNI_UZEMI_P.qml', 'Polygon'),
     ('sample/style/labels_without_symbols/KATASTRALNI_UZEMI_L.qml', 'Line'),
+    ('sample/style/labels_without_symbols/BODOVE_POLE_T.qml', 'Unknown'),
+    ('sample/style/labels_without_symbols/DALSI_PRVKY_MAPY_T.qml', 'Unknown'),
+    ('sample/style/labels_without_symbols/KATASTRALNI_UZEMI_DEF.qml', 'Unknown'),
+    ('sample/style/labels_without_symbols/PRVKY_ORIENT_MAPY_T.qml', 'Unknown'),
 ])
-def test_get_qml_geometry_from_qml(qml_path, exp_qml_type):
+def test__get_qml_geometry_from_qml(qml_path, exp_qml_type):
     parser = ET.XMLParser(remove_blank_text=True)
     qml_xml = ET.parse(qml_path, parser=parser)
-    result = util.get_qml_geometry_from_qml(qml_xml)
+    # pylint: disable=protected-access
+    result = util._get_qml_geometry_from_qml(qml_xml)
     assert result == exp_qml_type
+
+
+@pytest.mark.parametrize('qml_path, db_types, exp_qml_type', [
+    ('sample/style/small_layer.qml', [], 'Polygon'),
+    ('sample/style/labels_without_symbols/KATASTRALNI_UZEMI_P.qml', [], 'Polygon'),
+    ('sample/style/labels_without_symbols/KATASTRALNI_UZEMI_L.qml', [], 'Line'),
+    ('sample/style/labels_without_symbols/BODOVE_POLE_T.qml', ["ST_Point"], 'Point'),
+    ('sample/style/labels_without_symbols/BODOVE_POLE_T.qml', [], 'Point'),
+])
+def test_get_qml_geometry_from_qml(qml_path, db_types, exp_qml_type):
+    parser = ET.XMLParser(remove_blank_text=True)
+    qml_xml = ET.parse(qml_path, parser=parser)
+    result = util.get_qml_geometry_from_qml(qml_xml, db_types)
+    assert result == exp_qml_type
+
+
+@pytest.mark.parametrize('qml_path, db_types, exp_message', [
+    pytest.param(
+        'sample/style/labels_without_symbols/BODOVE_POLE_T.qml',
+        ["ST_Polygon"],
+        'Unknown QGIS geometry type "Unknown". Geometries in DB: [\'ST_Polygon\'].',
+        id='point_qml_with_polygon',
+    ),
+])
+def test_get_qml_geometry_from_qml_raises(qml_path, db_types, exp_message):
+    parser = ET.XMLParser(remove_blank_text=True)
+    qml_xml = ET.parse(qml_path, parser=parser)
+    with pytest.raises(LaymanError) as exc_info:
+        util.get_qml_geometry_from_qml(qml_xml, db_types)
+    assert exc_info.value.http_code == 400
+    assert exc_info.value.code == 47
+    assert exc_info.value.message == 'Error in QML'
+    assert exc_info.value.data == exp_message

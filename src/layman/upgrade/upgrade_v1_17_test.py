@@ -173,8 +173,8 @@ def publish_layer(workspace, layer, *, file_path, style_type, style_file, ):
         elif style_type == 'qml':
             qgis.ensure_layer_dir(workspace, layer)
             qml = qgis_util.get_original_style_xml(workspace, layer)
-            qml_geometry = qgis_util.get_qml_geometry_from_qml(qml)
             db_types = db.get_geometry_types(workspace, table_name)
+            qml_geometry = qgis_util.get_qml_geometry_from_qml(qml, db_types)
             db_cols = [
                 col for col in db.get_all_column_infos(workspace, table_name)
                 if col.name not in [settings.OGR_DEFAULT_GEOMETRY_COLUMN, settings.OGR_DEFAULT_PRIMARY_KEY]
@@ -185,7 +185,7 @@ def publish_layer(workspace, layer, *, file_path, style_type, style_file, ):
                                  primary_key_column=settings.OGR_DEFAULT_PRIMARY_KEY)
             column_srid = db.get_column_srid(table_uri.schema, table_uri.table, table_uri.geo_column)
             layer_qml = qgis_util.fill_layer_template(layer, uuid_str, bbox, crs, qml, source_type, db_cols, table_uri,
-                                                      column_srid)
+                                                      column_srid, db_types)
             qgs_str = qgis_util.fill_project_template(layer, uuid_str, layer_qml, crs, settings.LAYMAN_OUTPUT_SRS_LIST,
                                                       bbox, source_type, table_uri, column_srid)
             with open(qgis_wms.get_layer_file_path(workspace, layer), "w", encoding="utf-8") as qgs_file:
