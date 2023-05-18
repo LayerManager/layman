@@ -180,6 +180,6 @@ def test_public_metadata(provide_map):
     uuid = provide_map['uuid']
     muuid = get_metadata_uuid(uuid)
     micka_url = urljoin(settings.CSW_URL, "./")
-    response = requests.get(micka_url)
+    response = requests.get(micka_url, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
     response.raise_for_status()
     assert muuid in response.text, f"Metadata record {muuid} is not public!"

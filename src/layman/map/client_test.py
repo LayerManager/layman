@@ -54,7 +54,7 @@ def test_post_no_file(browser):
     workspace = 'testuser2'
     client_url = settings.LAYMAN_CLIENT_URL
 
-    response = requests.get(client_url)
+    response = requests.get(client_url, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
     assert response.status_code == 200
 
     browser.get(client_url)

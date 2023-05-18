@@ -62,7 +62,7 @@ def test_mock():
     url1 = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{PORT1}/rest/test-oauth2/user-profile"
     response = requests.get(url1, headers={
         f'{TOKEN_HEADER}': 'Bearer abc'
-    })
+    }, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
     assert response.status_code == 200
     resp_json = response.json()
     assert resp_json['FLASK_DEBUG'] == '1'
@@ -70,7 +70,7 @@ def test_mock():
     url2 = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{PORT2}/rest/test-oauth2/user-profile"
     response = requests.get(url2, headers={
         f'{TOKEN_HEADER}': 'Bearer abc'
-    })
+    }, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
     assert response.status_code == 200
     resp_json = response.json()
     assert resp_json['FLASK_DEBUG'] == ''

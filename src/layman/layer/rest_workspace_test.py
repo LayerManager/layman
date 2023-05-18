@@ -276,7 +276,8 @@ def test_post_layers_simple(client):
         assert 'id' not in layer_info.keys()
         assert 'type' not in layer_info.keys()
 
-        response = requests.get(md_record_url, auth=settings.CSW_BASIC_AUTHN)
+        response = requests.get(md_record_url, auth=settings.CSW_BASIC_AUTHN,
+                                timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
         response.raise_for_status()
         assert layername in response.text
 
@@ -496,7 +497,8 @@ def test_post_layers_complex(client):
 
         style_url = geoserver_sld.get_workspace_style_url(workspace, layername)
         response = requests.get(style_url + '.sld',
-                                auth=settings.LAYMAN_GS_AUTH
+                                auth=settings.LAYMAN_GS_AUTH,
+                                timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
                                 )
         response.raise_for_status()
         sld_file = io.BytesIO(response.content)
@@ -1010,14 +1012,16 @@ def test_layer_with_different_geometry():
     response = requests.post(url_path_ows,
                              data=data_xml,
                              headers=headers_wfs,
-                             auth=settings.LAYMAN_GS_AUTH
+                             auth=settings.LAYMAN_GS_AUTH,
+                             timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
                              )
     response.raise_for_status()
 
     response = requests.post(url_path_wfs,
                              data=data_xml,
                              headers=headers_wfs,
-                             auth=settings.LAYMAN_GS_AUTH
+                             auth=settings.LAYMAN_GS_AUTH,
+                             timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
                              )
     assert response.status_code == 200, f"HTTP Error {response.status_code}\n{response.text}"
 
@@ -1026,14 +1030,16 @@ def test_layer_with_different_geometry():
     response = requests.post(url_path_ows,
                              data=data_xml2,
                              headers=headers_wfs,
-                             auth=settings.LAYMAN_GS_AUTH
+                             auth=settings.LAYMAN_GS_AUTH,
+                             timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
                              )
     assert response.status_code == 200, f"HTTP Error {response.status_code}\n{response.text}"
 
     response = requests.post(url_path_wfs,
                              data=data_xml2,
                              headers=headers_wfs,
-                             auth=settings.LAYMAN_GS_AUTH
+                             auth=settings.LAYMAN_GS_AUTH,
+                             timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
                              )
     assert response.status_code == 200, f"HTTP Error {response.status_code}\n{response.text}"
     process_client.delete_workspace_layer(workspace, layername)

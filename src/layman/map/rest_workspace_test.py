@@ -268,7 +268,7 @@ def test_post_maps_simple(client):
     assert map_info['metadata']['csw_url'] == settings.CSW_PROXY_URL
     md_record_url = f"http://micka:80/record/basic/m-{uuid_str}"
     assert map_info['metadata']['record_url'].replace("http://localhost:3080", "http://micka:80") == md_record_url
-    response = requests.get(md_record_url, auth=settings.CSW_BASIC_AUTHN)
+    response = requests.get(md_record_url, auth=settings.CSW_BASIC_AUTHN, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
     response.raise_for_status()
     assert mapname in response.text
 
@@ -567,7 +567,8 @@ def test_delete_map(client):
         resp_json = response.get_json()
         uuid_str = resp_json['uuid']
         md_record_url = f"http://micka:80/record/basic/m-{uuid_str}"
-        response = requests.get(md_record_url, auth=settings.CSW_BASIC_AUTHN)
+        response = requests.get(md_record_url, auth=settings.CSW_BASIC_AUTHN,
+                                timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
         response.raise_for_status()
         assert 'Záznam nenalezen' in response.text
         assert mapname not in response.text

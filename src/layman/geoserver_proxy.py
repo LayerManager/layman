@@ -275,7 +275,8 @@ def proxy(subpath):
                                 data=data,
                                 headers=headers_req,
                                 cookies=request.cookies,
-                                allow_redirects=False
+                                allow_redirects=False,
+                                timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
                                 )
 
     if response.status_code == 200:

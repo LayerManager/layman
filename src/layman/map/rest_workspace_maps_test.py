@@ -3,7 +3,7 @@ import requests
 import pytest
 
 del sys.modules['layman']
-from layman import app
+from layman import app, settings
 from test_tools import process_client
 from test_tools.util import url_for
 
@@ -23,7 +23,7 @@ def test_get_map_title():
     with app.app_context():
         url_get = url_for('rest_workspace_maps.get', workspace=workspace)
     # maps.GET
-    response = requests.get(url_get)
+    response = requests.get(url_get, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
     assert response.status_code == 200, response.json()
 
     for i in range(0, len(sorted_maps) - 1):

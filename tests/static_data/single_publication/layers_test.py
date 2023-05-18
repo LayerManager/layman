@@ -80,7 +80,7 @@ def test_get_layer_style(workspace, publ_type, publication):
 
     with app.app_context():
         rest_url = url_for('rest_workspace_layer_style.get', workspace=workspace, layername=publication)
-    response = requests.get(rest_url, headers=headers)
+    response = requests.get(rest_url, headers=headers, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
     assert response.status_code == 200, response.text
 
     # lxml does not support importing from utf8 string
@@ -95,7 +95,7 @@ def test_get_layer_style(workspace, publ_type, publication):
         assert len(xml_tree.xpath('/qgis/renderer-v2')) == 1, response.text
         assert xml_tree.attrib, response.text
 
-    r_del = requests.delete(rest_url)
+    r_del = requests.delete(rest_url, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
     assert r_del.status_code >= 400, (r_del.text, rest_url)
 
 

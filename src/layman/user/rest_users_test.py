@@ -28,6 +28,6 @@ def test_get_users():
         url = url_for('rest_users.get')
         assert url.endswith('/' + settings.REST_USERS_PREFIX)
 
-    response = requests.get(url)
+    response = requests.get(url, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
     assert response.status_code == 200, response.json()
     assert username in [info["username"] for info in response.json()]

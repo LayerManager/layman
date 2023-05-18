@@ -1,7 +1,7 @@
 import requests
 
 import crs as crs_def
-from layman import app
+from layman import app, settings
 from layman.layer.geoserver.util import wfs_direct, wms_direct
 from layman.layer.geoserver import wfs
 from .util import url_for
@@ -49,7 +49,7 @@ def get_features(workspace, feature_type, crs=crs_def.EPSG_3857):
         'typeNames': f"{workspace}:{feature_type}",
         'outputFormat': f"application/json",
         'srsName': crs_urn,
-    })
+    }, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
     response.raise_for_status()
     result = response.json()
     excpected_crs_urn = crs_urn if crs != crs_def.CRS_84 else get_crs_urn(crs_def.EPSG_4326)

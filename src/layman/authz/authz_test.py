@@ -152,16 +152,16 @@ class TestRestApiClass:
             'read': username,
             'write': username,
         })
-        response = requests.get(rest_url, headers=authz_headers)
+        response = requests.get(rest_url, headers=authz_headers, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
         self.assert_response(response, authz_status_code, authz_response)
-        response = requests.get(rest_url)
+        response = requests.get(rest_url, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
         self.assert_response(response, unauthz_status_code, unauthz_response)
 
         patch_method(username, publ_name, headers=authz_headers, access_rights={
             'read': settings.RIGHTS_EVERYONE_ROLE,
             'write': settings.RIGHTS_EVERYONE_ROLE,
         })
-        response = requests.get(rest_url, headers=authz_headers)
+        response = requests.get(rest_url, headers=authz_headers, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
         self.assert_response(response, authz_status_code, authz_response)
-        response = requests.get(rest_url)
+        response = requests.get(rest_url, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
         self.assert_response(response, authz_status_code, authz_response)

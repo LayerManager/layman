@@ -52,7 +52,7 @@ def test_post_layers_chunk(browser):
 
     client_url = settings.LAYMAN_CLIENT_URL
 
-    response = requests.get(client_url)
+    response = requests.get(client_url, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
     assert response.status_code == 200
 
     browser.get(client_url)
@@ -132,7 +132,7 @@ def test_patch_layer_chunk(browser):
 
     client_url = settings.LAYMAN_CLIENT_URL
 
-    response = requests.get(client_url)
+    response = requests.get(client_url, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
     assert response.status_code == 200
 
     browser.get(client_url)

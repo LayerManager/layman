@@ -7,7 +7,7 @@ import requests
 from requests.exceptions import ConnectionError
 from PIL import Image, ImageChops
 
-from layman import app, celery
+from layman import app, celery, settings
 from layman.util import url_for as layman_url_for
 
 
@@ -27,7 +27,7 @@ def wait_for_url(url, max_attempts, sleeping_time):
         # print(f"Waiting for URL {url}, attempt {attempt}")
         try:
             # Just checking the url, no need to store result
-            requests.get(url)
+            requests.get(url, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
             break
         except ConnectionError as exception:
             if attempt == max_attempts:

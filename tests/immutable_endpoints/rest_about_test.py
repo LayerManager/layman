@@ -1,7 +1,7 @@
 import requests
 import pytest
 
-from layman import app
+from layman import app, settings
 from test_tools import process_client
 from test_tools.util import url_for
 
@@ -10,7 +10,7 @@ from test_tools.util import url_for
 def test_version():
     with app.app_context():
         r_url = url_for('rest_about.get_version')
-    response = requests.get(r_url)
+    response = requests.get(r_url, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
     process_client.raise_layman_error(response)
     result = response.json()
     assert 'about' in result.keys()
