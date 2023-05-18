@@ -170,13 +170,16 @@ def import_layer_vector_file_to_internal_table_async_with_iconv(schema, table_na
                                              crs_id=crs_id,
                                              output='/vsistdin/')
 
+    # pylint: disable=consider-using-with
     first_ogr2ogr_process = subprocess.Popen(first_ogr2ogr_args,
                                              stdout=subprocess.PIPE)
     with first_ogr2ogr_process.stdout:
+        # pylint: disable=consider-using-with
         iconv_process = subprocess.Popen(iconv_args,
                                          stdin=first_ogr2ogr_process.stdout,
                                          stdout=subprocess.PIPE)
         with iconv_process.stdout:
+            # pylint: disable=consider-using-with
             final_ogr2ogr_process = subprocess.Popen(final_ogr2ogr_args,
                                                      stdin=iconv_process.stdout,
                                                      stdout=subprocess.PIPE)
@@ -194,6 +197,7 @@ def import_layer_vector_file_to_internal_table_async(schema, table_name, main_fi
                                     output=main_filepath)
 
     # print(' '.join(bash_args))
+    # pylint: disable=consider-using-with
     process = subprocess.Popen(bash_args, stdout=subprocess.PIPE,
                                stderr=subprocess.STDOUT)
     return process
