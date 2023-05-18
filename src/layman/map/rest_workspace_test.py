@@ -1,3 +1,4 @@
+from contextlib import ExitStack
 from datetime import date
 import glob
 import json
@@ -139,21 +140,17 @@ def test_post_maps_invalid_file(client):
     ]
     for file_path in file_paths:
         assert os.path.isfile(file_path)
-    files = []
-    try:
-        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+    with ExitStack() as stack:
+        files = [(stack.enter_context(open(fp, 'rb')), os.path.basename(fp)) for fp in file_paths]
         response = client.post(rest_path, data={
             'file': files,
         })
-        assert response.status_code == 400
-        resp_json = response.get_json()
-        # print('resp_json', resp_json)
-        assert resp_json['code'] == 2
-        assert resp_json['detail']['parameter'] == 'file'
-        assert resp_json['detail']['reason'] == 'Invalid JSON syntax'
-    finally:
-        for file_path in files:
-            file_path[0].close()
+    assert response.status_code == 400
+    resp_json = response.get_json()
+    # print('resp_json', resp_json)
+    assert resp_json['code'] == 2
+    assert resp_json['detail']['parameter'] == 'file'
+    assert resp_json['detail']['reason'] == 'Invalid JSON syntax'
 
 
 @pytest.mark.usefixtures('app_context', 'ensure_layman')
@@ -165,22 +162,18 @@ def test_post_maps_invalid_json(client):
     ]
     for file_path in file_paths:
         assert os.path.isfile(file_path)
-    files = []
-    try:
-        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+    with ExitStack() as stack:
+        files = [(stack.enter_context(open(fp, 'rb')), os.path.basename(fp)) for fp in file_paths]
         response = client.post(rest_path, data={
             'file': files,
         })
-        assert response.status_code == 400
-        resp_json = response.get_json()
-        # print('resp_json', resp_json)
-        assert resp_json['code'] == 2
-        assert resp_json['detail']['parameter'] == 'file'
-        assert resp_json['detail']['reason'] == 'JSON not valid against schema https://raw.githubusercontent.com/hslayers/map-compositions/2.0.0/schema.json'
-        assert len(resp_json['detail']['validation-errors']) == 2
-    finally:
-        for file_path in files:
-            file_path[0].close()
+    assert response.status_code == 400
+    resp_json = response.get_json()
+    # print('resp_json', resp_json)
+    assert resp_json['code'] == 2
+    assert resp_json['detail']['parameter'] == 'file'
+    assert resp_json['detail']['reason'] == 'JSON not valid against schema https://raw.githubusercontent.com/hslayers/map-compositions/2.0.0/schema.json'
+    assert len(resp_json['detail']['validation-errors']) == 2
 
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{MAP_TYPE}': publication_counter.get()
@@ -199,22 +192,18 @@ def test_post_maps_simple(client):
         ]
         for file_path in file_paths:
             assert os.path.isfile(file_path)
-        files = []
-        try:
-            files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+        with ExitStack() as stack:
+            files = [(stack.enter_context(open(fp, 'rb')), os.path.basename(fp)) for fp in file_paths]
             response = client.post(rest_path, data={
                 'file': files,
             })
-            assert response.status_code == 200
-            resp_json = response.get_json()
-            # print('resp_json', resp_json)
-            assert len(resp_json) == 1
-            assert resp_json[0]['name'] == expected_mapname
-            mapname = resp_json[0]['name']
-            uuid_str = resp_json[0]['uuid']
-        finally:
-            for file_path in files:
-                file_path[0].close()
+        assert response.status_code == 200
+        resp_json = response.get_json()
+        # print('resp_json', resp_json)
+        assert len(resp_json) == 1
+        assert resp_json[0]['name'] == expected_mapname
+        mapname = resp_json[0]['name']
+        uuid_str = resp_json[0]['uuid']
 
         assert uuid.is_valid_uuid(uuid_str)
 
@@ -325,24 +314,20 @@ def test_post_maps_complex(client):
         ]
         for file_path in file_paths:
             assert os.path.isfile(file_path)
-        files = []
-        try:
-            files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+        with ExitStack() as stack:
+            files = [(stack.enter_context(open(fp, 'rb')), os.path.basename(fp)) for fp in file_paths]
             response = client.post(rest_path, data={
                 'file': files,
                 'name': mapname,
                 'title': title,
                 'description': description,
             })
-            assert response.status_code == 200
-            resp_json = response.get_json()
-            # print('resp_json', resp_json)
-            assert len(resp_json) == 1
-            assert resp_json[0]['name'] == mapname
-            uuid_str = resp_json[0]['uuid']
-        finally:
-            for file_path in files:
-                file_path[0].close()
+        assert response.status_code == 200
+        resp_json = response.get_json()
+        # print('resp_json', resp_json)
+        assert len(resp_json) == 1
+        assert resp_json[0]['name'] == mapname
+        uuid_str = resp_json[0]['uuid']
 
         publication_counter.increase()
         uuid.check_redis_consistency(expected_publ_num_by_type={
@@ -456,18 +441,14 @@ def test_patch_map(client):
         ]
         for file in file_paths:
             assert os.path.isfile(file)
-        files = []
-        try:
-            files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+        with ExitStack() as stack:
+            files = [(stack.enter_context(open(fp, 'rb')), os.path.basename(fp)) for fp in file_paths]
             response = client.patch(rest_path, data={
                 'file': files,
             })
-            assert response.status_code == 200
-            resp_json = response.get_json()
-            # print('resp_json', resp_json)
-        finally:
-            for file in files:
-                file[0].close()
+        assert response.status_code == 200
+        resp_json = response.get_json()
+        # print('resp_json', resp_json)
 
         uuid.check_redis_consistency(expected_publ_num_by_type={
             f'{MAP_TYPE}': publication_counter.get()
@@ -625,18 +606,14 @@ def test_map_composed_from_local_layers(client):
         file_paths = [os.path.join(os.getcwd(), fp) for fp in relative_file_paths]
         for file in file_paths:
             assert os.path.isfile(file)
-        files = []
-        try:
-            files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+        with ExitStack() as stack:
+            files = [(stack.enter_context(open(fp, 'rb')), os.path.basename(fp)) for fp in file_paths]
             response = client.post(rest_path, data={
                 'file': files,
                 'name': layername1,
             })
-            assert response.status_code == 200
-            layer1uuid = response.get_json()[0]['uuid']
-        finally:
-            for file in files:
-                file[0].close()
+        assert response.status_code == 200
+        layer1uuid = response.get_json()[0]['uuid']
 
     # If no sleep, Micka throws 500
     # [2020-03-26 09-54-11] Dibi\UniqueConstraintViolationException: duplicate key value violates unique constraint "edit_md_pkey" DETAIL:  Key (recno)=(17) already exists. SCHEMA NAME:  public TABLE NAME:  edit_md CONSTRAINT NAME:  edit_md_pkey LOCATION:  _bt_check_unique, nbtinsert.c:434 #23505 in /var/www/html/Micka/php/vendor/dibi/dibi/src/Dibi/Drivers/PostgreDriver.php:150  @  http://localhost:3080/csw  @@  exception--2020-03-26--09-54--3f034f5a61.html
@@ -652,18 +629,14 @@ def test_map_composed_from_local_layers(client):
         assert len(file_paths) > 0
         for file in file_paths:
             assert os.path.isfile(file)
-        files = []
-        try:
-            files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+        with ExitStack() as stack:
+            files = [(stack.enter_context(open(fp, 'rb')), os.path.basename(fp)) for fp in file_paths]
             response = client.post(rest_path, data={
                 'file': files,
                 'name': layername2,
             })
-            assert response.status_code == 200
-            layer2uuid = response.get_json()[0]['uuid']
-        finally:
-            for file in files:
-                file[0].close()
+        assert response.status_code == 200
+        layer2uuid = response.get_json()[0]['uuid']
 
     with app.app_context():
         keys_to_check = ['db', 'wms', 'wfs', 'thumbnail', 'metadata']
@@ -703,21 +676,17 @@ def test_map_composed_from_local_layers(client):
         ]
         for file in file_paths:
             assert os.path.isfile(file)
-        files = []
-        try:
-            files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+        with ExitStack() as stack:
+            files = [(stack.enter_context(open(fp, 'rb')), os.path.basename(fp)) for fp in file_paths]
             response = client.post(rest_path, data={
                 'file': files,
                 'name': mapname,
             })
-            assert response.status_code == 200
-            resp_json = response.get_json()
-            # print('resp_json', resp_json)
-            assert len(resp_json) == 1
-            assert resp_json[0]['name'] == mapname
-        finally:
-            for file_path in files:
-                file_path[0].close()
+        assert response.status_code == 200
+        resp_json = response.get_json()
+        # print('resp_json', resp_json)
+        assert len(resp_json) == 1
+        assert resp_json[0]['name'] == mapname
 
     with app.app_context():
         map_info = client.get(url_for('rest_workspace_map.get', workspace=workspace, mapname=mapname)).get_json()

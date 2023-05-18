@@ -1,3 +1,4 @@
+from contextlib import ExitStack
 from multiprocessing import Process
 import os
 import time
@@ -67,17 +68,13 @@ def patch_layer(client):
         ]
         for file_path in file_paths:
             assert os.path.isfile(file_path)
-        files = []
-        try:
-            files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+        with ExitStack() as stack:
+            files = [(stack.enter_context(open(fp, 'rb')), os.path.basename(fp)) for fp in file_paths]
             response = client.patch(rest_path, data={
                 'file': files,
                 'title': 'patched layer',
             })
-            assert response.status_code == 200
-        finally:
-            for file_path in files:
-                file_path[0].close()
+        assert response.status_code == 200
 
     flask_client.wait_till_layer_ready(username, layername)
 

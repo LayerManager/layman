@@ -3,6 +3,7 @@ import time
 import os
 import logging
 import json
+from contextlib import ExitStack
 from functools import partial
 from collections import namedtuple
 import xml.etree.ElementTree as ET
@@ -130,26 +131,21 @@ def upload_file_chunks(publication_type,
                             )
 
     file_chunks = [('file', file_name) for file_name in file_paths]
-    file_dict = None
     for file_type, file_name in file_chunks:
-        try:
-            basename = os.path.basename(file_name)
-            file_dict = {file_type: (basename, open(file_name, 'rb')), }
-            data = {
-                'file': basename,
-                'resumableFilename': basename,
-                'layman_original_parameter': file_type,
-                'resumableChunkNumber': 1,
-                'resumableTotalChunks': 1
-            }
-
+        basename = os.path.basename(file_name)
+        data = {
+            'file': basename,
+            'resumableFilename': basename,
+            'layman_original_parameter': file_type,
+            'resumableChunkNumber': 1,
+            'resumableTotalChunks': 1
+        }
+        with open(file_name, 'rb') as file:
+            file_dict = {file_type: (basename, file), }
             chunk_response = requests.post(chunk_url,
                                            files=file_dict,
                                            data=data)
-            raise_layman_error(chunk_response)
-        finally:
-            if file_dict:
-                file_dict[file_type][1].close()
+        raise_layman_error(chunk_response)
 
 
 def patch_workspace_publication(publication_type,
@@ -219,12 +215,12 @@ def patch_workspace_publication(publication_type,
     for file_path in file_paths:
         assert os.path.isfile(file_path), file_path
     files = []
-    try:
+    with ExitStack() as stack:
         data = {}
         if not with_chunks:
             for file_path in file_paths:
                 assert os.path.isfile(file_path), file_path
-            files = [('file', (os.path.basename(fp), open(fp, 'rb'))) for fp in file_paths]
+            files = [('file', (os.path.basename(fp), stack.enter_context(open(fp, 'rb')))) for fp in file_paths]
         else:
             data['file'] = [os.path.basename(file) for file in file_paths]
         if access_rights and access_rights.get('read'):
@@ -234,7 +230,7 @@ def patch_workspace_publication(publication_type,
         if title:
             data['title'] = title
         if style_file:
-            files.append(('style', (os.path.basename(style_file), open(style_file, 'rb'))))
+            files.append(('style', (os.path.basename(style_file), stack.enter_context(open(style_file, 'rb')))))
         if overview_resampling:
             data['overview_resampling'] = overview_resampling
         if time_regex:
@@ -248,10 +244,7 @@ def patch_workspace_publication(publication_type,
                                   files=files,
                                   headers=headers,
                                   data=data)
-        raise_layman_error(response)
-    finally:
-        for file_path in files:
-            file_path[1][1].close()
+    raise_layman_error(response)
 
     if with_chunks and not do_not_upload_chunks:
         upload_file_chunks(publication_type,
@@ -365,7 +358,7 @@ def publish_workspace_publication(publication_type,
         file_paths = [file_path]
 
     files = []
-    try:
+    with ExitStack() as stack:
         data = {}
         if not do_not_post_name:
             data['name'] = name
@@ -374,11 +367,11 @@ def publish_workspace_publication(publication_type,
             if not with_chunks:
                 for file_path in file_paths:
                     assert os.path.isfile(file_path), file_path
-                files = [('file', (os.path.basename(fp), open(fp, 'rb'))) for fp in file_paths]
+                files = [('file', (os.path.basename(fp), stack.enter_context(open(fp, 'rb')))) for fp in file_paths]
             else:
                 data['file'] = [os.path.basename(file) for file in file_paths]
         if style_file:
-            files.append(('style', (os.path.basename(style_file), open(style_file, 'rb'))))
+            files.append(('style', (os.path.basename(style_file), stack.enter_context(open(style_file, 'rb')))))
         if access_rights and access_rights.get('read'):
             data["access_rights.read"] = access_rights['read']
         if access_rights and access_rights.get('write'):
@@ -397,13 +390,9 @@ def publish_workspace_publication(publication_type,
                                  files=files,
                                  data=data,
                                  headers=headers)
-        raise_layman_error(response)
-        assert response.json()[0]['name'] == name or not name, f'name={name}, response.name={response.json()[0]["name"]}'
-        name = name or response.json()[0]['name']
-
-    finally:
-        for file_path in files:
-            file_path[1][1].close()
+    raise_layman_error(response)
+    assert response.json()[0]['name'] == name or not name, f'name={name}, response.name={response.json()[0]["name"]}'
+    name = name or response.json()[0]['name']
 
     if with_chunks and not do_not_upload_chunks:
         upload_file_chunks(publication_type,

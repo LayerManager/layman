@@ -1,5 +1,6 @@
 import os
 import time
+from contextlib import ExitStack
 
 import pytest
 
@@ -22,19 +23,14 @@ def publish_layer(workspace,
 
         for file_path in file_paths:
             assert os.path.isfile(file_path)
-        files = []
-
-        try:
-            files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+        with ExitStack() as stack:
+            files = [(stack.enter_context(open(fp, 'rb')), os.path.basename(fp)) for fp in file_paths]
             response = client.post(rest_path, data={
                 'file': files,
                 'name': layername,
                 'title': title,
             })
-            assert response.status_code == 200, (response.status_code, response.get_json())
-        finally:
-            for file_path in files:
-                file_path[0].close()
+        assert response.status_code == 200, (response.status_code, response.get_json())
 
     wait_till_layer_ready(workspace, layername)
     return response.get_json()[0]
@@ -85,20 +81,15 @@ def publish_map(workspace,
 
         for file_path in file_paths:
             assert os.path.isfile(file_path)
-        files = []
-
-        try:
-            files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+        with ExitStack() as stack:
+            files = [(stack.enter_context(open(fp, 'rb')), os.path.basename(fp)) for fp in file_paths]
             response = client.post(rest_path,
                                    data={'file': files,
                                          'name': mapname,
                                          'title': maptitle,
                                          },
                                    headers=headers)
-            assert response.status_code == 200, (response.status_code, response.get_json())
-        finally:
-            for file_path in files:
-                file_path[0].close()
+        assert response.status_code == 200, (response.status_code, response.get_json())
 
     wait_till_map_ready(workspace, mapname)
 

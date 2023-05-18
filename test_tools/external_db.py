@@ -104,10 +104,9 @@ def import_table(input_file_path, *, table=None, schema='public', geo_column=set
         input_file_path,
     ])
 
-    process = subprocess.Popen(bash_args, stdout=subprocess.PIPE,
-                               stderr=subprocess.STDOUT)
-    stdout, stderr = process.communicate()
-    return_code = process.poll()
+    with subprocess.Popen(bash_args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT) as process:
+        stdout, stderr = process.communicate()
+        return_code = process.poll()
     assert return_code == 0 and not stdout and not stderr, f"return_code={return_code}, stdout={stdout}, stderr={stderr}"
 
     if primary_key_column is None:
