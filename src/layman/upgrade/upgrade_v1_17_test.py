@@ -174,7 +174,7 @@ def publish_layer(workspace, layer, *, file_path, style_type, style_file, ):
             qgis.ensure_layer_dir(workspace, layer)
             qml = qgis_util.get_original_style_xml(workspace, layer)
             db_types = db.get_geometry_types(workspace, table_name)
-            qml_geometry = qgis_util.get_qml_geometry_from_qml(qml, db_types)
+            qml_geometry = qgis_util.get_geometry_from_qml_and_db_types(qml, db_types)
             db_cols = [
                 col for col in db.get_all_column_infos(workspace, table_name)
                 if col.name not in [settings.OGR_DEFAULT_GEOMETRY_COLUMN, settings.OGR_DEFAULT_PRIMARY_KEY]

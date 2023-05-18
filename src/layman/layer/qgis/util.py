@@ -63,7 +63,7 @@ def fill_layer_template(layer, uuid, native_bbox, crs, qml_xml, source_type, att
     geo_column = table_uri.geo_column
     layer_name = layer
     wkb_type = source_type
-    qml_geometry = get_qml_geometry_from_qml(qml_xml, db_types)
+    qml_geometry = get_geometry_from_qml_and_db_types(qml_xml, db_types)
 
     template_path = get_layer_template_path()
     with open(template_path, 'r', encoding="utf-8") as template_file:
@@ -211,7 +211,7 @@ def _get_qml_geometry_from_qml(qml):
     return result
 
 
-def get_qml_geometry_from_qml(qml, db_types):
+def get_geometry_from_qml_and_db_types(qml, db_types):
     qml_geometry = _get_qml_geometry_from_qml(qml)
     if qml_geometry == 'Unknown' and ("ST_Point" in db_types or "ST_MultiPoint" in db_types or len(db_types) == 0):
         qml_geometry = "Point"
