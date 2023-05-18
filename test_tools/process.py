@@ -127,6 +127,7 @@ def start_layman(env_vars=None):
     layman_env.update(**env_vars)
     layman_env['LAYMAN_CELERY_QUEUE'] = LAYMAN_CELERY_QUEUE
     cmd = f'flask run --host=0.0.0.0 --port={port} --no-reload'
+    # pylint: disable=consider-using-with
     layman_process = subprocess.Popen(cmd.split(), shell=False, stdin=None, env=layman_env)
 
     SUBPROCESSES.add(layman_process)
@@ -136,6 +137,7 @@ def start_layman(env_vars=None):
     celery_env = layman_env.copy()
     celery_env['LAYMAN_SKIP_REDIS_LOADING'] = 'true'
     cmd = f'python3 -m celery -A layman.celery_app worker -Q {LAYMAN_CELERY_QUEUE} --loglevel=info --concurrency=4'
+    # pylint: disable=consider-using-with
     celery_process = subprocess.Popen(cmd.split(), shell=False, stdin=None, env=layman_env, cwd='src')
 
     SUBPROCESSES.add(celery_process)

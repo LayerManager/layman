@@ -333,6 +333,7 @@ def normalize_raster_file_async(input_path, crs_id, output_file):
         input_path,
         output_file,
     ])
+    # pylint: disable=consider-using-with
     process = subprocess.Popen(bash_args, stdout=subprocess.PIPE,
                                stderr=subprocess.STDOUT)
     return process
@@ -364,6 +365,7 @@ def compress_and_mask_raster_file_async(*, output_file, input_file_path, color_i
         input_file_path,
         result_path,
     ]
+    # pylint: disable=consider-using-with
     process = subprocess.Popen(bash_args, stdout=subprocess.PIPE,
                                stderr=subprocess.STDOUT)
     return process
@@ -391,6 +393,7 @@ def add_overview_async(*, filepath, overview_resampling,):
         normalized_path,
     ])
     # print(' '.join(bash_args))
+    # pylint: disable=consider-using-with
     process = subprocess.Popen(bash_args, stdout=subprocess.PIPE,
                                stderr=subprocess.STDOUT)
     return process
