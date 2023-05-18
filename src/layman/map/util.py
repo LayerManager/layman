@@ -191,9 +191,8 @@ def get_composition_schema(url):
         schema_json = json.loads(schema_txt)
 
         os.makedirs(local_path, exist_ok=True)
-        out_file = open(local_full_path, "w", encoding="utf-8")
-        json.dump(schema_json, out_file, indent=4)
-        out_file.close()
+        with open(local_full_path, "w", encoding="utf-8") as out_file:
+            json.dump(schema_json, out_file, indent=4)
     return schema_json
 
 

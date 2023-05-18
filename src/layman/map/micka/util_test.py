@@ -45,7 +45,8 @@ def test_fill_template():
         out.write(file_object.read())
 
     def get_diff(path1, path2):
-        diff = difflib.unified_diff(open(path1, encoding="utf-8").readlines(), open(path2, encoding="utf-8").readlines())
+        with open(path1, encoding="utf-8") as file1, open(path2, encoding="utf-8") as file2:
+            diff = difflib.unified_diff(file1.readlines(), file2.readlines())
         return f"diff={''.join(diff)}"
 
     expected_path = 'src/layman/map/micka/util_test_filled_template.xml'

@@ -1,3 +1,4 @@
+from contextlib import ExitStack
 from datetime import date
 import io
 import json
@@ -134,19 +135,15 @@ def test_layman_gs_user_conflict(client):
     ]
     for file_path in file_paths:
         assert os.path.isfile(file_path)
-    files = []
-    try:
-        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+    with ExitStack() as stack:
+        files = [(stack.enter_context(open(fp, 'rb')), os.path.basename(fp)) for fp in file_paths]
         response = client.post(rest_path, data={
             'file': files,
             'name': layername,
         })
-        resp_json = response.get_json()
-        assert response.status_code == 409
-        assert resp_json['code'] == 41
-    finally:
-        for file_path in files:
-            file_path[0].close()
+    resp_json = response.get_json()
+    assert response.status_code == 409
+    assert resp_json['code'] == 41
 
 
 @pytest.mark.usefixtures('ensure_layman')
@@ -220,16 +217,12 @@ def test_post_layers_simple(client):
         ]
         for file_path in file_paths:
             assert os.path.isfile(file_path)
-        files = []
-        try:
-            files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+        with ExitStack() as stack:
+            files = [(stack.enter_context(open(fp, 'rb')), os.path.basename(fp)) for fp in file_paths]
             response = client.post(rest_path, data={
                 'file': files,
             })
-            assert response.status_code == 200
-        finally:
-            for file_path in files:
-                file_path[0].close()
+        assert response.status_code == 200
 
         layername = 'ne_110m_admin_0_countries'
 
@@ -325,33 +318,26 @@ def test_post_layers_concurrent(client):
     ]
     for file_path in file_paths:
         assert os.path.isfile(file_path)
-    files = []
-    try:
-        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+    with ExitStack() as stack:
+        files = [(stack.enter_context(open(fp, 'rb')), os.path.basename(fp)) for fp in file_paths]
         response = client.post(rest_path, data={
             'file': files,
             'name': layername,
         })
-        assert response.status_code == 200
-    finally:
-        for file_path in files:
-            file_path[0].close()
+    assert response.status_code == 200
 
     chain_info = util.get_layer_chain(workspace, layername)
     assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
 
-    try:
-        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+    with ExitStack() as stack:
+        files = [(stack.enter_context(open(fp, 'rb')), os.path.basename(fp)) for fp in file_paths]
         response = client.post(rest_path, data={
             'file': files,
             'name': layername,
         })
-        assert response.status_code == 409
-        resp_json = response.get_json()
-        assert resp_json['code'] == 17
-    finally:
-        for file_path in files:
-            file_path[0].close()
+    assert response.status_code == 409
+    resp_json = response.get_json()
+    assert resp_json['code'] == 17
 
     publication_counter.increase()
     uuid.check_redis_consistency(expected_publ_num_by_type={
@@ -370,22 +356,18 @@ def test_post_layers_shp_missing_extensions(client):
     ]
     for file_path in file_paths:
         assert os.path.isfile(file_path)
-    files = []
-    try:
-        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+    with ExitStack() as stack:
+        files = [(stack.enter_context(open(fp, 'rb')), os.path.basename(fp)) for fp in file_paths]
         response = client.post(rest_path, data={
             'file': files,
             'name': 'ne_110m_admin_0_countries_shp',
         })
-        resp_json = response.get_json()
-        # print(resp_json)
-        assert response.status_code == 400
-        assert resp_json['code'] == 18
-        assert sorted(resp_json['detail']['missing_extensions']) == [
-            '.prj', '.shx']
-    finally:
-        for file_path in files:
-            file_path[0].close()
+    resp_json = response.get_json()
+    # print(resp_json)
+    assert response.status_code == 400
+    assert resp_json['code'] == 18
+    assert sorted(resp_json['detail']['missing_extensions']) == [
+        '.prj', '.shx']
 
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': publication_counter.get()
@@ -408,17 +390,13 @@ def test_post_layers_shp(client):
     ]
     for file_path in file_paths:
         assert os.path.isfile(file_path)
-    files = []
-    try:
-        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+    with ExitStack() as stack:
+        files = [(stack.enter_context(open(fp, 'rb')), os.path.basename(fp)) for fp in file_paths]
         response = client.post(rest_path, data={
             'file': files,
             'name': layername,
         })
-        assert response.status_code == 200
-    finally:
-        for file_path in files:
-            file_path[0].close()
+    assert response.status_code == 200
 
     chain_info = util.get_layer_chain(workspace, layername)
     assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
@@ -444,18 +422,14 @@ def test_post_layers_layer_exists(client):
     ]
     for file_path in file_paths:
         assert os.path.isfile(file_path)
-    files = []
-    try:
-        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+    with ExitStack() as stack:
+        files = [(stack.enter_context(open(fp, 'rb')), os.path.basename(fp)) for fp in file_paths]
         response = client.post(rest_path, data={
             'file': files,
         })
-        assert response.status_code == 409
-        resp_json = response.get_json()
-        assert resp_json['code'] == 17
-    finally:
-        for file_path in files:
-            file_path[0].close()
+    assert response.status_code == 409
+    resp_json = response.get_json()
+    assert resp_json['code'] == 17
 
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': publication_counter.get()
@@ -472,26 +446,22 @@ def test_post_layers_complex(client):
         ]
         for file_path in file_paths:
             assert os.path.isfile(file_path)
-        files = []
         sld_path = 'sample/style/generic-blue_sld.xml'
         assert os.path.isfile(sld_path)
         layername = ''
-        try:
-            files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+        with ExitStack() as stack, open(sld_path, 'rb') as sld_file:
+            files = [(stack.enter_context(open(fp, 'rb')), os.path.basename(fp)) for fp in file_paths]
             response = client.post(rest_path, data={
                 'file': files,
                 'name': 'countries',
                 'title': 'staty',
                 'description': 'popis států',
-                'style': (open(sld_path, 'rb'), os.path.basename(sld_path)),
+                'style': (sld_file, os.path.basename(sld_path)),
             })
-            assert response.status_code == 200
-            resp_json = response.get_json()
-            # print(resp_json)
-            layername = resp_json[0]['name']
-        finally:
-            for file_path in files:
-                file_path[0].close()
+        assert response.status_code == 200
+        resp_json = response.get_json()
+        # print(resp_json)
+        layername = resp_json[0]['name']
 
         chain_info = util.get_layer_chain(workspace, layername)
         assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
@@ -582,19 +552,16 @@ def test_uppercase_attr(client):
         sld_path = 'sample/data/upper_attr.sld'
         assert os.path.isfile(sld_path)
         layername = 'upper_attr'
-        try:
-            files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+        with ExitStack() as stack, open(sld_path, 'rb') as sld_file:
+            files = [(stack.enter_context(open(fp, 'rb')), os.path.basename(fp)) for fp in file_paths]
             response = client.post(rest_path, data={
                 'file': files,
                 'name': layername,
-                'style': (open(sld_path, 'rb'), os.path.basename(sld_path)),
+                'style': (sld_file, os.path.basename(sld_path)),
             })
-            assert response.status_code == 200
-            resp_json = response.get_json()
-            # print(resp_json)
-        finally:
-            for file_path in files:
-                file_path[0].close()
+        assert response.status_code == 200
+        resp_json = response.get_json()
+        # print(resp_json)
 
         chain_info = util.get_layer_chain(workspace, layername)
         assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
@@ -727,10 +694,11 @@ def test_patch_layer_style(client):
         rest_path = url_for('rest_workspace_layer.patch', workspace=workspace, layername=layername)
         sld_path = 'sample/style/generic-blue_sld.xml'
         assert os.path.isfile(sld_path)
-        response = client.patch(rest_path, data={
-            'style': (open(sld_path, 'rb'), os.path.basename(sld_path)),
-            'title': 'countries in blue'
-        })
+        with open(sld_path, 'rb') as sld_file:
+            response = client.patch(rest_path, data={
+                'style': (sld_file, os.path.basename(sld_path)),
+                'title': 'countries in blue'
+            })
         assert response.status_code == 200
 
         # last_task = util._get_layer_task(workspace, layername)
@@ -792,18 +760,13 @@ def test_patch_layer_data(client):
         ]
         for file_path in file_paths:
             assert os.path.isfile(file_path)
-        files = []
-        try:
-            files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in
-                     file_paths]
+        with ExitStack() as stack:
+            files = [(stack.enter_context(open(fp, 'rb')), os.path.basename(fp)) for fp in file_paths]
             response = client.patch(rest_path, data={
                 'file': files,
                 'title': 'populated places'
             })
-            assert response.status_code == 200
-        finally:
-            for file_path in files:
-                file_path[0].close()
+        assert response.status_code == 200
 
         chain_info = util.get_layer_chain(workspace, layername)
         assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
@@ -870,18 +833,13 @@ def test_patch_layer_concurrent_and_delete_it(client):
         uuid_str = layer_uuid.get_layer_uuid(workspace, layername)
         assert uuid.is_valid_uuid(uuid_str)
 
-        files = []
-        try:
-            files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in
-                     file_paths]
+        with ExitStack() as stack:
+            files = [(stack.enter_context(open(fp, 'rb')), os.path.basename(fp)) for fp in file_paths]
             response = client.patch(rest_path, data={
                 'file': files,
                 'title': 'populated places'
             })
-            assert response.status_code == 200
-        finally:
-            for file_path in files:
-                file_path[0].close()
+        assert response.status_code == 200
 
         uuid.check_redis_consistency(expected_publ_num_by_type={
             f'{LAYER_TYPE}': publication_counter.get()
@@ -891,18 +849,14 @@ def test_patch_layer_concurrent_and_delete_it(client):
         assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
 
     with app.app_context():
-        try:
-            files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in
-                     file_paths]
+        with ExitStack() as stack:
+            files = [(stack.enter_context(open(fp, 'rb')), os.path.basename(fp)) for fp in file_paths]
             response = client.patch(rest_path, data={
                 'file': files,
             })
-            assert response.status_code == 400, response.get_json()
-            resp_json = response.get_json()
-            assert resp_json['code'] == 49
-        finally:
-            for file_path in files:
-                file_path[0].close()
+        assert response.status_code == 400, response.get_json()
+        resp_json = response.get_json()
+        assert resp_json['code'] == 49
 
         uuid.check_redis_consistency(expected_publ_num_by_type={
             f'{LAYER_TYPE}': publication_counter.get()
@@ -940,16 +894,12 @@ def test_post_layers_long_and_delete_it(client):
     ]
     for file_path in file_paths:
         assert os.path.isfile(file_path)
-    files = []
-    try:
-        files = [(open(fp, 'rb'), os.path.basename(fp)) for fp in file_paths]
+    with ExitStack() as stack:
+        files = [(stack.enter_context(open(fp, 'rb')), os.path.basename(fp)) for fp in file_paths]
         response = client.post(rest_path, data={
             'file': files,
         })
-        assert response.status_code == 200
-    finally:
-        for file_path in files:
-            file_path[0].close()
+    assert response.status_code == 200
 
     layername = 'ne_10m_admin_0_countries'
 

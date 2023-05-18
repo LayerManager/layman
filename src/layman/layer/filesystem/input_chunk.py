@@ -210,9 +210,8 @@ def layer_file_chunk_info(workspace, layername):
                     input_file.ensure_layer_input_file_dir(workspace, layername)
                     with open(target_fp, "ab") as target_file:
                         for chunk_path in chunk_paths:
-                            stored_chunk_file = open(chunk_path, 'rb')
-                            target_file.write(stored_chunk_file.read())
-                            stored_chunk_file.close()
+                            with open(chunk_path, 'rb') as stored_chunk_file:
+                                target_file.write(stored_chunk_file.read())
                             os.unlink(chunk_path)
                     target_file.close()
                     settings.LAYMAN_REDIS.hdel(r_key, rh_key)
