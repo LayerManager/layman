@@ -73,7 +73,7 @@ def save_qgs_file(workspace, layer):
     qml = util.get_original_style_xml(workspace, layer)
     conn_cur = db_util.get_connection_cursor(db_uri_str=table_uri.db_uri_str)
     db_types = db.get_geometry_types(db_schema, table_name, column_name=table_uri.geo_column, conn_cur=conn_cur)
-    qml_geometry = util.get_qml_geometry_from_qml(qml, db_types)
+    qml_geometry = util.get_geometry_from_qml_and_db_types(qml, db_types)
     db_cols = [
         col for col in db.get_all_column_infos(db_schema, table_name, conn_cur=conn_cur, omit_geometry_columns=True)
         if col.name != table_uri.primary_key_column

@@ -74,7 +74,7 @@ def test_geometry_types(layer, exp_db_types, qml_geometry_dict):
                 old_qml_style_name = new_qml_style_name
             with app.app_context():
                 qml = util.get_original_style_xml(workspace, layer)
-            found_qml_geometry = util.get_qml_geometry_from_qml(qml, db_types=[])
+            found_qml_geometry = util.get_geometry_from_qml_and_db_types(qml, db_types=[])
             assert found_qml_geometry == qml_geometry
             exp_file_path = f'/code/sample/data/geometry-types/{new_qml_style_name}.png'
             with app.app_context():
@@ -112,7 +112,7 @@ def test__get_qml_geometry_from_qml(qml_path, exp_qml_type):
 def test_get_qml_geometry_from_qml(qml_path, db_types, exp_qml_type):
     parser = ET.XMLParser(remove_blank_text=True)
     qml_xml = ET.parse(qml_path, parser=parser)
-    result = util.get_qml_geometry_from_qml(qml_xml, db_types)
+    result = util.get_geometry_from_qml_and_db_types(qml_xml, db_types)
     assert result == exp_qml_type
 
 
@@ -128,7 +128,7 @@ def test_get_qml_geometry_from_qml_raises(qml_path, db_types, exp_message):
     parser = ET.XMLParser(remove_blank_text=True)
     qml_xml = ET.parse(qml_path, parser=parser)
     with pytest.raises(LaymanError) as exc_info:
-        util.get_qml_geometry_from_qml(qml_xml, db_types)
+        util.get_geometry_from_qml_and_db_types(qml_xml, db_types)
     assert exc_info.value.http_code == 400
     assert exc_info.value.code == 47
     assert exc_info.value.message == 'Error in QML'

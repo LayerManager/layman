@@ -221,7 +221,7 @@ def test_fill_project_template(workspace, publ_type, publication):
             col for col in layer_db.get_all_column_infos(workspace, table_name)
             if col.name not in ['wkb_geometry', 'ogc_fid']
         ]
-    qml_geometry = qgis_util.get_qml_geometry_from_qml(qml_xml, db_types)
+    qml_geometry = qgis_util.get_geometry_from_qml_and_db_types(qml_xml, db_types)
     source_type = qgis_util.get_source_type(db_types, qml_geometry)
     with app.app_context():
         column_srid = layer_db.get_column_srid(table_uri.schema, table_uri.table, table_uri.geo_column)
