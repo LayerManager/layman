@@ -239,13 +239,13 @@ def test_patch_current_user_without_username():
     # reserve username
     with app.app_context():
         rest_path = url_for('rest_current_user.patch', adjust_username='true')
-    response = requests.patch(rest_path, headers=user1_authn_headers)
+    response = requests.patch(rest_path, headers=user1_authn_headers, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
     assert response.status_code == 200, response.text
 
     # check if it was reserved
     with app.app_context():
         rest_path = url_for('rest_current_user.get')
-    response = requests.get(rest_path, headers=user1_authn_headers)
+    response = requests.get(rest_path, headers=user1_authn_headers, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
     assert response.status_code == 200, response.text
     resp_json = response.json()
     assert resp_json['authenticated'] is True
@@ -269,7 +269,7 @@ def test_patch_current_user_without_username():
     # re-reserve username
     with app.app_context():
         rest_path = url_for('rest_current_user.patch', adjust_username='true')
-    response = requests.patch(rest_path, headers=user1_authn_headers)
+    response = requests.patch(rest_path, headers=user1_authn_headers, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
     assert response.status_code == 400, response.text
     r_json = response.json()
     assert r_json['code'] == 34
@@ -280,7 +280,7 @@ def test_patch_current_user_without_username():
         rest_path = url_for('rest_current_user.patch')
     response = requests.patch(rest_path, data={
         'username': exp_username,
-    }, headers=user2_authn_headers)
+    }, headers=user2_authn_headers, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
     assert response.status_code == 409, response.text
     r_json = response.json()
     assert r_json['code'] == 35
@@ -293,7 +293,7 @@ def test_patch_current_user_without_username():
     exp_sub2 = '20143'
     response = requests.patch(rest_path, data={
         'username': exp_username2,
-    }, headers=user2_authn_headers)
+    }, headers=user2_authn_headers, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
     assert response.status_code == 200, response.text
     resp_json = response.json()
     assert 'username' in resp_json
@@ -309,7 +309,7 @@ def test_patch_current_user_without_username():
 
     with app.app_context():
         rest_path = url_for('rest_workspace_map_file.get', workspace=workspace, mapname=mapname)
-    response = requests.get(rest_path, headers=user1_authn_headers)
+    response = requests.get(rest_path, headers=user1_authn_headers, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
     assert response.status_code == 200, response.text
     resp_json = response.json()
     assert resp_json['name'] == mapname

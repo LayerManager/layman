@@ -27,7 +27,7 @@ def test_get_layer_title():
     # layers.GET
     with app.app_context():
         url = url_for('rest_workspace_layers.get', workspace=workspace)
-    response = requests.get(url)
+    response = requests.get(url, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
     assert response.status_code == 200, response.text
 
     for i in range(0, len(sorted_layers) - 1):

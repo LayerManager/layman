@@ -122,7 +122,7 @@ def get_open_id_claims():
     try:
         response = requests.get(USER_PROFILE_URL, headers={
             'Authorization': f'Bearer {access_token}',
-        })
+        }, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
         response.raise_for_status()
         r_json = response.json()
         result['sub'] = r_json['userId']

@@ -73,7 +73,8 @@ DROP USER IF EXISTS {READ_ONLY_USER}
     auth = settings.GEOSERVER_ADMIN_AUTH or settings.LAYMAN_GS_AUTH
     response = requests.get(geoserver.GS_REST_USERS,
                             headers=headers_json,
-                            auth=auth
+                            auth=auth,
+                            timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
                             )
     response.raise_for_status()
     all_users = [u['userName'] for u in response.json()['users']]
@@ -83,7 +84,8 @@ DROP USER IF EXISTS {READ_ONLY_USER}
     for user in all_users:
         response = requests.get(urljoin(geoserver.GS_REST_ROLES, f'user/{user}/'),
                                 headers=headers_json,
-                                auth=auth
+                                auth=auth,
+                                timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
                                 )
         response.raise_for_status()
         roles = response.json()['roles']
@@ -92,7 +94,8 @@ DROP USER IF EXISTS {READ_ONLY_USER}
             response = requests.delete(
                 urljoin(geoserver.GS_REST_SECURITY_ACL_LAYERS, user + '.*.r'),
                 headers=headers_json,
-                auth=auth
+                auth=auth,
+                timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
             )
             if response.status_code != 404:
                 response.raise_for_status()
@@ -100,7 +103,8 @@ DROP USER IF EXISTS {READ_ONLY_USER}
             response = requests.delete(
                 urljoin(geoserver.GS_REST_SECURITY_ACL_LAYERS, user + '.*.w'),
                 headers=headers_json,
-                auth=auth
+                auth=auth,
+                timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
             )
             if response.status_code != 404:
                 response.raise_for_status()
@@ -111,7 +115,8 @@ DROP USER IF EXISTS {READ_ONLY_USER}
                 auth=auth,
                 params={
                     'recurse': 'true'
-                }
+                },
+                timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
             )
             response.raise_for_status()
 
@@ -120,6 +125,7 @@ DROP USER IF EXISTS {READ_ONLY_USER}
                     urljoin(geoserver.GS_REST_ROLES, f'role/{role}/user/{user}/'),
                     headers=headers_json,
                     auth=auth,
+                    timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
                 )
                 response.raise_for_status()
 
@@ -127,6 +133,7 @@ DROP USER IF EXISTS {READ_ONLY_USER}
                 urljoin(geoserver.GS_REST_ROLES, 'role/' + f"USER_{user.upper()}"),
                 headers=headers_json,
                 auth=auth,
+                timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
             )
             if response.status_code != 404:
                 response.raise_for_status()
@@ -135,12 +142,14 @@ DROP USER IF EXISTS {READ_ONLY_USER}
                 urljoin(geoserver.GS_REST_USER, user),
                 headers=headers_json,
                 auth=auth,
+                timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
             )
             response.raise_for_status()
 
     response = requests.get(geoserver.GS_REST_WORKSPACES,
                             headers=headers_json,
-                            auth=auth
+                            auth=auth,
+                            timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
                             )
     response.raise_for_status()
 
@@ -153,7 +162,8 @@ DROP USER IF EXISTS {READ_ONLY_USER}
                 auth=auth,
                 params={
                     'recurse': 'true'
-                }
+                },
+                timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
             )
             response.raise_for_status()
 

@@ -32,5 +32,5 @@ def workspace_wfs_2_0_0_capabilities_available_if_vector(workspace, publ_type, n
             'service': 'WFS',
             'request': 'GetCapabilities',
             'version': '2.0.0',
-        })
+        }, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
         assert r_wfs.status_code == 200

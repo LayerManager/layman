@@ -79,7 +79,6 @@ disable=raw-checker-failed,
         f-string-without-interpolation,
         logging-fstring-interpolation,
 
-        missing-timeout,
         use-implicit-booleaness-not-comparison,
 
 # Enable the message, report, category or checker with the given id(s). You can

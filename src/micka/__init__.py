@@ -1,5 +1,6 @@
 from lxml import etree as ET
 import requests
+from layman import settings
 
 NAMESPACES = {
     'csw': 'http://www.opengis.net/cat/csw/2.0.2',
@@ -31,7 +32,7 @@ def csw_get_records(csw_url, *, auth):
           </csw:Constraint>
          </csw:Query>
         </csw:GetRecords>
-        """)
+        """, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
     root = ET.fromstring(resp.text.encode('utf-8'))
     els = root.xpath(f"/csw:GetRecordsResponse/csw:SearchResults/gmd:MD_Metadata", namespaces=NAMESPACES)
     return els

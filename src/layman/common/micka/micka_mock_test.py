@@ -60,11 +60,11 @@ def server2():
 @pytest.mark.usefixtures('server', 'server2')
 def test_mock():
     csw_url = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{PORT1}/csw"
-    response = requests.get(csw_url)
+    response = requests.get(csw_url, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
     assert response.status_code == 404
     assert response.text == "Response code is 404"
 
     csw_url = f"http://{settings.LAYMAN_SERVER_NAME.split(':')[0]}:{PORT2}/csw"
-    response = requests.get(csw_url)
+    response = requests.get(csw_url, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
     assert response.status_code == 500
     assert response.text == "Response code is 500"
