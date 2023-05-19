@@ -1,3 +1,5 @@
+import copy
+
 from celery import states
 from layman import app
 from layman.layer import LAYER_TYPE
@@ -47,3 +49,45 @@ def async_error_in_info_key(rest_publication_detail, info_key, expected):
     assert rest_publication_detail[info_key]['status'] == states.FAILURE
     test_util.assert_async_error(expected,
                                  rest_publication_detail[info_key]['error'])
+
+
+def same_values_in_detail_and_multi(workspace, publ_type, name, rest_publication_detail, headers):
+    # keep only multi-endpoint keys
+    expected_keys = ['workspace', 'name', 'title', 'uuid', 'url', 'updated_at', 'access_rights', 'bounding_box',
+                     'native_crs', 'native_bounding_box']
+    if publ_type == process_client.LAYER_TYPE:
+        expected_keys += ['geodata_type', 'file']
+    rest_detail = copy.deepcopy(rest_publication_detail)
+    exp_info = {k: v for k, v in rest_detail.items() if k in expected_keys}
+
+    # adjust deprecated `file` key
+    if 'file' in exp_info:
+        exp_info['file'] = {k: v for k, v in exp_info['file'].items() if k == 'file_type'}
+    elif publ_type == process_client.LAYER_TYPE:
+        exp_info['file'] = {
+            'file_type': exp_info['geodata_type'],
+        }
+
+    # add other expected keys
+    exp_info['workspace'] = workspace
+    if publ_type == process_client.LAYER_TYPE:
+        if any(k for k in ['wfs', 'wms', 'style'] if rest_detail.get(k, {}).get('status', None) in ['FAILURE', 'NOT_AVAILABLE']):
+            wfs_wms_status = 'NOT_AVAILABLE'
+        elif any(k for k in ['wfs', 'wms', 'style'] if rest_detail.get(k, {}).get('status', None) in ['PENDING', 'STARTED']):
+            wfs_wms_status = 'PREPARING'
+        else:
+            wfs_wms_status = 'AVAILABLE'
+        exp_info['wfs_wms_status'] = wfs_wms_status
+
+    multi_requests = [
+        (process_client.get_workspace_publications, [publ_type, workspace], {'headers': headers}),
+        (process_client.get_publications, [publ_type], {'headers': headers}),
+    ]
+    for rest_multi_method, args, kwargs in multi_requests:
+        rest_multi_response_json = rest_multi_method(*args, **kwargs)
+        rest_multi_infos = [info for info in rest_multi_response_json
+                            if info['workspace'] == workspace and info['name'] == name]
+        assert len(rest_multi_infos) == 1, f'rest_multi_infos={rest_multi_infos}'
+        rest_multi_info = rest_multi_infos[0]
+
+        assert rest_multi_info == exp_info
