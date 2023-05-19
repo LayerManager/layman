@@ -22,7 +22,6 @@ def patch_layer(workspace, layername, metadata_properties_to_refresh, access_rig
                                           metadata_properties_to_refresh=metadata_properties_to_refresh,
                                           actor_name=None,
                                           access_rights=access_rights,
-                                          csw_source=csw,
                                           csw_patch_method=csw.patch_layer,
                                           soap_insert_method=soap_insert,
                                           )

@@ -20,7 +20,6 @@ def patch_map(workspace, mapname, metadata_properties_to_refresh=None, access_ri
                                           metadata_properties_to_refresh=metadata_properties_to_refresh,
                                           actor_name=actor_name,
                                           access_rights=access_rights,
-                                          csw_source=csw,
                                           csw_patch_method=csw.patch_map,
                                           soap_insert_method=soap_insert,
                                           )

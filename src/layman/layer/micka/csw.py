@@ -28,17 +28,13 @@ get_publication_uuid = empty_method_returns_none
 post_layer = empty_method
 
 
-def get_metadata_uuid(uuid):
-    return f"m-{uuid}" if uuid is not None else None
-
-
 def get_layer_info(workspace, layername):
     uuid = get_layer_uuid(workspace, layername)
     try:
         csw = common_util.create_csw()
         if uuid is None or csw is None:
             return {}
-        muuid = get_metadata_uuid(uuid)
+        muuid = common_util.get_metadata_uuid(uuid)
         csw.getrecordbyid(id=[muuid], esn='brief')
     except HTTPError as exc:
         current_app.logger.info(f'traceback={traceback.format_exc()},\n'
@@ -69,7 +65,7 @@ def patch_layer(workspace, layername, metadata_properties_to_refresh, _actor_nam
     csw = common_util.create_csw()
     if uuid is None or csw is None:
         return None
-    muuid = get_metadata_uuid(uuid)
+    muuid = common_util.get_metadata_uuid(uuid)
     element = common_util.get_record_element_by_id(csw, muuid)
     if element is None:
         if create_if_not_exists:
@@ -99,7 +95,7 @@ def delete_layer(workspace, layername, *, backup_uuid=None):
     uuid = get_layer_uuid(workspace, layername) or backup_uuid
     if backup_uuid and uuid:
         assert backup_uuid == uuid
-    muuid = get_metadata_uuid(uuid)
+    muuid = common_util.get_metadata_uuid(uuid)
     if muuid is None:
         return
     micka_requests.csw_delete(muuid)
@@ -176,7 +172,7 @@ def get_template_path_and_values(workspace, layername, http_method):
     languages = languages or []
 
     prop_values = {
-        'md_file_identifier': get_metadata_uuid(get_layer_uuid(workspace, layername)),
+        'md_file_identifier': common_util.get_metadata_uuid(get_layer_uuid(workspace, layername)),
         'md_language': md_language,
         'md_date_stamp': date.today().strftime('%Y-%m-%d'),
         'reference_system': settings.LAYMAN_OUTPUT_SRS_LIST,
@@ -355,7 +351,7 @@ def get_metadata_comparison(workspace, layername):
     csw = common_util.create_csw()
     if uuid is None or csw is None:
         return {}
-    muuid = get_metadata_uuid(uuid)
+    muuid = common_util.get_metadata_uuid(uuid)
     element = common_util.get_record_element_by_id(csw, muuid)
     if element is None:
         return {}

@@ -44,7 +44,7 @@ def test_fill_template():
     layer = 'layer'
     file_object = common_util.fill_xml_template_as_pretty_file_object('src/layman/layer/micka/record-template.xml',
                                                                       {
-                                                                          'md_file_identifier': csw_util.get_metadata_uuid('ca238200-8200-1a23-9399-42c9fca53542'),
+                                                                          'md_file_identifier': common_util.get_metadata_uuid('ca238200-8200-1a23-9399-42c9fca53542'),
                                                                           'md_language': None,
                                                                           'md_date_stamp': '2007-05-25',
                                                                           'reference_system': ['EPSG:3857', 'EPSG:4326'],
