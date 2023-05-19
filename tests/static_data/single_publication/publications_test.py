@@ -7,7 +7,7 @@ from layman.layer.filesystem import gdal
 from test_tools import assert_util, process_client
 from .. import util
 from ... import static_data as data
-from ...asserts.final.publication import internal as asserts_internal, rest as asserts_rest, internal_rest as asserts_internal_rest
+from ...asserts.final.publication import internal as asserts_internal, rest as asserts_rest
 from ..data import ensure_publication
 
 
@@ -37,9 +37,8 @@ def test_infos(workspace, publ_type, publication):
 
     publ_def = data.PUBLICATIONS[(workspace, publ_type, publication)]
     headers = data.HEADERS.get(publ_def[data.TEST_DATA].get('users_can_write', [None])[0])
-    asserts_internal_rest.same_title_and_wfs_wms_status_in_source_and_rest_multi(workspace, publ_type, publication, headers)
-    asserts_rest.is_in_rest_multi(workspace, publ_type, publication, headers)
-    asserts_rest.correct_url_in_rest_multi(workspace, publ_type, publication, headers)
+    rest_detail = process_client.get_workspace_publication(publ_type, workspace, publication, headers=headers)
+    asserts_rest.same_values_in_detail_and_multi(workspace, publ_type, publication, rest_detail, headers)
     if 'geodata_type' in publ_def[data.TEST_DATA]:
         exp_geodata_type = publ_def[data.TEST_DATA]['geodata_type']
         asserts_rest.correct_file_type_in_rest_multi(workspace, publ_type, publication, headers, exp_geodata_type)

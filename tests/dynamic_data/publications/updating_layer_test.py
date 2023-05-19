@@ -75,8 +75,13 @@ class TestUpdatingLayer(base_test.TestSingleRestPublication):
                                                                        'description', 'wfs', 'db', ]
                                                        )
 
-        asserts_publ.internal_rest.same_title_and_wfs_wms_status_in_source_and_rest_multi(workspace=layer.workspace,
-                                                                                          publ_type=layer.type,
-                                                                                          name=layer.name,
-                                                                                          headers=None,
-                                                                                          )
+        # check also wfs_wms_status
+        rest_detail = process_client.get_workspace_layer(layer.workspace, layer.name)
+        for key in ['wms', 'style']:  # wfs is not here, because geodata_type is unknown
+            assert rest_detail[key]['status'] == 'PENDING'
+        asserts_publ.rest.same_values_in_detail_and_multi(workspace=layer.workspace,
+                                                          publ_type=layer.type,
+                                                          name=layer.name,
+                                                          rest_publication_detail=rest_detail,
+                                                          headers=None,
+                                                          )
