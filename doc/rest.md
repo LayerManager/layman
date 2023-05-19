@@ -69,7 +69,7 @@ JSON array of objects representing available layers with following structure:
 - **native_crs**: Code of native CRS in form "EPSG:&lt;code&gt;", e.g. "EPSG:4326".
 - **native_bounding_box**: List of 4 floats and one string. Bounding box coordinates [minx, miny, maxx, maxy] in native CRS.
 - **geodata_type**: String. Either `vector`, `raster`, or `unknown`. Value `unknown` is used if input files are zipped and still being uploaded.
-- - **file**:
+- **file**: **Deprecated**.
   - *file_type*: **Deprecated**. Replaced by **geodata_type** at root level, contains same info.
 - **wfs_wms_status**: String. Status of layer availability in WMS (and WFS in case of vector data) endpoints. Either `AVAILABLE`, `PREPARING`, or `NOT_AVAILABLE`.
 
@@ -522,7 +522,7 @@ JSON object with one attribute:
 ### GET Maps
 Get list of published maps (map compositions).
 
-Have the same request parameters and response structure and headers as [GET Layers](#get-layers), except `file_type`, `geodata_type` and `wfs_wms_status` keys are not available in response.
+Have the same request parameters and response structure and headers as [GET Layers](#get-layers), except `file`, `geodata_type` and `wfs_wms_status` keys are not available in response.
 
 ## Workspace Maps
 ### URL
