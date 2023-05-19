@@ -49,7 +49,7 @@ def get_layer_info(workspace, layername):
             'metadata': {
                 'identifier': muuid,
                 'csw_url': settings.CSW_PROXY_URL,
-                'record_url': common_util.get_metadata_url(uuid),
+                'record_url': common_util.get_metadata_url(uuid, url_type=common_util.RecordUrlType.BASIC),
                 'comparison_url': url_for('rest_workspace_layer_metadata_comparison.get', workspace=workspace, layername=layername),
             }
         }

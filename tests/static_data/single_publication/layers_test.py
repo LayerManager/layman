@@ -69,7 +69,7 @@ def test_geoserver_workspace(workspace, publ_type, publication):
     headers = data.HEADERS.get(data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_write', [None])[0])
 
     publ_asserts.geoserver_proxy.is_complete_in_workspace_wms_1_3_0(workspace, publ_type, publication, headers)
-    publ_asserts.geoserver_proxy.workspace_wfs_2_0_0_capabilities_available_if_vector(workspace, publ_type, publication)
+    publ_asserts.geoserver_proxy.workspace_wfs_2_0_0_capabilities_available_if_vector(workspace, publ_type, publication, headers)
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_LAYERS)

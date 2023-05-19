@@ -1,3 +1,4 @@
+from enum import Enum
 import os
 import time
 from io import BytesIO
@@ -19,6 +20,11 @@ from .requests import base_insert, csw_delete, fill_template_as_str
 logger = logging.getLogger(__name__)
 
 
+class RecordUrlType(Enum):
+    BASIC = 'basic'
+    XML = 'xml'
+
+
 for k, v in NAMESPACES.items():
     ET.register_namespace(k, v)
 
@@ -27,10 +33,10 @@ def get_metadata_uuid(uuid):
     return f"m-{uuid}" if uuid is not None else None
 
 
-def get_metadata_url(uuid):
+def get_metadata_url(uuid, *, url_type: RecordUrlType):
     muuid = get_metadata_uuid(uuid)
     server_url = settings.CSW_PROXY_URL[:-3]
-    result = f'{server_url}record/basic/{muuid}'
+    result = f'{server_url}record/{url_type.value}/{muuid}'
     return result
 
 
