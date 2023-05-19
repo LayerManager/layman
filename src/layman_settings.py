@@ -7,6 +7,7 @@ import redis
 import db
 import geoserver
 from layman_settings_util import read_clients_dict_from_env
+import micka
 
 
 class EnumOriginalDataSource(Enum):
@@ -251,6 +252,7 @@ assert MICKA_REGEXP_MATCH, f'os.getenv(MICKA_ACCEPTED_VERSION)={os.getenv("MICKA
 assert len(
     MICKA_REGEXP_MATCH.groups()) == 3, f'os.getenv(MICKA_ACCEPTED_VERSION)={os.getenv("MICKA_ACCEPTED_VERSION", "")}, MICKA_REGEXP_MATCH={MICKA_REGEXP_MATCH}'
 MICKA_ACCEPTED_VERSION = MICKA_REGEXP_MATCH.groups()
+micka.set_settings(DEFAULT_CONNECTION_TIMEOUT)
 
 LAYMAN_PUBLIC_URL_SCHEME = urlparse(LAYMAN_CLIENT_PUBLIC_URL).scheme
 

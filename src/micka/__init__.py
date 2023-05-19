@@ -1,7 +1,7 @@
 from lxml import etree as ET
 import requests
-from layman import settings
 
+MICKA_HTTP_TIMEOUT = None
 NAMESPACES = {
     'csw': 'http://www.opengis.net/cat/csw/2.0.2',
     'ows': 'http://www.opengis.net/ows/1.1',
@@ -15,6 +15,13 @@ NAMESPACES = {
     'soap': 'http://www.w3.org/2003/05/soap-envelope',
     'hs': 'http://www.hsrs.cz/micka',
 }
+
+
+def set_settings(timeout):
+    # pylint: disable=global-statement
+    global MICKA_HTTP_TIMEOUT
+
+    MICKA_HTTP_TIMEOUT = timeout
 
 
 def csw_get_records(csw_url, *, auth):
@@ -32,7 +39,7 @@ def csw_get_records(csw_url, *, auth):
           </csw:Constraint>
          </csw:Query>
         </csw:GetRecords>
-        """, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
+        """, timeout=MICKA_HTTP_TIMEOUT)
     root = ET.fromstring(resp.text.encode('utf-8'))
     els = root.xpath(f"/csw:GetRecordsResponse/csw:SearchResults/gmd:MD_Metadata", namespaces=NAMESPACES)
     return els
