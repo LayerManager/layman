@@ -129,7 +129,7 @@ def is_complete_in_internal_workspace_wms(workspace, publ_type, name):
     assert publ_type == process_client.LAYER_TYPE
 
     wms_inst = wms.get_wms_proxy(workspace)
-    geoserver_util.is_complete_in_workspace_wms_instance(wms_inst, name)
+    geoserver_util.is_complete_in_workspace_wms_instance(wms_inst, name, validate_metadata_url=False)
 
 
 def assert_workspace_stores(workspace, *, exp_stores=None, exp_existing_stores=None, exp_deleted_stores=None):

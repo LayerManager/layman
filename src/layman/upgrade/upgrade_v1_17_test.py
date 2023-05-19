@@ -6,6 +6,7 @@ from db import util as db_util, TableUri
 from layman import app, settings, util as layman_util
 from layman.common.prime_db_schema import publications as prime_db_schema_publications
 from layman.common.filesystem import uuid as uuid_common
+from layman.common.micka import util as micka_util
 from layman.layer import LAYER_TYPE, STYLE_TYPES_DEF, db, geoserver, qgis
 from layman.layer.db import table
 from layman.layer.geoserver import wms, wfs
@@ -150,6 +151,8 @@ def publish_layer(workspace, layer, *, file_path, style_type, style_file, ):
         geoserver.ensure_workspace(workspace)
         geoserver.ensure_workspace(wms_workspace)
 
+        metadata_url = micka_util.get_metadata_url(uuid_str, url_type=micka_util.RecordUrlType.XML)
+
         # import into GS WFS workspace
         geoserver.publish_layer_from_db(workspace,
                                         layer,
@@ -157,6 +160,7 @@ def publish_layer(workspace, layer, *, file_path, style_type, style_file, ):
                                         title=layer,
                                         crs=crs,
                                         table_name=table_name,
+                                        metadata_url=metadata_url,
                                         geoserver_workspace=workspace,
                                         )
 
@@ -168,6 +172,7 @@ def publish_layer(workspace, layer, *, file_path, style_type, style_file, ):
                                             title=layer,
                                             crs=crs,
                                             table_name=table_name,
+                                            metadata_url=metadata_url,
                                             geoserver_workspace=wms_workspace,
                                             )
         elif style_type == 'qml':
@@ -195,6 +200,7 @@ def publish_layer(workspace, layer, *, file_path, style_type, style_file, ):
                                               layer,
                                               description=layer,
                                               title=layer,
+                                              metadata_url=metadata_url,
                                               geoserver_workspace=wms_workspace,
                                               )
         for gs_workspace in [workspace, wms.get_geoserver_workspace(workspace)]:

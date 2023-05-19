@@ -273,7 +273,7 @@ def patch_feature_type(geoserver_workspace, feature_type_name, store_name=None, 
     response.raise_for_status()
 
 
-def post_feature_type(geoserver_workspace, layername, description, title, bbox, crs, auth, *, lat_lon_bbox, table_name, store_name=None):
+def post_feature_type(geoserver_workspace, layername, description, title, bbox, crs, auth, *, lat_lon_bbox, table_name, metadata_url, store_name=None, ):
     store_name = store_name or DEFAULT_DB_STORE_NAME
     keywords = [
         "features",
@@ -298,6 +298,15 @@ def post_feature_type(geoserver_workspace, layername, description, title, bbox, 
         },
         'nativeBoundingBox': bbox_to_dict(bbox, crs),
         'latLonBoundingBox': bbox_to_dict(lat_lon_bbox, 'CRS:84'),
+        'metadataLinks': {
+            "metadataLink": [
+                {
+                    "type": "application/xml",
+                    "metadataType": "ISO19115:2003",
+                    "content": metadata_url,
+                }
+            ]
+        }
     }
     response = requests.post(urljoin(GS_REST_WORKSPACES,
                                      f'{geoserver_workspace}/datastores/{store_name}/featuretypes/'),
@@ -615,7 +624,8 @@ def delete_coverage_store(geoserver_workspace, auth, name):
         response.raise_for_status()
 
 
-def publish_coverage(geoserver_workspace, auth, coverage_store, layer, title, description, bbox, crs, *, lat_lon_bbox, enable_time_dimension=False):
+def publish_coverage(geoserver_workspace, auth, coverage_store, layer, title, description, bbox, crs, *, lat_lon_bbox, metadata_url,
+                     enable_time_dimension=False):
     keywords = [
         "features",
         layer,
@@ -641,6 +651,15 @@ def publish_coverage(geoserver_workspace, auth, coverage_store, layer, title, de
                 "name": f"{geoserver_workspace}:{coverage_store}"
             },
             "title": title,
+            'metadataLinks': {
+                "metadataLink": [
+                    {
+                        "type": "application/xml",
+                        "metadataType": "ISO19115:2003",
+                        "content": metadata_url,
+                    }
+                ]
+            }
         }
     }
     if enable_time_dimension:
@@ -755,7 +774,7 @@ def patch_wms_layer(geoserver_workspace, layer, *, auth, bbox=None, title=None, 
     response.raise_for_status()
 
 
-def post_wms_layer(geoserver_workspace, layer, store_name, title, description, bbox, crs, auth, *, lat_lon_bbox):
+def post_wms_layer(geoserver_workspace, layer, store_name, title, description, bbox, crs, auth, *, lat_lon_bbox, metadata_url):
     keywords = [
         "features",
         layer,
@@ -780,6 +799,15 @@ def post_wms_layer(geoserver_workspace, layer, store_name, title, description, b
         },
         'nativeBoundingBox': bbox_to_dict(bbox, crs),
         'latLonBoundingBox': bbox_to_dict(lat_lon_bbox, 'CRS:84'),
+        'metadataLinks': {
+            "metadataLink": [
+                {
+                    "type": "application/xml",
+                    "metadataType": "ISO19115:2003",
+                    "content": metadata_url,
+                }
+            ]
+        }
     }
     response = requests.post(urljoin(GS_REST_WORKSPACES,
                                      geoserver_workspace + '/wmslayers/'),

@@ -7,6 +7,7 @@ from geoserver import util as gs_util
 from layman.celery import AbortedException
 from layman import celery_app, settings, util as layman_util
 from layman.common import empty_method_returns_true, bbox as bbox_util
+from layman.common.micka import util as micka_util
 from layman.http import LaymanError
 from . import wms, wfs, sld
 from .. import geoserver, LAYER_TYPE
@@ -38,7 +39,7 @@ def refresh_wms(
         original_data_source=settings.EnumOriginalDataSource.FILE.value,
 ):
     info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': [
-        'file', 'geodata_type', 'native_bounding_box', 'native_crs', 'table_uri'
+        'file', 'geodata_type', 'native_bounding_box', 'native_crs', 'table_uri', 'uuid'
     ]})
     geodata_type = info['geodata_type']
     crs = info['native_crs']
@@ -47,6 +48,7 @@ def refresh_wms(
     assert title is not None
     geoserver_workspace = wms.get_geoserver_workspace(workspace)
     geoserver.ensure_workspace(workspace)
+    metadata_url = micka_util.get_metadata_url(info['uuid'], url_type=micka_util.RecordUrlType.XML)
 
     if self.is_aborted():
         raise AbortedException
@@ -67,6 +69,7 @@ def refresh_wms(
                                             title,
                                             crs=crs,
                                             table_name=table_name,
+                                            metadata_url=metadata_url,
                                             geoserver_workspace=geoserver_workspace,
                                             store_name=store_name,
                                             )
@@ -75,6 +78,7 @@ def refresh_wms(
                                               layername,
                                               description,
                                               title,
+                                              metadata_url=metadata_url,
                                               geoserver_workspace=geoserver_workspace,
                                               )
     elif geodata_type == settings.GEODATA_TYPE_RASTER:
@@ -102,7 +106,7 @@ def refresh_wms(
             enable_time_dimension = True
         gs_util.create_coverage_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, coverage_store_name, source_file_or_dir, coverage_type=coverage_type)
         gs_util.publish_coverage(geoserver_workspace, settings.LAYMAN_GS_AUTH, coverage_store_name, layername, title,
-                                 description, bbox, crs, lat_lon_bbox=lat_lon_bbox, enable_time_dimension=enable_time_dimension)
+                                 description, bbox, crs, lat_lon_bbox=lat_lon_bbox, metadata_url=metadata_url, enable_time_dimension=enable_time_dimension)
     else:
         raise NotImplementedError(f"Unknown geodata type: {geodata_type}")
 
@@ -139,7 +143,7 @@ def refresh_wfs(
         access_rights=None,
         original_data_source=settings.EnumOriginalDataSource.FILE.value,
 ):
-    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['geodata_type', 'native_crs', 'table_uri']})
+    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['geodata_type', 'native_crs', 'table_uri', 'uuid']})
     geodata_type = info['geodata_type']
     if geodata_type == settings.GEODATA_TYPE_RASTER:
         return
@@ -161,7 +165,8 @@ def refresh_wfs(
                                                         layer=layername,
                                                         table_uri=table_uri,
                                                         )
-    geoserver.publish_layer_from_db(workspace, layername, description, title, crs=crs, table_name=table_name, store_name=store_name)
+    metadata_url = micka_util.get_metadata_url(info['uuid'], url_type=micka_util.RecordUrlType.XML)
+    geoserver.publish_layer_from_db(workspace, layername, description, title, crs=crs, table_name=table_name, metadata_url=metadata_url, store_name=store_name)
     geoserver.set_security_rules(workspace, layername, access_rights, settings.LAYMAN_GS_AUTH, workspace)
     wfs.clear_cache(workspace)
 
