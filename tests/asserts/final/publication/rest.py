@@ -1,28 +1,8 @@
 import copy
 
 from celery import states
-from layman import app
 from layman.layer import LAYER_TYPE
 from test_tools import process_client, util as test_util
-
-
-def is_in_rest_multi(workspace, publ_type, name, headers):
-    infos = process_client.get_workspace_publications(publ_type, workspace, headers=headers)
-
-    publication_infos = [info for info in infos if info['name'] == name]
-    assert len(publication_infos) == 1, f'publication_infos={publication_infos}'
-
-
-def correct_url_in_rest_multi(workspace, publ_type, name, headers):
-    infos = process_client.get_workspace_publications(publ_type, workspace, headers=headers)
-    publication_infos = [info for info in infos if info['name'] == name]
-    info = next(iter(publication_infos))
-    get_workspace_publication_url = process_client.PUBLICATION_TYPES_DEF[publ_type].get_workspace_publication_url
-    param_name = process_client.PUBLICATION_TYPES_DEF[publ_type].url_param_name
-    with app.app_context():
-        expected_url = test_util.url_for(get_workspace_publication_url, workspace=workspace, **{param_name: name},
-                                         internal=False)
-        assert info['url'] == expected_url, f'publication_infos={publication_infos}, expected_url={expected_url}'
 
 
 def correct_file_type_in_rest_multi(workspace, publ_type, name, headers, exp_file_type):

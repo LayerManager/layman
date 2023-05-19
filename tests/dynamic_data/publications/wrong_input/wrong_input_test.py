@@ -1377,8 +1377,9 @@ class TestPublication(base_test.TestSingleRestPublication):
 
                 assert publ_info['_wfs_wms_status'] == settings.EnumWfsWmsStatus.NOT_AVAILABLE
 
-                publication_asserts.internal_rest.same_title_and_wfs_wms_status_in_source_and_rest_multi(workspace=publication.workspace,
-                                                                                                         publ_type=publication.type,
-                                                                                                         name=publication.name,
-                                                                                                         headers=None,
-                                                                                                         )
+                publication_asserts.rest.same_values_in_detail_and_multi(workspace=publication.workspace,
+                                                                         publ_type=publication.type,
+                                                                         name=publication.name,
+                                                                         rest_publication_detail=rest_publication_detail,
+                                                                         headers=None,
+                                                                         )
