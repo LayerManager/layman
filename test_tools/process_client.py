@@ -22,6 +22,8 @@ from .process import LAYMAN_CELERY_QUEUE
 
 logger = logging.getLogger(__name__)
 
+HTTP_TIMEOUT = 15
+
 TOKEN_HEADER = 'Authorization'
 
 layer_keys_to_check = ['db', 'wms', 'wfs', 'thumbnail', 'file', 'metadata']
@@ -145,7 +147,7 @@ def upload_file_chunks(publication_type,
             chunk_response = requests.post(chunk_url,
                                            files=file_dict,
                                            data=data,
-                                           timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
+                                           timeout=HTTP_TIMEOUT,
                                            )
         raise_layman_error(chunk_response)
 
@@ -246,7 +248,7 @@ def patch_workspace_publication(publication_type,
                                   files=files,
                                   headers=headers,
                                   data=data,
-                                  timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
+                                  timeout=HTTP_TIMEOUT,
                                   )
     raise_layman_error(response)
 
@@ -394,7 +396,7 @@ def publish_workspace_publication(publication_type,
                                  files=files,
                                  data=data,
                                  headers=headers,
-                                 timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
+                                 timeout=HTTP_TIMEOUT,
                                  )
     raise_layman_error(response)
     assert response.json()[0]['name'] == name or not name, f'name={name}, response.name={response.json()[0]["name"]}'
@@ -424,7 +426,7 @@ def get_workspace_publications_response(publication_type, workspace, *, headers=
 
     with app.app_context():
         r_url = url_for(publication_type_def.get_workspace_publications_url, workspace=workspace)
-    response = requests.get(r_url, headers=headers, params=query_params, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
+    response = requests.get(r_url, headers=headers, params=query_params, timeout=HTTP_TIMEOUT)
     raise_layman_error(response)
     return response
 
@@ -444,7 +446,7 @@ def get_publications_response(publication_type, *, headers=None, query_params=No
 
     with app.app_context():
         r_url = url_for(publication_type_def.get_publications_url)
-    response = requests.get(r_url, headers=headers, params=query_params, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
+    response = requests.get(r_url, headers=headers, params=query_params, timeout=HTTP_TIMEOUT)
     raise_layman_error(response)
     return response
 
@@ -465,7 +467,7 @@ def get_workspace_publication(publication_type, workspace, name, headers=None, )
         r_url = url_for(publication_type_def.get_workspace_publication_url,
                         workspace=workspace,
                         **{publication_type_def.url_param_name: name})
-    response = requests.get(r_url, headers=headers, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
+    response = requests.get(r_url, headers=headers, timeout=HTTP_TIMEOUT)
     raise_layman_error(response)
     return response.json()
 
@@ -479,13 +481,13 @@ def get_workspace_layer_style(workspace, layer, headers=None):
         r_url = url_for('rest_workspace_layer_style.get',
                         workspace=workspace,
                         layername=layer)
-    response = requests.get(r_url, headers=headers, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
+    response = requests.get(r_url, headers=headers, timeout=HTTP_TIMEOUT)
     raise_layman_error(response)
     return ET.parse(io.BytesIO(response.content))
 
 
 def finish_delete(workspace, url, headers, skip_404=False, ):
-    response = requests.delete(url, headers=headers, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
+    response = requests.delete(url, headers=headers, timeout=HTTP_TIMEOUT)
     status_codes_to_skip = {404} if skip_404 else set()
     raise_layman_error(response, status_codes_to_skip)
     wfs.clear_cache(workspace)
@@ -540,7 +542,7 @@ def get_workspace_publication_metadata_comparison(publication_type, workspace, n
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
     with app.app_context():
         r_url = url_for(publication_type_def.get_workspace_metadata_comparison_url, **{publication_type_def.url_param_name: name}, workspace=workspace)
-    response = requests.get(r_url, headers=headers, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
+    response = requests.get(r_url, headers=headers, timeout=HTTP_TIMEOUT)
     raise_layman_error(response)
     return response.json()
 
@@ -556,7 +558,7 @@ def reserve_username(username, headers=None):
     data = {
         'username': username,
     }
-    response = requests.patch(r_url, headers=headers, data=data, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
+    response = requests.patch(r_url, headers=headers, data=data, timeout=HTTP_TIMEOUT)
     raise_layman_error(response)
     claimed_username = response.json()['username']
     assert claimed_username == username
@@ -566,7 +568,7 @@ def get_current_user(headers=None):
     headers = headers or {}
     with app.app_context():
         r_url = url_for('rest_current_user.get')
-    response = requests.get(r_url, headers=headers, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
+    response = requests.get(r_url, headers=headers, timeout=HTTP_TIMEOUT)
     response.raise_for_status()
     return response.json()
 
@@ -603,7 +605,7 @@ def post_wfst(xml, *, headers=None, url=None, workspace=None):
     response = requests.post(rest_url,
                              data=xml,
                              headers=headers,
-                             timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
+                             timeout=HTTP_TIMEOUT,
                              )
     if response.headers.get('content-type') == 'application/json':
         raise_layman_error(response)
