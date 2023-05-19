@@ -27,6 +27,12 @@ def get_metadata_uuid(uuid):
     return f"m-{uuid}" if uuid is not None else None
 
 
+def get_metadata_url(uuid):
+    muuid = get_metadata_uuid(uuid)
+    result = settings.CSW_RECORD_URL.format(identifier=muuid)
+    return result
+
+
 def get_single_prop_els(parent_el, prop_name, publ_properties):
     micka_prop = publ_properties[prop_name]
     single_prop_els = parent_el.xpath(micka_prop['xpath_property'], namespaces=NAMESPACES)
