@@ -24,17 +24,13 @@ get_publication_uuid = empty_method_returns_none
 post_map = empty_method
 
 
-def get_metadata_uuid(uuid):
-    return f"m-{uuid}" if uuid is not None else None
-
-
 def get_map_info(workspace, mapname):
     uuid = get_map_uuid(workspace, mapname)
     try:
         csw = common_util.create_csw()
         if uuid is None or csw is None:
             return {}
-        muuid = get_metadata_uuid(uuid)
+        muuid = common_util.get_metadata_uuid(uuid)
         csw.getrecordbyid(id=[muuid], esn='brief')
     except HTTPError as exc:
         current_app.logger.info(f'traceback={traceback.format_exc()},\n'
@@ -58,7 +54,7 @@ def get_map_info(workspace, mapname):
 
 def delete_map(workspace, mapname):
     uuid = get_map_uuid(workspace, mapname)
-    muuid = get_metadata_uuid(uuid)
+    muuid = common_util.get_metadata_uuid(uuid)
     if muuid is None:
         return
     micka_requests.csw_delete(muuid)
@@ -74,7 +70,7 @@ def patch_map(workspace, mapname, metadata_properties_to_refresh=None, actor_nam
     csw = common_util.create_csw()
     if uuid is None or csw is None:
         return None
-    muuid = get_metadata_uuid(uuid)
+    muuid = common_util.get_metadata_uuid(uuid)
     element = common_util.get_record_element_by_id(csw, muuid)
     if element is None:
         if create_if_not_exists:
@@ -240,7 +236,7 @@ def _get_property_values(
     ]
 
     result = {
-        'md_file_identifier': get_metadata_uuid(uuid),
+        'md_file_identifier': common_util.get_metadata_uuid(uuid),
         'md_language': md_language,
         'md_date_stamp': md_date_stamp,
         'reference_system': crs_list,
@@ -396,7 +392,7 @@ def get_metadata_comparison(workspace, mapname):
     csw = common_util.create_csw()
     if uuid is None or csw is None:
         return {}
-    muuid = get_metadata_uuid(uuid)
+    muuid = common_util.get_metadata_uuid(uuid)
     element = common_util.get_record_element_by_id(csw, muuid)
     if element is None:
         return {}

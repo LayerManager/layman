@@ -23,6 +23,10 @@ for k, v in NAMESPACES.items():
     ET.register_namespace(k, v)
 
 
+def get_metadata_uuid(uuid):
+    return f"m-{uuid}" if uuid is not None else None
+
+
 def get_single_prop_els(parent_el, prop_name, publ_properties):
     micka_prop = publ_properties[prop_name]
     single_prop_els = parent_el.xpath(micka_prop['xpath_property'], namespaces=NAMESPACES)
@@ -650,7 +654,6 @@ def patch_publication_by_soap(workspace,
                               metadata_properties_to_refresh,
                               actor_name,
                               access_rights,
-                              csw_source,
                               csw_patch_method,
                               soap_insert_method):
     publ_info = get_publication_info(workspace, publ_type, publ_name, context={'keys': ['access_rights'], })
@@ -659,7 +662,7 @@ def patch_publication_by_soap(workspace,
     csw_instance = create_csw()
     if uuid is None or csw_instance is None:
         return
-    muuid = csw_source.get_metadata_uuid(uuid)
+    muuid = get_metadata_uuid(uuid)
     num_records = get_number_of_records(muuid, True)
     if num_records == 0:
         full_access_rights = authz.complete_access_rights(access_rights, publ_info['access_rights'])
