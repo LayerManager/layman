@@ -243,7 +243,7 @@ CSW_URL = os.getenv('CSW_URL', None)
 CSW_PROXY_URL = os.getenv('CSW_PROXY_URL', None)
 CSW_BASIC_AUTHN = None if ':' not in os.getenv('CSW_BASIC_AUTHN', '') else tuple(
     os.environ['CSW_BASIC_AUTHN'].split(':'))
-CSW_RECORD_URL = os.getenv('CSW_RECORD_URL', None)
+assert CSW_PROXY_URL.endswith('/csw')
 
 # # tuples like (version, revision)
 MICKA_REGEXP = r"^(?P<operation>==|>=|)(?P<version>[0-9.]+):(?P<revision>[0-9-.]+)$"
