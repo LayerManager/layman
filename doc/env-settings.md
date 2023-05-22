@@ -198,9 +198,6 @@ Filesystem directory where data published on QGIS are stored, including styles.
 ### CSW_BASIC_AUTHN
 HTTP Basic Authentication credentials for communication with [CSW](#CSW_URL) encoded as `user:password`.
 
-### CSW_RECORD_URL
-URL of [CSW](#CSW_URL) metadata record accessible by web browser, probably with some editing capabilities. Must contain `{identifier}` string that will be replaced with record ID.
-
 ### CSW_URL
 Internal URL of [OGC Catalogue Service v2.0.2](https://www.opengeospatial.org/standards/cat) endpoint. Tested with [Micka](http://micka.bnhelp.cz/).
 

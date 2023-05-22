@@ -29,7 +29,8 @@ def get_metadata_uuid(uuid):
 
 def get_metadata_url(uuid):
     muuid = get_metadata_uuid(uuid)
-    result = settings.CSW_RECORD_URL.format(identifier=muuid)
+    server_url = settings.CSW_PROXY_URL[:-3]
+    result = f'{server_url}record/basic/{muuid}'
     return result
 
 

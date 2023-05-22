@@ -13,6 +13,7 @@
 - If you are using environment variable [`OAUTH2_CALLBACK_URL`](doc/env-settings.md#oauth2_callback_url), change only its URL path from `/client/authn/oauth2-liferay/callback` to `/client/authn/oauth2-provider/callback`. Keep protocol, domain, and port unchanged.
 - Stop using environment variable `LAYMAN_AUTHN_OAUTH2_PROVIDERS`, it has no effect to Layman anymore. There is exactly one OAuth2 provider Python module now, no need to set it.
 - Stop using environment variable `FLASK_ENV`, it has no effect to Layman anymore.
+- Stop using environment variable `CSW_RECORD_URL`, it has no effect to Layman anymore. Value is derived from variable `CSW_PROXY_URL`.
 - If you used environment variable `FLASK_ENV` with value `development`, add new environment variable [`FLASK_DEBUG`](https://flask.palletsprojects.com/en/2.3.x/config/?highlight=flask_debug#DEBUG):
   ```
   FLASK_DEBUG=1
