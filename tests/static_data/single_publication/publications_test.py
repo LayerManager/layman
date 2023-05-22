@@ -41,7 +41,7 @@ def test_infos(workspace, publ_type, publication):
     asserts_rest.same_values_in_detail_and_multi(workspace, publ_type, publication, rest_detail, headers)
     if 'geodata_type' in publ_def[data.TEST_DATA]:
         exp_geodata_type = publ_def[data.TEST_DATA]['geodata_type']
-        asserts_rest.correct_file_type_in_rest_multi(workspace, publ_type, publication, headers, exp_geodata_type)
+        assert rest_detail['geodata_type'] == exp_geodata_type
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)
