@@ -1,18 +1,7 @@
 import copy
 
 from celery import states
-from layman.layer import LAYER_TYPE
 from test_tools import process_client, util as test_util
-
-
-def correct_file_type_in_rest_multi(workspace, publ_type, name, headers, exp_file_type):
-    infos = process_client.get_workspace_publications(publ_type, workspace, headers=headers)
-    publication_infos = [info for info in infos if info['name'] == name]
-    info = next(iter(publication_infos))
-    if publ_type == LAYER_TYPE:
-        assert info['file']['file_type'] == exp_file_type
-    else:
-        assert 'file' not in info
 
 
 def is_complete_in_rest(rest_publication_detail):
