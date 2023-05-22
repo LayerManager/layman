@@ -216,7 +216,7 @@ class TestSingleRestPublication:
             }, scope='class')
         for username in self.usernames_to_reserve:
             headers = process_client.get_authz_headers(username)
-            process_client.ensure_reserved_username(self.workspace, headers=headers)
+            process_client.ensure_reserved_username(username, headers=headers)
         self.before_class()
         yield
         self.after_class(request)
