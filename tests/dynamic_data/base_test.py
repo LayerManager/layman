@@ -112,8 +112,11 @@ class TestSingleRestPublication:
                     parametrization=parametrization,
                 )
 
-                publ_name_parts = [publication_type.split('.')[1], input_test_case.key.replace(':', '_').lower()] +\
-                                  [val.publ_name_part for val in parametrization.values_list if val.publ_name_part]
+                publ_name_parts = ([publication_type.split('.')[1]] if publication_type else []) + [
+                    input_test_case.key.replace(':', '_').lower()
+                ] + [
+                    val.publ_name_part for val in parametrization.values_list if val.publ_name_part
+                ]
                 name = '_'.join(publ_name_parts)
                 pytest_id = name
 
