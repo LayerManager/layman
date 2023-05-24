@@ -26,3 +26,5 @@ def test_issue_738():
                                                     )
     style = response.content.decode()
     assert 'StyledLayerDescriptorImpl@' in style
+
+    process_client.delete_workspace_layer(workspace=workspace, name=layer)
