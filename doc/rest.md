@@ -69,8 +69,8 @@ JSON array of objects representing available layers with following structure:
 - **native_crs**: Code of native CRS in form "EPSG:&lt;code&gt;", e.g. "EPSG:4326".
 - **native_bounding_box**: List of 4 floats and one string. Bounding box coordinates [minx, miny, maxx, maxy] in native CRS.
 - **geodata_type**: String. Either `vector`, `raster`, or `unknown`. Value `unknown` is used if input files are zipped and still being uploaded.
-- **file**: **Deprecated**.
-  - *file_type*: **Deprecated**. Replaced by **geodata_type** at root level, contains same info.
+- **~~file~~**: **Deprecated**.
+  - *~~file_type~~*: **Deprecated**. Replaced by **geodata_type** at root level, contains same info.
 - **wfs_wms_status**: String. Status of layer availability in WMS (and WFS in case of vector data) endpoints. Either `AVAILABLE`, `PREPARING`, or `NOT_AVAILABLE`.
 
 Headers:
@@ -295,7 +295,7 @@ JSON object with following structure:
     - Replaced by *paths*, which contains list of all data files.
     - String. Path to input data file. Path is relative to workspace directory.  
     If data file was sent in ZIP archive to the server, path includes also path to the main file inside ZIP file. E.g. `layers/zipped_shapefile/input_file/zipped_shapefile.zip/layer_main_file.shp`
-  - *file_type*: **Deprecated**. Replaced by **geodata_type** at root level, contains same info.
+  - *~~file_type~~*: **Deprecated**. Replaced by **geodata_type** at root level, contains same info.
   - *status*: Status information about saving and availability of files. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - *db*, available only for vector layers
@@ -305,11 +305,11 @@ JSON object with following structure:
   - *external_uri*: String. Available only for layers published from external table. Connection string to external table without password.
   - *status*: Status information about DB import and availability of the table. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
-- *db_table*: **Deprecated**. Replaced by **db**.
+- *~~db_table~~*: **Deprecated**. Replaced by **db**.
   - available only for vector layers
-  - *name*: Replaced by db.table.
-  - *status*: Replaced by db.status.
-  - *error*: Replaced by db.error.
+  - *~~name~~*: Replaced by db.table.
+  - *~~status~~*: Replaced by db.status.
+  - *~~error~~*: Replaced by db.error.
 - **style**
   - *url*: String. URL of layer default style. It points to [GET Workspace Layer Style](#get-workspace-layer-style).
   - *type*: String. Type of used style. Either 'sld' or 'qml'.
@@ -848,6 +848,6 @@ JSON object representing current application version:
     - **layman**:
       - **last-schema-migration**: String. Identifier of the last successful schema migration in format 'X.Y.Z-m'.
       - **last-data-migration**: String. Identifier of the last successful data migration in format 'X.Y.Z-m'.
-      - **last-migration**:
+      - **~~last-migration~~**:
         - **deprecated parameter**
         - alias for *last-schema-migration* parameter
