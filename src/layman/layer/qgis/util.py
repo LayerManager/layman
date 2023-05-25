@@ -160,9 +160,9 @@ def get_layer_wms_crs_list_values(workspace, layer):
     return crs_list
 
 
-def _get_qml_geometry_by_xpath(qml, xpath, translate_dict):
+def _get_qml_geometry_by_xpaths(qml, xpaths, translate_dict):
     symbol_types = {
-        str(attr_value) for attr_value in qml.xpath(xpath)
+        str(attr_value) for xpath in xpaths for attr_value in qml.xpath(xpath)
     }
     if not symbol_types:
         return None
@@ -176,15 +176,13 @@ def _get_qml_geometry_by_xpath(qml, xpath, translate_dict):
 
 
 def _get_qml_geometry_from_qml(qml):
-    label_dict = {
-        'LineGeometry': 'Line',
-        'PolygonGeometry': 'Polygon',
-        'UnknownGeometry': 'Unknown',
-    }
-
-    for xpath, translate_dict in [
+    for xpaths, translate_dict in [
         (
-            '/qgis/renderer-v2/symbols/symbol/@type',
+            [
+                '/qgis/renderer-v2/symbols/symbol/@type',
+                '/qgis/renderer-v2/symbol/@type',
+                '/qgis/renderer-v2/renderer-v2/symbols/symbol/@type'
+            ],
             {
                 'marker': 'Point',
                 'line': 'Line',
@@ -192,18 +190,21 @@ def _get_qml_geometry_from_qml(qml):
             }
         ),
         (
-            '/qgis/labeling/rules/rule/settings/placement/@layerType',
-            label_dict
-        ),
-        (
-            '/qgis/labeling/settings/placement/@layerType',
-            label_dict
+            [
+                '/qgis/labeling/rules/rule/settings/placement/@layerType',
+                '/qgis/labeling/settings/placement/@layerType',
+            ],
+            {
+                'LineGeometry': 'Line',
+                'PolygonGeometry': 'Polygon',
+                'UnknownGeometry': 'Unknown',
+            }
         ),
     ]:
-        result = _get_qml_geometry_by_xpath(qml,
-                                            xpath,
-                                            translate_dict,
-                                            )
+        result = _get_qml_geometry_by_xpaths(qml,
+                                             xpaths,
+                                             translate_dict,
+                                             )
         if result:
             break
     if not result:

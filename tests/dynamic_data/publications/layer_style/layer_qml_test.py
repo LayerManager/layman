@@ -23,6 +23,14 @@ TEST_CASES = {
             'style_file': 'sample/style/labels_without_symbols/BODOVE_POLE_T.qml',
         },
     },
+    'points_clustering': {
+        'rest_args': {
+            'file_paths': [
+                os.path.join(DIRECTORY, 'cluster.geojson'),
+            ],
+            'style_file': 'sample/style//cluster.qml',
+        },
+    },
 }
 
 

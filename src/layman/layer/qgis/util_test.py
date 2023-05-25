@@ -93,6 +93,7 @@ def test_geometry_types(layer, exp_db_types, qml_geometry_dict):
     ('sample/style/labels_without_symbols/DALSI_PRVKY_MAPY_T.qml', 'Unknown'),
     ('sample/style/labels_without_symbols/KATASTRALNI_UZEMI_DEF.qml', 'Unknown'),
     ('sample/style/labels_without_symbols/PRVKY_ORIENT_MAPY_T.qml', 'Unknown'),
+    ('sample/style/cluster.qml', 'Point'),
 ])
 def test__get_qml_geometry_from_qml(qml_path, exp_qml_type):
     parser = ET.XMLParser(remove_blank_text=True)
