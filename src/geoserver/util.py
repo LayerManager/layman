@@ -1115,6 +1115,21 @@ def get_feature_type(
     return response.json()['featureType']
 
 
+def get_coverage(
+        workspace, data_store, feature_type,
+        gs_rest_workspaces=GS_REST_WORKSPACES):
+    r_url = urljoin(gs_rest_workspaces,
+                    f'{workspace}/coveragestores/{data_store}/coverages/{feature_type}')
+
+    response = requests.get(r_url,
+                            headers=headers_json,
+                            auth=GS_AUTH,
+                            timeout=GS_REST_TIMEOUT,
+                            )
+    response.raise_for_status()
+    return response.json()['coverage']
+
+
 def bbox_to_dict(bbox, crs):
     return {
         "minx": bbox[0],
