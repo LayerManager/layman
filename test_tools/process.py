@@ -61,6 +61,7 @@ def oauth2_provider_mock():
                 'test_get_publications_workspace2': None,
                 'test_select_publications_complex_workspace1': None,
                 'test_select_publications_complex_workspace2': None,
+                'test_select_publications_complex_workspace3': None,
                 'test_owner': None,
                 'test_owner2': None,
                 'test_not_owner': None,
