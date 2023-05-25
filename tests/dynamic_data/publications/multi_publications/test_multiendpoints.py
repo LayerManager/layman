@@ -1,18 +1,17 @@
-from enum import Enum, unique
+import copy
+import inspect
 import os
 import pytest
 
 import crs as crs_def
 from layman import app, settings
 from layman.common.prime_db_schema import publications as prime_db_schema_publications
-from tests import EnumTestTypes, Publication
+from tests import Publication, EnumTestTypes
 from tests.dynamic_data import base_test
 from test_tools import process_client, prime_db_schema_client
 
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
-pytest_generate_tests = base_test.pytest_generate_tests
-
 WORKSPACE1 = 'test_select_publications_complex_workspace1'
 WORKSPACE2 = 'test_select_publications_complex_workspace2'
 WORKSPACE3 = 'test_select_publications_complex_workspace3'
@@ -78,7 +77,7 @@ PUBLICATIONS = {
     },
 }
 
-TEST_CASES = [
+INTERNAL_TEST_CASES = [
     ({}, {
         'items': [MAP_1E_2_4X6_6,
                   MAP_1E_3_3X3_3,
@@ -367,10 +366,44 @@ TEST_CASES = [
 ]
 
 
-def generate_test_cases():
+def pytest_generate_tests(metafunc):
+    # https://docs.pytest.org/en/6.2.x/parametrize.html#pytest-generate-tests
+    cls = metafunc.cls
+    test_fn = metafunc.function
+    arg_names = [a for a in inspect.getfullargspec(test_fn).args if a != 'self']
+    argvalues = []
+    ids = []
+
+    test_cases = cls.test_cases[test_fn.__name__]
+    for test_case in test_cases:
+        assert not test_case.publication, f"Not yet implemented"
+        assert not test_case.publication_type, f"Not yet implemented"
+        assert not test_case.key, f"Not yet implemented"
+        assert not test_case.rest_method, f"Not yet implemented"
+        assert not test_case.rest_args, f"Not yet implemented"
+        assert not test_case.specific_params, f"Not yet implemented"
+        assert not test_case.specific_types, f"Not yet implemented"
+        assert not test_case.parametrization, f"Not yet implemented"
+        assert not test_case.post_before_patch_args, f"Not yet implemented"
+        assert test_case.type == EnumTestTypes.MANDATORY, f"Other types then MANDATORY are not implemented yet"
+        arg_name_to_value = {
+            'params': copy.deepcopy(test_case.params),
+        }
+        arg_values = [arg_name_to_value[n] for n in arg_names]
+
+        argvalues.append(pytest.param(*arg_values, marks=test_case.marks))
+        ids.append(test_case.pytest_id)
+    metafunc.parametrize(
+        argnames=', '.join(arg_names),
+        argvalues=argvalues,
+        ids=ids,
+    )
+
+
+def generate_test_cases(test_cases):
     tc_list = []
-    for idx, (query_params, exp_result) in enumerate(TEST_CASES):
-        test_case = base_test.TestCaseType(key=f"query-{idx+1}",
+    for idx, (query_params, exp_result) in enumerate(test_cases):
+        test_case = base_test.TestCaseType(pytest_id=f"query-{idx+1}",
                                            params={
                                                'query': query_params,
                                                'exp_result': exp_result,
@@ -381,22 +414,31 @@ def generate_test_cases():
     return tc_list
 
 
-@pytest.mark.usefixtures('oauth2_provider_mock')
-class TestGet(base_test.TestSingleRestPublication):
+@pytest.mark.usefixtures('ensure_layman_module', 'oauth2_provider_mock')
+class TestGet:
+    test_cases = {
+        'test_internal_query': generate_test_cases(INTERNAL_TEST_CASES),
+    }
 
-    test_cases = generate_test_cases()
+    @pytest.fixture(scope='class', autouse=True)
+    def class_fixture(self):
+        TestGet.before_class()
+        yield
+        TestGet.after_class()
 
-    def before_class(self):
+    @staticmethod
+    def before_class():
         for workspace in WORKSPACES:
             prime_db_schema_client.ensure_user(workspace)
         for publication, publ_params in PUBLICATIONS.items():
             prime_db_schema_client.post_workspace_publication(publication.type, publication.workspace, publication.name,
                                                               actor=publication.workspace, **publ_params)
 
-    def after_class(self, request):
+    @staticmethod
+    def after_class():
         prime_db_schema_client.clear_workspaces(WORKSPACES)
 
-    def test_query(self, params):
+    def test_internal_query(self, params):
         query_params = params['query']
         exp_result = params['exp_result']
         with app.app_context():
