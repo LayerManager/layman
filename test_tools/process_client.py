@@ -424,10 +424,15 @@ def publish_workspace_publication(publication_type,
 publish_workspace_map = partial(publish_workspace_publication, MAP_TYPE)
 publish_workspace_layer = partial(publish_workspace_publication, LAYER_TYPE)
 
+GET_PUBLICATIONS_KNOWN_PARAMS = {'full_text_filter', 'bbox_filter', 'bbox_filter_crs', 'order_by', 'ordering_bbox',
+                                 'ordering_bbox_crs', 'limit', 'offset'}
+
 
 def get_workspace_publications_response(publication_type, workspace, *, headers=None, query_params=None, ):
-    headers = headers or {}
     query_params = query_params or {}
+    assert set(query_params.keys()) <= GET_PUBLICATIONS_KNOWN_PARAMS, \
+        f"Unknown params: {set(query_params.keys()) - GET_PUBLICATIONS_KNOWN_PARAMS}"
+    headers = headers or {}
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
 
     with app.app_context():
@@ -446,8 +451,10 @@ get_workspace_layers = partial(get_workspace_publications, LAYER_TYPE)
 
 
 def get_publications_response(publication_type, *, headers=None, query_params=None):
-    headers = headers or {}
     query_params = query_params or {}
+    assert set(query_params.keys()) <= GET_PUBLICATIONS_KNOWN_PARAMS, \
+        f"Unknown params: {set(query_params.keys()) - GET_PUBLICATIONS_KNOWN_PARAMS}"
+    headers = headers or {}
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
 
     with app.app_context():
