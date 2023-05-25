@@ -10,11 +10,6 @@ from tests.dynamic_data import base_test
 from test_tools import process_client, prime_db_schema_client
 
 
-@unique
-class Key(Enum):
-    REST_ARGS = 'rest_args'
-
-
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 pytest_generate_tests = base_test.pytest_generate_tests
 
