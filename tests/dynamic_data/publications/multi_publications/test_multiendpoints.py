@@ -365,6 +365,18 @@ INTERNAL_TEST_CASES = [
     }),
 ]
 
+REST_TEST_CASES = [
+    ({}, {
+        'items': [MAP_1E_2_4X6_6,
+                  MAP_1E_3_3X3_3,
+                  MAP_1OE_3_7X5_9,
+                  MAP_2E_3_3X5_5,
+                  ],
+        'total_count': 4,
+        'content_range': (1, 4),
+    })
+]
+
 
 def pytest_generate_tests(metafunc):
     # https://docs.pytest.org/en/6.2.x/parametrize.html#pytest-generate-tests
@@ -418,18 +430,23 @@ def generate_test_cases(test_cases):
 class TestGet:
     test_cases = {
         'test_internal_query': generate_test_cases(INTERNAL_TEST_CASES),
+        'test_rest_query': generate_test_cases(REST_TEST_CASES),
     }
+
+    usernames_to_reserve = WORKSPACES
 
     @pytest.fixture(scope='class', autouse=True)
     def class_fixture(self):
+        for username in self.usernames_to_reserve:
+            headers = process_client.get_authz_headers(username)
+            process_client.ensure_reserved_username(username, headers=headers)
+
         TestGet.before_class()
         yield
         TestGet.after_class()
 
     @staticmethod
     def before_class():
-        for workspace in WORKSPACES:
-            prime_db_schema_client.ensure_user(workspace)
         for publication, publ_params in PUBLICATIONS.items():
             prime_db_schema_client.post_workspace_publication(publication.type, publication.workspace, publication.name,
                                                               actor=publication.workspace, **publ_params)
@@ -448,3 +465,20 @@ class TestGet:
         assert info_publications == exp_result['items']
         assert infos['total_count'] == exp_result['total_count']
         assert infos['content_range'] == exp_result['content_range']
+
+    def test_rest_query(self, params):
+        query_params = params['query']
+
+        exp_result = params['exp_result']
+
+        info_publications_response = process_client.get_publications_response(process_client.MAP_TYPE,
+                                                                              query_params=query_params)
+        info_publications_json = info_publications_response.json()
+        info_publications = [Publication(item['workspace'], process_client.MAP_TYPE, item['name'])
+                             for item in info_publications_json]
+
+        assert set(info_publications) == set(exp_result['items'])
+        assert info_publications == exp_result['items']
+        assert info_publications_response.headers['X-Total-Count'] == f"{exp_result['total_count']}"
+        content_range_str = f"items {exp_result['content_range'][0]}-{exp_result['content_range'][1]}/{exp_result['total_count']}"
+        assert info_publications_response.headers['Content-Range'] == content_range_str
