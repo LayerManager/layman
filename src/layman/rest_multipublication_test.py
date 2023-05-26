@@ -230,7 +230,7 @@ class TestGetPublications:
             'X-Total-Count': '5',
             'Content-Range': 'items 1-5/5'
         },),
-        (authn_headers_user2, {'order_by_list': ['bbox'],
+        (authn_headers_user2, {'order_by': 'bbox',
                                'ordering_bbox': ','.join(str(c) for c in (2999, 2999, 5001, 5001))}, [
             (workspace2, publication_2e_3_3x5_5),
             (workspace1, publication_1e_2_4x6_6),
@@ -241,7 +241,7 @@ class TestGetPublications:
             'X-Total-Count': '5',
             'Content-Range': 'items 1-5/5'
         },),
-        (authn_headers_user2, {'order_by_list': ['bbox'],
+        (authn_headers_user2, {'order_by': 'bbox',
                                'ordering_bbox': ','.join(str(c) for c in (0.0269405, 0.0269405, 0.0449247, 0.0449247)),  # EPSG:3857 (2999, 2999, 5001, 5001)
                                'ordering_bbox_crs': 'EPSG:4326',
                                }, [
@@ -254,7 +254,7 @@ class TestGetPublications:
             'X-Total-Count': '5',
             'Content-Range': 'items 1-5/5'
         },),
-        (authn_headers_user2, {'order_by_list': ['bbox'],
+        (authn_headers_user2, {'order_by': 'bbox',
                                'ordering_bbox': ','.join(str(c) for c in (3001, 3001, 3001, 3001))}, [
             (workspace2, publication_2e_3_3x5_5),
             (workspace2, publication_2o_2_2x4_4),
@@ -265,7 +265,7 @@ class TestGetPublications:
             'X-Total-Count': '5',
             'Content-Range': 'items 1-5/5'
         },),
-        (authn_headers_user2, {'order_by_list': ['bbox'],
+        (authn_headers_user2, {'order_by': 'bbox',
                                'ordering_bbox': ','.join(str(c) for c in (3001, 3001, 3001, 3001)),
                                'ordering_bbox_crs': 'EPSG:3857', }, [
             (workspace2, publication_2e_3_3x5_5),
@@ -524,7 +524,7 @@ class TestGetPublications:
             'Content-Range': 'items 1-3/3',
             },
         ),
-        (workspace1, None, {'order_by_list': ['bbox'],
+        (workspace1, None, {'order_by': 'bbox',
                             'ordering_bbox': ','.join(str(c) for c in (0.0269405, 0.0269405, 0.0449247, 0.0449247)),  # EPSG:3857 (2999, 2999, 5001, 5001)
                             'ordering_bbox_crs': 'EPSG:4326'}, [
             (workspace1, publication_1e_2_4x6_6),
@@ -534,7 +534,7 @@ class TestGetPublications:
             'Content-Range': 'items 1-3/3',
             },
         ),
-        (workspace1, None, {'order_by_list': ['bbox'],
+        (workspace1, None, {'order_by': 'bbox',
                             'ordering_bbox': ','.join(str(c) for c in (3001, 3001, 3001, 3001)),
                             'ordering_bbox_crs': 'EPSG:3857'}, [
             (workspace1, publication_1e_2_4x6_6),
