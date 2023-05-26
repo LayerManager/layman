@@ -111,6 +111,8 @@ def post(workspace):
             raise LaymanError(2, {'parameter': 'time_regex',
                                   'expected': 'Regular expression',
                                   }) from exp
+    time_regex_format = request.form.get('time_regex_format') or None
+    slugified_time_regex_format = input_file.slugify_timeseries_filename_pattern(time_regex_format) if time_regex_format else None
 
     name_normalized_tif_by_layer = time_regex is None
     name_input_file_by_layer = time_regex is None or input_files.is_one_archive
@@ -167,6 +169,7 @@ def post(workspace):
         'geodata_type': geodata_type,
         'time_regex': time_regex,
         'slugified_time_regex': slugified_time_regex,
+        'slugified_time_regex_format': slugified_time_regex_format,
         'image_mosaic': time_regex is not None,
         'name_normalized_tif_by_layer': name_normalized_tif_by_layer,
         'name_input_file_by_layer': name_input_file_by_layer,

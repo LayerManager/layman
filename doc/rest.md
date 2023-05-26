@@ -207,6 +207,9 @@ Body parameters:
     - or has one or more matching groups that concatenated together matches ISO 8601 year, date, or datetime patterns, e.g. `^some_prefix_([0-9]{8})_some_postfix.*$` or , e.g. `some_prefix_([0-9]{8})_some_separator_(T[0-9]{6}Z)_some_postfix`
   - latin diacritic is removed from the regex and spaces are replaced with underscores to be consistent with slugifying of timeseries filenames
   - error is raised if any of main data file names do not match *time_regex* value
+- *time_regex_format*, string, e.g. yyyyddMM
+  - description of `time_regex` result format as [java SimpleDateFormat](https://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html), [GeoServer examples](https://docs.geoserver.geo-solutions.it/edu/en/multidim/imagemosaic/mosaic_indexer.html#format)
+  - supported only in combination with `time_regex`
 
 #### Response
 Content-Type: `application/json`
