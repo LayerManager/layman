@@ -36,6 +36,7 @@ def refresh_wms(
         access_rights=None,
         image_mosaic=False,
         slugified_time_regex=None,
+        slugified_time_regex_format=None,
         original_data_source=settings.EnumOriginalDataSource.FILE.value,
 ):
     info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': [
@@ -100,8 +101,9 @@ def refresh_wms(
             dir_path = os.path.dirname(file_path)
             shutil.copy(os.path.join(DIRECTORY, 'indexer.properties'), dir_path)
             timeregex_path = os.path.join(dir_path, 'timeregex.properties')
+            timeregex_format_str = f',format={slugified_time_regex_format}' if slugified_time_regex_format else ''
             with open(timeregex_path, 'w', encoding="utf-8") as file:
-                file.write(f'regex={slugified_time_regex}\n')
+                file.write(f'regex={slugified_time_regex}{timeregex_format_str}\n')
             coverage_type = gs_util.COVERAGESTORE_IMAGEMOSAIC
             enable_time_dimension = True
         gs_util.create_coverage_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, coverage_store_name, source_file_or_dir, coverage_type=coverage_type)

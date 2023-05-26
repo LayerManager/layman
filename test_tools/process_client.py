@@ -323,6 +323,7 @@ def publish_workspace_publication(publication_type,
                                   overview_resampling=None,
                                   do_not_upload_chunks=False,
                                   time_regex=None,
+                                  time_regex_format=None,
                                   do_not_post_name=False,
                                   ):
     title = title or name
@@ -390,6 +391,8 @@ def publish_workspace_publication(publication_type,
             data['overview_resampling'] = overview_resampling
         if time_regex:
             data['time_regex'] = time_regex
+        if time_regex_format:
+            data['time_regex_format'] = time_regex_format
         if external_table_uri:
             data['external_table_uri'] = external_table_uri
         response = requests.post(r_url,

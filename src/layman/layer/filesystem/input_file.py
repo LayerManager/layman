@@ -399,11 +399,8 @@ def check_filenames(workspace, layername, input_files, check_crs, *, ignore_exis
             new_match = re.search(slugified_time_regex, new_filename)
             assert old_match is not None and new_match is not None
             assert len(old_match.groups()) == len(new_match.groups())
-            if len(old_match.groups()) > 0:
-                # if there are any matching groups, compare them instead of the whole result
-                assert old_match.groups() == new_match.groups()
-            else:
-                assert old_match.group(0) == new_match.group(0)
+            assert all(len(old_match.groups(idx)) == len(new_match.groups(idx)) for idx in range(0, len(old_match.groups())))
+            assert all(slugify_timeseries_filename(old_match.groups(idx)[0]) == new_match.groups(idx)[0] for idx in range(0, len(old_match.groups())))
 
     if not ignore_existing_files:
         conflict_paths = [v
