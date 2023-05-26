@@ -1,6 +1,10 @@
 import copy
+from dataclasses import dataclass
+from enum import Enum, unique
 import inspect
 import os
+from typing import Union, Tuple
+import unicodedata
 import pytest
 
 import crs as crs_def
@@ -25,60 +29,106 @@ MAP_2E_BBOX_CE35 = Publication(WORKSPACE2, process_client.MAP_TYPE, 'test_select
 MAP_2O_BBOX_BD24 = Publication(WORKSPACE2, process_client.MAP_TYPE, 'test_select_publications_map2o')
 MAP_3O_BBOX_EMPTY = Publication(WORKSPACE3, process_client.MAP_TYPE, 'test_select_publications_map3o')
 
+
+@dataclass(frozen=True)
+class BBoxClass:
+    epsg_3857: Union[Tuple[float], Tuple[int], Tuple[None]] = None
+    epsg_4326: Union[Tuple[float], Tuple[int], Tuple[None]] = None
+    epsg_5514: Union[Tuple[float], Tuple[int], Tuple[None]] = None
+    epsg_32633: Union[Tuple[float], Tuple[int], Tuple[None]] = None
+    epsg_32634: Union[Tuple[float], Tuple[int], Tuple[None]] = None
+    epsg_3034: Union[Tuple[float], Tuple[int], Tuple[None]] = None
+    epsg_3035: Union[Tuple[float], Tuple[int], Tuple[None]] = None
+
+
+@unique
+class BBox(Enum):
+    BC26 = BBoxClass(
+        # 1842011 6321892 1842988 6326107
+        epsg_5514=(-601597.1407428421, -1151286.9441679057, -600665.4471820187, -1148625.2345234894),
+    )
+    BD24 = BBoxClass(
+        # 1841824 6322015 1844176 6323984
+        epsg_3034=(4459469.209282893, 2527850.676486253, 4460838.491401795, 2529216.681901061),
+    )
+    BF46 = BBoxClass(
+        epsg_3857=(1842000, 6324000, 1846000, 6326000),
+    )
+    C3 = BBoxClass(
+        # 1843000 6323000
+        epsg_4326=(16.55595068632278, 49.28289621550056, 16.55595068632278, 49.28289621550056),
+        # 1843001, 6323001
+        epsg_32634=(176844.09626803786, 5468335.761457844, 176844.09626803786, 5468335.761457844),
+    )
+    CE35 = BBoxClass(
+        epsg_3857=(1843000, 6323000, 1845000, 6325000),
+        # 1843006 6322882 1844993 6325117
+        epsg_32634=(176844.09626803786, 5468335.761457844, 178226.55642100016, 5469714.707582928),
+        # 1842999, 6322999, 1845001, 6325001
+        epsg_4326=(16.5559417, 49.2828904, 16.573926, 49.2946205),
+        # 1842999, 6322999, 1845001, 6325001
+        epsg_5514=(-600879.43, -1150642.64, -599437.98, -1149487.13),
+    )
+    CE79 = BBoxClass(
+        # 1842958 6327000 1845041 6328999
+        epsg_32633=(613077.7082822081, 5462674.538979379, 614410.4777841105, 5464003.656058598),
+    )
+    D4 = BBoxClass(
+        epsg_3857=(1844000, 6324000, 1844000, 6324000),
+    )
+    EMPTY = BBoxClass(
+        epsg_3035=(None, None, None, None),
+    )
+
+
 PUBLICATIONS = {
     MAP_1E_BBOX_BF46: {
         'title': 'Příliš žluťoučký Kůň úpěl ďábelské ódy',
         'access_rights': {'read': {settings.RIGHTS_EVERYONE_ROLE},
                           'write': {settings.RIGHTS_EVERYONE_ROLE}},
-        # rect
-        'bbox': (1842000, 6324000, 1846000, 6326000),
+        'bbox': BBox.BF46.value.epsg_3857,
         'crs': crs_def.EPSG_3857,
     },
     MAP_1E_BBOX_C3: {
         'title': 'Jednobodová vrstva Kodaň',
         'access_rights': {'read': {settings.RIGHTS_EVERYONE_ROLE},
                           'write': {settings.RIGHTS_EVERYONE_ROLE}},
-        # point 1843000 6323000
-        'bbox': (16.55595068632278, 49.28289621550056, 16.55595068632278, 49.28289621550056),
+        'bbox': BBox.C3.value.epsg_4326,
         'crs': crs_def.EPSG_4326,
     },
     MAP_1O_BBOX_BC26: {
         'title': 'Ďůlek kun Karel',
         'access_rights': {'read': {WORKSPACE1},
                           'write': {WORKSPACE1}},
-        # rect 1842011 6321892 1842988 6326107
-        'bbox': (-601597.1407428421, -1151286.9441679057, -600665.4471820187, -1148625.2345234894),
+        'bbox': BBox.BC26.value.epsg_5514,
         'crs': crs_def.EPSG_5514,
     },
     MAP_1OE_BBOX_CE79: {
         'title': 'jedna dva tři čtyři kód',
         'access_rights': {'read': {settings.RIGHTS_EVERYONE_ROLE},
                           'write': {WORKSPACE1}},
-        # rect 1842958 6327000 1845041 6328999
-        'bbox': (613077.7082822081, 5462674.538979379, 614410.4777841105, 5464003.656058598),
+        'bbox': BBox.CE79.value.epsg_32633,
         'crs': crs_def.EPSG_32633,
     },
     MAP_2E_BBOX_CE35: {
         'title': 'Svíčky is the best game',
         'access_rights': {'read': {settings.RIGHTS_EVERYONE_ROLE},
                           'write': {settings.RIGHTS_EVERYONE_ROLE}},
-        # rect 1843006 6322882 1844993 6325117
-        'bbox': (176844.09626803786, 5468335.761457844, 178226.55642100016, 5469714.707582928),
+        'bbox': BBox.CE35.value.epsg_32634,
         'crs': crs_def.EPSG_32634,
     },
     MAP_2O_BBOX_BD24: {
         'title': 'druhá mapa JeDnA óda',
         'access_rights': {'read': {WORKSPACE2},
                           'write': {WORKSPACE2}},
-        # rect 1841824 6322015 1844176 6323984
-        'bbox': (4459469.209282893, 2527850.676486253, 4460838.491401795, 2529216.681901061),
+        'bbox': BBox.BD24.value.epsg_3034,
         'crs': crs_def.EPSG_3034,
     },
     MAP_3O_BBOX_EMPTY: {
         'title': 'Nullový bounding box',
         'access_rights': {'read': {WORKSPACE3},
                           'write': {WORKSPACE3}},
-        'bbox': (None, None, None, None),
+        'bbox': BBox.EMPTY.value.epsg_3035,
         'crs': crs_def.EPSG_3035,
     },
 }
@@ -238,7 +288,7 @@ INTERNAL_TEST_CASES = [
         'content_range': (1, 7),
     }),
     ({'order_by_list': ['bbox'],
-      'ordering_bbox': (1842999, 6322999, 1845001, 6325001),  # BBOX CE35
+      'ordering_bbox': BBox.CE35.value.epsg_3857,
       'ordering_bbox_crs': crs_def.EPSG_3857,
       }, {'items': [MAP_2E_BBOX_CE35,   # area 4
                     MAP_1E_BBOX_BF46,   # area 1
@@ -252,8 +302,7 @@ INTERNAL_TEST_CASES = [
           'content_range': (1, 7),
           }),
     ({'order_by_list': ['bbox'],
-      'ordering_bbox': (16.5559417, 49.2828904, 16.573926, 49.2946205),  # BBOX CE35
-      # EPSG:3857 (1842999, 6322999, 1845001, 6325001)
+      'ordering_bbox': BBox.CE35.value.epsg_4326,
       'ordering_bbox_crs': crs_def.EPSG_4326,
       }, {'items': [MAP_2E_BBOX_CE35,   # area 4
                     MAP_1E_BBOX_BF46,   # area 1
@@ -267,8 +316,7 @@ INTERNAL_TEST_CASES = [
           'content_range': (1, 7),
           }),
     ({'order_by_list': ['bbox'],
-      'ordering_bbox': (-600879.43, -1150642.64, -599437.98, -1149487.13),  # BBOX CE35
-      # EPSG:3857 (1842999, 6322999, 1845001, 6325001)
+      'ordering_bbox': BBox.CE35.value.epsg_5514,
       'ordering_bbox_crs': crs_def.EPSG_5514,
       }, {'items': [MAP_2E_BBOX_CE35,   # area 4
                     MAP_1E_BBOX_BF46,   # area 1
@@ -282,9 +330,9 @@ INTERNAL_TEST_CASES = [
           'content_range': (1, 7),
           }),
     ({'order_by_list': ['bbox'],
-      'ordering_bbox': (1844001, 6324001, 1844001, 6324001),  # BBOX D4
+      'ordering_bbox': BBox.D4.value.epsg_3857,
       'ordering_bbox_crs': crs_def.EPSG_3857,
-      'bbox_filter': (1844001, 6324001, 1844001, 6324001),  # BBOX D4
+      'bbox_filter': BBox.D4.value.epsg_3857,
       'bbox_filter_crs': crs_def.EPSG_3857,
       }, {'items': [MAP_2E_BBOX_CE35,  # area 0, point
                     MAP_2O_BBOX_BD24,  # area 0, point
@@ -303,8 +351,7 @@ INTERNAL_TEST_CASES = [
           'total_count': 3,
           'content_range': (1, 3),
           }),
-    ({'bbox_filter': (176844.09626803786, 5468335.761457844, 176844.09626803786, 5468335.7614578441),  # BBOX C3
-      # EPSG:3857 (1843001, 6323001, 1843001, 6323001)
+    ({'bbox_filter': BBox.C3.value.epsg_32634,
       'bbox_filter_crs': crs_def.EPSG_32634,
       }, {'items': [MAP_1O_BBOX_BC26,  # area 0, point
                     MAP_2E_BBOX_CE35,  # area 0, point
