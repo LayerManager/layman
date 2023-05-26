@@ -341,15 +341,16 @@ INTERNAL_TEST_CASES = [
           'total_count': 3,
           'content_range': (1, 3),
           }),
-    ({'bbox_filter': (-600665, -1150641, -599439, -1149488),  # BBOX CE(35)
-      # EPSG:3857 (1843001, 6323001, 1844999, 6324999)
+    ({'bbox_filter': BBox.CE35.value.epsg_5514,
       'bbox_filter_crs': crs_def.EPSG_5514,
       }, {'items': [MAP_1E_BBOX_BF46,  # area 1
+                    MAP_1E_BBOX_C3,    # area 0, point
+                    MAP_1O_BBOX_BC26,  # area 0, line 2
                     MAP_2E_BBOX_CE35,  # area 4
                     MAP_2O_BBOX_BD24,  # area 1
                     ],
-          'total_count': 3,
-          'content_range': (1, 3),
+          'total_count': 5,
+          'content_range': (1, 5),
           }),
     ({'bbox_filter': BBox.C3.value.epsg_32634,
       'bbox_filter_crs': crs_def.EPSG_32634,
