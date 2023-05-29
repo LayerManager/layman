@@ -270,6 +270,35 @@ LAYERS = {
             ],
         },
     },
+    'one_file_format_complex': {
+        EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
+        'rest_args': {
+            'time_regex': r'^.*([0-9]{4} [0-9]{2}_[0-9]{2}at[0-9]{2}-[0-9]{2}).*$',
+            'time_regex_format': "yyyy dd_MM'at'HH-mm",
+            'file_paths': [
+                os.path.join(DIRECTORY, 'timeseries_tif/S2A_MSIL2A_2022 16_03at10-00.tif'),
+            ],
+        },
+        'do_complex_test': False,
+        'detail_values': {
+            'exp_publication_detail': {
+                'bounding_box': [1737176.364826313, 6500364.015801598, 1751338.4804418762, 6509901.824098258],
+                'native_crs': 'EPSG:32633',
+                'native_bounding_box': [543100.0, 5573500.0, 552100.0, 5579500.0],
+                'image_mosaic': True,
+                'wms': {
+                    'time': {'default': '2022-03-16T00:00:00Z',
+                             'units': 'ISO8601',
+                             'regex': "^.*([0-9]{4}_[0-9]{2}_[0-9]{2}at[0-9]{2}-[0-9]{2}).*$,format=yyyy_dd_MM'at'HH-mm",
+                             'values': ['2022-03-16T00:00:00.000Z']},
+                },
+            },
+            'publ_type_detail': ('raster', 'sld'),
+            'filenames': [
+                'S2A_MSIL2A_2022_16_03at10-00.tif',
+            ],
+        },
+    },
 }
 
 
