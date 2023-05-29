@@ -50,7 +50,7 @@
   - owslib 0.27.2 -> 0.28.1
 - [#520](https://github.com/LayerManager/layman/issues/520) WFS in version `2.0.0` and WMS in version `1.3.0` includes also MetadataURL for each layer with url of Micka record.
 - [#833](https://github.com/LayerManager/layman/issues/833) Make Timgen WMS requests more robust (handle WML errors, delayed retry, add timestamp to each request).
-- [#800](https://github.com/LayerManager/layman/issues/800) Endpoint [POST Workspace Layers](doc/rest.md#post-workspace-layers) supports new parameter `time_regex_format`.
+- [#800](https://github.com/LayerManager/layman/issues/800) Endpoints [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) support new parameter `time_regex_format`.
 - [#815](https://github.com/LayerManager/layman/issues/815) Propagate [`LAYMAN_PROXY_SERVER_NAME`](doc/env-settings.md#LAYMAN_PROXY_SERVER_NAME) value to GeoServer environment variable [GEOSERVER_CSRF_WHITELIST](https://docs.geoserver.org/latest/en/user/security/webadmin/csrf.html).
 - [#847](https://github.com/LayerManager/layman/issues/847) Fix publishing external table layers with `@` in the username or the password.
 - [#764](https://github.com/LayerManager/layman/issues/764), [#860](https://github.com/LayerManager/layman/issues/860) Layman accepts QML styles with labels without symbology and with point clustering.
