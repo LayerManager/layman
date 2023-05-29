@@ -150,6 +150,9 @@ def patch(workspace, layername):
             raise LaymanError(2, {'parameter': 'time_regex',
                                   'expected': 'Regular expression',
                                   }) from exp
+    time_regex_format = request.form.get('time_regex_format') or None
+    slugified_time_regex_format = input_file.slugify_timeseries_filename_pattern(time_regex_format) if time_regex_format else None
+
     name_normalized_tif_by_layer = time_regex is None
     name_input_file_by_layer = time_regex is None or input_files.is_one_archive
     enable_more_main_files = time_regex is not None
@@ -183,6 +186,7 @@ def patch(workspace, layername):
 
     kwargs['time_regex'] = time_regex
     kwargs['slugified_time_regex'] = slugified_time_regex
+    kwargs['slugified_time_regex_format'] = slugified_time_regex_format
     kwargs['image_mosaic'] = time_regex is not None if delete_from == 'layman.layer.filesystem.input_file' else None
     kwargs['name_normalized_tif_by_layer'] = name_normalized_tif_by_layer
     kwargs['name_input_file_by_layer'] = name_input_file_by_layer

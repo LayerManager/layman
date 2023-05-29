@@ -405,6 +405,9 @@ Body parameters:
 - *time_regex*, string, e.g. `[0-9]{8}T[0-9]{6}Z`
   - supported only in combination with *file* parameter
   - see [POST Workspace Layers](#post-workspace-layers)
+- *time_regex_format*, string, e.g. yyyyddMM
+  - description of `time_regex` result format as [java SimpleDateFormat](https://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html), [GeoServer examples](https://docs.geoserver.geo-solutions.it/edu/en/multidim/imagemosaic/mosaic_indexer.html#format)
+  - supported only in combination with `time_regex`
 
 #### Response
 Content-Type: `application/json`
