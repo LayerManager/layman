@@ -467,10 +467,65 @@ def pytest_generate_tests(metafunc):
     )
 
 
-def generate_test_cases(test_cases):
+def strip_accents(string):
+    return ''.join(c for c in unicodedata.normalize('NFD', string) if unicodedata.category(c) != 'Mn')
+
+
+def bbox_to_pylint_id_part(bbox, crs):
+    epsg_code = crs.split(':')[-1]
+    bbox_item = next(
+        item for item in BBox
+        if any(k for k, v in item.value.__dict__.items() if k == f"epsg_{epsg_code}" and v == bbox)
+    )
+    return f"{bbox_item.name}({epsg_code})"
+
+
+def get_internal_pylint_id(query_params):
+    pylint_id_parts = []
+    if 'reader' in query_params:
+        actor_name = 'reader'
+        actor_value = query_params['reader']
+    elif 'writer' in query_params:
+        actor_name = 'writer'
+        actor_value = query_params['writer']
+    else:
+        actor_name = 'actor'
+        actor_value = 'admin'
+    actor_value = 'anonym' if actor_value == settings.ANONYM_USER else actor_value
+    pylint_id_parts.append((actor_name, actor_value))
+    if 'full_text_filter' in query_params:
+        pylint_id_parts.append(('full_text', f"'{strip_accents(query_params['full_text_filter'])}'"))
+    if 'bbox_filter' in query_params:
+        bbox_part = bbox_to_pylint_id_part(query_params['bbox_filter'],
+                                           query_params['bbox_filter_crs'])
+        pylint_id_parts.append(('bbox', bbox_part))
+    if 'order_by_list' in query_params:
+        assert len(query_params['order_by_list']) == 1
+        order_by = query_params['order_by_list'][0]
+        if order_by == 'full_text':
+            pylint_id_parts.append(('order_by', f"'{strip_accents(query_params['ordering_full_text'])}'"))
+        elif order_by == 'bbox':
+            bbox_part = bbox_to_pylint_id_part(query_params['ordering_bbox'],
+                                               query_params['ordering_bbox_crs'])
+            pylint_id_parts.append(('order_by', f"bbox({bbox_part})"))
+        elif order_by in ['title', 'last_change']:
+            pylint_id_parts.append(('order_by', order_by.upper()))
+    if 'limit' in query_params:
+        pylint_id_parts.append(('limit', query_params['limit']))
+    if 'offset' in query_params:
+        pylint_id_parts.append(('offset', query_params['offset']))
+    pytest_id = ' & '.join(f"{name}={value}" for name, value in pylint_id_parts)
+    return pytest_id
+
+
+def generate_test_cases(test_cases, *, pylint_id_generator=None):
     tc_list = []
     for idx, (query_params, exp_result) in enumerate(test_cases):
-        test_case = base_test.TestCaseType(pytest_id=f"query-{idx+1}",
+        if pylint_id_generator is not None:
+            pytest_id = pylint_id_generator(query_params)
+        else:
+            pytest_id = f"query-{idx + 1}"
+        test_case = base_test.TestCaseType(pytest_id=pytest_id,
                                            params={
                                                'query': query_params,
                                                'exp_result': exp_result,
@@ -484,7 +539,7 @@ def generate_test_cases(test_cases):
 @pytest.mark.usefixtures('ensure_layman_module', 'oauth2_provider_mock')
 class TestGet:
     test_cases = {
-        'test_internal_query': generate_test_cases(INTERNAL_TEST_CASES),
+        'test_internal_query': generate_test_cases(INTERNAL_TEST_CASES, pylint_id_generator=get_internal_pylint_id),
         'test_rest_query': generate_test_cases(REST_TEST_CASES),
     }
 
