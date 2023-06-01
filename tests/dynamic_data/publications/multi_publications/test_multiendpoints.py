@@ -16,18 +16,22 @@ from test_tools import process_client, prime_db_schema_client
 
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
-WORKSPACE1 = 'test_select_publications_complex_workspace1'
-WORKSPACE2 = 'test_select_publications_complex_workspace2'
-WORKSPACE3 = 'test_select_publications_complex_workspace3'
-WORKSPACES = [WORKSPACE1, WORKSPACE2, WORKSPACE3]
+WS_USER1 = 'test_dynamic_multi_ws1'
+WS_USER2 = 'test_dynamic_multi_ws2'
+WS_USER3 = 'test_dynamic_multi_ws3'
+WS_PUBL = 'test_dynamic_multi_ws_public'
+USERNAMES = [WS_USER1, WS_USER2, WS_USER3]
+WORKSPACES = USERNAMES + [WS_PUBL]
 
-MAP_1E_BBOX_BF46 = Publication(WORKSPACE1, process_client.MAP_TYPE, 'test_select_publications_map1e')
-MAP_1E_BBOX_C3 = Publication(WORKSPACE1, process_client.MAP_TYPE, 'test_select_publications_map1e_3_3x3_3')
-MAP_1O_BBOX_BC26 = Publication(WORKSPACE1, process_client.MAP_TYPE, 'test_select_publications_map1o')
-MAP_1OE_BBOX_CE79 = Publication(WORKSPACE1, process_client.MAP_TYPE, 'test_select_publications_map1oe')
-MAP_2E_BBOX_CE35 = Publication(WORKSPACE2, process_client.MAP_TYPE, 'test_select_publications_map2e')
-MAP_2O_BBOX_BD24 = Publication(WORKSPACE2, process_client.MAP_TYPE, 'test_select_publications_map2o')
-MAP_3O_BBOX_EMPTY = Publication(WORKSPACE3, process_client.MAP_TYPE, 'test_select_publications_map3o')
+MAP1_WS1_REWE_BBOX_BF46 = Publication(WS_USER1, process_client.MAP_TYPE, 'test_dynamic_map1')
+MAP2_WS1_REWE_BBOX_C3 = Publication(WS_USER1, process_client.MAP_TYPE, 'test_dynamic_map2')
+MAP3_WS1_ROWO_BBOX_BC26 = Publication(WS_USER1, process_client.MAP_TYPE, 'test_dynamic_map3')
+MAP4_WS1_REWO_BBOX_CE79 = Publication(WS_USER1, process_client.MAP_TYPE, 'test_dynamic_map4')
+MAP5_WS2_REWE_BBOX_CE35 = Publication(WS_USER2, process_client.MAP_TYPE, 'test_dynamic_map5')
+MAP6_WS2_ROWO_BBOX_BD24 = Publication(WS_USER2, process_client.MAP_TYPE, 'test_dynamic_map6')
+MAP7_WS3_ROWO_BBOX_EMPTY = Publication(WS_USER3, process_client.MAP_TYPE, 'test_dynamic_map7')
+LAY1_WSP_REWE_BBOX_BC26 = Publication(WS_PUBL, process_client.LAYER_TYPE, 'test_dynamic_lyr1')
+LAY2_WS1_R2WO_BBOX_BC26 = Publication(WS_USER1, process_client.LAYER_TYPE, 'test_dynamic_lyr2')
 
 
 @dataclass(frozen=True)
@@ -82,128 +86,153 @@ class BBox(Enum):
 
 
 PUBLICATIONS = {
-    MAP_1E_BBOX_BF46: {
+    MAP1_WS1_REWE_BBOX_BF46: {
         'title': 'Příliš žluťoučký Kůň úpěl ďábelské ódy',
         'access_rights': {'read': {settings.RIGHTS_EVERYONE_ROLE},
                           'write': {settings.RIGHTS_EVERYONE_ROLE}},
         'bbox': BBox.BF46.value.epsg_3857,
         'crs': crs_def.EPSG_3857,
     },
-    MAP_1E_BBOX_C3: {
+    MAP2_WS1_REWE_BBOX_C3: {
         'title': 'Jednobodová vrstva Kodaň',
         'access_rights': {'read': {settings.RIGHTS_EVERYONE_ROLE},
                           'write': {settings.RIGHTS_EVERYONE_ROLE}},
         'bbox': BBox.C3.value.epsg_4326,
         'crs': crs_def.EPSG_4326,
     },
-    MAP_1O_BBOX_BC26: {
+    MAP3_WS1_ROWO_BBOX_BC26: {
         'title': 'Ďůlek kun Karel',
-        'access_rights': {'read': {WORKSPACE1},
-                          'write': {WORKSPACE1}},
+        'access_rights': {'read': {WS_USER1},
+                          'write': {WS_USER1}},
         'bbox': BBox.BC26.value.epsg_5514,
         'crs': crs_def.EPSG_5514,
     },
-    MAP_1OE_BBOX_CE79: {
+    MAP4_WS1_REWO_BBOX_CE79: {
         'title': 'jedna dva tři čtyři kód',
         'access_rights': {'read': {settings.RIGHTS_EVERYONE_ROLE},
-                          'write': {WORKSPACE1}},
+                          'write': {WS_USER1}},
         'bbox': BBox.CE79.value.epsg_32633,
         'crs': crs_def.EPSG_32633,
     },
-    MAP_2E_BBOX_CE35: {
+    MAP5_WS2_REWE_BBOX_CE35: {
         'title': 'Svíčky is the best game',
         'access_rights': {'read': {settings.RIGHTS_EVERYONE_ROLE},
                           'write': {settings.RIGHTS_EVERYONE_ROLE}},
         'bbox': BBox.CE35.value.epsg_32634,
         'crs': crs_def.EPSG_32634,
     },
-    MAP_2O_BBOX_BD24: {
+    MAP6_WS2_ROWO_BBOX_BD24: {
         'title': 'druhá mapa JeDnA óda',
-        'access_rights': {'read': {WORKSPACE2},
-                          'write': {WORKSPACE2}},
+        'access_rights': {'read': {WS_USER2},
+                          'write': {WS_USER2}},
         'bbox': BBox.BD24.value.epsg_3034,
         'crs': crs_def.EPSG_3034,
     },
-    MAP_3O_BBOX_EMPTY: {
+    MAP7_WS3_ROWO_BBOX_EMPTY: {
         'title': 'Nullový bounding box',
-        'access_rights': {'read': {WORKSPACE3},
-                          'write': {WORKSPACE3}},
+        'access_rights': {'read': {WS_USER3},
+                          'write': {WS_USER3}},
         'bbox': BBox.EMPTY.value.epsg_3035,
         'crs': crs_def.EPSG_3035,
+    },
+    LAY1_WSP_REWE_BBOX_BC26: {
+        'title': 'Hezká vektorová vrstva, óda na Křováka',
+        'access_rights': {'read': {settings.RIGHTS_EVERYONE_ROLE},
+                          'write': {settings.RIGHTS_EVERYONE_ROLE}},
+        'bbox': BBox.BC26.value.epsg_5514,
+        'crs': crs_def.EPSG_5514,
+        'geodata_type': 'vector',
+        'wfs_wms_status': 'AVAILABLE',
+    },
+    LAY2_WS1_R2WO_BBOX_BC26: {
+        'title': 'Vektorová vrstva',
+        'access_rights': {'read': {WS_USER1, WS_USER2},
+                          'write': {WS_USER1}},
+        'bbox': BBox.BC26.value.epsg_5514,
+        'crs': crs_def.EPSG_5514,
+        'geodata_type': 'vector',
+        'wfs_wms_status': 'AVAILABLE',
     },
 }
 
 INTERNAL_TEST_CASES = [
     ({}, {
-        'items': [MAP_1E_BBOX_BF46,
-                  MAP_1E_BBOX_C3,
-                  MAP_1O_BBOX_BC26,
-                  MAP_1OE_BBOX_CE79,
-                  MAP_2E_BBOX_CE35,
-                  MAP_2O_BBOX_BD24,
-                  MAP_3O_BBOX_EMPTY,
+        'items': [LAY2_WS1_R2WO_BBOX_BC26,
+                  MAP1_WS1_REWE_BBOX_BF46,
+                  MAP2_WS1_REWE_BBOX_C3,
+                  MAP3_WS1_ROWO_BBOX_BC26,
+                  MAP4_WS1_REWO_BBOX_CE79,
+                  MAP5_WS2_REWE_BBOX_CE35,
+                  MAP6_WS2_ROWO_BBOX_BD24,
+                  MAP7_WS3_ROWO_BBOX_EMPTY,
+                  LAY1_WSP_REWE_BBOX_BC26,
                   ],
-        'total_count': 7,
-        'content_range': (1, 7),
+        'total_count': 9,
+        'content_range': (1, 9),
     }),
     ({'reader': settings.ANONYM_USER}, {
-        'items': [MAP_1E_BBOX_BF46,
-                  MAP_1E_BBOX_C3,
-                  MAP_1OE_BBOX_CE79,
-                  MAP_2E_BBOX_CE35,
-                  ],
-        'total_count': 4,
-        'content_range': (1, 4),
-    }),
-    ({'reader': WORKSPACE2}, {
-        'items': [MAP_1E_BBOX_BF46,
-                  MAP_1E_BBOX_C3,
-                  MAP_1OE_BBOX_CE79,
-                  MAP_2E_BBOX_CE35,
-                  MAP_2O_BBOX_BD24,
+        'items': [MAP1_WS1_REWE_BBOX_BF46,
+                  MAP2_WS1_REWE_BBOX_C3,
+                  MAP4_WS1_REWO_BBOX_CE79,
+                  MAP5_WS2_REWE_BBOX_CE35,
+                  LAY1_WSP_REWE_BBOX_BC26,
                   ],
         'total_count': 5,
         'content_range': (1, 5),
     }),
-    ({'writer': settings.ANONYM_USER}, {
-        'items': [MAP_1E_BBOX_BF46,
-                  MAP_1E_BBOX_C3,
-                  MAP_2E_BBOX_CE35,
+    ({'reader': WS_USER2}, {
+        'items': [LAY2_WS1_R2WO_BBOX_BC26,
+                  MAP1_WS1_REWE_BBOX_BF46,
+                  MAP2_WS1_REWE_BBOX_C3,
+                  MAP4_WS1_REWO_BBOX_CE79,
+                  MAP5_WS2_REWE_BBOX_CE35,
+                  MAP6_WS2_ROWO_BBOX_BD24,
+                  LAY1_WSP_REWE_BBOX_BC26,
                   ],
-        'total_count': 3,
-        'content_range': (1, 3),
+        'total_count': 7,
+        'content_range': (1, 7),
     }),
-    ({'writer': WORKSPACE2}, {
-        'items': [MAP_1E_BBOX_BF46,
-                  MAP_1E_BBOX_C3,
-                  MAP_2E_BBOX_CE35,
-                  MAP_2O_BBOX_BD24,
+    ({'writer': settings.ANONYM_USER}, {
+        'items': [MAP1_WS1_REWE_BBOX_BF46,
+                  MAP2_WS1_REWE_BBOX_C3,
+                  MAP5_WS2_REWE_BBOX_CE35,
+                  LAY1_WSP_REWE_BBOX_BC26,
                   ],
         'total_count': 4,
         'content_range': (1, 4),
     }),
+    ({'writer': WS_USER2}, {
+        'items': [MAP1_WS1_REWE_BBOX_BF46,
+                  MAP2_WS1_REWE_BBOX_C3,
+                  MAP5_WS2_REWE_BBOX_CE35,
+                  MAP6_WS2_ROWO_BBOX_BD24,
+                  LAY1_WSP_REWE_BBOX_BC26,
+                  ],
+        'total_count': 5,
+        'content_range': (1, 5),
+    }),
     ({'full_text_filter': 'dva'}, {
-        'items': [MAP_1OE_BBOX_CE79,
+        'items': [MAP4_WS1_REWO_BBOX_CE79,
                   ],
         'total_count': 1,
         'content_range': (1, 1),
     }),
     ({'full_text_filter': 'games'}, {
-        'items': [MAP_2E_BBOX_CE35,
+        'items': [MAP5_WS2_REWE_BBOX_CE35,
                   ],
         'total_count': 1,
         'content_range': (1, 1),
     }),
     ({'full_text_filter': 'kun'}, {
-        'items': [MAP_1E_BBOX_BF46,
-                  MAP_1O_BBOX_BC26,
+        'items': [MAP1_WS1_REWE_BBOX_BF46,
+                  MAP3_WS1_ROWO_BBOX_BC26,
                   ],
         'total_count': 2,
         'content_range': (1, 2),
     }),
     ({'full_text_filter': 'jedna'}, {
-        'items': [MAP_1OE_BBOX_CE79,
-                  MAP_2O_BBOX_BD24,
+        'items': [MAP4_WS1_REWO_BBOX_CE79,
+                  MAP6_WS2_ROWO_BBOX_BD24,
                   ],
         'total_count': 2,
         'content_range': (1, 2),
@@ -214,218 +243,243 @@ INTERNAL_TEST_CASES = [
         'content_range': (0, 0),
     }),
     ({'full_text_filter': 'dva kun'}, {
-        'items': [MAP_1E_BBOX_BF46,
-                  MAP_1O_BBOX_BC26,
-                  MAP_1OE_BBOX_CE79,
+        'items': [MAP1_WS1_REWE_BBOX_BF46,
+                  MAP3_WS1_ROWO_BBOX_BC26,
+                  MAP4_WS1_REWO_BBOX_CE79,
                   ],
         'total_count': 3,
         'content_range': (1, 3),
     }),
     ({'full_text_filter': 'dn'}, {
-        'items': [MAP_1E_BBOX_C3,
-                  MAP_1OE_BBOX_CE79,
-                  MAP_2O_BBOX_BD24,
+        'items': [MAP2_WS1_REWE_BBOX_C3,
+                  MAP4_WS1_REWO_BBOX_CE79,
+                  MAP6_WS2_ROWO_BBOX_BD24,
                   ],
         'total_count': 3,
         'content_range': (1, 3),
     }),
     ({'full_text_filter': 'oda', 'ordering_full_text': 'oda', 'order_by_list': ['full_text'], }, {
-        'items': [MAP_2O_BBOX_BD24,
-                  MAP_1E_BBOX_C3,
+        'items': [MAP6_WS2_ROWO_BBOX_BD24,
+                  LAY1_WSP_REWE_BBOX_BC26,
+                  MAP2_WS1_REWE_BBOX_C3,
                   ],
-        'total_count': 2,
-        'content_range': (1, 2),
+        'total_count': 3,
+        'content_range': (1, 3),
     }),
     ({'full_text_filter': 'va kód', 'ordering_full_text': 'va kód', 'order_by_list': ['full_text'], }, {
-        'items': [MAP_1OE_BBOX_CE79,
-                  MAP_1E_BBOX_C3,
+        'items': [MAP4_WS1_REWO_BBOX_CE79,
+                  MAP2_WS1_REWE_BBOX_C3,
                   ],
         'total_count': 2,
         'content_range': (1, 2),
     }),
     ({'order_by_list': ['full_text'], 'ordering_full_text': 'jedna'}, {
-        'items': [MAP_1OE_BBOX_CE79,
-                  MAP_2O_BBOX_BD24,
-                  MAP_1E_BBOX_BF46,
-                  MAP_1E_BBOX_C3,
-                  MAP_1O_BBOX_BC26,
-                  MAP_2E_BBOX_CE35,
-                  MAP_3O_BBOX_EMPTY,
+        'items': [MAP4_WS1_REWO_BBOX_CE79,
+                  MAP6_WS2_ROWO_BBOX_BD24,
+                  LAY2_WS1_R2WO_BBOX_BC26,
+                  MAP1_WS1_REWE_BBOX_BF46,
+                  MAP2_WS1_REWE_BBOX_C3,
+                  MAP3_WS1_ROWO_BBOX_BC26,
+                  MAP5_WS2_REWE_BBOX_CE35,
+                  MAP7_WS3_ROWO_BBOX_EMPTY,
+                  LAY1_WSP_REWE_BBOX_BC26,
                   ],
-        'total_count': 7,
-        'content_range': (1, 7),
+        'total_count': 9,
+        'content_range': (1, 9),
     }),
     ({'full_text_filter': 'dva kun', 'order_by_list': ['full_text'], 'ordering_full_text': 'karel kun'}, {
-        'items': [MAP_1O_BBOX_BC26,
-                  MAP_1E_BBOX_BF46,
-                  MAP_1OE_BBOX_CE79,
+        'items': [MAP3_WS1_ROWO_BBOX_BC26,
+                  MAP1_WS1_REWE_BBOX_BF46,
+                  MAP4_WS1_REWO_BBOX_CE79,
                   ],
         'total_count': 3,
         'content_range': (1, 3),
     }),
     ({'order_by_list': ['title'], }, {
-        'items': [MAP_2O_BBOX_BD24,
-                  MAP_1O_BBOX_BC26,
-                  MAP_1OE_BBOX_CE79,
-                  MAP_1E_BBOX_C3,
-                  MAP_3O_BBOX_EMPTY,
-                  MAP_1E_BBOX_BF46,
-                  MAP_2E_BBOX_CE35,
+        'items': [MAP6_WS2_ROWO_BBOX_BD24,
+                  MAP3_WS1_ROWO_BBOX_BC26,
+                  LAY1_WSP_REWE_BBOX_BC26,
+                  MAP4_WS1_REWO_BBOX_CE79,
+                  MAP2_WS1_REWE_BBOX_C3,
+                  MAP7_WS3_ROWO_BBOX_EMPTY,
+                  MAP1_WS1_REWE_BBOX_BF46,
+                  MAP5_WS2_REWE_BBOX_CE35,
+                  LAY2_WS1_R2WO_BBOX_BC26,
                   ],
-        'total_count': 7,
-        'content_range': (1, 7),
+        'total_count': 9,
+        'content_range': (1, 9),
     }),
     ({'order_by_list': ['last_change'], }, {
-        'items': [MAP_3O_BBOX_EMPTY,
-                  MAP_2O_BBOX_BD24,
-                  MAP_2E_BBOX_CE35,
-                  MAP_1OE_BBOX_CE79,
-                  MAP_1O_BBOX_BC26,
-                  MAP_1E_BBOX_C3,
-                  MAP_1E_BBOX_BF46,
+        'items': [LAY2_WS1_R2WO_BBOX_BC26,
+                  LAY1_WSP_REWE_BBOX_BC26,
+                  MAP7_WS3_ROWO_BBOX_EMPTY,
+                  MAP6_WS2_ROWO_BBOX_BD24,
+                  MAP5_WS2_REWE_BBOX_CE35,
+                  MAP4_WS1_REWO_BBOX_CE79,
+                  MAP3_WS1_ROWO_BBOX_BC26,
+                  MAP2_WS1_REWE_BBOX_C3,
+                  MAP1_WS1_REWE_BBOX_BF46,
                   ],
-        'total_count': 7,
-        'content_range': (1, 7),
+        'total_count': 9,
+        'content_range': (1, 9),
     }),
     ({'order_by_list': ['bbox'],
       'ordering_bbox': BBox.CE35.value.epsg_3857,
       'ordering_bbox_crs': crs_def.EPSG_3857,
-      }, {'items': [MAP_2E_BBOX_CE35,   # area 4
-                    MAP_1E_BBOX_BF46,   # area 1
-                    MAP_2O_BBOX_BD24,   # area 1
-                    MAP_1O_BBOX_BC26,   # area 0, line 2
-                    MAP_1E_BBOX_C3,     # area 0, point
-                    MAP_1OE_BBOX_CE79,  # no intersection
-                    MAP_3O_BBOX_EMPTY,  # no intersection
+      }, {'items': [MAP5_WS2_REWE_BBOX_CE35,  # area 4
+                    MAP1_WS1_REWE_BBOX_BF46,  # area 1
+                    MAP6_WS2_ROWO_BBOX_BD24,  # area 1
+                    LAY2_WS1_R2WO_BBOX_BC26,  # area 0, line 2
+                    MAP3_WS1_ROWO_BBOX_BC26,  # area 0, line 2
+                    LAY1_WSP_REWE_BBOX_BC26,  # area 0, line 2
+                    MAP2_WS1_REWE_BBOX_C3,  # area 0, point
+                    MAP4_WS1_REWO_BBOX_CE79,  # no intersection
+                    MAP7_WS3_ROWO_BBOX_EMPTY,  # no intersection
                     ],
-          'total_count': 7,
-          'content_range': (1, 7),
+          'total_count': 9,
+          'content_range': (1, 9),
           }),
     ({'order_by_list': ['bbox'],
       'ordering_bbox': BBox.CE35.value.epsg_4326,
       'ordering_bbox_crs': crs_def.EPSG_4326,
-      }, {'items': [MAP_2E_BBOX_CE35,   # area 4
-                    MAP_1E_BBOX_BF46,   # area 1
-                    MAP_2O_BBOX_BD24,   # area 1
-                    MAP_1E_BBOX_C3,     # area 0, point
-                    MAP_1O_BBOX_BC26,   # area 0, line 2
-                    MAP_1OE_BBOX_CE79,  # no intersection
-                    MAP_3O_BBOX_EMPTY,  # no intersection
+      }, {'items': [MAP5_WS2_REWE_BBOX_CE35,  # area 4
+                    MAP1_WS1_REWE_BBOX_BF46,  # area 1
+                    MAP6_WS2_ROWO_BBOX_BD24,  # area 1
+                    MAP2_WS1_REWE_BBOX_C3,  # area 0, point
+                    LAY2_WS1_R2WO_BBOX_BC26,  # area 0, line 2
+                    MAP3_WS1_ROWO_BBOX_BC26,  # area 0, line 2
+                    LAY1_WSP_REWE_BBOX_BC26,  # area 0, line 2
+                    MAP4_WS1_REWO_BBOX_CE79,  # no intersection
+                    MAP7_WS3_ROWO_BBOX_EMPTY,  # no intersection
                     ],
-          'total_count': 7,
-          'content_range': (1, 7),
+          'total_count': 9,
+          'content_range': (1, 9),
           }),
     ({'order_by_list': ['bbox'],
       'ordering_bbox': BBox.CE35.value.epsg_5514,
       'ordering_bbox_crs': crs_def.EPSG_5514,
-      }, {'items': [MAP_2E_BBOX_CE35,   # area 4
-                    MAP_1E_BBOX_BF46,   # area 1
-                    MAP_2O_BBOX_BD24,   # area 1
-                    MAP_1O_BBOX_BC26,   # area 0, line 2
-                    MAP_1E_BBOX_C3,     # area 0, point
-                    MAP_1OE_BBOX_CE79,  # no intersection
-                    MAP_3O_BBOX_EMPTY,  # no intersection
+      }, {'items': [MAP5_WS2_REWE_BBOX_CE35,  # area 4
+                    MAP1_WS1_REWE_BBOX_BF46,  # area 1
+                    MAP6_WS2_ROWO_BBOX_BD24,  # area 1
+                    LAY2_WS1_R2WO_BBOX_BC26,  # area 0, line 2
+                    MAP3_WS1_ROWO_BBOX_BC26,  # area 0, line 2
+                    LAY1_WSP_REWE_BBOX_BC26,  # area 0, line 2
+                    MAP2_WS1_REWE_BBOX_C3,  # area 0, point
+                    MAP4_WS1_REWO_BBOX_CE79,  # no intersection
+                    MAP7_WS3_ROWO_BBOX_EMPTY,  # no intersection
                     ],
-          'total_count': 7,
-          'content_range': (1, 7),
+          'total_count': 9,
+          'content_range': (1, 9),
           }),
     ({'order_by_list': ['bbox'],
       'ordering_bbox': BBox.D4.value.epsg_3857,
       'ordering_bbox_crs': crs_def.EPSG_3857,
       'bbox_filter': BBox.D4.value.epsg_3857,
       'bbox_filter_crs': crs_def.EPSG_3857,
-      }, {'items': [MAP_2E_BBOX_CE35,  # area 0, point
-                    MAP_2O_BBOX_BD24,  # area 0, point
-                    MAP_1E_BBOX_BF46,  # area 0, point
+      }, {'items': [MAP5_WS2_REWE_BBOX_CE35,  # area 0, point
+                    MAP6_WS2_ROWO_BBOX_BD24,  # area 0, point
+                    MAP1_WS1_REWE_BBOX_BF46,  # area 0, point
                     ],
           'total_count': 3,
           'content_range': (1, 3),
           }),
     ({'bbox_filter': BBox.CE35.value.epsg_5514,
       'bbox_filter_crs': crs_def.EPSG_5514,
-      }, {'items': [MAP_1E_BBOX_BF46,  # area 1
-                    MAP_1E_BBOX_C3,    # area 0, point
-                    MAP_1O_BBOX_BC26,  # area 0, line 2
-                    MAP_2E_BBOX_CE35,  # area 4
-                    MAP_2O_BBOX_BD24,  # area 1
+      }, {'items': [LAY2_WS1_R2WO_BBOX_BC26,  # area 0, line 2
+                    MAP1_WS1_REWE_BBOX_BF46,  # area 1
+                    MAP2_WS1_REWE_BBOX_C3,  # area 0, point
+                    MAP3_WS1_ROWO_BBOX_BC26,  # area 0, line 2
+                    MAP5_WS2_REWE_BBOX_CE35,  # area 4
+                    MAP6_WS2_ROWO_BBOX_BD24,  # area 1
+                    LAY1_WSP_REWE_BBOX_BC26,  # area 0, line 2
+                    ],
+          'total_count': 7,
+          'content_range': (1, 7),
+          }),
+    ({'bbox_filter': BBox.C3.value.epsg_32634,
+      'bbox_filter_crs': crs_def.EPSG_32634,
+      }, {'items': [LAY2_WS1_R2WO_BBOX_BC26,  # area 0, line 2
+                    MAP3_WS1_ROWO_BBOX_BC26,  # area 0, point
+                    MAP5_WS2_REWE_BBOX_CE35,  # area 0, point
+                    MAP6_WS2_ROWO_BBOX_BD24,  # area 0, point
+                    LAY1_WSP_REWE_BBOX_BC26,  # area 0, point
                     ],
           'total_count': 5,
           'content_range': (1, 5),
           }),
-    ({'bbox_filter': BBox.C3.value.epsg_32634,
-      'bbox_filter_crs': crs_def.EPSG_32634,
-      }, {'items': [MAP_1O_BBOX_BC26,  # area 0, point
-                    MAP_2E_BBOX_CE35,  # area 0, point
-                    MAP_2O_BBOX_BD24,  # area 0, point
-                    ],
-          'total_count': 3,
-          'content_range': (1, 3),
-          }),
     ({'limit': 2}, {
-        'items': [MAP_1E_BBOX_BF46,
-                  MAP_1E_BBOX_C3,
-                  # MAP_1O_BBOX_BC26,
-                  # MAP_1OE_BBOX_CE79,
-                  # MAP_2E_BBOX_CE35,
-                  # MAP_2O_BBOX_BD24,
-                  # MAP_3O_BBOX_EMPTY,
+        'items': [LAY2_WS1_R2WO_BBOX_BC26,
+                  MAP1_WS1_REWE_BBOX_BF46,
+                  # MAP2_WS1_REWE_BBOX_C3,
+                  # MAP3_WS1_ROWO_BBOX_BC26,
+                  # MAP4_WS1_REWO_BBOX_CE79,
+                  # MAP5_WS2_REWE_BBOX_CE35,
+                  # MAP6_WS2_ROWO_BBOX_BD24,
+                  # MAP7_WS3_ROWO_BBOX_EMPTY,
+                  # LAY1_WSP_REWE_BBOX_BC26,
                   ],
-        'total_count': 7,
+        'total_count': 9,
         'content_range': (1, 2),
     }),
     ({'offset': 2}, {
         'items': [
-            # MAP_1E_BBOX_BF46,
-            # MAP_1E_BBOX_C3,
-            MAP_1O_BBOX_BC26,
-            MAP_1OE_BBOX_CE79,
-            MAP_2E_BBOX_CE35,
-            MAP_2O_BBOX_BD24,
-            MAP_3O_BBOX_EMPTY,
+            # LAY2_WS1_R2WO_BBOX_BC26
+            # MAP1_WS1_REWE_BBOX_BF46,
+            MAP2_WS1_REWE_BBOX_C3,
+            MAP3_WS1_ROWO_BBOX_BC26,
+            MAP4_WS1_REWO_BBOX_CE79,
+            MAP5_WS2_REWE_BBOX_CE35,
+            MAP6_WS2_ROWO_BBOX_BD24,
+            MAP7_WS3_ROWO_BBOX_EMPTY,
+            LAY1_WSP_REWE_BBOX_BC26,
         ],
-        'total_count': 7,
-        'content_range': (3, 7),
+        'total_count': 9,
+        'content_range': (3, 9),
     }),
-    ({'limit': 5, 'offset': 5}, {
+    ({'limit': 5, 'offset': 6}, {
         'items': [
-            # MAP_1E_BBOX_BF46,
-            # MAP_1E_BBOX_C3,
-            # MAP_1O_BBOX_BC26,
-            # MAP_1OE_BBOX_CE79,
-            # MAP_2E_BBOX_CE35,
-            MAP_2O_BBOX_BD24,
-            MAP_3O_BBOX_EMPTY,
+            # LAY1_WSP_REWE_BBOX_BC26,
+            # MAP1_WS1_REWE_BBOX_BF46,
+            # MAP2_WS1_REWE_BBOX_C3,
+            # MAP3_WS1_ROWO_BBOX_BC26,
+            # MAP4_WS1_REWO_BBOX_CE79,
+            # MAP5_WS2_REWE_BBOX_CE35,
+            MAP6_WS2_ROWO_BBOX_BD24,
+            MAP7_WS3_ROWO_BBOX_EMPTY,
+            LAY1_WSP_REWE_BBOX_BC26,
         ],
-        'total_count': 7,
-        'content_range': (6, 7),
+        'total_count': 9,
+        'content_range': (7, 9),
     }),
     ({'limit': 2, 'offset': 2}, {
         'items': [
-            # MAP_1E_BBOX_BF46,
-            # MAP_1E_BBOX_C3,
-            MAP_1O_BBOX_BC26,
-            MAP_1OE_BBOX_CE79,
-            # MAP_2E_BBOX_CE35,
-            # MAP_2O_BBOX_BD24,
-            # MAP_3O_BBOX_EMPTY,
+            # LAY1_WSP_REWE_BBOX_BC26
+            # MAP1_WS1_REWE_BBOX_BF46,
+            MAP2_WS1_REWE_BBOX_C3,
+            MAP3_WS1_ROWO_BBOX_BC26,
+            # MAP4_WS1_REWO_BBOX_CE79,
+            # MAP5_WS2_REWE_BBOX_CE35,
+            # MAP6_WS2_ROWO_BBOX_BD24,
+            # MAP7_WS3_ROWO_BBOX_EMPTY,
+            # LAY1_WSP_REWE_BBOX_BC26,
         ],
-        'total_count': 7,
+        'total_count': 9,
         'content_range': (3, 4),
     }),
     ({'limit': 0, 'offset': 0}, {
         'items': [
         ],
-        'total_count': 7,
+        'total_count': 9,
         'content_range': (0, 0),
     }),
 ]
 
 REST_TEST_CASES = [
     ({}, {
-        'items': [MAP_1E_BBOX_BF46,
-                  MAP_1E_BBOX_C3,
-                  MAP_1OE_BBOX_CE79,
-                  MAP_2E_BBOX_CE35,
+        'items': [MAP1_WS1_REWE_BBOX_BF46,
+                  MAP2_WS1_REWE_BBOX_C3,
+                  MAP4_WS1_REWO_BBOX_CE79,
+                  MAP5_WS2_REWE_BBOX_CE35,
                   ],
         'total_count': 4,
         'content_range': (1, 4),
@@ -543,7 +597,7 @@ class TestGet:
         'test_rest_query': generate_test_cases(REST_TEST_CASES),
     }
 
-    usernames_to_reserve = WORKSPACES
+    usernames_to_reserve = USERNAMES
 
     @pytest.fixture(scope='class', autouse=True)
     def class_fixture(self):
