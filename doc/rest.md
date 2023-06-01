@@ -276,6 +276,7 @@ JSON object with following structure:
     - **values**: List of strings. Time instants available for layer written in ISO 8601 format.
     - **default**: Time. Default time instant.
     - **regex**: Slugified regular expression used to extract time instants from file names. Originally sent in `time_regex` parameter.
+    - **regex_format**: Slugified format of `regex` result date and time. Originally sent in `time_regex_format` parameter.
   - *status*: Status information about GeoServer import and availability of WMS layer. No status object means the source is available. Usual state values are
     - PENDING: publishing of this source is queued, but it did not start yet
     - STARTED: publishing of this source is in process

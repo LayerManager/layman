@@ -147,7 +147,6 @@ def clear_cache(workspace):
 
 
 def get_timeregex_props(workspace, layername):
-    result = {}
     layer_dir = gdal.get_normalized_raster_layer_dir(workspace, layername)
     props_path = os.path.join(layer_dir, 'timeregex.properties')
     props_config = configparser.ConfigParser()
@@ -155,8 +154,15 @@ def get_timeregex_props(workspace, layername):
     try:
         with open(props_path, encoding="utf-8") as props_file:
             props_config.read_file(itertools.chain([f'[{section_name}]'], props_file), source=props_path)
-            result = {**props_config[section_name]}
+            regex = props_config[section_name]['regex']
+        split = regex.split(',format=')
+        result = {
+            'regex': split[0],
+        }
+        if len(split) > 1:
+            result['regex_format'] = split[1]
     except IOError:
+        result = {}
         logger.warning(f"File {props_path} seems not to exist or not to be readable.")
     return result
 
@@ -181,8 +187,10 @@ def get_layer_info(workspace, layername):
         },
     }
     if 'time' in wms.contents[layername].dimensions:
-        result['wms']['time'] = wms.contents[layername].dimensions['time']
-        result['wms']['time']['regex'] = get_timeregex_props(workspace, layername).get('regex')
+        result['wms']['time'] = {
+            **wms.contents[layername].dimensions['time'],
+            **get_timeregex_props(workspace, layername),
+        }
     return result
 
 
