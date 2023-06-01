@@ -23,6 +23,10 @@ WS_PUBL = 'test_dynamic_multi_ws_public'
 USERNAMES = [WS_USER1, WS_USER2, WS_USER3]
 WORKSPACES = USERNAMES + [WS_PUBL]
 
+AUTHN_HEADERS_USER1 = process_client.get_authz_headers(WS_USER1)
+AUTHN_HEADERS_USER2 = process_client.get_authz_headers(WS_USER2)
+AUTHN_HEADERS_USER3 = process_client.get_authz_headers(WS_USER3)
+
 MAP1_WS1_REWE_BBOX_BF46 = Publication(WS_USER1, process_client.MAP_TYPE, 'test_dynamic_map1')
 MAP2_WS1_REWE_BBOX_C3 = Publication(WS_USER1, process_client.MAP_TYPE, 'test_dynamic_map2')
 MAP3_WS1_ROWO_BBOX_BC26 = Publication(WS_USER1, process_client.MAP_TYPE, 'test_dynamic_map3')
@@ -475,7 +479,11 @@ INTERNAL_TEST_CASES = [
 ]
 
 REST_TEST_CASES = [
-    ({}, {
+    ({'headers': {},
+      'workspace': None,
+      'publ_type': process_client.MAP_TYPE,
+      'rest_params': {},
+      }, {
         'items': [MAP1_WS1_REWE_BBOX_BF46,
                   MAP2_WS1_REWE_BBOX_C3,
                   MAP4_WS1_REWO_BBOX_CE79,
@@ -483,7 +491,32 @@ REST_TEST_CASES = [
                   ],
         'total_count': 4,
         'content_range': (1, 4),
-    })
+    }),
+    ({'headers': AUTHN_HEADERS_USER2,
+      'workspace': None,
+      'publ_type': process_client.MAP_TYPE,
+      'rest_params': {},
+      }, {
+        'items': [MAP1_WS1_REWE_BBOX_BF46,
+                  MAP2_WS1_REWE_BBOX_C3,
+                  MAP4_WS1_REWO_BBOX_CE79,
+                  MAP5_WS2_REWE_BBOX_CE35,
+                  MAP6_WS2_ROWO_BBOX_BD24,
+                  ],
+        'total_count': 5,
+        'content_range': (1, 5),
+    }),
+    ({'headers': AUTHN_HEADERS_USER2,
+      'workspace': WS_USER2,
+      'publ_type': process_client.MAP_TYPE,
+      'rest_params': {},
+      }, {
+        'items': [MAP5_WS2_REWE_BBOX_CE35,
+                  MAP6_WS2_ROWO_BBOX_BD24,
+                  ],
+        'total_count': 2,
+        'content_range': (1, 2),
+    }),
 ]
 
 
@@ -632,13 +665,31 @@ class TestGet:
 
     def test_rest_query(self, params):
         query_params = params['query']
+        headers = query_params.pop('headers')
+        workspace = query_params.pop('workspace')
+        publ_type = query_params.pop('publ_type')
+        assert publ_type is not None
 
         exp_result = params['exp_result']
 
-        info_publications_response = process_client.get_publications_response(process_client.MAP_TYPE,
-                                                                              query_params=query_params)
+        if workspace is None:
+            method_def = (process_client.get_publications_response, {})
+        else:
+            method_def = (process_client.get_workspace_publications_response, {
+                'workspace': workspace,
+            })
+        method, method_args = method_def
+
+        info_publications_response = method(**{
+            **{
+                'publication_type': publ_type,
+                'headers': headers,
+            },
+            **method_args,
+        })
+
         info_publications_json = info_publications_response.json()
-        info_publications = [Publication(item['workspace'], process_client.MAP_TYPE, item['name'])
+        info_publications = [Publication(item['workspace'], publ_type, item['name'])
                              for item in info_publications_json]
 
         assert set(info_publications) == set(exp_result['items'])
