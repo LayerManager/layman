@@ -112,6 +112,14 @@ def post(workspace):
                                   'expected': 'Regular expression',
                                   }) from exp
     time_regex_format = request.form.get('time_regex_format') or None
+    if time_regex_format and not time_regex:
+        raise LaymanError(48, {
+            'parameters': ['time_regex_format'],
+            'message': 'Parameter `time_regex_format` needs also parameter `time_regex`.',
+            'expected': 'Image mosaic regex in `time_regex` parameter or empty `time_regex_format` parameter.',
+            'found': {
+                'time_regex_format': time_regex_format,
+            }})
     slugified_time_regex_format = input_file.slugify_timeseries_filename_pattern(time_regex_format) if time_regex_format else None
 
     name_normalized_tif_by_layer = time_regex is None
