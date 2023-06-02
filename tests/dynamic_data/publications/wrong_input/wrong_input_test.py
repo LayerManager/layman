@@ -1286,6 +1286,32 @@ TESTCASES = {
         Key.RUN_ONLY_CASES: frozenset([RestMethod.PATCH, WithChunksDomain.FALSE, CompressDomain.FALSE]),
         Key.SPECIFIC_CASES: {},
     },
+    'format_without_time_regex': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            'time_regex_format': 'yyyyMMdd',
+            'file_paths': [
+                'tests/dynamic_data/publications/layer_timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif'],
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 48,
+            'message': 'Wrong combination of parameters',
+            'data': {
+                'parameters': ['time_regex_format'],
+                'message': 'Parameter `time_regex_format` needs also parameter `time_regex`.',
+                'expected': 'Image mosaic regex in `time_regex` parameter or empty `time_regex_format` parameter.',
+                'found': {
+                    'time_regex_format': 'yyyyMMdd',
+                },
+            },
+        },
+        Key.MANDATORY_CASES: None,
+        Key.RUN_ONLY_CASES: frozenset([RestMethod, WithChunksDomain.FALSE, CompressDomain.FALSE]),
+        Key.SPECIFIC_CASES: {},
+    },
 }
 
 
