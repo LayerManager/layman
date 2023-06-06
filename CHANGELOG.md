@@ -5,7 +5,7 @@
 ### Upgrade requirements
 - Change environment variable [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION):
   ```
-  LAYMAN_CLIENT_VERSION=fbee452b481eb5a8a1125434d110bea5f13dc4e5
+  LAYMAN_CLIENT_VERSION=e3914070974f6e905dddd3b32b78ddf54e11e5c4
   ```
 - Rename environment variable `OAUTH2_LIFERAY_SECRET` to `OAUTH2_CLIENT_SECRET`.
 - Rename all environment variables `OAUTH2_LIFERAY_SECRET<n>` to `OAUTH2_CLIENT<n>_SECRET`. For example, variable `OAUTH2_LIFERAY_SECRET4` becomes `OAUTH2_CLIENT4_SECRET`.
