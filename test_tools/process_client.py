@@ -283,9 +283,9 @@ def ensure_workspace_publication(publication_type,
                                  ):
     headers = headers or {}
 
-    resposne = get_workspace_publications(publication_type, workspace, headers=headers, )
-    publication_obj = next((publication for publication in resposne.json() if publication['name'] == name), None)
-    if resposne.status_code == 200 and publication_obj:
+    response = get_workspace_publications(publication_type, workspace, headers=headers, )
+    publication_obj = next((publication for publication in response.json() if publication['name'] == name), None)
+    if response.status_code == 200 and publication_obj:
         patch_needed = False
         if access_rights is not None:
             if 'read' in access_rights and set(access_rights['read'].split(',')) != set(publication_obj['access_rights']['read']):
