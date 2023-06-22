@@ -28,8 +28,8 @@ class TestDeletePublicationsClass:
             publication_set = {publication['name'] for publication in delete_json}
             assert after_delete_publications == publication_set
 
-            get_json = process_client.get_workspace_publications(publ_type, workspace=owner,
-                                                                 headers=authn_headers_owner)
+            get_json = process_client.get_publications(publ_type, workspace=owner,
+                                                       headers=authn_headers_owner)
             publication_set = {publication['name'] for publication in get_json}
             assert remaining_publications == publication_set
 
@@ -47,7 +47,7 @@ class TestDeletePublicationsClass:
             process_client.publish_workspace_publication(publ_type, owner, name, access_rights=access_rights,
                                                          headers=authn_headers_owner)
 
-        response = process_client.get_workspace_publications(publ_type, workspace=owner, headers=authn_headers_owner)
+        response = process_client.get_publications(publ_type, workspace=owner, headers=authn_headers_owner)
         assert len(response) == len(publications)
 
         # Delete by other user with rights only for one layer
@@ -682,7 +682,7 @@ class TestGetPublications:
     @pytest.mark.parametrize('publication_type', process_client.PUBLICATION_TYPES)
     @pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman', 'provide_data')
     def test_get_workspace_publications(publication_type, workspace, headers, query_params, expected_publications, expected_headers, ):
-        response = process_client.get_workspace_publications_response(publication_type, workspace, headers=headers, query_params=query_params)
+        response = process_client.get_publications_response(publication_type, workspace=workspace, headers=headers, query_params=query_params)
         TestGetPublications.assert_response(response, expected_publications, expected_headers)
 
 

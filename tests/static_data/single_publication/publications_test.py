@@ -54,12 +54,12 @@ def test_auth_get_publications(workspace, publ_type, publication):
     headers_list_out = all_auth_info['read'][util.KEY_NOT_AUTH][util.KEY_HEADERS]
 
     for in_headers in headers_list_in:
-        infos = process_client.get_workspace_publications(publ_type, workspace, headers=in_headers)
+        infos = process_client.get_publications(publ_type, workspace=workspace, headers=in_headers)
         publication_names = [li['name'] for li in infos]
         assert publication in publication_names, in_headers
 
     for out_headers in headers_list_out:
-        infos = process_client.get_workspace_publications(publ_type, workspace, headers=out_headers)
+        infos = process_client.get_publications(publ_type, workspace=workspace, headers=out_headers)
         publication_names = [li['name'] for li in infos]
         assert publication not in publication_names, out_headers
 

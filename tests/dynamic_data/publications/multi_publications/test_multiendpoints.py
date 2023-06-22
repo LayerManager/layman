@@ -672,15 +672,9 @@ class TestGet:
 
         exp_result = params['exp_result']
 
-        if workspace is None:
-            method_def = (process_client.get_publications_response, {})
-        else:
-            method_def = (process_client.get_workspace_publications_response, {
-                'workspace': workspace,
-            })
-        method, method_args = method_def
+        method_args = {'workspace': workspace} if workspace else {}
 
-        info_publications_response = method(**{
+        info_publications_response = process_client.get_publications_response(**{
             **{
                 'publication_type': publ_type,
                 'headers': headers,
