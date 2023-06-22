@@ -20,7 +20,8 @@ def async_error_in_info_key(rest_publication_detail, info_key, expected):
                                  rest_publication_detail[info_key]['error'])
 
 
-def same_values_in_detail_and_multi(workspace, publ_type, name, rest_publication_detail, headers):
+def same_values_in_detail_and_multi(workspace, publ_type, name, rest_publication_detail, headers, *, different_value_keys=None):
+    different_value_keys = different_value_keys or []
     # keep only multi-endpoint keys
     expected_keys = ['workspace', 'name', 'title', 'uuid', 'url', 'updated_at', 'access_rights', 'bounding_box',
                      'native_crs', 'native_bounding_box']
@@ -48,6 +49,9 @@ def same_values_in_detail_and_multi(workspace, publ_type, name, rest_publication
             wfs_wms_status = 'AVAILABLE'
         exp_info['wfs_wms_status'] = wfs_wms_status
 
+    for key in different_value_keys:
+        exp_info.pop(key)
+
     multi_requests = [
         (process_client.get_workspace_publications, [publ_type, workspace], {'headers': headers}),
         (process_client.get_publications, [publ_type], {'headers': headers}),
@@ -59,4 +63,6 @@ def same_values_in_detail_and_multi(workspace, publ_type, name, rest_publication
         assert len(rest_multi_infos) == 1, f'rest_multi_infos={rest_multi_infos}'
         rest_multi_info = rest_multi_infos[0]
 
+        for key in different_value_keys:
+            rest_multi_info.pop(key)
         assert rest_multi_info == exp_info

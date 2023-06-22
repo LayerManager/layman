@@ -1408,4 +1408,5 @@ class TestPublication(base_test.TestSingleRestPublication):
                                                                      name=publication.name,
                                                                      rest_publication_detail=rest_publication_detail,
                                                                      headers=None,
+                                                                     different_value_keys=['file', 'geodata_type'],
                                                                      )
