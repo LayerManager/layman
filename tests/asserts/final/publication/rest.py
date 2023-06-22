@@ -49,7 +49,7 @@ def same_values_in_detail_and_multi(workspace, publ_type, name, rest_publication
         exp_info['wfs_wms_status'] = wfs_wms_status
 
     multi_requests = [
-        (process_client.get_workspace_publications, [publ_type, workspace], {'headers': headers}),
+        (process_client.get_publications, [publ_type], {'workspace': workspace, 'headers': headers}),
         (process_client.get_publications, [publ_type], {'headers': headers}),
     ]
     for rest_multi_method, args, kwargs in multi_requests:

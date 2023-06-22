@@ -55,7 +55,7 @@ def test_get_publication_infos():
                     assert publications_set == expected[actor][workspace][publ_type][access_type]
 
                 # test authenticated GET Workspace Layers/Maps
-                publications = process_client.get_workspace_publications(publ_type, workspace, headers=headers)
+                publications = process_client.get_publications(publ_type, workspace=workspace, headers=headers)
                 publication_set = {publication['name'] for publication in publications}
                 assert publication_set == expected[actor][workspace][publ_type]['read']
 

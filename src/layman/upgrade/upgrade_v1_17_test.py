@@ -80,14 +80,14 @@ def test_file_type():
     assert prime_db_schema_infos[raster_layer_def[:3]]['geodata_type'] == 'raster'
     assert prime_db_schema_infos[map_def[:3]]['geodata_type'] is None
 
-    layer_infos = process_client.get_workspace_layers(main_workspace)
+    layer_infos = process_client.get_layers(workspace=main_workspace)
     assert len(layer_infos) == 2
     vector_layer_info = next(info for info in layer_infos if info['name'] == vector_layer_def[2])
     assert vector_layer_info['file']['file_type'] == 'vector'
     raster_layer_info = next(info for info in layer_infos if info['name'] == raster_layer_def[2])
     assert raster_layer_info['file']['file_type'] == 'raster'
 
-    map_infos = process_client.get_workspace_maps(main_workspace)
+    map_infos = process_client.get_maps(workspace=main_workspace)
     assert len(map_infos) == 1
     for map_info in map_infos:
         assert 'geodata_type' not in map_info

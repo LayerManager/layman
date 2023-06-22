@@ -283,7 +283,7 @@ def ensure_workspace_publication(publication_type,
                                  ):
     headers = headers or {}
 
-    response = get_workspace_publications(publication_type, workspace, headers=headers, )
+    response = get_publications(publication_type, workspace=workspace, headers=headers, )
     publication_obj = next((publication for publication in response.json() if publication['name'] == name), None)
     if response.status_code == 200 and publication_obj:
         patch_needed = False
@@ -442,15 +442,7 @@ def get_workspace_publications_response(publication_type, workspace, *, headers=
     return response
 
 
-def get_workspace_publications(publication_type, workspace, *, headers=None, query_params=None, ):
-    return get_workspace_publications_response(publication_type, workspace, headers=headers, query_params=query_params,).json()
-
-
-get_workspace_maps = partial(get_workspace_publications, MAP_TYPE)
-get_workspace_layers = partial(get_workspace_publications, LAYER_TYPE)
-
-
-def get_publications_response(publication_type, *, headers=None, query_params=None):
+def get_publications_response(publication_type, *, workspace=None, headers=None, query_params=None):
     query_params = query_params or {}
     assert set(query_params.keys()) <= GET_PUBLICATIONS_KNOWN_PARAMS, \
         f"Unknown params: {set(query_params.keys()) - GET_PUBLICATIONS_KNOWN_PARAMS}"
@@ -458,14 +450,14 @@ def get_publications_response(publication_type, *, headers=None, query_params=No
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
 
     with app.app_context():
-        r_url = url_for(publication_type_def.get_publications_url)
+        r_url = url_for(publication_type_def.get_workspace_publications_url, workspace=workspace) if workspace else url_for(publication_type_def.get_publications_url)
     response = requests.get(r_url, headers=headers, params=query_params, timeout=HTTP_TIMEOUT)
     raise_layman_error(response)
     return response
 
 
-def get_publications(publication_type, *, headers=None, query_params=None):
-    return get_publications_response(publication_type, headers=headers, query_params=query_params).json()
+def get_publications(publication_type, *, workspace=None, headers=None, query_params=None):
+    return get_publications_response(publication_type, workspace=workspace, headers=headers, query_params=query_params).json()
 
 
 get_maps = partial(get_publications, MAP_TYPE)
@@ -541,7 +533,7 @@ delete_workspace_layers = partial(delete_workspace_publications, LAYER_TYPE)
 
 
 def assert_workspace_publications(publication_type, workspace, expected_publication_names, headers=None):
-    response = get_workspace_publications(publication_type, workspace, headers=headers)
+    response = get_publications(publication_type, workspace=workspace, headers=headers)
     publication_names = [li['name'] for li in response]
     assert set(publication_names) == set(expected_publication_names),\
         f"Publications {expected_publication_names} not equal to {response.text}. publication_type={publication_type}"
