@@ -49,6 +49,7 @@
   - redis 4.5.1 -> 4.5.4
   - owslib 0.27.2 -> 0.28.1
 - [#520](https://github.com/LayerManager/layman/issues/520) WFS in version `2.0.0` and WMS in version `1.3.0` includes also MetadataURL for each layer with url of Micka record.
+- [#769](https://github.com/LayerManager/layman/issues/769) Endpoints [GET Layers](doc/rest.md#get-layers), [GET Workspace Layers](doc/rest.md#get-workspace-layers), [GET Maps](doc/rest.md#get-maps), and [GET Workspace Maps](doc/rest.md#get-workspace-maps) return new key `publication_type`. 
 - [#833](https://github.com/LayerManager/layman/issues/833) Make Timgen WMS requests more robust (handle WML errors, delayed retry, add timestamp to each request).
 - [#800](https://github.com/LayerManager/layman/issues/800) Endpoints [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) support new parameter `time_regex_format`.
 - [#800](https://github.com/LayerManager/layman/issues/800) Endpoints [GET Workspace Layer](doc/rest.md#get-workspace-layer) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) return new subkey `wms`.`time`.`regex_format`.

@@ -57,6 +57,7 @@ Content-Type: `application/json`
 
 JSON array of objects representing available layers with following structure:
 - **workspace**: String. Name of the layer's workspace.
+- **publication_type**: String. Always with value `layer`.
 - **name**: String. Name of the layer.
 - **title**: String. Title of the layer.
 - **uuid**: String. UUID of the layer.
@@ -529,7 +530,7 @@ JSON object with one attribute:
 ### GET Maps
 Get list of published maps (map compositions).
 
-Have the same request parameters and response structure and headers as [GET Layers](#get-layers), except `file`, `geodata_type` and `wfs_wms_status` keys are not available in response.
+Have the same request parameters and response structure and headers as [GET Layers](#get-layers), except `publication_type` has value `map` and `file`, `geodata_type` and `wfs_wms_status` keys are not available in response.
 
 ## Workspace Maps
 ### URL
