@@ -533,6 +533,24 @@ REST_TEST_CASES = [
         'total_count': 7,
         'content_range': (1, 7),
     }),
+    ({'headers': AUTHN_HEADERS_USER2,
+      'workspace': None,
+      'publ_type': None,
+      'rest_params': {
+          'order_by': 'bbox',
+          'ordering_bbox': ','.join([f'{coord}' for coord in BBox.D4.value.epsg_3857]),
+          'ordering_bbox_crs': crs_def.EPSG_3857,
+          'bbox_filter': ','.join([f'{coord}' for coord in BBox.D4.value.epsg_3857]),
+          'bbox_filter_crs': crs_def.EPSG_3857,
+      },
+      }, {
+        'items': [MAP5_WS2_REWE_BBOX_CE35,
+                  MAP6_WS2_ROWO_BBOX_BD24,
+                  MAP1_WS1_REWE_BBOX_BF46,
+                  ],
+        'total_count': 3,
+        'content_range': (1, 3),
+    }),
 ]
 
 
@@ -684,6 +702,7 @@ class TestGet:
         headers = query_params.pop('headers')
         workspace = query_params.pop('workspace')
         publ_type = query_params.pop('publ_type')
+        rest_params = query_params.pop('rest_params')
 
         exp_result = params['exp_result']
 
@@ -693,6 +712,7 @@ class TestGet:
             **{
                 'publication_type': publ_type,
                 'headers': headers,
+                'query_params': rest_params,
             },
             **method_args,
         })
