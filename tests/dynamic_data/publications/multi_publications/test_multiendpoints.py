@@ -517,6 +517,22 @@ REST_TEST_CASES = [
         'total_count': 2,
         'content_range': (1, 2),
     }),
+    ({'headers': AUTHN_HEADERS_USER2,
+      'workspace': None,
+      'publ_type': None,
+      'rest_params': {},
+      }, {
+        'items': [LAY2_WS1_R2WO_BBOX_BC26,
+                  MAP1_WS1_REWE_BBOX_BF46,
+                  MAP2_WS1_REWE_BBOX_C3,
+                  MAP4_WS1_REWO_BBOX_CE79,
+                  MAP5_WS2_REWE_BBOX_CE35,
+                  MAP6_WS2_ROWO_BBOX_BD24,
+                  LAY1_WSP_REWE_BBOX_BC26,
+                  ],
+        'total_count': 7,
+        'content_range': (1, 7),
+    }),
 ]
 
 
@@ -668,7 +684,6 @@ class TestGet:
         headers = query_params.pop('headers')
         workspace = query_params.pop('workspace')
         publ_type = query_params.pop('publ_type')
-        assert publ_type is not None
 
         exp_result = params['exp_result']
 
@@ -683,7 +698,7 @@ class TestGet:
         })
 
         info_publications_json = info_publications_response.json()
-        info_publications = [Publication(item['workspace'], publ_type, item['name'])
+        info_publications = [Publication(item['workspace'], f'layman.{item["publication_type"]}', item['name'])
                              for item in info_publications_json]
 
         assert set(info_publications) == set(exp_result['items'])

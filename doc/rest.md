@@ -3,6 +3,7 @@
 ## Overview
 |Endpoint|URL|GET|POST|PATCH|DELETE|
 |---|---|---|---|---|---|
+|Publications|`/rest/publications`|[GET](#get-publications)| x | x | x |
 |Layers|`/rest/layers`|[GET](#get-layers)| x | x | x |
 |Workspace Layers|`/rest/workspaces/<workspace_name>/layers`|[GET](#get-workspace-layers)| [POST](#post-workspace-layers) | x | [DELETE](#delete-workspace-layers) |
 |[Workspace Layer](models.md#layer)|`/rest/workspaces/<workspace_name>/layers/<layername>`|[GET](#get-workspace-layer)| x | [PATCH](#patch-workspace-layer) | [DELETE](#delete-workspace-layer) |
@@ -26,38 +27,38 @@
   
 **_NOTE:_** Before version 1.10.0, workspace-related endpoints did not include `/workspaces` in their path. These old endpoints are still functional, but deprecated. More specifically, they return HTTP header **Deprecation**. If you get such header in response, rewrite your client to use new endpoint path. Old endpoints will stop working in the next major release.
 
-## Layers
+## Publications
 ### URL
-`/rest/layers`
+`/rest/publications`
 
-### GET Layers
-Get list of published layers.
+### GET Publications
+Get list of published publications, i.e. layers and maps.
 
 #### Request
 Query parameters:
-- *full_text_filter*: String. Only layers satisfying any of following conditions are returned:
+- *full_text_filter*: String. Only publications satisfying any of following conditions are returned:
   - Any word from input string appears in title. Search is case-insensitive, unaccent and does lemmatization for English.
   - Input string appears as substring of title. Search is case-insensitive and unaccent.
-- *bbox_filter*: String. Bounding box defined by four comma-separated coordinates `minx,miny,maxx,maxy`. Only layers whose bounding box intersects with given bounding box will be returned.
+- *bbox_filter*: String. Bounding box defined by four comma-separated coordinates `minx,miny,maxx,maxy`. Only publications whose bounding box intersects with given bounding box will be returned.
 - *bbox_filter_crs*: String. CRS of *bbox_filter*, default value is `EPSG:3857`, has to be one of [LAYMAN_OUTPUT_SRS_LIST](env-settings.md#LAYMAN_OUTPUT_SRS_LIST).
 - *order_by*: String. Can be one of these values:
-  - `full_text` Layers will be ordered by results of full-text search. Can be used only in combination with *full_text_filter*.
-  - `title` Layers will be ordered lexicographically by title value.
-  - `last_change` Layers will be ordered by time of last change. Recently updated layers will be first.
-  - `bbox` Layers will be ordered by similarity of bounding box with bounding box passed in *ordering_bbox* or *bbox_filter*. Can be used only in combination with  *ordering_bbox* or *bbox_filter*.
+  - `full_text` Publications will be ordered by results of full-text search. Can be used only in combination with *full_text_filter*.
+  - `title` Publications will be ordered lexicographically by title value.
+  - `last_change` Publications will be ordered by time of last change. Recently updated publications will be first.
+  - `bbox` Publications will be ordered by similarity of bounding box with bounding box passed in *ordering_bbox* or *bbox_filter*. Can be used only in combination with  *ordering_bbox* or *bbox_filter*.
   
   If *full_text_filter* is set, default value is `full_text`; if *bbox_filter* is set, default value is `bbox`; otherwise default value is empty string, i.e. no ordering is guaranteed.
 - *ordering_bbox*: String. Bounding box defined by four comma-separated coordinates `minx,miny,maxx,maxy`. The bounding box will be used for ordering. Can be used only if *order_by* is set to `bbox` (by default or explicitly). If *order_by* is set to `bbox`, default value of *ordering_bbox* is the value of *bbox_filter*.
 - *ordering_bbox_crs*: String. CRS of *ordering_bbox*, default value is *bbox_filter_crs* if defined otherwise `EPSG:3857`, has to be one of [LAYMAN_OUTPUT_SRS_LIST](env-settings.md#LAYMAN_OUTPUT_SRS_LIST).
-- *limit*: Non-negative Integer. No more layers than this number will be returned. But possibly less, if the query itself yields fewer layers.
-- *offset*: Non-negative Integer. Says to skip that many layers before beginning to return layers.
+- *limit*: Non-negative Integer. No more publications than this number will be returned. But possibly less, if the query itself yields fewer publications.
+- *offset*: Non-negative Integer. Says to skip that many publications before beginning to return publications.
 
 #### Response
 Content-Type: `application/json`
 
-JSON array of objects representing available layers with following structure:
+JSON array of objects representing available layers and maps with following structure:
 - **workspace**: String. Name of the layer's workspace.
-- **publication_type**: String. Always with value `layer`.
+- **publication_type**: String. Value `layer` for layers and `map` for maps.
 - **name**: String. Name of the layer.
 - **title**: String. Title of the layer.
 - **uuid**: String. UUID of the layer.
@@ -69,14 +70,23 @@ JSON array of objects representing available layers with following structure:
 - **bounding_box**: List of 4 floats. Bounding box coordinates [minx, miny, maxx, maxy] in EPSG:3857.
 - **native_crs**: Code of native CRS in form "EPSG:&lt;code&gt;", e.g. "EPSG:4326".
 - **native_bounding_box**: List of 4 floats and one string. Bounding box coordinates [minx, miny, maxx, maxy] in native CRS.
-- **geodata_type**: String. Either `vector`, `raster`, or `unknown`. Value `unknown` is used if input files are zipped and still being uploaded.
-- **~~file~~**: **Deprecated**.
-  - *~~file_type~~*: **Deprecated**. Replaced by **geodata_type** at root level, contains same info.
-- **wfs_wms_status**: String. Status of layer availability in WMS (and WFS in case of vector data) endpoints. Either `AVAILABLE`, `PREPARING`, or `NOT_AVAILABLE`.
+- *geodata_type*: String. Available only for layers. Either `vector`, `raster`, or `unknown`. Value `unknown` is used if input files are zipped and still being uploaded.
+- *~~file~~*: **Deprecated**.
+  - *~~file_type~~*: **Deprecated**. Replaced by **geodata_type** at root level, contains same info. Available only for layers.
+- *wfs_wms_status*: String. Available only for layers. Status of layer availability in WMS (and WFS in case of vector data) endpoints. Either `AVAILABLE`, `PREPARING`, or `NOT_AVAILABLE`.
 
 Headers:
 - **X-Total-Count**: Total number of layers available from the request, taking into account all filtering parameters except `limit` and `offset`. Example `"247"`.
 - **Content-Range**: Indicates where in a full list of layers a partial response belongs. Syntax of value is `<units> <range_start>-<range_end>/<size>`. Value of `units` is always `items`. Value of `range_start` is one-based index of the first layer within the full list, or zero if no values are returned. Value of `range_end` is one-based index of the last layer within the full list, or zero if no values are returned. Example: `items 1-20/247`.
+
+## Layers
+### URL
+`/rest/layers`
+
+### GET Layers
+Get list of published layers.
+
+Have the same request parameters and response structure and headers as [GET Publications](#get-publications), except only layers are returned.
 
 ## Workspace Layers
 ### URL
@@ -530,7 +540,7 @@ JSON object with one attribute:
 ### GET Maps
 Get list of published maps (map compositions).
 
-Have the same request parameters and response structure and headers as [GET Layers](#get-layers), except `publication_type` has value `map` and `file`, `geodata_type` and `wfs_wms_status` keys are not available in response.
+Have the same request parameters and response structure and headers as [GET Publications](#get-publications), except only maps are returned.
 
 ## Workspace Maps
 ### URL
