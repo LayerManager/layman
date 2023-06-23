@@ -5,7 +5,7 @@ import crs as crs_def
 from layman import settings, app as app, LaymanError
 from layman.layer import LAYER_TYPE
 from layman.map import MAP_TYPE
-from test_tools import process_client, prime_db_schema_client
+from test_tools import prime_db_schema_client
 from . import publications, workspaces, users
 
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
@@ -107,20 +107,27 @@ def test_publication_basic():
 class TestSelectPublicationsBasic:
     workspace1 = 'test_select_publications_basic_workspace1'
     workspace2 = 'test_select_publications_basic_workspace2'
-    qml_style_file = 'sample/style/small_layer.qml'
     publications = [(workspace1, LAYER_TYPE, 'test_select_publications_publication1le', {}),
-                    (workspace1, LAYER_TYPE, 'test_select_publications_publication1le_qml', {'style_file': qml_style_file}),
-                    (workspace1, MAP_TYPE, 'test_select_publications_publication1me', {}),
+                    (workspace1, LAYER_TYPE, 'test_select_publications_publication1le_qml', {'style_type': 'qml'}),
+                    (workspace1, MAP_TYPE, 'test_select_publications_publication1me', {'style_type': None}),
                     (workspace2, LAYER_TYPE, 'test_select_publications_publication2le', {}),
                     ]
 
     @pytest.fixture(scope="class")
     def provide_data(self):
-        for publication in self.publications:
-            process_client.publish_workspace_publication(publication[1], publication[0], publication[2], **publication[3])
+        for workspace, type, name, kwargs in self.publications:
+            if type == LAYER_TYPE:
+                kwargs = {
+                    **kwargs,
+                    'geodata_type': settings.GEODATA_TYPE_VECTOR,
+                    'wfs_wms_status': settings.EnumWfsWmsStatus.AVAILABLE.value,
+                }
+            prime_db_schema_client.post_workspace_publication(publication_type=type,
+                                                              workspace=workspace,
+                                                              name=name,
+                                                              **kwargs, )
         yield
-        for publication in self.publications:
-            process_client.delete_workspace_publication(publication[1], publication[0], publication[2])
+        prime_db_schema_client.clear_workspaces([self.workspace1, self.workspace2])
 
     @staticmethod
     @pytest.mark.parametrize('query_params, expected_publications', [
