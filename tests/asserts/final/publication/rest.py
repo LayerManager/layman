@@ -60,7 +60,7 @@ def same_values_in_detail_and_multi(workspace, publ_type, name, rest_publication
     for rest_multi_method, args, kwargs in multi_requests:
         rest_multi_response_json = rest_multi_method(*args, **kwargs)
         rest_multi_infos = [info for info in rest_multi_response_json
-                            if info['workspace'] == workspace and info['name'] == name]
+                            if info['workspace'] == workspace and info['name'] == name and info['publication_type'] == publ_type.split('.')[1]]
         assert len(rest_multi_infos) == 1, f'rest_multi_infos={rest_multi_infos}'
         rest_multi_info = rest_multi_infos[0]
 

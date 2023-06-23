@@ -129,8 +129,8 @@ def authorize_publications_decorator(func):
     def decorated_function(*args, **kwargs):
         # print(f"authorize ARGS {args} KWARGS {kwargs}")
         req_path = request.script_root + request.path
-        (workspace, publication_type, publication_name) = parse_request_path(req_path)
-        if publication_type is None or workspace or publication_name:
+        (workspace, _, publication_name) = parse_request_path(req_path)
+        if workspace or publication_name:
             raise Exception(f"Authorization module is unable to authorize path {req_path}")
         actor_name = authn.get_authn_username()
         if request.method.lower() == common.REQUEST_METHOD_GET:

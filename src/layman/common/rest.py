@@ -244,13 +244,14 @@ def get_publications(publication_type, actor, request_args=None, workspace=None)
                                                                               ordering_bbox_crs=ordering_bbox_crs
                                                                               )
 
-    infos = [
-        {
+    infos = []
+    for (res_workspace, _, name), info in publication_infos_whole['items'].items():
+        rest_info = {
             'name': name,
-            'workspace': workspace,
+            'workspace': res_workspace,
             'publication_type': info['type'].split('.')[1],
             'title': info.get("title"),
-            'url': layman_util.get_workspace_publication_url(publication_type, workspace, name),
+            'url': layman_util.get_workspace_publication_url(info['type'], res_workspace, name),
             'uuid': info["uuid"],
             'access_rights': info['access_rights'],
             'updated_at': info['updated_at'].isoformat(),
@@ -263,13 +264,10 @@ def get_publications(publication_type, actor, request_args=None, workspace=None)
             },
             'wfs_wms_status': info['_wfs_wms_status'].value if info['_wfs_wms_status'] else None,
         }
-        for (workspace, _, name), info in publication_infos_whole['items'].items()
-    ]
-
-    multi_info_keys_to_remove = layman_util.get_multi_info_keys_to_remove(publication_type)
-    for info in infos:
+        multi_info_keys_to_remove = layman_util.get_multi_info_keys_to_remove(info['type'])
         for info_key_to_remove in multi_info_keys_to_remove:
-            info.pop(info_key_to_remove, None)
+            rest_info.pop(info_key_to_remove, None)
+        infos.append(rest_info)
 
     response = make_response(jsonify(infos), 200)
     response.headers['X-Total-Count'] = publication_infos_whole['total_count']

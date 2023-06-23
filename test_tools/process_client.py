@@ -79,6 +79,19 @@ PUBLICATION_TYPES_DEF = {MAP_TYPE: PublicationTypeDef('mapname',
                                                         'rest_workspace_layer_metadata_comparison.get',
                                                         'rest_workspace_layer_chunk.post',
                                                         ),
+                         None: PublicationTypeDef('publicationname',
+                                                  'rest_publications.get',
+                                                  None,
+                                                  None,
+                                                  None,
+                                                  None,
+                                                  None,
+                                                  None,
+                                                  None,
+                                                  None,
+                                                  None,
+                                                  None,
+                                                  ),
                          }
 
 # pylint: disable=unexpected-keyword-arg
@@ -443,6 +456,7 @@ def get_workspace_publications_response(publication_type, workspace, *, headers=
 
 
 def get_publications_response(publication_type, *, workspace=None, headers=None, query_params=None):
+    assert publication_type or not workspace
     query_params = query_params or {}
     assert set(query_params.keys()) <= GET_PUBLICATIONS_KNOWN_PARAMS, \
         f"Unknown params: {set(query_params.keys()) - GET_PUBLICATIONS_KNOWN_PARAMS}"

@@ -197,9 +197,11 @@ def get_workspace_blueprints():
 
 
 def get_blueprints():
+    from .rest_publications import bp as rest_publications_bp
     blueprints = []
     for type_def in get_publication_types(use_cache=False).values():
         blueprints += type_def['blueprints']
+    blueprints.append(rest_publications_bp)
     return blueprints
 
 
