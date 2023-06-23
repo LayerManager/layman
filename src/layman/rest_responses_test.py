@@ -83,6 +83,7 @@ class TestResponsesClass:
             'file_type': settings.GEODATA_TYPE_VECTOR,
         },
         'wfs_wms_status': settings.EnumWfsWmsStatus.AVAILABLE.value,
+        'publication_type': 'layer',
     }
     expected_maps = {
         **expected_common_multi,
@@ -90,6 +91,7 @@ class TestResponsesClass:
         'native_crs': 'EPSG:3857',
         'native_bounding_box': list(test_data.SMALL_MAP_BBOX),
         'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/maps/{publication}',
+        'publication_type': 'map',
     }
 
     expected_common = {

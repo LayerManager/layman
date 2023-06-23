@@ -248,6 +248,7 @@ def get_publications(publication_type, actor, request_args=None, workspace=None)
         {
             'name': name,
             'workspace': workspace,
+            'publication_type': info['type'].split('.')[1],
             'title': info.get("title"),
             'url': layman_util.get_workspace_publication_url(publication_type, workspace, name),
             'uuid': info["uuid"],

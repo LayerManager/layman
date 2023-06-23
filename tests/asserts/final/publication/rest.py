@@ -48,6 +48,7 @@ def same_values_in_detail_and_multi(workspace, publ_type, name, rest_publication
         else:
             wfs_wms_status = 'AVAILABLE'
         exp_info['wfs_wms_status'] = wfs_wms_status
+    exp_info['publication_type'] = 'layer' if publ_type == process_client.LAYER_TYPE else 'map'
 
     for key in different_value_keys:
         exp_info.pop(key)
