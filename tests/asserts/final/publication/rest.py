@@ -56,6 +56,7 @@ def same_values_in_detail_and_multi(workspace, publ_type, name, rest_publication
     multi_requests = [
         (process_client.get_publications, [publ_type], {'workspace': workspace, 'headers': headers}),
         (process_client.get_publications, [publ_type], {'headers': headers}),
+        (process_client.get_publications, [None], {'headers': headers}),
     ]
     for rest_multi_method, args, kwargs in multi_requests:
         rest_multi_response_json = rest_multi_method(*args, **kwargs)
