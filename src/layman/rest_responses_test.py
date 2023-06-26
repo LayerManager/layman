@@ -173,18 +173,20 @@ class TestResponsesClass:
     @staticmethod
     @pytest.mark.usefixtures('ensure_layman', 'provide_data')
     @pytest.mark.parametrize('query_method, method_params, expected_info', [
-        pytest.param(process_client.get_layers, {}, expected_layers, id='get_layers'),
-        pytest.param(process_client.get_maps, {}, expected_maps, id='get_maps'),
-        pytest.param(process_client.get_layers, {'workspace': workspace}, expected_layers, id='get_workspace_layers'),
-        pytest.param(process_client.get_maps, {'workspace': workspace}, expected_maps, id='get_workspace_maps'),
+        pytest.param(process_client.get_publications, {'publication_type': None, 'query_params': {'order_by': 'title'}}, [expected_layers, expected_maps, ], id='get_publications'),
+        pytest.param(process_client.get_layers, {}, [expected_layers], id='get_layers'),
+        pytest.param(process_client.get_maps, {}, [expected_maps], id='get_maps'),
+        pytest.param(process_client.get_layers, {'workspace': workspace}, [expected_layers], id='get_workspace_layers'),
+        pytest.param(process_client.get_maps, {'workspace': workspace}, [expected_maps], id='get_workspace_maps'),
         pytest.param(process_client.get_workspace_layer, {'workspace': workspace, 'name': publication}, expected_layer, id='get_workspace_layer'),
         pytest.param(process_client.get_workspace_map, {'workspace': workspace, 'name': publication}, expected_map, id='get_workspace_map'),
     ])
     def test_rest_responses(query_method, method_params, expected_info, ):
         response = query_method(**method_params)
         if isinstance(response, list):
-            assert len(response) == 1
-            info = response[0]
+            assert len(response) == len(expected_info)
+            for idx, info in enumerate(response):
+                TestResponsesClass.compare_infos(info, expected_info[idx], '/')
         else:
             info = response
-        TestResponsesClass.compare_infos(info, expected_info, '/')
+            TestResponsesClass.compare_infos(info, expected_info, '/')
