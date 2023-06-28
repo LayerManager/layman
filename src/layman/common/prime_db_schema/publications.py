@@ -198,6 +198,7 @@ from {DB_SCHEMA}.workspaces w inner join
 
     order_by_parts.append('w.name ASC')
     order_by_parts.append('p.name ASC')
+    order_by_parts.append('p.type ASC')
     order_by_clause = 'ORDER BY ' + ', '.join(order_by_parts)
 
     #########################################################
