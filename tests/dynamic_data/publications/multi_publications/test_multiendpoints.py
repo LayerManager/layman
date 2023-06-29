@@ -482,14 +482,14 @@ REST_TEST_CASES = [
     ({'headers': {},
       'workspace_type_list': [
           (None, process_client.MAP_TYPE),
-      ],
-      'rest_params': {},
-      }, [MAP1_WS1_REWE_BBOX_BF46,
-          MAP2_WS1_REWE_BBOX_C3,
-          MAP4_WS1_REWO_BBOX_CE79,
-          MAP5_WS2_REWE_BBOX_CE35,
-          ]
-     ),
+    ],
+        'rest_params': {},
+    }, [MAP1_WS1_REWE_BBOX_BF46,
+        MAP2_WS1_REWE_BBOX_C3,
+        MAP4_WS1_REWO_BBOX_CE79,
+        MAP5_WS2_REWE_BBOX_CE35,
+        ]
+    ),
     ({'headers': AUTHN_HEADERS_USER2,
       'workspace_type_list': [
           (None, None),
