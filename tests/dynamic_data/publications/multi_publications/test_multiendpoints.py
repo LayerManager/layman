@@ -480,62 +480,36 @@ INTERNAL_TEST_CASES = [
 
 REST_TEST_CASES = [
     ({'headers': {},
-      'workspace': None,
-      'publ_type': process_client.MAP_TYPE,
+      'workspace_type_list': [
+          (None, process_client.MAP_TYPE),
+      ],
       'rest_params': {},
-      }, {
-        'items': [MAP1_WS1_REWE_BBOX_BF46,
-                  MAP2_WS1_REWE_BBOX_C3,
-                  MAP4_WS1_REWO_BBOX_CE79,
-                  MAP5_WS2_REWE_BBOX_CE35,
-                  ],
-        'total_count': 4,
-        'content_range': (1, 4),
-    }),
+      }, [MAP1_WS1_REWE_BBOX_BF46,
+          MAP2_WS1_REWE_BBOX_C3,
+          MAP4_WS1_REWO_BBOX_CE79,
+          MAP5_WS2_REWE_BBOX_CE35,
+          ]
+     ),
     ({'headers': AUTHN_HEADERS_USER2,
-      'workspace': None,
-      'publ_type': process_client.MAP_TYPE,
+      'workspace_type_list': [
+          (None, None),
+          (None, process_client.MAP_TYPE),
+          (WS_USER2, process_client.MAP_TYPE),
+      ],
       'rest_params': {},
-      }, {
-        'items': [MAP1_WS1_REWE_BBOX_BF46,
-                  MAP2_WS1_REWE_BBOX_C3,
-                  MAP4_WS1_REWO_BBOX_CE79,
-                  MAP5_WS2_REWE_BBOX_CE35,
-                  MAP6_WS2_ROWO_BBOX_BD24,
-                  ],
-        'total_count': 5,
-        'content_range': (1, 5),
-    }),
+      }, [LAY2_WS1_R2WO_BBOX_BC26,
+          MAP1_WS1_REWE_BBOX_BF46,
+          MAP2_WS1_REWE_BBOX_C3,
+          MAP4_WS1_REWO_BBOX_CE79,
+          MAP5_WS2_REWE_BBOX_CE35,
+          MAP6_WS2_ROWO_BBOX_BD24,
+          LAY1_WSP_REWE_BBOX_BC26,
+          ]
+     ),
     ({'headers': AUTHN_HEADERS_USER2,
-      'workspace': WS_USER2,
-      'publ_type': process_client.MAP_TYPE,
-      'rest_params': {},
-      }, {
-        'items': [MAP5_WS2_REWE_BBOX_CE35,
-                  MAP6_WS2_ROWO_BBOX_BD24,
-                  ],
-        'total_count': 2,
-        'content_range': (1, 2),
-    }),
-    ({'headers': AUTHN_HEADERS_USER2,
-      'workspace': None,
-      'publ_type': None,
-      'rest_params': {},
-      }, {
-        'items': [LAY2_WS1_R2WO_BBOX_BC26,
-                  MAP1_WS1_REWE_BBOX_BF46,
-                  MAP2_WS1_REWE_BBOX_C3,
-                  MAP4_WS1_REWO_BBOX_CE79,
-                  MAP5_WS2_REWE_BBOX_CE35,
-                  MAP6_WS2_ROWO_BBOX_BD24,
-                  LAY1_WSP_REWE_BBOX_BC26,
-                  ],
-        'total_count': 7,
-        'content_range': (1, 7),
-    }),
-    ({'headers': AUTHN_HEADERS_USER2,
-      'workspace': None,
-      'publ_type': None,
+      'workspace_type_list': [
+          (None, None),
+      ],
       'rest_params': {
           'order_by': 'bbox',
           'ordering_bbox': ','.join([f'{coord}' for coord in BBox.D4.value.epsg_3857]),
@@ -543,14 +517,11 @@ REST_TEST_CASES = [
           'bbox_filter': ','.join([f'{coord}' for coord in BBox.D4.value.epsg_3857]),
           'bbox_filter_crs': crs_def.EPSG_3857,
       },
-      }, {
-        'items': [MAP5_WS2_REWE_BBOX_CE35,
-                  MAP6_WS2_ROWO_BBOX_BD24,
-                  MAP1_WS1_REWE_BBOX_BF46,
-                  ],
-        'total_count': 3,
-        'content_range': (1, 3),
-    }),
+      }, [MAP5_WS2_REWE_BBOX_CE35,
+          MAP6_WS2_ROWO_BBOX_BD24,
+          MAP1_WS1_REWE_BBOX_BF46,
+          ]
+     ),
 ]
 
 
@@ -639,6 +610,21 @@ def get_internal_pylint_id(query_params):
     return pytest_id
 
 
+def get_rest_pylint_id(query_params):
+    pylint_id_parts = []
+    headers = query_params['headers']
+    if headers:
+        actor_value = headers[process_client.TOKEN_HEADER][7:]
+    else:
+        actor_value = settings.ANONYM_USER
+    pylint_id_parts.append(('user', actor_value))
+    pylint_id_parts.append(('workspace', query_params.get('workspace')))
+    publ_type = query_params.get('publ_type')
+    pylint_id_parts.append(('type', publ_type.split('.')[1] if publ_type else publ_type))
+    pytest_id = ' & '.join(f"{name}={value}" for name, value in pylint_id_parts)
+    return pytest_id
+
+
 def generate_test_cases(test_cases, *, pylint_id_generator=None):
     tc_list = []
     for idx, (query_params, exp_result) in enumerate(test_cases):
@@ -657,11 +643,35 @@ def generate_test_cases(test_cases, *, pylint_id_generator=None):
     return tc_list
 
 
+def unpack_rest_test_case_query(query, expected):
+    params = copy.deepcopy(query)
+    unpacked = []
+    ws_type_list = params.pop('workspace_type_list')
+    for workspace, publ_type in ws_type_list:
+        exp_list = [publication for publication in expected
+                    if (publication.workspace == workspace or workspace is None)
+                    and (publication.type == publ_type or publ_type is None)]
+        unpacked.append((
+            {
+                **params,
+                'workspace': workspace,
+                'publ_type': publ_type,
+            },
+            {
+                'items': exp_list,
+                'total_count': len(exp_list),
+                'content_range': (1, len(exp_list)),
+            }
+        ))
+    assert len(unpacked) > 0
+    return unpacked
+
+
 @pytest.mark.usefixtures('ensure_layman_module', 'oauth2_provider_mock')
 class TestGet:
     test_cases = {
         'test_internal_query': generate_test_cases(INTERNAL_TEST_CASES, pylint_id_generator=get_internal_pylint_id),
-        'test_rest_query': generate_test_cases(REST_TEST_CASES),
+        'test_rest_query': generate_test_cases([(unpacked_query, unpacked_expected) for query, expected in REST_TEST_CASES for unpacked_query, unpacked_expected in unpack_rest_test_case_query(query, expected)], pylint_id_generator=get_rest_pylint_id),
     }
 
     usernames_to_reserve = USERNAMES
