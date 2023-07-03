@@ -162,6 +162,7 @@ Body parameters:
    - [connection URI](https://www.postgresql.org/docs/15/libpq-connect.html#id-1.7.3.8.3.6) is required, usual format is `postgresql://<username>:<password>@<host>:<port>/<dbname>?schema=<schema_name>&table=<table_name>&geo_column=<geo_column_name>`
      - `host` part and query parameters `schema` and `table` are mandatory
      - URI scheme is required to be `postgresql`
+     - `host.docker.internal` can be used to reach `localhost` of host server
    - if `geo_column` is not specified, first geometry column of the table by alphabetic order is used
    - published table is required to have one-column primary key
    - names of schema, table and all columns of the table are required to match regular expression `^[a-zA-Z_][a-zA-Z_0-9]*$`

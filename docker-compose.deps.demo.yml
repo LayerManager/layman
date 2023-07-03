@@ -18,6 +18,8 @@ services:
       build:
         context: deps/qgis/docker
         dockerfile: Dockerfile
+      extra_hosts:
+         - "host.docker.internal:host-gateway"
       volumes:
         - ./deps/qgis/data:/qgis/data:ro
       restart: on-failure
@@ -30,6 +32,8 @@ services:
 
    geoserver:
       image: docker.osgeo.org/geoserver:2.21.2
+      extra_hosts:
+         - "host.docker.internal:host-gateway"
       volumes:
         - ./deps/geoserver/data:/opt/geoserver_data/
       restart: on-failure

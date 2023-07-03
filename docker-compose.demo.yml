@@ -14,6 +14,7 @@ services:
       env_file:
          - .env
       extra_hosts:
+         - "host.docker.internal:host-gateway"
          - ${EXTRA_HOST1}
          - ${EXTRA_HOST2}
       volumes:
@@ -40,6 +41,7 @@ services:
         - C_FORCE_ROOT=true
         - LAYMAN_SKIP_REDIS_LOADING=true
       extra_hosts:
+         - "host.docker.internal:host-gateway"
          - ${EXTRA_HOST1}
          - ${EXTRA_HOST2}
       volumes:
