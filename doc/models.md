@@ -32,7 +32,7 @@
   - one metadata record per WMS&WFS layer
 
 ## Timeseries
-- Timeseries is [layer](#layer) created from set of raster data files (GeoJSON, ShapeFile, GeoTIFF, JPEG2000, PNG or JPEG).
+- Timeseries is [layer](#layer) created from set of raster data files (GeoTIFF, JPEG2000, PNG or JPEG).
 - Each file represents one time instant, more files may represent the same time instant.
 - Information about time representation is passed through [time_regex](rest.md#post-workspace-layers) parameter.
   
