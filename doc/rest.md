@@ -217,6 +217,7 @@ Body parameters:
   - regular expression pattern used for extracting the time information from [timeseries](models.md#timeseries) raster file names. The pattern
     - either has no matching group and matches ISO 8601 [year](https://en.wikipedia.org/wiki/ISO_8601#Years), [date](https://en.wikipedia.org/wiki/ISO_8601#Calendar_dates), or [datetime](https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations) patterns, e.g. `[0-9]{8}` or `[0-9]{8}T[0-9]{6}Z`
     - or has one or more matching groups that concatenated together matches ISO 8601 year, date, or datetime patterns, e.g. `^some_prefix_([0-9]{8})_some_postfix.*$` or , e.g. `some_prefix_([0-9]{8})_some_separator_(T[0-9]{6}Z)_some_postfix`
+  - although time pattern is accepted in time_regex, the temporal part is later cut off, so the smallest recognizable temporal unit is one day (see [#875](https://github.com/LayerManager/layman/issues/875))
   - latin diacritic is removed from the regex and spaces are replaced with underscores to be consistent with slugifying of timeseries filenames
   - error is raised if any of main data file names do not match *time_regex* value
 - *time_regex_format*, string, e.g. yyyyddMM
@@ -286,7 +287,9 @@ JSON object with following structure:
   - *time*, available only for time-series layers
     - **units**: String. Code of time format. Always `ISO8601`.
     - **values**: List of strings. Time instants available for layer written in ISO 8601 format.
+      - time part of the value is always `00:00:00.000Z` (see [#875](https://github.com/LayerManager/layman/issues/875))
     - **default**: Time. Default time instant.
+      - time part of the value is always `00:00:00Z` (see [#875](https://github.com/LayerManager/layman/issues/875))
     - **regex**: Slugified regular expression used to extract time instants from file names. Originally sent in `time_regex` parameter.
     - **regex_format**: Slugified format of `regex` result date and time. Originally sent in `time_regex_format` parameter.
   - *status*: Status information about GeoServer import and availability of WMS layer. No status object means the source is available. Usual state values are

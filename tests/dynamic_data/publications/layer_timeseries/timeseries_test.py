@@ -288,11 +288,11 @@ LAYERS = {
                 'native_bounding_box': [543100.0, 5573500.0, 552100.0, 5579500.0],
                 'image_mosaic': True,
                 'wms': {
-                    'time': {'default': '2022-03-16T00:00:00Z',
+                    'time': {'default': '2022-03-16T00:00:00Z',  # https://github.com/LayerManager/layman/issues/875
                              'units': 'ISO8601',
                              'regex': "^.*([0-9]{4}_[0-9]{2}_[0-9]{2}at[0-9]{2}-[0-9]{2}).*$",
                              'regex_format': "yyyy_dd_MM'at'HH-mm",
-                             'values': ['2022-03-16T00:00:00.000Z']},
+                             'values': ['2022-03-16T00:00:00.000Z']},  # https://github.com/LayerManager/layman/issues/875
                 },
             },
             'publ_type_detail': ('raster', 'sld'),
