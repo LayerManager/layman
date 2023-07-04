@@ -48,6 +48,9 @@
   - flask 2.2.2 -> 2.3.2
   - redis 4.5.1 -> 4.5.4
   - owslib 0.27.2 -> 0.28.1
+  - requests 2.28.1 -> 2.31.0
+- Upgrade Node.js Timgen dependencies
+  - vite 3.2.5 -> 3.2.7
 - [#520](https://github.com/LayerManager/layman/issues/520) WFS in version `2.0.0` and WMS in version `1.3.0` includes also MetadataURL for each layer with url of Micka record.
 - [#769](https://github.com/LayerManager/layman/issues/769) New endpoint [GET Publications](doc/rest.md#get-publications) returning layers and maps. 
 - [#769](https://github.com/LayerManager/layman/issues/769) Endpoints [GET Layers](doc/rest.md#get-layers), [GET Workspace Layers](doc/rest.md#get-workspace-layers), [GET Maps](doc/rest.md#get-maps), and [GET Workspace Maps](doc/rest.md#get-workspace-maps) return new key `publication_type`. 
