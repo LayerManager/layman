@@ -62,6 +62,7 @@
 - [#764](https://github.com/LayerManager/layman/issues/764), [#860](https://github.com/LayerManager/layman/issues/860) Layman accepts QML styles with labels without symbology and with point clustering.
 - [#857](https://github.com/LayerManager/layman/issues/857) Endpoints [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) accepts `host.docker.internal` in `external_table_uri` parameter to reach `localhost` of host server.
 - Document that temporal part of timeseries datetime dimension extracted by [`time_regex` parameter](doc/rest.md#post-workspace-layers) is cut off, so the smallest possible unit of datetime dimension is one day.
+- [#877](https://github.com/LayerManager/layman/issues/877) Use docker compose version 2 in Makefile. As of now, all containers are named in the same way as previously. Old Makefile using docker-compose v1 is archived as `Makefile_docker-compose_v1` and can be used.
 
 ## v1.20.1
  2023-04-11

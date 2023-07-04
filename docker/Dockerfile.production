@@ -20,7 +20,7 @@ RUN pip install -r requirements.production.txt
 
 COPY src /code/src
 
-# because docker-compose passes empty string if environment variable is not defined at host, the following default value is not used
+# because docker compose passes empty string if environment variable is not defined at host, the following default value is not used
 # https://github.com/docker/compose/issues/3608
 ARG UID_GID=0:0
 # therefore we need to use it in this way anywhere below: ${UID_GID:-"0:0"}

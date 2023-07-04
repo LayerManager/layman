@@ -35,8 +35,8 @@ Publishing geospatial data online through [REST API](doc/rest.md).
   - Fedora 29+
 
     You can check your kernel version with `uname -r`.
-- docker v17.12+, installation instructions for [centos 7](https://docs.docker.com/install/linux/docker-ce/centos/)
-- docker-compose v1.14+, installation instructions for [centos 7](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-centos-7)
+- Docker Engine v20.10.13+ including Docker Compose v2+
+  - installation instructions for [centos 7](https://docs.docker.com/install/linux/docker-ce/centos/), including docker-compose-plugin installation
 
 **Optionally**
 - linux or any tool to run tasks defined in Makefile using `make` command
@@ -184,7 +184,7 @@ Within Redis, you need to provide two databases, one for Layman, second for Laym
 
 Within Micka, you need to provide one user with editor privileges, whose credentials are defined by [CSW_BASIC_AUTHN](doc/env-settings.md#CSW_BASIC_AUTHN).
 
-After providing external dependencies there is time to provide **internal dependencies** (system-level, python-level and node.js-level dependencies). You can either use our docker and docker-compose configuration to generate docker images that already provides internal dependencies, or you can provide internal dependencies by yourself (if you prefer not to use docker in production).
+After providing external dependencies there is time to provide **internal dependencies** (system-level, python-level and node.js-level dependencies). You can either use our docker and docker compose configuration to generate docker images that already provides internal dependencies, or you can provide internal dependencies by yourself (if you prefer not to use docker in production).
 
 **System-level** dependencies includes
 - python 3.8+
@@ -204,10 +204,10 @@ Next you need to choose how you deploy Layman. As Layman is Flask application, c
 Configure Layman using [environment settings](doc/env-settings.md). Demo configuration is a good starting point to setup Layman for production, however it needs to be adjusted carefully.
 
 Last, start layman and necessary services:
-- thumbnail image generator (Timgen) using npm (see startup command of `timgen` docker-compose service)
-- Layman client using npm (see startup command of `layman_client` docker-compose service)
-- Layman using your deployment server (see startup command of `layman` docker-compose service)
-- Layman celery worker using python (see startup command of `celery_worker` docker-compose service)
+- thumbnail image generator (Timgen) using npm (see startup command of `timgen` docker compose service)
+- Layman client using npm (see startup command of `layman_client` docker compose service)
+- Layman using your deployment server (see startup command of `layman` docker compose service)
+- Layman celery worker using python (see startup command of `celery_worker` docker compose service)
 
 ## Run in development
 Suitable for **development only**.
