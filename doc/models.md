@@ -34,6 +34,7 @@
 ## Timeseries
 - Timeseries is [layer](#layer) created from set of raster data files (GeoTIFF, JPEG2000, PNG or JPEG).
 - Each file represents one time instant, more files may represent the same time instant.
+- The smallest possible supported temporal unit is one day (see [#875](https://github.com/LayerManager/layman/issues/875)).
 - Information about time representation is passed through [time_regex](rest.md#post-workspace-layers) parameter.
   
 ## Map
