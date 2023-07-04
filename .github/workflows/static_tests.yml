@@ -21,7 +21,7 @@ jobs:
       - name: View versions
         run: |
           docker -v
-          docker-compose -v
+          docker compose version
 
       - name: Usage info
         run: |
@@ -32,13 +32,13 @@ jobs:
         run: |
           cp .env.test .env
           make pull-dev-images
-          docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml pull redis postgresql nginx-qgis
-          docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml build --parallel qgis geoserver micka
+          docker compose --compatibility -f docker-compose.deps.yml -f docker-compose.test.yml pull redis postgresql nginx-qgis
+          docker compose --compatibility -f docker-compose.deps.yml -f docker-compose.test.yml build --parallel qgis geoserver micka
 
       - name: Download test data
         run: |
           mkdir -p tmp
-          docker-compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --no-deps layman_test bash -c "bash ensure-test-data.sh"
+          docker compose --compatibility -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --no-deps layman_test bash -c "bash ensure-test-data.sh"
 
       - name: Usage info
         if: always()
