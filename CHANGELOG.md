@@ -43,7 +43,18 @@
 - [#528](https://github.com/LayerManager/layman/issues/528) Fill column `wfs_wms_status` in `publications` table in prime DB schema. For layers set value `AVAILABLE` if fully available through WFS and WFS, otherwise `NOT_AVAILABLE`. Value is set to `null` for all existing maps. 
 - [#520](https://github.com/LayerManager/layman/issues/520) Set MetadataURL for each layer in WFS and WMS workspace in GeoServer.
 ### Changes
+- [#769](https://github.com/LayerManager/layman/issues/769) New endpoint [GET Publications](doc/rest.md#get-publications) returning layers and maps. 
+- [#769](https://github.com/LayerManager/layman/issues/769) Endpoints [GET Layers](doc/rest.md#get-layers), [GET Workspace Layers](doc/rest.md#get-workspace-layers), [GET Maps](doc/rest.md#get-maps), and [GET Workspace Maps](doc/rest.md#get-workspace-maps) return new key `publication_type`. 
 - [#528](https://github.com/LayerManager/layman/issues/528) Endpoints [GET Layers](doc/rest.md#get-layers) and [GET Workspace Layers](doc/rest.md#get-workspace-layers) returns new key `wfs_wms_status`.
+- [#520](https://github.com/LayerManager/layman/issues/520) WFS in version `2.0.0` and WMS in version `1.3.0` includes also MetadataURL for each layer with url of Micka record.
+- [#800](https://github.com/LayerManager/layman/issues/800) Endpoints [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) support new parameter `time_regex_format`.
+- [#800](https://github.com/LayerManager/layman/issues/800) Endpoints [GET Workspace Layer](doc/rest.md#get-workspace-layer) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) return new subkey `wms`.`time`.`regex_format`.
+- [#764](https://github.com/LayerManager/layman/issues/764), [#860](https://github.com/LayerManager/layman/issues/860) Layman accepts QML styles with labels without symbology and with point clustering.
+- [#857](https://github.com/LayerManager/layman/issues/857) Endpoints [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) accepts `host.docker.internal` in `external_table_uri` parameter to reach `localhost` of host server.
+- [#847](https://github.com/LayerManager/layman/issues/847) Fix publishing external table layers with `@` in the username or the password.
+- [#833](https://github.com/LayerManager/layman/issues/833) Make Timgen WMS requests more robust (handle WML errors, delayed retry, add timestamp to each request).
+- [#877](https://github.com/LayerManager/layman/issues/877) Use docker compose version 2 in Makefile. As of now, all containers are named in the same way as previously. Old Makefile using docker-compose v1 is archived as `Makefile_docker-compose_v1` and can be used.
+- [#815](https://github.com/LayerManager/layman/issues/815) Propagate [`LAYMAN_PROXY_SERVER_NAME`](doc/env-settings.md#LAYMAN_PROXY_SERVER_NAME) value to GeoServer environment variable [GEOSERVER_CSRF_WHITELIST](https://docs.geoserver.org/latest/en/user/security/webadmin/csrf.html).
 - [#765](https://github.com/LayerManager/layman/issues/765) Remove Liferay from dev stack, use [Wagtail CRX](https://docs.coderedcorp.com/wagtail-crx/) + [Django OAuth Toolkit](https://django-oauth-toolkit.readthedocs.io/en/latest/) as new OAuth2 provider (authorization server).
 - Upgrade Python dependencies
   - flask 2.2.2 -> 2.3.2
@@ -52,18 +63,7 @@
   - requests 2.28.1 -> 2.31.0
 - Upgrade Node.js Timgen dependencies
   - vite 3.2.5 -> 3.2.7
-- [#520](https://github.com/LayerManager/layman/issues/520) WFS in version `2.0.0` and WMS in version `1.3.0` includes also MetadataURL for each layer with url of Micka record.
-- [#769](https://github.com/LayerManager/layman/issues/769) New endpoint [GET Publications](doc/rest.md#get-publications) returning layers and maps. 
-- [#769](https://github.com/LayerManager/layman/issues/769) Endpoints [GET Layers](doc/rest.md#get-layers), [GET Workspace Layers](doc/rest.md#get-workspace-layers), [GET Maps](doc/rest.md#get-maps), and [GET Workspace Maps](doc/rest.md#get-workspace-maps) return new key `publication_type`. 
-- [#833](https://github.com/LayerManager/layman/issues/833) Make Timgen WMS requests more robust (handle WML errors, delayed retry, add timestamp to each request).
-- [#800](https://github.com/LayerManager/layman/issues/800) Endpoints [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) support new parameter `time_regex_format`.
-- [#800](https://github.com/LayerManager/layman/issues/800) Endpoints [GET Workspace Layer](doc/rest.md#get-workspace-layer) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) return new subkey `wms`.`time`.`regex_format`.
-- [#815](https://github.com/LayerManager/layman/issues/815) Propagate [`LAYMAN_PROXY_SERVER_NAME`](doc/env-settings.md#LAYMAN_PROXY_SERVER_NAME) value to GeoServer environment variable [GEOSERVER_CSRF_WHITELIST](https://docs.geoserver.org/latest/en/user/security/webadmin/csrf.html).
-- [#847](https://github.com/LayerManager/layman/issues/847) Fix publishing external table layers with `@` in the username or the password.
-- [#764](https://github.com/LayerManager/layman/issues/764), [#860](https://github.com/LayerManager/layman/issues/860) Layman accepts QML styles with labels without symbology and with point clustering.
-- [#857](https://github.com/LayerManager/layman/issues/857) Endpoints [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) accepts `host.docker.internal` in `external_table_uri` parameter to reach `localhost` of host server.
 - Document that temporal part of timeseries datetime dimension extracted by [`time_regex` parameter](doc/rest.md#post-workspace-layers) is cut off, so the smallest possible unit of datetime dimension is one day.
-- [#877](https://github.com/LayerManager/layman/issues/877) Use docker compose version 2 in Makefile. As of now, all containers are named in the same way as previously. Old Makefile using docker-compose v1 is archived as `Makefile_docker-compose_v1` and can be used.
 
 ## v1.20.1
  2023-04-11
