@@ -108,6 +108,8 @@ def adjust_layer_metadata_url_on_gs():
                 timeout=GS_REST_TIMEOUT,
             )
             response.raise_for_status()
+        elif geodata_type == settings.GEODATA_TYPE_UNKNOWN:
+            continue
         else:
             raise NotImplementedError(f"Unknown geodata type: {geodata_type}")
 
