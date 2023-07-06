@@ -53,6 +53,7 @@ MIGRATIONS = {
         ]),
         ((1, 21, 0), [
             upgrade_v1_21.adjust_publications_wfs_wms_status,
+            upgrade_v1_21.adjust_layer_metadata_url_on_gs,
         ])
     ],
 }
