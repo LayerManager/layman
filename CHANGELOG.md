@@ -13,13 +13,13 @@
 - If you are using environment variable [`OAUTH2_CALLBACK_URL`](doc/env-settings.md#oauth2_callback_url), change only its URL path from `/client/authn/oauth2-liferay/callback` to `/client/authn/oauth2-provider/callback`. Keep protocol, domain, and port unchanged.
 - Stop using environment variable `LAYMAN_AUTHN_OAUTH2_PROVIDERS`, it has no effect to Layman anymore. There is exactly one OAuth2 provider Python module now, no need to set it.
 - Stop using environment variable `FLASK_ENV`, it has no effect to Layman anymore.
+  - If you used environment variable `FLASK_ENV` with value `development`, add new environment variable [`FLASK_DEBUG`](https://flask.palletsprojects.com/en/2.3.x/config/?highlight=flask_debug#DEBUG):
+    ```
+    FLASK_DEBUG=1
+    ```
 - Stop using environment variable `CSW_RECORD_URL`, it has no effect to Layman anymore. Value is derived from variable `CSW_PROXY_URL`.
-- If you used environment variable `FLASK_ENV` with value `development`, add new environment variable [`FLASK_DEBUG`](https://flask.palletsprojects.com/en/2.3.x/config/?highlight=flask_debug#DEBUG):
-  ```
-  FLASK_DEBUG=1
-  ```
 - Stop using HTTP header `AuthorizationIssUrl` when [authenticating by OAuth](doc/oauth2/index.md). The header has no effect to Layman anymore. There is exactly one OAuth2 provider now, no need to distinguish it. Now, the only distinguished HTTP header when authenticating by OAuth2 is `Authorization` header.
-- If you are running Layman with development settings
+- If you are running Layman with development settings (e.g. starting it with `make start-dev`)
   - change values of environment variables:  
     ```
     OAUTH2_CLIENT_ID=VECGuQb00tWt8HZNkA4cxu6dnoQD5pF6Up3daAoK
@@ -35,6 +35,7 @@
     ```
     make wagtail-build
     ```
+- If your [upgrade command](README.md#upgrade) ends with message `Error response from daemon: invalid IP address in add-host: "host-gateway"`, try to uninstall Docker Engine completely and install it again with Docker Compose plugin (see e.g. manual for [Centos](https://docs.docker.com/engine/install/centos/)). Then run upgrade command again.
 ### Migrations and checks
 #### Schema migrations
 - [#528](https://github.com/LayerManager/layman/issues/528) Add new data type `enum_wfs_wms_status` and create new string column `wfs_wms_status` in `publications` table in prime DB schema.
