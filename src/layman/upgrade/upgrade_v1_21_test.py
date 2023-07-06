@@ -52,6 +52,20 @@ DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
         id='layer_not_available',
     ),
     pytest.param(
+        process_client.LAYER_TYPE,
+        'test_raster_layer',
+        common_publications.LAYER_RASTER.definition,
+        settings.EnumWfsWmsStatus.AVAILABLE,
+        id='layer_raster_available',
+    ),
+    pytest.param(
+        process_client.LAYER_TYPE,
+        'layer_vector_qml_layer',
+        common_publications.LAYER_VECTOR_QML.definition,
+        settings.EnumWfsWmsStatus.AVAILABLE,
+        id='layer_vector_qml_available',
+    ),
+    pytest.param(
         process_client.MAP_TYPE,
         'test_map',
         {},

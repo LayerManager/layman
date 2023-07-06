@@ -447,8 +447,11 @@ def redact_uri(uri):
 
 
 def set_wfs_wms_status_after_fail(workspace, name):
-    keys = ['wfs', 'wms', 'style']
+    keys = ['wfs', 'wms', 'style', 'geodata_type']
     publ_info = layman_util.get_publication_info(workspace, LAYER_TYPE, name, context={'keys': keys})
+    keys.remove('geodata_type')
+    if publ_info['geodata_type'] == settings.GEODATA_TYPE_RASTER:
+        keys.remove('wfs')
     wfs_wms_status = settings.EnumWfsWmsStatus.AVAILABLE if all(
         publ_info.get(key) for key in keys) else settings.EnumWfsWmsStatus.NOT_AVAILABLE
     publications.set_wfs_wms_status(workspace, LAYER_TYPE, name, wfs_wms_status)
