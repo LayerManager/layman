@@ -522,6 +522,233 @@ REST_TEST_CASES = [
           MAP1_WS1_REWE_BBOX_BF46,
           ]
      ),
+    ({'headers': AUTHN_HEADERS_USER2,
+      'workspace_type_list': [
+          (None, None),
+      ],
+      'rest_params': {
+          'full_text_filter': 'kůň',
+      },
+      }, [MAP1_WS1_REWE_BBOX_BF46,
+          ]
+     ),
+    ({'headers': {},
+      'workspace_type_list': [
+          (None, None),
+      ],
+      'rest_params': {
+          'full_text_filter': 'The Fačřš_tÚŮTŤsa   "  a34432[;] ;.\\Ra\'\'ts',
+      },
+      }, []
+     ),
+    ({'headers': AUTHN_HEADERS_USER2,
+      'workspace_type_list': [
+          (None, None),
+      ],
+      'rest_params': {
+          'full_text_filter': '\'Too yellow horse\' means "Příliš žluťoučký kůň".',
+      },
+      }, [MAP1_WS1_REWE_BBOX_BF46,
+          ]
+     ),
+    ({'headers': AUTHN_HEADERS_USER2,
+      'workspace_type_list': [
+          (None, None),
+      ],
+      'rest_params': {
+          'full_text_filter': 'ód',
+          'order_by': 'full_text',
+      },
+      }, [MAP1_WS1_REWE_BBOX_BF46,
+          MAP2_WS1_REWE_BBOX_C3,
+          MAP4_WS1_REWO_BBOX_CE79,
+          MAP6_WS2_ROWO_BBOX_BD24,
+          LAY1_WSP_REWE_BBOX_BC26,
+          ]
+     ),
+    ({'headers': AUTHN_HEADERS_USER2,
+      'workspace_type_list': [
+          (None, None),
+      ],
+      'rest_params': {
+          'full_text_filter': 'OVA',
+      },
+      }, [LAY2_WS1_R2WO_BBOX_BC26,
+          MAP2_WS1_REWE_BBOX_C3,
+          LAY1_WSP_REWE_BBOX_BC26,
+          ]
+     ),
+    ({'headers': AUTHN_HEADERS_USER2,
+      'workspace_type_list': [
+          (None, process_client.MAP_TYPE),
+      ],
+      'rest_params': {
+          'order_by': 'title',
+      },
+      }, [MAP6_WS2_ROWO_BBOX_BD24,
+          MAP4_WS1_REWO_BBOX_CE79,
+          MAP2_WS1_REWE_BBOX_C3,
+          LAY2_WS1_R2WO_BBOX_BC26,
+          MAP1_WS1_REWE_BBOX_BF46,
+          MAP5_WS2_REWE_BBOX_CE35,
+          LAY1_WSP_REWE_BBOX_BC26,
+          ]
+     ),
+    ({'headers': AUTHN_HEADERS_USER2,
+      'workspace_type_list': [
+          (None, None),
+      ],
+      'rest_params': {
+          'order_by': 'last_change',
+      },
+      }, [LAY2_WS1_R2WO_BBOX_BC26,
+          LAY1_WSP_REWE_BBOX_BC26,
+          MAP6_WS2_ROWO_BBOX_BD24,
+          MAP5_WS2_REWE_BBOX_CE35,
+          MAP4_WS1_REWO_BBOX_CE79,
+          MAP2_WS1_REWE_BBOX_C3,
+          MAP1_WS1_REWE_BBOX_BF46,
+          ]
+     ),
+    ({'headers': AUTHN_HEADERS_USER2,
+      'workspace_type_list': [
+          (None, None),
+      ],
+      'rest_params': {
+          'order_by': 'bbox',
+          'ordering_bbox': ','.join(str(c) for c in BBox.CE35.value.epsg_3857),
+      },
+      }, [MAP5_WS2_REWE_BBOX_CE35,
+          MAP1_WS1_REWE_BBOX_BF46,
+          MAP6_WS2_ROWO_BBOX_BD24,
+          LAY2_WS1_R2WO_BBOX_BC26,
+          LAY1_WSP_REWE_BBOX_BC26,
+          MAP2_WS1_REWE_BBOX_C3,
+          MAP4_WS1_REWO_BBOX_CE79,
+          ]
+     ),
+    ({'headers': AUTHN_HEADERS_USER2,
+      'workspace_type_list': [
+          (None, None),
+      ],
+      'rest_params': {
+          'limit': 2,
+      },
+      }, [LAY2_WS1_R2WO_BBOX_BC26,
+          MAP1_WS1_REWE_BBOX_BF46,
+          MAP2_WS1_REWE_BBOX_C3,
+          MAP4_WS1_REWO_BBOX_CE79,
+          MAP5_WS2_REWE_BBOX_CE35,
+          MAP6_WS2_ROWO_BBOX_BD24,
+          LAY1_WSP_REWE_BBOX_BC26,
+          ]
+     ),
+    ({'headers': AUTHN_HEADERS_USER2,
+      'workspace_type_list': [
+          (None, None),
+      ],
+      'rest_params': {
+          'offset': 1,
+      },
+      }, [LAY2_WS1_R2WO_BBOX_BC26,
+          MAP1_WS1_REWE_BBOX_BF46,
+          MAP2_WS1_REWE_BBOX_C3,
+          MAP4_WS1_REWO_BBOX_CE79,
+          MAP5_WS2_REWE_BBOX_CE35,
+          MAP6_WS2_ROWO_BBOX_BD24,
+          LAY1_WSP_REWE_BBOX_BC26,
+          ]
+     ),
+    ({'headers': AUTHN_HEADERS_USER2,
+      'workspace_type_list': [
+          (None, None),
+      ],
+      'rest_params': {
+          'offset': 4,
+          'limit': 2,
+      },
+      }, [LAY2_WS1_R2WO_BBOX_BC26,
+          MAP1_WS1_REWE_BBOX_BF46,
+          MAP2_WS1_REWE_BBOX_C3,
+          MAP4_WS1_REWO_BBOX_CE79,
+          MAP5_WS2_REWE_BBOX_CE35,
+          MAP6_WS2_ROWO_BBOX_BD24,
+          LAY1_WSP_REWE_BBOX_BC26,
+          ]
+     ),
+    ({'headers': AUTHN_HEADERS_USER2,
+      'workspace_type_list': [
+          (None, None),
+      ],
+      'rest_params': {
+          'offset': 0,
+          'limit': 0,
+      },
+      }, [LAY2_WS1_R2WO_BBOX_BC26,
+          MAP1_WS1_REWE_BBOX_BF46,
+          MAP2_WS1_REWE_BBOX_C3,
+          MAP4_WS1_REWO_BBOX_CE79,
+          MAP5_WS2_REWE_BBOX_CE35,
+          MAP6_WS2_ROWO_BBOX_BD24,
+          LAY1_WSP_REWE_BBOX_BC26,
+          ]
+     ),
+    ({'headers': AUTHN_HEADERS_USER2,
+      'workspace_type_list': [
+          (None, None),
+      ],
+      'rest_params': {
+          'order_by': 'title',
+          'full_text_filter': 'ód',
+          'bbox_filter': ','.join(str(c) for c in BBox.CE35.value.epsg_3857),
+          'limit': 1,
+      },
+      }, [MAP6_WS2_ROWO_BBOX_BD24,
+          LAY1_WSP_REWE_BBOX_BC26,
+          MAP2_WS1_REWE_BBOX_C3,
+          MAP1_WS1_REWE_BBOX_BF46,
+          ]
+     ),
+    ({'headers': AUTHN_HEADERS_USER2,
+      'workspace_type_list': [
+          (None, None),
+      ],
+      'rest_params': {
+          'order_by': 'bbox',
+          'bbox_filter': ','.join(str(c) for c in BBox.CE35.value.epsg_3857),
+          'offset': 1,
+      },
+      }, [MAP5_WS2_REWE_BBOX_CE35,
+          MAP1_WS1_REWE_BBOX_BF46,
+          MAP6_WS2_ROWO_BBOX_BD24,
+          LAY2_WS1_R2WO_BBOX_BC26,
+          LAY1_WSP_REWE_BBOX_BC26,
+          MAP2_WS1_REWE_BBOX_C3,
+          ]
+     ),
+    ({'headers': AUTHN_HEADERS_USER2,
+      'workspace_type_list': [
+          (None, None),
+          (None, process_client.MAP_TYPE),
+          (None, process_client.LAYER_TYPE),
+          (WS_USER2, process_client.MAP_TYPE),
+          (WS_USER2, process_client.LAYER_TYPE),
+      ],
+      'rest_params': {
+          'order_by': 'bbox',
+          'ordering_bbox': ','.join([f'{coord}' for coord in BBox.CE35.value.epsg_5514]),
+          'ordering_bbox_crs': crs_def.EPSG_5514,
+          'bbox_filter': ','.join([f'{coord}' for coord in BBox.CE35.value.epsg_32634]),
+          'bbox_filter_crs': crs_def.EPSG_32634,
+      },
+      }, [MAP5_WS2_REWE_BBOX_CE35,
+          MAP1_WS1_REWE_BBOX_BF46,
+          MAP6_WS2_ROWO_BBOX_BD24,
+          LAY2_WS1_R2WO_BBOX_BC26,
+          LAY1_WSP_REWE_BBOX_BC26,
+          MAP2_WS1_REWE_BBOX_C3,
+          ]
+     ),
 ]
 
 
@@ -647,10 +874,14 @@ def unpack_rest_test_case_query(query, expected):
     params = copy.deepcopy(query)
     unpacked = []
     ws_type_list = params.pop('workspace_type_list')
+    rest_params = params['rest_params']
+    limit = rest_params.get('limit', 999)
+    offset = rest_params.get('offset', 0)
     for workspace, publ_type in ws_type_list:
-        exp_list = [publication for publication in expected
+        exp_list_full = [publication for publication in expected
                     if (publication.workspace == workspace or workspace is None)
                     and (publication.type == publ_type or publ_type is None)]
+        exp_list = exp_list_full[offset:offset+limit]
         unpacked.append((
             {
                 **params,
@@ -659,8 +890,8 @@ def unpack_rest_test_case_query(query, expected):
             },
             {
                 'items': exp_list,
-                'total_count': len(exp_list),
-                'content_range': (1, len(exp_list)),
+                'total_count': len(exp_list_full),
+                'content_range': (min(1, len(exp_list)) + offset, len(exp_list) + offset),
             }
         ))
     assert len(unpacked) > 0
