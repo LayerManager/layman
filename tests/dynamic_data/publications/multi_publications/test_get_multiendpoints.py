@@ -799,6 +799,47 @@ def bbox_to_pylint_id_part(bbox, crs):
     return f"{bbox_item.name}({epsg_code})"
 
 
+def ensure_bbox_as_tuple(bbox):
+    if isinstance(bbox, tuple):
+        bbox_tuple = bbox
+    else:
+        bbox_tuple = tuple(float(coord) for coord in bbox.split(','))
+    return bbox_tuple
+
+
+def rest_params_to_pylint_id_parts(rest_params):
+    pylint_id_parts = []
+    if 'full_text_filter' in rest_params:
+        pylint_id_parts.append(('full_text', f"'{strip_accents(rest_params['full_text_filter'])}'"))
+    if 'bbox_filter' in rest_params:
+        bbox = ensure_bbox_as_tuple(rest_params['bbox_filter'])
+        bbox_part = bbox_to_pylint_id_part(bbox,
+                                           rest_params.get('bbox_filter_crs', crs_def.EPSG_3857))
+        pylint_id_parts.append(('bbox', bbox_part))
+    order_by_list = [rest_params.get('order_by')] or rest_params.get('order_by_list')
+    if order_by_list:
+        assert len(order_by_list) == 1
+        order_by = order_by_list[0]
+        if order_by == 'full_text' and rest_params.get('ordering_full_text'):
+            pylint_id_parts.append(('order_by', f"'{strip_accents(rest_params['ordering_full_text'])}'"))
+        elif order_by == 'bbox' and rest_params.get('ordering_bbox'):
+            bbox = ensure_bbox_as_tuple(rest_params['ordering_bbox'])
+            bbox_part = bbox_to_pylint_id_part(bbox,
+                                               rest_params.get('ordering_bbox_crs', crs_def.EPSG_3857))
+            pylint_id_parts.append(('order_by', f"bbox({bbox_part})"))
+        elif order_by in ['title', 'last_change']:
+            pylint_id_parts.append(('order_by', order_by.upper()))
+    if 'limit' in rest_params:
+        pylint_id_parts.append(('limit', rest_params['limit']))
+    if 'offset' in rest_params:
+        pylint_id_parts.append(('offset', rest_params['offset']))
+    return pylint_id_parts
+
+
+def pylint_id_parts_to_string(pylint_id_parts):
+    return ' & '.join(f"{name}={value}" for name, value in pylint_id_parts)
+
+
 def get_internal_pylint_id(query_params):
     pylint_id_parts = []
     if 'reader' in query_params:
@@ -812,29 +853,9 @@ def get_internal_pylint_id(query_params):
         actor_value = 'admin'
     actor_value = 'anonym' if actor_value == settings.ANONYM_USER else actor_value
     pylint_id_parts.append((actor_name, actor_value))
-    if 'full_text_filter' in query_params:
-        pylint_id_parts.append(('full_text', f"'{strip_accents(query_params['full_text_filter'])}'"))
-    if 'bbox_filter' in query_params:
-        bbox_part = bbox_to_pylint_id_part(query_params['bbox_filter'],
-                                           query_params['bbox_filter_crs'])
-        pylint_id_parts.append(('bbox', bbox_part))
-    if 'order_by_list' in query_params:
-        assert len(query_params['order_by_list']) == 1
-        order_by = query_params['order_by_list'][0]
-        if order_by == 'full_text':
-            pylint_id_parts.append(('order_by', f"'{strip_accents(query_params['ordering_full_text'])}'"))
-        elif order_by == 'bbox':
-            bbox_part = bbox_to_pylint_id_part(query_params['ordering_bbox'],
-                                               query_params['ordering_bbox_crs'])
-            pylint_id_parts.append(('order_by', f"bbox({bbox_part})"))
-        elif order_by in ['title', 'last_change']:
-            pylint_id_parts.append(('order_by', order_by.upper()))
-    if 'limit' in query_params:
-        pylint_id_parts.append(('limit', query_params['limit']))
-    if 'offset' in query_params:
-        pylint_id_parts.append(('offset', query_params['offset']))
-    pytest_id = ' & '.join(f"{name}={value}" for name, value in pylint_id_parts)
-    return pytest_id
+
+    pylint_id_parts += rest_params_to_pylint_id_parts(query_params)
+    return pylint_id_parts_to_string(pylint_id_parts)
 
 
 def get_rest_pylint_id(query_params):
@@ -843,13 +864,17 @@ def get_rest_pylint_id(query_params):
     if headers:
         actor_value = headers[process_client.TOKEN_HEADER][7:]
     else:
-        actor_value = settings.ANONYM_USER
+        actor_value = 'anonym'
     pylint_id_parts.append(('user', actor_value))
-    pylint_id_parts.append(('workspace', query_params.get('workspace')))
+    workspace = query_params.get('workspace')
+    if workspace:
+        pylint_id_parts.append(('workspace', workspace))
     publ_type = query_params.get('publ_type')
-    pylint_id_parts.append(('type', publ_type.split('.')[1] if publ_type else publ_type))
-    pytest_id = ' & '.join(f"{name}={value}" for name, value in pylint_id_parts)
-    return pytest_id
+    if publ_type:
+        pylint_id_parts.append(('type', publ_type.split('.')[1] if publ_type else publ_type))
+
+    pylint_id_parts += rest_params_to_pylint_id_parts(query_params['rest_params'])
+    return pylint_id_parts_to_string(pylint_id_parts)
 
 
 def generate_test_cases(test_cases, *, pylint_id_generator=None):
