@@ -482,7 +482,8 @@ REST_TEST_CASES = [
     ({'headers': {},
       'workspace_type_list': [
           (None, process_client.MAP_TYPE),
-    ],
+          (WS_USER2, process_client.MAP_TYPE),
+      ],
         'rest_params': {},
     }, [MAP1_WS1_REWE_BBOX_BF46,
         MAP2_WS1_REWE_BBOX_C3,
@@ -525,6 +526,8 @@ REST_TEST_CASES = [
     ({'headers': AUTHN_HEADERS_USER2,
       'workspace_type_list': [
           (None, None),
+          (None, process_client.MAP_TYPE),
+          (WS_USER1, process_client.MAP_TYPE),
       ],
       'rest_params': {
           'full_text_filter': 'kůň',
@@ -535,6 +538,8 @@ REST_TEST_CASES = [
     ({'headers': {},
       'workspace_type_list': [
           (None, None),
+          (None, process_client.MAP_TYPE),
+          (WS_USER1, process_client.MAP_TYPE),
       ],
       'rest_params': {
           'full_text_filter': 'The Fačřš_tÚŮTŤsa   "  a34432[;] ;.\\Ra\'\'ts',
@@ -554,6 +559,8 @@ REST_TEST_CASES = [
     ({'headers': AUTHN_HEADERS_USER2,
       'workspace_type_list': [
           (None, None),
+          (None, process_client.MAP_TYPE),
+          (WS_USER1, process_client.MAP_TYPE),
       ],
       'rest_params': {
           'full_text_filter': 'ód',
@@ -597,6 +604,8 @@ REST_TEST_CASES = [
     ({'headers': AUTHN_HEADERS_USER2,
       'workspace_type_list': [
           (None, None),
+          (None, process_client.MAP_TYPE),
+          (WS_USER1, process_client.MAP_TYPE),
       ],
       'rest_params': {
           'order_by': 'last_change',
@@ -613,6 +622,8 @@ REST_TEST_CASES = [
     ({'headers': AUTHN_HEADERS_USER2,
       'workspace_type_list': [
           (None, None),
+          (None, process_client.MAP_TYPE),
+          (WS_USER1, process_client.MAP_TYPE),
       ],
       'rest_params': {
           'order_by': 'bbox',
@@ -662,6 +673,8 @@ REST_TEST_CASES = [
     ({'headers': AUTHN_HEADERS_USER2,
       'workspace_type_list': [
           (None, None),
+          (None, process_client.MAP_TYPE),
+          (WS_USER1, process_client.MAP_TYPE),
       ],
       'rest_params': {
           'offset': 4,
@@ -679,6 +692,8 @@ REST_TEST_CASES = [
     ({'headers': AUTHN_HEADERS_USER2,
       'workspace_type_list': [
           (None, None),
+          (None, process_client.MAP_TYPE),
+          (WS_USER1, process_client.MAP_TYPE),
       ],
       'rest_params': {
           'offset': 0,
@@ -696,6 +711,8 @@ REST_TEST_CASES = [
     ({'headers': AUTHN_HEADERS_USER2,
       'workspace_type_list': [
           (None, None),
+          (None, process_client.MAP_TYPE),
+          (WS_USER1, process_client.MAP_TYPE),
       ],
       'rest_params': {
           'order_by': 'title',
@@ -907,7 +924,8 @@ def unpack_rest_test_case_query(query, expected):
                     if (publication.workspace == workspace or workspace is None)
                     and (publication.type == publ_type or publ_type is None)]
         exp_list = exp_list_full[offset:offset+limit]
-        unpacked.append((
+        content_range = (min(1, len(exp_list)) + offset, len(exp_list) + offset) if offset <= len(exp_list_full) else (0,0)
+        item = (
             {
                 **params,
                 'workspace': workspace,
@@ -916,9 +934,10 @@ def unpack_rest_test_case_query(query, expected):
             {
                 'items': exp_list,
                 'total_count': len(exp_list_full),
-                'content_range': (min(1, len(exp_list)) + offset, len(exp_list) + offset),
+                'content_range': content_range,
             }
-        ))
+        )
+        unpacked.append(item)
     assert len(unpacked) > 0
     return unpacked
 
