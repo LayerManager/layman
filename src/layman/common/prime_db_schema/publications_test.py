@@ -104,60 +104,6 @@ def test_publication_basic():
                          )
 
 
-class TestSelectPublicationsBasic:
-    workspace1 = 'test_select_publications_basic_workspace1'
-    workspace2 = 'test_select_publications_basic_workspace2'
-    publications = [(workspace1, LAYER_TYPE, 'test_select_publications_publication1le', {}),
-                    (workspace1, LAYER_TYPE, 'test_select_publications_publication1le_qml', {'style_type': 'qml'}),
-                    (workspace1, MAP_TYPE, 'test_select_publications_publication1me', {'style_type': None}),
-                    (workspace2, LAYER_TYPE, 'test_select_publications_publication2le', {}),
-                    ]
-
-    @pytest.fixture(scope="class")
-    def provide_data(self):
-        for workspace, type, name, kwargs in self.publications:
-            if type == LAYER_TYPE:
-                kwargs = {
-                    **kwargs,
-                    'geodata_type': settings.GEODATA_TYPE_VECTOR,
-                    'wfs_wms_status': settings.EnumWfsWmsStatus.AVAILABLE.value,
-                }
-            prime_db_schema_client.post_workspace_publication(publication_type=type,
-                                                              workspace=workspace,
-                                                              name=name,
-                                                              **kwargs, )
-        yield
-        prime_db_schema_client.clear_workspaces([self.workspace1, self.workspace2])
-
-    @staticmethod
-    @pytest.mark.parametrize('query_params, expected_publications', [
-        ({'workspace_name': workspace1, 'pub_type': LAYER_TYPE},
-         [(workspace1, LAYER_TYPE, 'test_select_publications_publication1le'),
-          (workspace1, LAYER_TYPE, 'test_select_publications_publication1le_qml'),
-          ]),
-        ({'workspace_name': workspace1, 'pub_type': MAP_TYPE}, [(workspace1, MAP_TYPE, 'test_select_publications_publication1me'), ]),
-        ({'workspace_name': workspace1, 'style_type': 'qml'},
-         [(workspace1, LAYER_TYPE, 'test_select_publications_publication1le_qml'), ]),
-        ({'workspace_name': workspace1, 'style_type': 'sld'},
-         [(workspace1, LAYER_TYPE, 'test_select_publications_publication1le'), ]),
-        ({'workspace_name': workspace1}, [(workspace1, LAYER_TYPE, 'test_select_publications_publication1le'),
-                                          (workspace1, LAYER_TYPE, 'test_select_publications_publication1le_qml'),
-                                          (workspace1, MAP_TYPE, 'test_select_publications_publication1me'),
-                                          ]),
-        ({}, [(workspace1, LAYER_TYPE, 'test_select_publications_publication1le'),
-              (workspace1, LAYER_TYPE, 'test_select_publications_publication1le_qml'),
-              (workspace1, MAP_TYPE, 'test_select_publications_publication1me'),
-              (workspace2, LAYER_TYPE, 'test_select_publications_publication2le'),
-              ]),
-    ])
-    @pytest.mark.usefixtures('ensure_layman', 'provide_data')
-    def test_get_publications(query_params, expected_publications):
-        with app.app_context():
-            infos = publications.get_publication_infos(**query_params)
-        info_publications = list(infos.keys())
-        assert expected_publications == info_publications
-
-
 class TestWorldBboxFilter:
     workspace = 'test_world_bbox_filter_workspace'
     layer_prefix = 'test_world_bbox_filter_layer'

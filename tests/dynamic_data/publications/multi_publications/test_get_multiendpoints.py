@@ -156,6 +156,7 @@ PUBLICATIONS = {
         'crs': crs_def.EPSG_5514,
         'geodata_type': 'vector',
         'wfs_wms_status': 'AVAILABLE',
+        'style_type': 'qml',
     },
 }
 
@@ -476,6 +477,30 @@ INTERNAL_TEST_CASES = [
         'total_count': 9,
         'content_range': (0, 0),
     }),
+    ({'workspace_name': WS_USER1,
+      'pub_type': process_client.MAP_TYPE,
+      }, {'items': [MAP1_WS1_REWE_BBOX_BF46,
+                    MAP2_WS1_REWE_BBOX_C3,
+                    MAP3_WS1_ROWO_BBOX_BC26,
+                    MAP4_WS1_REWO_BBOX_CE79,
+                    ],
+          'total_count': 4,
+          'content_range': (1, 4),
+          }),
+    ({'pub_type': process_client.LAYER_TYPE,
+      'style_type': 'sld',
+      }, {'items': [LAY1_WSP_REWE_BBOX_BC26,
+                    ],
+          'total_count': 1,
+          'content_range': (1, 1),
+          }),
+    ({'pub_type': process_client.LAYER_TYPE,
+      'style_type': 'qml',
+      }, {'items': [LAY2_WS1_R2WO_BBOX_BC26,
+                    ],
+          'total_count': 1,
+          'content_range': (1, 1),
+          }),
 ]
 
 REST_TEST_CASES = [
@@ -901,6 +926,10 @@ def get_internal_pylint_id(query_params):
         actor_value = 'admin'
     actor_value = 'anonym' if actor_value == settings.ANONYM_USER else actor_value
     pylint_id_parts.append((actor_name, actor_value))
+
+    publ_type = query_params.get('pub_type')
+    if publ_type:
+        pylint_id_parts.append(('type', publ_type.split('.')[1] if publ_type else publ_type))
 
     pylint_id_parts += rest_params_to_pylint_id_parts(query_params)
     return pylint_id_parts_to_string(pylint_id_parts)
