@@ -45,11 +45,11 @@ def get_user_infos(username=None,
     if username:
         join_clause = 'c.username = w.name'
     elif iss_sub:
-        join_clause = 'c.issuer_id = u.issuer_id and c.sub = u.sub'
+        join_clause = 'c.sub = u.sub'
     elif id_workspace:
         join_clause = 'c.id_workspace = w.id'
 
-    sql = f"""with const as (select %s username, %s issuer_id, %s sub, %s id_workspace)
+    sql = f"""with const as (select %s username, %s sub, %s id_workspace)
 select u.id,
        w.name username,
        u.preferred_username,
@@ -65,7 +65,7 @@ from {DB_SCHEMA}.workspaces w inner join
      const c on (""" + join_clause + """)
 order by w.name asc
 ;"""
-    params = (username, iss_sub.get('issuer_id'), iss_sub.get('sub'), id_workspace)
+    params = (username, iss_sub.get('sub'), id_workspace)
     values = db_util.run_query(sql, params)
     result = {username: {"id": user_id,
                          "username": username,
