@@ -77,7 +77,7 @@ def reserve_username(username, adjust=False):
 def _save_reservation(username, claims):
     iss_id = get_iss_id()
     sub = get_sub()
-    authn_redis.save_username_reservation(username, iss_id, sub)
+    authn_redis.save_username_reservation(username, sub)
     authn_filesystem.save_username_reservation(username, iss_id, sub, claims)
     authn_prime_db_schema.save_username_reservation(username, iss_id, sub, claims)
     g.user['username'] = username

@@ -257,7 +257,7 @@ def test_patch_current_user_without_username():
 
     iss_id = oauth2.__name__
     from layman.authn.redis import _get_issid_sub_2_username_key
-    rds_key = _get_issid_sub_2_username_key(iss_id, exp_sub)
+    rds_key = _get_issid_sub_2_username_key(exp_sub)
     rds = settings.LAYMAN_REDIS
     assert rds.get(rds_key) == exp_username
 
