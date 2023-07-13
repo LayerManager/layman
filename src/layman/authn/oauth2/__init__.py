@@ -105,8 +105,7 @@ def authenticate():
     g.setdefault(FLASK_ACCESS_TOKEN_KEY, access_token)
     g.setdefault(FLASK_SUB_KEY, sub)
 
-    iss_id = get_iss_id()
-    username = get_username(iss_id, sub)
+    username = get_username(sub)
 
     user = {}
     if username is not None:

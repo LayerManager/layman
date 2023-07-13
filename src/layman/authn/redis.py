@@ -3,23 +3,23 @@ from layman import settings
 from layman.util import get_usernames
 from . import filesystem
 
-REDIS_ISSID_SUB_2_USERNAME_KEY = f"{__name__}:ISSID_SUB_2_USERNAME:{{iss_id}}:{{sub}}"
+REDIS_ISSID_SUB_2_USERNAME_KEY = f"{__name__}:ISSID_SUB_2_USERNAME:{{sub}}"
 
 
-def save_username_reservation(username, iss_id, sub):
+def save_username_reservation(username, sub):
     rds = settings.LAYMAN_REDIS
-    key = _get_issid_sub_2_username_key(iss_id, sub)
+    key = _get_issid_sub_2_username_key(sub)
     rds.set(key, username)
 
 
-def get_username(iss_id, sub):
+def get_username(sub):
     rds = settings.LAYMAN_REDIS
-    key = _get_issid_sub_2_username_key(iss_id, sub)
+    key = _get_issid_sub_2_username_key(sub)
     return rds.get(key)
 
 
-def _get_issid_sub_2_username_key(iss_id, sub):
-    key = REDIS_ISSID_SUB_2_USERNAME_KEY.format(iss_id=iss_id, sub=sub)
+def _get_issid_sub_2_username_key(sub):
+    key = REDIS_ISSID_SUB_2_USERNAME_KEY.format(sub=sub)
     return key
 
 
@@ -32,8 +32,7 @@ def import_authn_to_redis():
         authn_info = filesystem.get_authn_info(username)
         if not authn_info:
             continue
-        iss_id = authn_info['iss_id']
         sub = authn_info['sub']
-        save_username_reservation(username, iss_id, sub)
+        save_username_reservation(username, sub)
         current_app.logger.info(
-            f'Import authn into redis: username {username}, iss_id {iss_id}, sub {sub}')
+            f'Import authn into redis: username {username}, sub {sub}')
