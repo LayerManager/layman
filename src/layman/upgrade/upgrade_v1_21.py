@@ -122,3 +122,17 @@ def adjust_layer_metadata_url_on_gs():
             timeout=GS_REST_TIMEOUT,
         )
         response.raise_for_status()
+
+
+def ensure_sub_uniqueness():
+    logger.info(f'    Ensure sub is unique for all users')
+
+    statement = f'''
+alter table {DB_SCHEMA}.users
+    drop constraint users_issuer_sub_key;
+
+alter table {DB_SCHEMA}.users
+    add constraint users_sub_key
+        unique (sub);'''
+
+    db_util.run_statement(statement)
