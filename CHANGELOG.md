@@ -6,8 +6,10 @@
 ### Migrations and checks
 #### Schema migrations
 #### Data migrations
+- [#887](https://github.com/LayerManager/layman/issues/887) Creating unique DB index on `users.sub` column. It was already introduced in v1.21.1. 
 ### Changes
 - [#880](https://github.com/LayerManager/layman/issues/880) Use Docker Compose v2 (`docker compose`) in Makefile without `compatibility` flag and remove `Makefile_docker-compose_v1` file. Docker containers are named according to Docker Compose v2 and may have different name after upgrade.
+- [#887](https://github.com/LayerManager/layman/issues/887) Fix creating new user workspaces for existing users that happened in v1.21.0. It was already fixed in v1.21.1.
 
 ## v1.21.0
  2023-07-06
