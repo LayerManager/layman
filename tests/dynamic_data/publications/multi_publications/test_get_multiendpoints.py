@@ -507,6 +507,37 @@ REST_TEST_CASES = [
           LAY1_WSP_REWE_BBOX_BC26,
           ]
      ),
+    ({'headers': AUTHN_HEADERS_USER1,
+      'workspace_type_list': [
+          (None, None),
+          (None, process_client.MAP_TYPE),
+          (WS_USER2, process_client.MAP_TYPE),
+      ],
+      'rest_params': {},
+      }, [LAY2_WS1_R2WO_BBOX_BC26,
+          MAP1_WS1_REWE_BBOX_BF46,
+          MAP2_WS1_REWE_BBOX_C3,
+          MAP3_WS1_ROWO_BBOX_BC26,
+          MAP4_WS1_REWO_BBOX_CE79,
+          MAP5_WS2_REWE_BBOX_CE35,
+          LAY1_WSP_REWE_BBOX_BC26,
+          ]
+     ),
+    ({'headers': AUTHN_HEADERS_USER3,
+      'workspace_type_list': [
+          (None, None),
+          (None, process_client.MAP_TYPE),
+          (WS_USER2, process_client.MAP_TYPE),
+      ],
+      'rest_params': {},
+      }, [MAP1_WS1_REWE_BBOX_BF46,
+          MAP2_WS1_REWE_BBOX_C3,
+          MAP4_WS1_REWO_BBOX_CE79,
+          MAP5_WS2_REWE_BBOX_CE35,
+          MAP7_WS3_ROWO_BBOX_EMPTY,
+          LAY1_WSP_REWE_BBOX_BC26,
+          ]
+     ),
     ({'headers': AUTHN_HEADERS_USER2,
       'workspace_type_list': [
           (None, None),
