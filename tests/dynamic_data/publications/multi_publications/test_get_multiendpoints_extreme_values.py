@@ -104,6 +104,16 @@ class TestExtremeCoordinatesFilter:
                                                                                  )
         assert (self.workspace, self.publ_type, name) in publication_infos['items']
 
+        publication_infos = process_client.get_publications(publication_type=self.publ_type,
+                                                            workspace=self.workspace,
+                                                            query_params={
+                                                                'bbox_filter': ','.join(str(c) for c in native_bbox),
+                                                                'bbox_filter_crs': native_crs,
+                                                            })
+        assert (self.workspace, self.publ_type, name) in [
+            (publication['workspace'], f'layman.{publication["publication_type"]}', publication['name']) for publication in
+            publication_infos]
+
         with app.app_context():
             publication_infos = publications.get_publication_infos_with_metainfo(workspace_name=self.workspace,
                                                                                  pub_type=self.publ_type,
@@ -111,6 +121,16 @@ class TestExtremeCoordinatesFilter:
                                                                                  bbox_filter_crs=crs_3857,
                                                                                  )
         assert (self.workspace, self.publ_type, name) in publication_infos['items']
+
+        publication_infos = process_client.get_publications(publication_type=self.publ_type,
+                                                            workspace=self.workspace,
+                                                            query_params={
+                                                                'bbox_filter': ','.join(str(c) for c in bbox_3857),
+                                                                'bbox_filter_crs': crs_3857,
+                                                            })
+        assert (self.workspace, self.publ_type, name) in [
+            (publication['workspace'], f'layman.{publication["publication_type"]}', publication['name']) for publication in
+            publication_infos]
 
         with app.app_context():
             publications.delete_publication(self.workspace, self.publ_type, name,)
