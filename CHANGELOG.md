@@ -6,7 +6,9 @@
 ### Migrations and checks
 #### Schema migrations
 #### Data migrations
+- [#887](https://github.com/LayerManager/layman/issues/887) Creating unique DB index on `users.sub` column. 
 ### Changes
+- [#887](https://github.com/LayerManager/layman/issues/887) Fix creating new user workspaces for users after 1.21.0
 
 ## v1.21.0
  2023-07-06
