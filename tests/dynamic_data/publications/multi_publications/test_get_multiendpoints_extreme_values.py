@@ -4,9 +4,10 @@ import crs as crs_def
 from layman import settings, app as app
 from layman.common.prime_db_schema import publications
 from layman.layer import LAYER_TYPE
-from test_tools import prime_db_schema_client
+from test_tools import prime_db_schema_client, process_client
 
 
+@pytest.mark.usefixtures('ensure_layman_module')
 class TestWorldBboxFilter:
     workspace = 'test_world_bbox_filter_workspace'
     layer_prefix = 'test_world_bbox_filter_layer'
@@ -32,6 +33,11 @@ class TestWorldBboxFilter:
         with app.app_context():
             publications.get_publication_infos_with_metainfo(bbox_filter=(-100, -100, 100, 100),
                                                              bbox_filter_crs=crs)
+            process_client.get_publications(publication_type=None,
+                                            query_params={
+                                                'bbox_filter': '-100,-100,100,100',
+                                                'bbox_filter_crs': crs,
+                                            })
 
     @staticmethod
     @pytest.mark.parametrize('crs', crs_def.CRSDefinitions.keys())
@@ -41,3 +47,9 @@ class TestWorldBboxFilter:
             publications.get_publication_infos_with_metainfo(ordering_bbox=(-100, -100, 100, 100),
                                                              ordering_bbox_crs=crs,
                                                              order_by_list=['bbox', ])
+            process_client.get_publications(publication_type=None,
+                                            query_params={
+                                                'order_by': 'bbox',
+                                                'ordering_bbox': '-100,-100,100,100',
+                                                'ordering_bbox_crs': crs,
+                                            })
