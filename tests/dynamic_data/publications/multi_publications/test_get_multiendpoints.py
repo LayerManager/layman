@@ -483,7 +483,7 @@ REST_TEST_CASES = [
       'workspace_type_list': [
           (None, process_client.MAP_TYPE),
           (WS_USER2, process_client.MAP_TYPE),
-      ],
+    ],
         'rest_params': {},
     }, [MAP1_WS1_REWE_BBOX_BF46,
         MAP2_WS1_REWE_BBOX_C3,
@@ -571,12 +571,12 @@ REST_TEST_CASES = [
           (None, None),
           (None, process_client.MAP_TYPE),
           (WS_USER1, process_client.MAP_TYPE),
-      ],
-      'rest_params': {
+    ],
+        'rest_params': {
           'full_text_filter': 'The Fačřš_tÚŮTŤsa   "  a34432[;] ;.\\Ra\'\'ts',
-      },
-      }, []
-     ),
+    },
+    }, []
+    ),
     ({'headers': AUTHN_HEADERS_USER2,
       'workspace_type_list': [
           (None, None),
@@ -952,10 +952,10 @@ def unpack_rest_test_case_query(query, expected):
     offset = rest_params.get('offset', 0)
     for workspace, publ_type in ws_type_list:
         exp_list_full = [publication for publication in expected
-                    if (publication.workspace == workspace or workspace is None)
-                    and (publication.type == publ_type or publ_type is None)]
-        exp_list = exp_list_full[offset:offset+limit]
-        content_range = (min(1, len(exp_list)) + offset, len(exp_list) + offset) if offset <= len(exp_list_full) else (0,0)
+                         if (publication.workspace == workspace or workspace is None)
+                         and (publication.type == publ_type or publ_type is None)]
+        exp_list = exp_list_full[offset:offset + limit]
+        content_range = (min(1, len(exp_list)) + offset, len(exp_list) + offset) if offset <= len(exp_list_full) else (0, 0)
         item = (
             {
                 **params,
