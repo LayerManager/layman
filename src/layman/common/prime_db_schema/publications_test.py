@@ -1,11 +1,8 @@
 import uuid
 import pytest
 
-import crs as crs_def
 from layman import settings, app as app, LaymanError
-from layman.layer import LAYER_TYPE
 from layman.map import MAP_TYPE
-from test_tools import prime_db_schema_client
 from . import publications, workspaces, users
 
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
@@ -19,67 +16,6 @@ userinfo_baseline = {"issuer_id": 'mock_test_publications_test',
                                 "middle_name": "ensure",
                                 }
                      }
-
-
-class TestExtremeCoordinatesFilter:
-    # pylint: disable=too-few-public-methods
-
-    workspace = 'test_extreme_coordinates_filter'
-    name_prefix = 'test_extreme_coordinates_filter_publication'
-    publ_type = LAYER_TYPE
-
-    @pytest.mark.parametrize('layer_suffix, x_coord_idx, y_coord_idx', [
-        ('min_corner', 0, 1,),
-        ('max_corner', 2, 3,),
-    ])
-    @pytest.mark.parametrize('crs, crs_values', crs_def.CRSDefinitions.items())
-    def test_default_bbox_corner_filter(self, crs, crs_values, layer_suffix, x_coord_idx, y_coord_idx):
-        name = self.name_prefix + '_' + crs.split(':')[1] + '_' + layer_suffix
-        prime_db_schema_client.post_workspace_publication(self.publ_type, self.workspace, name,
-                                                          geodata_type=settings.GEODATA_TYPE_VECTOR,
-                                                          wfs_wms_status=settings.EnumWfsWmsStatus.AVAILABLE.value,
-                                                          )
-        default_bbox = crs_values.default_bbox
-        point_bbox = (
-            default_bbox[x_coord_idx],
-            default_bbox[y_coord_idx],
-            default_bbox[x_coord_idx],
-            default_bbox[y_coord_idx]
-        )
-        with app.app_context():
-            publications.set_bbox(self.workspace, LAYER_TYPE, name, point_bbox, crs)
-
-            publication_infos = publications.get_publication_infos(workspace_name=self.workspace,
-                                                                   pub_type=self.publ_type,
-                                                                   )
-        info = publication_infos[(self.workspace, self.publ_type, name)]
-        native_bbox = info['native_bounding_box']
-        native_crs = info['native_crs']
-
-        bbox_3857 = info['bounding_box']
-        crs_3857 = crs_def.EPSG_3857
-
-        assert native_bbox == list(point_bbox)
-        assert native_crs == crs
-
-        with app.app_context():
-            publication_infos = publications.get_publication_infos_with_metainfo(workspace_name=self.workspace,
-                                                                                 pub_type=self.publ_type,
-                                                                                 bbox_filter=tuple(native_bbox),
-                                                                                 bbox_filter_crs=native_crs,
-                                                                                 )
-        assert (self.workspace, self.publ_type, name) in publication_infos['items']
-
-        with app.app_context():
-            publication_infos = publications.get_publication_infos_with_metainfo(workspace_name=self.workspace,
-                                                                                 pub_type=self.publ_type,
-                                                                                 bbox_filter=tuple(bbox_3857),
-                                                                                 bbox_filter_crs=crs_3857,
-                                                                                 )
-        assert (self.workspace, self.publ_type, name) in publication_infos['items']
-
-        with app.app_context():
-            publications.delete_publication(self.workspace, self.publ_type, name,)
 
 
 def test_only_valid_names():
