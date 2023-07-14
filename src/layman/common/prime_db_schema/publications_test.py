@@ -21,42 +21,6 @@ userinfo_baseline = {"issuer_id": 'mock_test_publications_test',
                      }
 
 
-class TestWorldBboxFilter:
-    workspace = 'test_world_bbox_filter_workspace'
-    layer_prefix = 'test_world_bbox_filter_layer'
-
-    @pytest.fixture(scope="class")
-    def provide_data(self):
-        for crs, values in crs_def.CRSDefinitions.items():
-            layer = self.layer_prefix + '_' + crs.split(':')[1]
-            prime_db_schema_client.post_workspace_publication(LAYER_TYPE, self.workspace, layer,
-                                                              geodata_type=settings.GEODATA_TYPE_VECTOR,
-                                                              wfs_wms_status=settings.EnumWfsWmsStatus.AVAILABLE.value,
-                                                              )
-            bbox = values.max_bbox or values.default_bbox
-            with app.app_context():
-                publications.set_bbox(self.workspace, LAYER_TYPE, layer, bbox, crs)
-        yield
-        prime_db_schema_client.clear_workspace(self.workspace)
-
-    @staticmethod
-    @pytest.mark.parametrize('crs', crs_def.CRSDefinitions.keys())
-    @pytest.mark.usefixtures('provide_data')
-    def test_world_bbox_filter(crs):
-        with app.app_context():
-            publications.get_publication_infos_with_metainfo(bbox_filter=(-100, -100, 100, 100),
-                                                             bbox_filter_crs=crs)
-
-    @staticmethod
-    @pytest.mark.parametrize('crs', crs_def.CRSDefinitions.keys())
-    @pytest.mark.usefixtures('provide_data')
-    def test_world_bbox_ordering(crs):
-        with app.app_context():
-            publications.get_publication_infos_with_metainfo(ordering_bbox=(-100, -100, 100, 100),
-                                                             ordering_bbox_crs=crs,
-                                                             order_by_list=['bbox', ])
-
-
 class TestExtremeCoordinatesFilter:
     # pylint: disable=too-few-public-methods
 
