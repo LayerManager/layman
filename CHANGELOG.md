@@ -1,10 +1,8 @@
 # Changelog
 
 ## v1.21.1
- {release-date}
-### Upgrade requirements
+ 2023-07-21
 ### Migrations and checks
-#### Schema migrations
 #### Data migrations
 - [#887](https://github.com/LayerManager/layman/issues/887) Creating unique DB index on `users.sub` column. 
 ### Changes
