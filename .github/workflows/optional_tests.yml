@@ -57,10 +57,10 @@ jobs:
         if: failure()
         run: |
           mkdir logs
-          docker logs layman_celery_worker_test_1 &> logs/log_celery_worker.txt
+          docker logs layman-celery_worker_test-1 &> logs/log_celery_worker.txt
           docker logs timgen &> logs/log_timgen.txt
           docker logs micka &> logs/log_micka.txt
-          docker logs layman_geoserver_1 &> logs/log_geoserver.txt
+          docker logs layman-geoserver-1 &> logs/log_geoserver.txt
 
       - name: Upload logs
         if: failure()
