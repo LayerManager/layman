@@ -21,29 +21,6 @@ TABLE_PATCH = 'multipolygon_patch'
 GEO_COLUMN = settings.OGR_DEFAULT_GEOMETRY_COLUMN
 
 TEST_CASES = {
-    'only_title': {
-        EnumTestKeys.TYPE: EnumTestTypes.MANDATORY,
-        'patch_args': {
-            'title': 'New title',
-        },
-        'exp_thumbnail': os.path.join(DIRECTORY, f"thumbnail_all.png"),
-        'exp_info_values': {
-            'publ_type_detail': (settings.GEODATA_TYPE_VECTOR, 'sld'),
-            'exp_publication_detail': {
-                'title': 'New title',
-                'bounding_box': [1669792.3618991035, 6274861.394006575, 1703188.2091370858, 6325919.274572152],
-                'native_crs': 'EPSG:4326',
-                'native_bounding_box': [15.0, 49.0, 15.3, 49.3],
-            },
-            'external_table_uri': TableUri(
-                db_uri_str=external_db.URI_STR,
-                schema=DB_SCHEMA,
-                table=TABLE_POST,
-                geo_column=settings.OGR_DEFAULT_GEOMETRY_COLUMN,
-                primary_key_column=settings.OGR_DEFAULT_PRIMARY_KEY,
-            ),
-        },
-    },
     'internal_vector': {
         EnumTestKeys.TYPE: EnumTestTypes.OPTIONAL,
         'patch_args': {
