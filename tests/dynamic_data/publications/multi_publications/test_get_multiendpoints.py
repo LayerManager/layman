@@ -984,7 +984,10 @@ def unpack_rest_test_case_query(query, expected):
                          if (publication.workspace == workspace or workspace is None)
                          and (publication.type == publ_type or publ_type is None)]
         exp_list = exp_list_full[offset:offset + limit]
-        content_range = (min(1, len(exp_list)) + offset, len(exp_list) + offset) if offset <= len(exp_list_full) else (0, 0)
+        content_range = (
+            1 + offset,
+            min(1 + offset + limit - 1, len(exp_list_full))
+        ) if 1 + offset <= len(exp_list_full) and limit > 0 else (0, 0)
         item = (
             {
                 **params,
