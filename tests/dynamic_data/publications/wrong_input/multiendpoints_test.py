@@ -25,7 +25,7 @@ from test_tools import process_client
     ({'offset': 'dasda'}, (2, 400), {'parameter': 'offset'}),
     ({'offset': '-7'}, (2, 400), {'parameter': 'offset'}),
 ])
-@pytest.mark.parametrize('publication_type', process_client.PUBLICATION_TYPES)
+@pytest.mark.parametrize('publication_type', process_client.PUBLICATION_TYPES + [None])
 @pytest.mark.usefixtures('ensure_layman', )
 def test_get_publications_errors(publication_type, query_params, error_code, error_specification):
     with pytest.raises(LaymanError) as exc_info:
