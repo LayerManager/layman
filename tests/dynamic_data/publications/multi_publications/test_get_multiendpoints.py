@@ -930,6 +930,9 @@ def get_internal_pylint_id(query_params):
     publ_type = query_params.get('pub_type')
     if publ_type:
         pylint_id_parts.append(('type', publ_type.split('.')[1] if publ_type else publ_type))
+    workspace = query_params.get('workspace_name')
+    if workspace:
+        pylint_id_parts.append(('workspace', workspace))
 
     pylint_id_parts += rest_params_to_pylint_id_parts(query_params)
     return pylint_id_parts_to_string(pylint_id_parts)
