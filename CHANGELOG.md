@@ -12,6 +12,7 @@
 - [#868](https://github.com/LayerManager/layman/issues/868) Endpoint [GET Publications](doc/rest.md#get-publications) respects [HTTP header `X-Forwarded-Prefix`](doc/client-proxy.md#x-forwarded-prefix-http-header) of the request in response in `url` key.
 - [#880](https://github.com/LayerManager/layman/issues/880) Use Docker Compose v2 (`docker compose`) in Makefile without `compatibility` flag and remove `Makefile_docker-compose_v1` file. Docker containers are named according to Docker Compose v2 and may have different name after upgrade.
 - [#765](https://github.com/LayerManager/layman/issues/765) Stop saving OAuth2 claims in filesystem, use prime DB schema only.
+- [#893](https://github.com/LayerManager/layman/issues/893) It is possible to specify logging level by new environment variable [LAYMAN_LOGLEVEL](doc/env-settings.md#LAYMAN_LOGLEVEL). Default level is `INFO`.
 - Upgrade Python dependencies
   - certifi 2023.5.7 -> 2023.7.22 (suggested by dependabot)
   - jsonschema 4.17.3 -> 4.19.0

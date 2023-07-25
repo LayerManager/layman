@@ -27,6 +27,7 @@ app = Flask(__name__)
 app.secret_key = os.environ['FLASK_SECRET_KEY']
 app.config['PREFERRED_URL_SCHEME'] = settings.LAYMAN_PUBLIC_URL_SCHEME
 logger = create_logger(app)
+logger.setLevel(settings.LAYMAN_LOGLEVEL)
 
 from geoserver import util as gs_util
 from .http import LaymanError

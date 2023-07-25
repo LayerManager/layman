@@ -2,6 +2,9 @@
 
 ## General Layman settings
 
+### LAYMAN_LOGLEVEL
+Logging level. Possible values are `FATAL`, `ERROR`, `WARNING`, `INFO`, and `DEBUG`. Default value is `INFO`.
+
 ### LAYMAN_DATA_DIR
 Filesystem directory where most of published data is stored, including data about authentication credentials, users, and publications.
 
