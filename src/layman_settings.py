@@ -21,6 +21,8 @@ class EnumWfsWmsStatus(Enum):
     NOT_AVAILABLE = 'NOT_AVAILABLE'
 
 
+LAYMAN_LOGLEVEL = os.getenv('LAYMAN_LOGLEVEL', 'INFO')
+
 LAYMAN_DATA_DIR = os.environ['LAYMAN_DATA_DIR']
 
 GEODATA_TYPE_VECTOR = 'vector'
