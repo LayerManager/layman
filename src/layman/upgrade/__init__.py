@@ -60,6 +60,7 @@ MIGRATIONS = {
         ]),
         ((1, 22, 0), [
             upgrade_v1_22.ensure_issuer_sub_uniqueness,
+            upgrade_v1_22.fix_issuer_id,
         ]),
     ],
 }

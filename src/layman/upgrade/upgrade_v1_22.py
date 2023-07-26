@@ -19,3 +19,16 @@ alter table {DB_SCHEMA}.users
         unique (issuer_id, sub);'''
 
     db_util.run_statement(statement)
+
+
+def fix_issuer_id():
+    logger.info(f'    Fix issuer_id in DB to correct value')
+
+    query = f'''select distinct issuer_id from {DB_SCHEMA}.users;'''
+    issuer_id_rows = db_util.run_query(query)
+    assert len(issuer_id_rows) <= 1, f"More than one issuer_id was found: {[r[0] for r in issuer_id_rows]}"
+    if issuer_id_rows:
+        assert issuer_id_rows[0][0] == 'layman.authn.oauth2.liferay', f"Unexpected issuer_id was found: {issuer_id_rows[0][0]}"
+
+    statement = f'''update {DB_SCHEMA}.users set issuer_id = 'layman.authn.oauth2';'''
+    db_util.run_statement(statement)
