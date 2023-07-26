@@ -20,7 +20,7 @@ Data stores:
 ### Users
 Information about users includes their names, contacts, and authentication credentials.
 
-When user [reserves his username](rest.md#patch-current-user), names, contacts and other relevant metadata are [obtained from authorization provider](oauth2/index.md#fetch-user-related-metadata) and saved to [filesystem](#filesystem), [Redis](#redis), [PostgreSQL](#postgresql), and [GeoServer](#geoserver). User's [personal workspace](models.md#personal-workspace) is created too.
+When user [reserves his username](rest.md#patch-current-user), names, contacts and other relevant metadata are [obtained from authorization provider](oauth2/index.md#fetch-user-related-metadata) and saved to [Redis](#redis), [PostgreSQL](#postgresql), and [GeoServer](#geoserver). User's [personal workspace](models.md#personal-workspace) is created too.
 
 ### Layers
 Information about [layers](models.md#layer) includes vector or raster data and visualization.
@@ -80,7 +80,7 @@ Redis is used as temporary data store. When Layman stops, data persists in Redis
 ### Filesystem
 Data is saved to LAYMAN_DATA_DIR directory, LAYMAN_QGIS_DATA_DIR directory, and GeoServer data directory.
 
-**Workspace directory** is created in LAYMAN_DATA_DIR directory for every created [workspace](models.md#workspace). Name of the workspace directory is the same as workspace name. User-related information is saved in the root of [personal workspace](models.md#personal-workspace) directory.
+**Workspace directory** is created in LAYMAN_DATA_DIR directory for every created [workspace](models.md#workspace). Name of the workspace directory is the same as workspace name.
 
 **Publication directory** is created inside workspace directory for each publication (e.g. map or layer) the user published. Name of the publication directory is the same as name of the publication (e.g. layername or mapname). Publication-related information is saved in publication directory.
 

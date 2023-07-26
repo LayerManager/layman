@@ -8,7 +8,7 @@ from jsonschema import validate, Draft7Validator
 from flask import current_app, request
 
 from layman import LaymanError, util as layman_util, celery as celery_util, settings
-from layman.authn.filesystem import get_authn_info
+from layman.authn.prime_db_schema import get_authn_info
 from layman.common.micka import util as micka_util
 from layman.common import redis as redis_util, tasks as tasks_util, metadata as metadata_common
 from layman.common.util import PUBLICATION_NAME_PATTERN, PUBLICATION_MAX_LENGTH, clear_publication_info as common_clear_publication_info

@@ -1,7 +1,7 @@
 from flask import current_app
 from layman import settings
 from layman.util import get_usernames
-from . import filesystem
+from . import prime_db_schema
 
 REDIS_ISSID_SUB_2_USERNAME_KEY = f"{__name__}:ISSID_SUB_2_USERNAME:{{iss_id}}:{{sub}}"
 
@@ -29,7 +29,7 @@ def import_authn_to_redis():
     usernames = get_usernames(use_cache=False)
 
     for username in usernames:
-        authn_info = filesystem.get_authn_info(username)
+        authn_info = prime_db_schema.get_authn_info(username)
         if not authn_info:
             continue
         iss_id = authn_info['iss_id']
