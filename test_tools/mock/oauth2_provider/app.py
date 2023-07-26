@@ -137,7 +137,6 @@ def get():
         "createDate": 1557361648854,
         "defaultUser": False,
         "emailAddress": "test@oauth2.org",
-        "emailAddressVerified": True,
         "externalReferenceCode": "",
         "facebookId": "0",
         "failedLoginAttempts": 0,

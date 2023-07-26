@@ -127,7 +127,6 @@ def get_open_id_claims():
         r_json = response.json()
         result['sub'] = r_json['userId']
         result['email'] = r_json['emailAddress']
-        result['email_verified'] = r_json['emailAddressVerified']
         name = [
             n for n in [
                 r_json.get('firstName', None),
@@ -142,7 +141,6 @@ def get_open_id_claims():
         result['family_name'] = r_json.get('lastName')
         result['middle_name'] = r_json.get('middleName')
         result['preferred_username'] = r_json.get('screenName')
-        result['updated_at'] = r_json.get('modifiedDate')
     except (ConnectionError, requests.HTTPError) as err:
         current_app.logger.error(f"get_open_id_claims error:")
         current_app.logger.error(err)
