@@ -6,6 +6,7 @@
 ### Migrations and checks
 #### Schema migrations
 #### Data migrations
+- [#765](https://github.com/LayerManager/layman/issues/765) Fix `issuer_id` value in `users` table that was broken since v1.21.0.
 ### Changes
 - [#880](https://github.com/LayerManager/layman/issues/880) Use Docker Compose v2 (`docker compose`) in Makefile without `compatibility` flag and remove `Makefile_docker-compose_v1` file. Docker containers are named according to Docker Compose v2 and may have different name after upgrade.
 
