@@ -30,7 +30,7 @@ def get_open_id_claims():
 
 
 def get_iss_id():
-    return __name__
+    return 'layman.authn.http_header'
 
 
 def get_sub():

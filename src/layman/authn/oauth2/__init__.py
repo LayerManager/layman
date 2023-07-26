@@ -152,7 +152,7 @@ def get_open_id_claims():
 
 
 def get_iss_id():
-    return __name__
+    return 'layman.authn.oauth2'
 
 
 def get_sub():
