@@ -188,11 +188,10 @@ def test_authn_get_current_user_without_username(client):
     assert {'authenticated', 'claims'} == set(resp_json.keys())
     claims = resp_json['claims']
     assert {
-        'email', 'email_verified', 'family_name', 'given_name', 'iss', 'middle_name', 'name',
-        'preferred_username', 'sub', 'updated_at', 'screen_name'
+        'email', 'family_name', 'given_name', 'iss', 'middle_name', 'name',
+        'preferred_username', 'sub', 'screen_name'
     } == set(claims.keys())
     assert claims['email'] == 'test@oauth2.org'
-    assert claims['email_verified'] is True
     assert claims['family_name'] == 'Test'
     assert claims['given_name'] == 'Test'
     assert claims['middle_name'] == ''

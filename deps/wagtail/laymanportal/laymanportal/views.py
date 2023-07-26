@@ -9,7 +9,6 @@ def profile(request):
         "userId": request.resource_owner.id,
         "screenName": request.resource_owner.username,
         "emailAddress": request.resource_owner.email,
-        "emailAddressVerified": True,
         "firstName": request.resource_owner.first_name,
         "lastName": request.resource_owner.last_name
     }), content_type="application/json")
