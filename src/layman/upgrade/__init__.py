@@ -2,7 +2,7 @@ import logging
 
 from db import util as db_util
 from layman.upgrade import upgrade_v1_8, upgrade_v1_9, upgrade_v1_10, upgrade_v1_12, upgrade_v1_16, upgrade_v1_17, upgrade_v1_18, \
-    upgrade_v1_20, upgrade_v1_21
+    upgrade_v1_20, upgrade_v1_21, upgrade_v1_22
 from layman import settings
 from . import consts
 
@@ -57,7 +57,10 @@ MIGRATIONS = {
         ]),
         ((1, 21, 1), [
             upgrade_v1_21.ensure_sub_uniqueness,
-        ])
+        ]),
+        ((1, 22, 0), [
+            upgrade_v1_22.ensure_issuer_sub_uniqueness,
+        ]),
     ],
 }
 
