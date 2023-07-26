@@ -1,7 +1,10 @@
+import glob
 import logging
+import os
 
 from db import util as db_util
 from layman import settings
+from layman.common.filesystem.util import get_workspaces_dir
 
 logger = logging.getLogger(__name__)
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
@@ -32,3 +35,14 @@ def fix_issuer_id():
 
     statement = f'''update {DB_SCHEMA}.users set issuer_id = 'layman.authn.oauth2';'''
     db_util.run_statement(statement)
+
+
+def remove_authn_txt_files():
+    logger.info(f'    Remove authn.txt files')
+
+    auth_paths = glob.glob(f"{get_workspaces_dir()}/*/authn.txt")
+    logger.info(f'      Found {len(auth_paths)} authn.txt files to remove')
+
+    for authn_path in auth_paths:
+        os.remove(authn_path)
+        logger.info(f'      File {authn_path} removed')

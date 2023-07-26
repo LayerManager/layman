@@ -7,6 +7,7 @@
 #### Schema migrations
 #### Data migrations
 - [#765](https://github.com/LayerManager/layman/issues/765) Fix `issuer_id` value in `users` table that was broken since v1.21.0.
+- [#765](https://github.com/LayerManager/layman/issues/765) Remove `authn.txt` files from workspace directories. The same information as in `authn.txt` files is saved in prime DB schema.
 ### Changes
 - [#880](https://github.com/LayerManager/layman/issues/880) Use Docker Compose v2 (`docker compose`) in Makefile without `compatibility` flag and remove `Makefile_docker-compose_v1` file. Docker containers are named according to Docker Compose v2 and may have different name after upgrade.
 - [#765](https://github.com/LayerManager/layman/issues/765) Stop saving OAuth2 claims in filesystem, use prime DB schema only.
