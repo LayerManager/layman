@@ -59,6 +59,11 @@ def get_authn_module():
     return authn_module
 
 
+def get_authn_module_by_iss_id(iss_id):
+    authn_module = next((m for m in get_authn_modules() if m.get_iss_id() == iss_id), None)
+    return authn_module
+
+
 def get_iss_id():
     authn_module = get_authn_module()
     return authn_module.get_iss_id()

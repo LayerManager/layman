@@ -145,12 +145,16 @@ def get_open_id_claims():
         current_app.logger.error(f"get_open_id_claims error:")
         current_app.logger.error(err)
         flush_cache()
-    result['iss'] = AUTH_URLS[0]
+    result['iss'] = get_iss()
     return result
 
 
 def get_iss_id():
     return 'layman.authn.oauth2'
+
+
+def get_iss():
+    return AUTH_URLS[0]
 
 
 def get_sub():

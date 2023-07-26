@@ -25,12 +25,16 @@ def authenticate():
 def get_open_id_claims():
     return {
         'sub': g.user['username'],
-        'iss': settings.LAYMAN_PROXY_SERVER_NAME,
+        'iss': get_iss(),
     }
 
 
 def get_iss_id():
     return 'layman.authn.http_header'
+
+
+def get_iss():
+    return settings.LAYMAN_PROXY_SERVER_NAME
 
 
 def get_sub():
