@@ -260,8 +260,9 @@ def test_patch_current_user_without_username():
     rds = settings.LAYMAN_REDIS
     assert rds.get(rds_key) == exp_username
 
-    from layman.authn.filesystem import get_authn_info
-    authn_info = get_authn_info(exp_username)
+    from layman.authn.prime_db_schema import get_authn_info
+    with app.app_context():
+        authn_info = get_authn_info(exp_username)
     assert authn_info['iss_id'] == iss_id
     assert authn_info['sub'] == exp_sub
 
