@@ -222,9 +222,9 @@ def get_publication_module(publication_type, use_cache=True):
     return module
 
 
-def get_workspace_publication_url(publication_type, workspace, publication_name, use_cache=True):
+def get_workspace_publication_url(publication_type, workspace, publication_name, use_cache=True, *, x_forwarded_prefix=None):
     publ_module = get_publication_module(publication_type, use_cache=use_cache)
-    return publ_module.get_workspace_publication_url(workspace, publication_name)
+    return publ_module.get_workspace_publication_url(workspace, publication_name, x_forwarded_prefix=x_forwarded_prefix)
 
 
 def get_providers_from_source_names(source_names, skip_modules=None):
@@ -274,20 +274,24 @@ def call_modules_fn(modules, fn_name, args=None, kwargs=None, omit_duplicate_cal
     return results
 
 
-DUMB_MAP_ADAPTER = SimpleStorage()
+DUMB_MAP_ADAPTER_DICT = {}
 
 
-def url_for(endpoint, *, internal=False, **values):
+def url_for(endpoint, *, internal=False, x_forwarded_prefix=None, **values):
     assert not (internal and values.get('_external'))
+    assert not (internal and x_forwarded_prefix)
+    x_forwarded_prefix = x_forwarded_prefix or ''
     # Flask does not accept SERVER_NAME without dot, and without SERVER_NAME url_for cannot be used
-    # therefore DUMB_MAP_ADAPTER is created manually ...
+    # therefore DUMB_MAP_ADAPTER_DICT is created manually ...
     if current_app.config.get('SERVER_NAME', None) is None or current_app.config['TESTING'] is True:
-        if DUMB_MAP_ADAPTER.get() is None:
-            DUMB_MAP_ADAPTER.set(current_app.url_map.bind(
-                settings.LAYMAN_PROXY_SERVER_NAME,
+        dumb_map_adapter = DUMB_MAP_ADAPTER_DICT.get(x_forwarded_prefix)
+        if dumb_map_adapter is None:
+            dumb_map_adapter = current_app.url_map.bind(
+                settings.LAYMAN_PROXY_SERVER_NAME + x_forwarded_prefix,
                 url_scheme=current_app.config['PREFERRED_URL_SCHEME']
-            ))
-        result = DUMB_MAP_ADAPTER.get().build(endpoint, values=values, force_external=True)
+            )
+            DUMB_MAP_ADAPTER_DICT[x_forwarded_prefix] = dumb_map_adapter
+        result = dumb_map_adapter.build(endpoint, values=values, force_external=True)
     else:
         result = flask_url_for(endpoint, **values, _external=True)
     if internal:
@@ -531,3 +535,7 @@ def ensure_home_dir():
         homedir = '/tmp/layman_home'
         pathlib.Path(homedir).mkdir(exist_ok=True, parents=True)
         os.environ['HOME'] = homedir
+
+
+def get_x_forwarded_prefix(request_headers):
+    return request_headers.get('X-Forwarded-Prefix')

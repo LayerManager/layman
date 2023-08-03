@@ -1,6 +1,6 @@
 from flask import Blueprint, g, request, current_app as app
 
-from layman import settings
+from layman import settings, util
 from layman.authn import authenticate, get_authn_username
 from layman.authz import authorize_publications_decorator
 from layman.common import rest as rest_common
@@ -20,4 +20,5 @@ def get():
     app.logger.info(f"GET Publications, actor={g.user}")
 
     actor = get_authn_username()
-    return rest_common.get_publications(publication_type=None, actor=actor, request_args=request.args)
+    x_forwarded_prefix = util.get_x_forwarded_prefix(request.headers)
+    return rest_common.get_publications(publication_type=None, actor=actor, request_args=request.args, x_forwarded_prefix=x_forwarded_prefix)
