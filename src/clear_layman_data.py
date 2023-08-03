@@ -58,10 +58,8 @@ DROP USER IF EXISTS {READ_ONLY_USER}
     # redis
     print(f"Flushing Redis DB {settings.LAYMAN_REDIS_URL}")
     settings.LAYMAN_REDIS.flushdb()
-    import redis
     print(f"Flushing Redis DB {os.environ['LTC_REDIS_URI']}")
-    ltc_redis = redis.Redis.from_url(os.environ['LTC_REDIS_URI'], encoding="utf-8", decode_responses=True)
-    ltc_redis.flushdb()
+    settings.LAYMAN_LTC_REDIS.flushdb()
 
     # geoserver
     import requests

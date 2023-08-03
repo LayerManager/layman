@@ -231,6 +231,9 @@ LAYMAN_REDIS_URL = os.environ['LAYMAN_REDIS_URL']
 
 LAYMAN_REDIS = redis.Redis.from_url(LAYMAN_REDIS_URL, encoding="utf-8", decode_responses=True)
 
+LAYMAN_LTC_REDIS_URL = os.environ['LTC_REDIS_URI']
+LAYMAN_LTC_REDIS = redis.Redis.from_url(LAYMAN_LTC_REDIS_URL, encoding="utf-8", decode_responses=True)
+
 LAYMAN_TIMGEN_URL = os.environ['LAYMAN_TIMGEN_URL']
 LAYMAN_CLIENT_URL = os.environ['LAYMAN_CLIENT_URL']
 LAYMAN_CLIENT_PUBLIC_URL = os.environ['LAYMAN_CLIENT_PUBLIC_URL']
