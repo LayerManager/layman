@@ -1,6 +1,7 @@
 import copy
 
 from celery import states
+from layman import settings
 from test_tools import process_client, util as test_util
 
 
@@ -68,3 +69,22 @@ def same_values_in_detail_and_multi(workspace, publ_type, name, rest_publication
         for key in different_value_keys:
             rest_multi_info.pop(key)
         assert rest_multi_info == exp_info
+
+
+def multi_url_with_x_forwarded_prefix(workspace, publ_type, name, headers, ):
+    proxy_prefix = '/layman-proxy'
+    headers = {
+        **(headers or {}),
+        'X-Forwarded-Prefix': proxy_prefix,
+    }
+    short_publ_type = publ_type.split('.')[1]
+    multi_requests = [
+        (process_client.get_publications, [None], {'headers': headers}),
+    ]
+    for rest_multi_method, args, kwargs in multi_requests:
+        rest_multi_response_json = rest_multi_method(*args, **kwargs)
+        rest_multi_info = next(iter(info for info in rest_multi_response_json
+                                    if info['workspace'] == workspace and info['name'] == name and info['publication_type']
+                                    == short_publ_type))
+        url = rest_multi_info['url']
+        assert url == f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/{short_publ_type}s/{name}'
