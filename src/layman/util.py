@@ -10,7 +10,7 @@ import urllib.parse
 from collections import OrderedDict
 import logging
 
-from flask import current_app, request, url_for as flask_url_for, jsonify
+from flask import current_app, request, jsonify
 from unidecode import unidecode
 
 from layman import settings, celery as celery_util, common
@@ -281,19 +281,18 @@ def url_for(endpoint, *, internal=False, x_forwarded_prefix=None, **values):
     assert not (internal and values.get('_external'))
     assert not (internal and x_forwarded_prefix)
     x_forwarded_prefix = x_forwarded_prefix or ''
+    # It seems SERVER_NAME is not None only in some tests. It also seems TESTING is True only in the same tests.
+    assert (current_app.config.get('SERVER_NAME', None) is not None) == (current_app.config['TESTING'] is True)
     # Flask does not accept SERVER_NAME without dot, and without SERVER_NAME url_for cannot be used
     # therefore DUMB_MAP_ADAPTER_DICT is created manually ...
-    if current_app.config.get('SERVER_NAME', None) is None or current_app.config['TESTING'] is True:
-        dumb_map_adapter = DUMB_MAP_ADAPTER_DICT.get(x_forwarded_prefix)
-        if dumb_map_adapter is None:
-            dumb_map_adapter = current_app.url_map.bind(
-                settings.LAYMAN_PROXY_SERVER_NAME + x_forwarded_prefix,
-                url_scheme=current_app.config['PREFERRED_URL_SCHEME']
-            )
-            DUMB_MAP_ADAPTER_DICT[x_forwarded_prefix] = dumb_map_adapter
-        result = dumb_map_adapter.build(endpoint, values=values, force_external=True)
-    else:
-        result = flask_url_for(endpoint, **values, _external=True)
+    dumb_map_adapter = DUMB_MAP_ADAPTER_DICT.get(x_forwarded_prefix)
+    if dumb_map_adapter is None:
+        dumb_map_adapter = current_app.url_map.bind(
+            settings.LAYMAN_PROXY_SERVER_NAME + x_forwarded_prefix,
+            url_scheme=current_app.config['PREFERRED_URL_SCHEME']
+        )
+        DUMB_MAP_ADAPTER_DICT[x_forwarded_prefix] = dumb_map_adapter
+    result = dumb_map_adapter.build(endpoint, values=values, force_external=True)
     if internal:
         _, netloc, path, query, fragment = urllib.parse.urlsplit(result)
         netloc = settings.LAYMAN_SERVER_NAME
