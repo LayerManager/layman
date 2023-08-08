@@ -19,8 +19,7 @@ Publishing geospatial data online through [REST API](doc/rest.md).
   - [Web Map Service (WMS)](doc/endpoints.md#web-map-service)
   - [Web Feature Service (WFS)](doc/endpoints.md#web-feature-service)
   - [Catalogue Service (CSW)](doc/endpoints.md#catalogue-service)
-- Documented [security system](doc/security.md)
-- Documented [data storage](doc/data-storage.md)
+- Documented [security system](doc/security.md), [data storage](doc/data-storage.md), and [proxying](doc/client-proxy.md)
 - Configurable by environment variables
 - Standing on the shoulders of Docker, Python, Flask, PostgreSQL, PostGIS, GDAL, QGIS Server, GeoServer, OpenLayers, Celery, Redis, and [more](doc/dependencies.md)
 - Inspired by [CCSS-CZ/layman](https://github.com/CCSS-CZ/layman)
