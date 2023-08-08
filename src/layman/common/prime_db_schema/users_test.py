@@ -59,14 +59,14 @@ def test_ensure_user():
         users_seq_value_1 = db_util.run_query(sql)[0][0]
         (id_workspace, id_user) = prime_db_schema.ensure_whole_user(username, userinfo)
         users_seq_value_2 = db_util.run_query(sql)[0][0]
-        assert users_seq_value_2 == id_user,\
+        assert users_seq_value_2 == id_user, \
             f'users_seq_value_1={users_seq_value_1}, id_user={id_user}, users_seq_value_2={users_seq_value_2}'
-        assert users_seq_value_2 == users_seq_value_1 + 1,\
+        assert users_seq_value_2 == users_seq_value_1 + 1, \
             f'users_seq_value_1={users_seq_value_1}, id_user={id_user}, users_seq_value_2={users_seq_value_2}'
         (_, id_user2) = prime_db_schema.ensure_whole_user(username, userinfo)
         users_seq_value_3 = db_util.run_query(sql)[0][0]
         assert id_user2 == id_user
-        assert users_seq_value_3 == users_seq_value_2,\
+        assert users_seq_value_3 == users_seq_value_2, \
             f'users_seq_value_1={users_seq_value_1}, id_user={id_user},' \
             f'users_seq_value_2={users_seq_value_2}, users_seq_value_3={users_seq_value_3}'
 
