@@ -22,13 +22,13 @@ def test_ensure_workspace():
         id_user = user_util.get_user_infos(username)
         assert not id_user
         workspaces_seq_value_1 = db_util.run_query(sql)[0][0]
-        assert workspaces_seq_value_1 == id_workspace,\
+        assert workspaces_seq_value_1 == id_workspace, \
             f'workspaces_seq_value_1={workspaces_seq_value_1}, id_workspace={id_workspace}'
 
         id_workspace2 = workspace_util.ensure_workspace(username)
         assert id_workspace == id_workspace2
         workspaces_seq_value_2 = db_util.run_query(sql)[0][0]
-        assert workspaces_seq_value_2 == workspaces_seq_value_1,\
+        assert workspaces_seq_value_2 == workspaces_seq_value_1, \
             f'workspaces_seq_value_1={workspaces_seq_value_1}, id_workspace={id_workspace}, workspaces_seq_value_2={workspaces_seq_value_2}'
 
         infos = workspace_util.get_workspace_infos()
@@ -46,7 +46,7 @@ def test_ensure_workspace():
 
         ensure_whole_user(username)
         workspaces_seq_value_3 = db_util.run_query(sql)[0][0]
-        assert workspaces_seq_value_3 == workspaces_seq_value_2 + 1,\
+        assert workspaces_seq_value_3 == workspaces_seq_value_2 + 1, \
             f'workspaces_seq_value_1={workspaces_seq_value_1}, id_workspace={id_workspace},' \
             f'workspaces_seq_value_2={workspaces_seq_value_2}, workspaces_seq_value_3={workspaces_seq_value_3}'
         infos = workspace_util.get_workspace_infos()

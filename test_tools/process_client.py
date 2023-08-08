@@ -549,7 +549,7 @@ delete_workspace_layers = partial(delete_workspace_publications, LAYER_TYPE)
 def assert_workspace_publications(publication_type, workspace, expected_publication_names, headers=None):
     response = get_publications(publication_type, workspace=workspace, headers=headers)
     publication_names = [li['name'] for li in response]
-    assert set(publication_names) == set(expected_publication_names),\
+    assert set(publication_names) == set(expected_publication_names), \
         f"Publications {expected_publication_names} not equal to {response.text}. publication_type={publication_type}"
 
 

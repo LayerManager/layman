@@ -29,7 +29,7 @@ def set_settings(gs_url, role_service, user_group_service, timeout):
     role_service = role_service or 'default'
     user_group_service = user_group_service or 'default'
     # pylint: disable=global-statement
-    global GS_REST, GS_REST_STYLES, GS_REST_WORKSPACES, GS_REST_SETTINGS,\
+    global GS_REST, GS_REST_STYLES, GS_REST_WORKSPACES, GS_REST_SETTINGS, \
         GS_REST_SECURITY_ACL_LAYERS, GS_REST_ROLES, GS_REST_USERS, GS_REST_USER, \
         GS_REST_WMS_SETTINGS, GS_REST_WFS_SETTINGS, GS_REST_TIMEOUT
 

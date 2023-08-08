@@ -69,7 +69,7 @@ def check_metadata(client, workspace, mapname, props_equal, expected_values):
                 vals = list(value['values'].values())
                 vals.append(expected_values[key])
                 assert prop_equals_strict(vals, equals_fn=PROPERTIES[key].get('equals_fn',
-                                                                              None)),\
+                                                                              None)), \
                     f"Property {key} has unexpected values {json.dumps(vals, indent=2)}"
 
 
