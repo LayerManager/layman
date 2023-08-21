@@ -35,7 +35,8 @@ def get(workspace):
     app.logger.info(f"GET Maps, actor={g.user}")
 
     actor = get_authn_username()
-    return rest_common.get_publications(MAP_TYPE, actor, request_args=request.args, workspace=workspace)
+    x_forwarded_prefix = layman_util.get_x_forwarded_prefix(request.headers)
+    return rest_common.get_publications(MAP_TYPE, actor, request_args=request.args, workspace=workspace, x_forwarded_prefix=x_forwarded_prefix)
 
 
 @bp.route(f"/{MAP_REST_PATH_NAME}", methods=['POST'])
