@@ -43,3 +43,5 @@ For example, if you send request to `/layman-client-proxy/rest/publications` wit
 Currently, value of `X-Forwarded-Prefix` affects following URLs:
 * [GET Publications](rest.md#get-publications)
   * `url` key
+* [GET Layers](rest.md#get-layers)
+  * `url` key
