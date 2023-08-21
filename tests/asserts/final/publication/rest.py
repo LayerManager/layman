@@ -81,11 +81,8 @@ def multi_url_with_x_forwarded_prefix(workspace, publ_type, name, headers, ):
     multi_requests = [
         (process_client.get_publications, [None], {'headers': headers}),
         (process_client.get_publications, [publ_type], {'headers': headers}),
+        (process_client.get_publications, [publ_type], {'workspace': workspace, 'headers': headers}),
     ]
-    if publ_type == process_client.LAYER_TYPE:
-        multi_requests += [
-            (process_client.get_publications, [publ_type], {'workspace': workspace, 'headers': headers}),
-        ]
     for rest_multi_method, args, kwargs in multi_requests:
         rest_multi_response_json = rest_multi_method(*args, **kwargs)
         rest_multi_info = next(iter(info for info in rest_multi_response_json

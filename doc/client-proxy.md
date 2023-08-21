@@ -49,3 +49,5 @@ Currently, value of `X-Forwarded-Prefix` affects following URLs:
   * `url` key
 * [GET Maps](rest.md#get-maps)
   * `url` key
+* [GET Workspace Maps](rest.md#get-workspace-maps)
+  * `url` key
