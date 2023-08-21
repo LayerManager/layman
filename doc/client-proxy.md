@@ -45,3 +45,5 @@ Currently, value of `X-Forwarded-Prefix` affects following URLs:
   * `url` key
 * [GET Layers](rest.md#get-layers)
   * `url` key
+* [GET Maps](rest.md#get-maps)
+  * `url` key
