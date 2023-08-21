@@ -4,6 +4,8 @@ from celery import states
 from layman import settings
 from test_tools import process_client, util as test_util
 
+PROXY_PREFIX = '/layman-proxy'
+
 
 def is_complete_in_rest(rest_publication_detail):
     assert 'layman_metadata' in rest_publication_detail, f'rest_publication_detail={rest_publication_detail}'
@@ -72,7 +74,7 @@ def same_values_in_detail_and_multi(workspace, publ_type, name, rest_publication
 
 
 def multi_url_with_x_forwarded_prefix(workspace, publ_type, name, headers, ):
-    proxy_prefix = '/layman-proxy'
+    proxy_prefix = PROXY_PREFIX
     headers = {
         **(headers or {}),
         'X-Forwarded-Prefix': proxy_prefix,
@@ -90,3 +92,13 @@ def multi_url_with_x_forwarded_prefix(workspace, publ_type, name, headers, ):
                                     == short_publ_type))
         url = rest_multi_info['url']
         assert url == f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/{short_publ_type}s/{name}'
+
+
+def get_layer_with_x_forwarded_prefix(workspace, name, headers, ):
+    proxy_prefix = PROXY_PREFIX
+    headers = {
+        **(headers or {}),
+        'X-Forwarded-Prefix': proxy_prefix,
+    }
+    rest_layer_info = process_client.get_workspace_layer(workspace, name, headers=headers)
+    assert rest_layer_info['url'] == f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/layers/{name}'

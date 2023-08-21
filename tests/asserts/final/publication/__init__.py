@@ -9,6 +9,7 @@ IS_LAYER_COMPLETE_AND_CONSISTENT = [
     Action(internal_rest.same_values_in_internal_and_rest, {}),
     Action(rest.same_values_in_detail_and_multi, {}),
     Action(rest.multi_url_with_x_forwarded_prefix, {}),
+    Action(rest.get_layer_with_x_forwarded_prefix, {}),
     Action(internal.same_value_of_key_in_all_sources, {}),
     Action(internal.mandatory_keys_in_all_sources, {}),
     Action(internal.all_keys_assigned_to_source, {}),
