@@ -83,7 +83,7 @@ def clear_publication_info(layer_info, file_type):
 
 
 def get_complete_layer_info(workspace, layername, *, x_forwarded_prefix=None):
-    partial_info = get_layer_info(workspace, layername)
+    partial_info = get_layer_info(workspace, layername, context={'x_forwarded_prefix': x_forwarded_prefix})
 
     if not any(partial_info):
         raise LaymanError(15, {'layername': layername})
