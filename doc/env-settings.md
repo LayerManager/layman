@@ -167,9 +167,6 @@ Password of [LAYMAN_GS_USER](#LAYMAN_GS_USER).
 ### LAYMAN_GS_ROLE
 Name of [GeoServer role](https://docs.geoserver.org/2.21.x/en/user/security/webadmin/ugr.html#edit-role-service) of [LAYMAN_GS_USER](#LAYMAN_GS_USER). The role is used to create explicit [access rule](https://docs.geoserver.org/2.21.x/en/user/security/layer.html) for all layers published by Layman. The LAYMAN_GS_ROLE must be another role than default [`ADMIN`](https://docs.geoserver.org/2.21.x/en/user/security/usergrouprole/roleservices.html#mapping-roles-to-system-roles) role (defined by `adminRoleName`)! The role will be created automatically if [GEOSERVER_ADMIN_PASSWORD](#GEOSERVER_ADMIN_PASSWORD) is provided.
  
-### LAYMAN_GS_PROXY_BASE_URL
-GeoServer [Proxy Base URL](https://docs.geoserver.org/2.21.x/en/user/configuration/globalsettings.html). It is automatically set on Layman's startup. If you do not set the variable, value is calculated as protocol, host, and port of [LAYMAN_CLIENT_PUBLIC_URL](#LAYMAN_CLIENT_PUBLIC_URL) followed by [LAYMAN_GS_PATH](#LAYMAN_GS_PATH). If you set it to empty string, no change of Proxy Base URL will be done on GeoServer side.
-
 ### LAYMAN_GS_USER_GROUP_SERVICE
 Name of [user/group service](https://docs.geoserver.org/2.21.x/en/user/security/usergrouprole/usergroupservices.html) used for managing users at GeoServer. If not set (default), the service named `default` is chosen. Usually it's [XML user/group service](https://docs.geoserver.org/2.21.x/en/user/security/usergrouprole/usergroupservices.html#xml-user-group-service).
 
