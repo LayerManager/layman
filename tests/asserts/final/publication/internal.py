@@ -218,7 +218,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                 table_uri = external_table_uri
                 util.recursive_dict_update(expected_detail,
                                            {
-                                               'wfs': {'url': f'http://localhost:8000/geoserver/{workspace}/wfs'},
+                                               'wfs': {'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{workspace}/wfs'},
                                                '_table_uri': table_uri,
                                                'db': {
                                                    'external_uri': layer_util.redact_uri(table_uri.db_uri_str),
@@ -238,7 +238,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                 )
                 util.recursive_dict_update(expected_detail,
                                            {
-                                               'wfs': {'url': f'http://localhost:8000/geoserver/{workspace}/wfs'},
+                                               'wfs': {'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{workspace}/wfs'},
                                                '_file': {'file_type': 'vector'},
                                                'db': {
                                                    'schema': workspace,

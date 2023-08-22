@@ -122,6 +122,16 @@ def wms_legend(workspace, publ_type, name, *, exp_legend, obtained_file_path):
         wms_inst = wms.get_wms_proxy(workspace)
     wms_layer = wms_inst.contents[name]
     legend_url = next(iter(wms_layer.styles.values()))['legend']
+
+    # replace public URL with internal URL
+    parsed_legend_url = parse.urlparse(legend_url)
+    assert parsed_legend_url.netloc == settings.LAYMAN_PROXY_SERVER_NAME
+    parsed_legend_url = parsed_legend_url._replace(
+        netloc=settings.LAYMAN_SERVER_NAME,
+        scheme='http'
+    )
+    legend_url = parsed_legend_url.geturl()
+
     assert_util.assert_same_images(legend_url, obtained_file_path, exp_legend, 0)
 
 
