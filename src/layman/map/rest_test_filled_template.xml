@@ -71,7 +71,7 @@
           <gmd:identifier>
             <gmd:MD_Identifier>
               <gmd:code>
-                <gmx:Anchor xlink:href="http://enjoychallenge.tech/rest/workspaces/testuser1/maps/svet">svet</gmx:Anchor>
+                <gmx:Anchor xlink:href="http://localhost/rest/workspaces/testuser1/maps/svet">svet</gmx:Anchor>
               </gmd:code>
             </gmd:MD_Identifier>
           </gmd:identifier>
@@ -111,7 +111,7 @@
       <gmd:graphicOverview>
         <gmd:MD_BrowseGraphic>
           <gmd:fileName>
-            <gco:CharacterString>http://enjoychallenge.tech/rest/workspaces/testuser1/maps/svet/thumbnail</gco:CharacterString>
+            <gco:CharacterString>http://localhost/rest/workspaces/testuser1/maps/svet/thumbnail</gco:CharacterString>
           </gmd:fileName>
           <gmd:fileType>
             <gco:CharacterString>PNG</gco:CharacterString>
@@ -197,7 +197,7 @@
           <gmd:onLine>
             <gmd:CI_OnlineResource>
               <gmd:linkage>
-                <gmd:URL>http://enjoychallenge.tech/rest/workspaces/testuser1/maps/svet</gmd:URL>
+                <gmd:URL>http://localhost/rest/workspaces/testuser1/maps/svet</gmd:URL>
               </gmd:linkage>
               <gmd:protocol>
                 <gmx:Anchor xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/WWW:LINK-1.0-http--link">WWW:LINK-1.0-http--link</gmx:Anchor>
@@ -210,7 +210,7 @@
           <gmd:onLine>
             <gmd:CI_OnlineResource>
               <gmd:linkage>
-                <gmd:URL>http://enjoychallenge.tech/rest/workspaces/testuser1/maps/svet/file</gmd:URL>
+                <gmd:URL>http://localhost/rest/workspaces/testuser1/maps/svet/file</gmd:URL>
               </gmd:linkage>
               <gmd:protocol>
                 <gmx:Anchor xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/WWW:LINK-1.0-http--link">WWW:LINK-1.0-http--link</gmx:Anchor>

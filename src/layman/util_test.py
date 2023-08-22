@@ -108,11 +108,11 @@ def test_publication_interface_methods():
 
 @pytest.mark.parametrize('endpoint, internal, params, expected_url', [
     ('rest_workspace_maps.get', False, {'workspace': 'workspace_name'},
-     f'http://enjoychallenge.tech/rest/{settings.REST_WORKSPACES_PREFIX}/workspace_name/maps'),
+     f'http://localhost/rest/{settings.REST_WORKSPACES_PREFIX}/workspace_name/maps'),
     ('rest_workspace_layers.get', False, {'workspace': 'workspace_name'},
-     f'http://enjoychallenge.tech/rest/{settings.REST_WORKSPACES_PREFIX}/workspace_name/layers'),
+     f'http://localhost/rest/{settings.REST_WORKSPACES_PREFIX}/workspace_name/layers'),
     ('rest_about.get_version', True, {}, 'http://layman_test_run_1:8000/rest/about/version'),
-    ('rest_about.get_version', False, {}, 'http://enjoychallenge.tech/rest/about/version'),
+    ('rest_about.get_version', False, {}, 'http://localhost/rest/about/version'),
 ])
 def test_url_for(endpoint, internal, params, expected_url):
     with app.app_context():
