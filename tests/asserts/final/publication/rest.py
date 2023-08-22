@@ -103,3 +103,4 @@ def get_layer_with_x_forwarded_prefix(workspace, name, headers, ):
     rest_layer_info = process_client.get_workspace_layer(workspace, name, headers=headers)
     assert rest_layer_info['url'] == f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/layers/{name}'
     assert rest_layer_info['thumbnail']['url'] == f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/layers/{name}/thumbnail'
+    assert rest_layer_info['metadata']['comparison_url'] == f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/layers/{name}/metadata-comparison'
