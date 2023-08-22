@@ -348,6 +348,7 @@ def get_publication_info(workspace, publ_type, publ_name, context=None):
     }[publ_type]
     partial_infos = call_modules_fn(sources, info_method, [workspace, publ_name], kwargs={
         'extra_keys': context.get('extra_keys', []),
+        'x_forwarded_prefix': context.get('x_forwarded_prefix'),
     })
 
     result = {}
