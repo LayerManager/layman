@@ -62,3 +62,4 @@ Currently, value of `X-Forwarded-Prefix` affects following URLs:
   * `url` key
   * `file`.`url` key
   * `thumbnail`.`url` key
+  * `metadata`.`comparison_url` key
