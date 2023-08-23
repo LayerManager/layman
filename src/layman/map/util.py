@@ -133,7 +133,7 @@ def clear_publication_info(layer_info):
 
 
 def get_complete_map_info(workspace, mapname, *, x_forwarded_prefix=None):
-    partial_info = get_map_info(workspace, mapname)
+    partial_info = get_map_info(workspace, mapname, context={'x_forwarded_prefix': x_forwarded_prefix})
 
     if not any(partial_info):
         raise LaymanError(26, {'mapname': mapname})
