@@ -55,5 +55,6 @@ Currently, value of `X-Forwarded-Prefix` affects following URLs:
   * `url` key
   * `wms`.`url` key
   * `wfs`.`url` key
+  * `style`.`url` key
   * `thumbnail`.`url` key
   * `metadata`.`comparison_url` key
