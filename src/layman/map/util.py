@@ -132,7 +132,7 @@ def clear_publication_info(layer_info):
     return clear_info
 
 
-def get_complete_map_info(workspace, mapname):
+def get_complete_map_info(workspace, mapname, *, x_forwarded_prefix=None):
     partial_info = get_map_info(workspace, mapname)
 
     if not any(partial_info):
@@ -142,7 +142,7 @@ def get_complete_map_info(workspace, mapname):
 
     complete_info = {
         'name': mapname,
-        'url': url_for('rest_workspace_map.get', mapname=mapname, workspace=workspace),
+        'url': url_for('rest_workspace_map.get', mapname=mapname, workspace=workspace, x_forwarded_prefix=x_forwarded_prefix),
         'title': mapname,
         'description': '',
     }
