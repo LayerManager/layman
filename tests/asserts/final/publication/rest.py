@@ -110,3 +110,13 @@ def get_layer_with_x_forwarded_prefix(workspace, name, headers, ):
         assert rest_layer_info['wfs']['url'] == f'http://localhost:8000{proxy_prefix}/geoserver/{workspace}/wfs'
     assert rest_layer_info['sld']['url'] == f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/layers/{name}/style'
     assert rest_layer_info['style']['url'] == f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/layers/{name}/style'
+
+
+def get_map_with_x_forwarded_prefix(workspace, name, headers, ):
+    proxy_prefix = PROXY_PREFIX
+    headers = {
+        **(headers or {}),
+        'X-Forwarded-Prefix': proxy_prefix,
+    }
+    rest_map_info = process_client.get_workspace_map(workspace, name, headers=headers)
+    assert rest_map_info['url'] == f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/maps/{name}'
