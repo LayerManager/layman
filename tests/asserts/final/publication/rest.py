@@ -120,3 +120,4 @@ def get_map_with_x_forwarded_prefix(workspace, name, headers, ):
     }
     rest_map_info = process_client.get_workspace_map(workspace, name, headers=headers)
     assert rest_map_info['url'] == f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/maps/{name}'
+    assert rest_map_info['file']['url'] == f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/maps/{name}/file'
