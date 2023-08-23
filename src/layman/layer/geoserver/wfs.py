@@ -9,7 +9,7 @@ from layman.layer.util import is_layer_chain_ready
 from layman import util as layman_util
 from layman.layer import LAYER_TYPE
 import requests_util.retry
-from .util import get_gs_proxy_base_url, get_external_db_store_name
+from .util import get_gs_proxy_server_url, get_external_db_store_name
 from . import wms
 
 FLASK_PROXY_KEY = f'{__name__}:PROXY:{{workspace}}'
@@ -58,8 +58,10 @@ def delete_layer(workspace, layername):
     return {}
 
 
-def get_wfs_url(workspace, external_url=False):
-    base_url = get_gs_proxy_base_url() if external_url else settings.LAYMAN_GS_URL
+def get_wfs_url(workspace, external_url=False, *, x_forwarded_prefix=None):
+    assert external_url or not x_forwarded_prefix
+    x_forwarded_prefix = x_forwarded_prefix or ''
+    base_url = urljoin(get_gs_proxy_server_url(), x_forwarded_prefix) + settings.LAYMAN_GS_PATH if external_url else settings.LAYMAN_GS_URL
     return urljoin(base_url, workspace + '/wfs')
 
 
@@ -122,11 +124,11 @@ def clear_cache(workspace):
     mem_redis.delete(key)
 
 
-def get_layer_info(workspace, layername):
+def get_layer_info(workspace, layername, *, x_forwarded_prefix=None):
     wfs = get_wfs_proxy(workspace)
     if wfs is None:
         return {}
-    wfs_proxy_url = get_wfs_url(workspace, external_url=True)
+    wfs_proxy_url = get_wfs_url(workspace, external_url=True, x_forwarded_prefix=x_forwarded_prefix)
 
     wfs_layername = f"{workspace}:{layername}"
     if wfs_layername not in wfs.contents:
