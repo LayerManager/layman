@@ -122,3 +122,4 @@ def get_map_with_x_forwarded_prefix(workspace, name, headers, ):
     assert rest_map_info['url'] == f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/maps/{name}'
     assert rest_map_info['file']['url'] == f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/maps/{name}/file'
     assert rest_map_info['thumbnail']['url'] == f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/maps/{name}/thumbnail'
+    assert rest_map_info['metadata']['comparison_url'] == f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/maps/{name}/metadata-comparison'
