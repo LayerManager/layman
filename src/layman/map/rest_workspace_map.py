@@ -35,7 +35,8 @@ def get(workspace, mapname):
     # pylint: disable=unused-argument
     app.logger.info(f"GET Map, actor={g.user}")
 
-    info = util.get_complete_map_info(workspace, mapname)
+    x_forwarded_prefix = layman_util.get_x_forwarded_prefix(request.headers)
+    info = util.get_complete_map_info(workspace, mapname, x_forwarded_prefix=x_forwarded_prefix)
 
     return jsonify(info), 200
 
