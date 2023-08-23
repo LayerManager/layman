@@ -24,7 +24,7 @@ get_publication_uuid = empty_method_returns_none
 post_map = empty_method
 
 
-def get_map_info(workspace, mapname):
+def get_map_info(workspace, mapname, *, x_forwarded_prefix=None):
     uuid = get_map_uuid(workspace, mapname)
     try:
         csw = common_util.create_csw()
@@ -46,7 +46,8 @@ def get_map_info(workspace, mapname):
                 'identifier': muuid,
                 'csw_url': settings.CSW_PROXY_URL,
                 'record_url': common_util.get_metadata_url(uuid, url_type=common_util.RecordUrlType.BASIC),
-                'comparison_url': url_for('rest_workspace_map_metadata_comparison.get', workspace=workspace, mapname=mapname),
+                'comparison_url': url_for('rest_workspace_map_metadata_comparison.get', workspace=workspace, mapname=mapname,
+                                          x_forwarded_prefix=x_forwarded_prefix),
             }
         }
     return {}
