@@ -60,3 +60,4 @@ Currently, value of `X-Forwarded-Prefix` affects following URLs:
   * `metadata`.`comparison_url` key
 * [GET Workspace Map](rest.md#get-workspace-map)
   * `url` key
+  * `file`.`url` key
