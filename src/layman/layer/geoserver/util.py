@@ -19,6 +19,11 @@ def get_gs_proxy_base_url():
     return proxy_base_url
 
 
+def get_gs_proxy_server_url():
+    proxy_base_url = f'{settings.LAYMAN_PUBLIC_URL_SCHEME}://{settings.LAYMAN_PROXY_SERVER_NAME}'
+    return proxy_base_url
+
+
 def wms_proxy(wms_url, xml=None, version=None, headers=None):
     from layman.layer.geoserver.wms import VERSION
     version = version or VERSION
