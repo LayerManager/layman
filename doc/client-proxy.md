@@ -61,3 +61,4 @@ Currently, value of `X-Forwarded-Prefix` affects following URLs:
 * [GET Workspace Map](rest.md#get-workspace-map)
   * `url` key
   * `file`.`url` key
+  * `thumbnail`.`url` key
