@@ -1,6 +1,7 @@
 from functools import wraps, partial
 from urllib import parse
 import re
+import logging
 import psycopg2
 
 from flask import current_app, request
@@ -20,6 +21,7 @@ FLASK_PROVIDERS_KEY = f'{__name__}:PROVIDERS'
 FLASK_SOURCES_KEY = f'{__name__}:SOURCES'
 
 EXTERNAL_TABLE_URI_PATTERN = 'postgresql://<username>:<password>@<host>:<port>/<dbname>?schema=<schema_name>&table=<table_name>&geo_column=<geo_column_name>'
+logger = logging.getLogger(__name__)
 
 
 def to_safe_layer_name(value):
