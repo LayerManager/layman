@@ -65,6 +65,7 @@ MIGRATIONS = {
             upgrade_v1_22.ensure_issuer_sub_uniqueness,
             upgrade_v1_22.fix_issuer_id,
             upgrade_v1_22.remove_authn_txt_files,
+            upgrade_v1_22.insert_map_layer_relations,
         ]),
     ],
 }

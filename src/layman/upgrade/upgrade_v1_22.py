@@ -1,3 +1,4 @@
+import json
 import glob
 import logging
 import os
@@ -5,6 +6,7 @@ import os
 from db import util as db_util
 from layman import settings
 from layman.common.filesystem.util import get_workspaces_dir
+from layman.map import MAP_TYPE, util as map_util
 
 logger = logging.getLogger(__name__)
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
@@ -71,3 +73,32 @@ CREATE TABLE {DB_SCHEMA}.map_layer
 )
 TABLESPACE pg_default;'''
     db_util.run_statement(sql_create_table)
+
+
+def insert_map_layer_relations():
+    logger.info(f'    Insert map-layer relations')
+
+    query = f'''
+    select p.id, w.name, p.name
+    from {DB_SCHEMA}.publications p inner join
+         {DB_SCHEMA}.workspaces w on w.id = p.id_workspace
+    where p.type = %s
+    ;'''
+    maps = db_util.run_query(query, (MAP_TYPE, ))
+
+    for map_id, workspace, map_name in maps:
+        map_file_path = os.path.join(settings.LAYMAN_DATA_DIR, 'workspaces', workspace, 'maps', map_name, 'input_file', map_name + '.json')
+        try:
+            with open(map_file_path, 'r', encoding="utf-8") as map_file:
+                map_json = json.load(map_file)
+
+            map_layers = map_util.get_layers_from_json(map_json)
+        except FileNotFoundError:
+            logger.warning(f'File not found for map {workspace}.{map_name}, map file path {map_file_path}')
+            map_layers = set()
+        for layer_workspace, layer_name, layer_index in map_layers:
+            insert_query = f'''
+            insert into {DB_SCHEMA}.map_layer(id_map, layer_workspace, layer_name, layer_index) values (%s, %s, %s, %s);
+            '''
+            db_util.run_statement(insert_query, (map_id, layer_workspace, layer_name, layer_index, ))
+        logger.info(f'        Number of imported map-layer relations for map {workspace}.{map_name}: {len(map_layers)}')
