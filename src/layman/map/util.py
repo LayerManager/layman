@@ -353,3 +353,31 @@ def find_maps_by_grep(regexp):
 
     maps = {(map_path.split('/')[-5], map_path.split('/')[-3]) for map_path in map_paths}
     return maps
+
+
+def get_layers_from_json(map_json):
+    map_json = input_file.unquote_urls(map_json)
+    gs_url = settings.LAYMAN_GS_PROXY_BASE_URL
+    gs_url = gs_url if gs_url.endswith('/') else f"{gs_url}/"
+    gs_wms_url_pattern = r'^' + re.escape(gs_url) + r'(' + layman_util.WORKSPACE_NAME_ONLY_PATTERN + r')' + \
+                         settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX + r'/(?:ows|wms|wfs).*$'
+    layman_layer = set()
+    for layer_idx, map_layer in enumerate(map_json['layers']):
+        layer_url = map_layer.get('url', None)
+        if not layer_url:
+            continue
+        match = re.match(gs_wms_url_pattern, layer_url)
+        if not match:
+            continue
+        layer_workspace = match.group(1)
+        if not layer_workspace:
+            continue
+        layer_names = [
+            n for n in map_layer.get('params', {}).get('LAYERS', '').split(',')
+            if len(n) > 0
+        ]
+        if not layer_names:
+            continue
+        for layername in layer_names:
+            layman_layer.add((layer_workspace, layername, layer_idx))
+    return layman_layer
