@@ -7,6 +7,7 @@
   - GeoServer's [Proxy Base URL](https://docs.geoserver.org/2.21.x/en/user/configuration/globalsettings.html) is now automatically set by Layman on each start. Value is automatically derived from environment variables [`LAYMAN_CLIENT_PUBLIC_URL`](doc/env-settings.md#layman_client_public_url) (protocol), [`LAYMAN_PROXY_SERVER_NAME`](doc/env-settings.md#layman_proxy_server_name) (domain and port), and [`LAYMAN_GS_PATH`](doc/env-settings.md#layman_gs_path) (path).
 ### Migrations and checks
 #### Schema migrations
+- [#868](https://github.com/LayerManager/layman/issues/868) Create new table `map_layer` in prime DB schema.
 #### Data migrations
 - [#765](https://github.com/LayerManager/layman/issues/765) Fix `issuer_id` value in `users` table that was broken since v1.21.0.
 - [#765](https://github.com/LayerManager/layman/issues/765) Remove `authn.txt` files from workspace directories. The same information as in `authn.txt` files is saved in prime DB schema.

@@ -38,6 +38,9 @@ MIGRATIONS = {
         ((1, 21, 0), [
             upgrade_v1_21.adjust_db_for_wfs_wms_status,
         ]),
+        ((1, 22, 0), [
+            upgrade_v1_22.create_map_layer_relation_table,
+        ]),
     ],
     consts.MIGRATION_TYPE_DATA: [
         ((1, 16, 0), [
