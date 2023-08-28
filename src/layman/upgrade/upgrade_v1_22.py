@@ -46,3 +46,28 @@ def remove_authn_txt_files():
     for authn_path in auth_paths:
         os.remove(authn_path)
         logger.info(f'      File {authn_path} removed')
+
+
+def create_map_layer_relation_table():
+    logger.info(f'    Create map-layer relation table')
+
+    sql_create_table = f'''
+CREATE SEQUENCE {DB_SCHEMA}.map_layer_id_seq
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 2147483647
+    CACHE 1;
+ALTER SEQUENCE {DB_SCHEMA}.map_layer_id_seq
+    OWNER TO {settings.LAYMAN_PG_USER};
+
+CREATE TABLE {DB_SCHEMA}.map_layer
+(
+    id integer NOT NULL DEFAULT nextval('{DB_SCHEMA}.map_layer_id_seq'::regclass) PRIMARY KEY,
+    id_map integer not null REFERENCES {DB_SCHEMA}.publications (id),
+    layer_workspace VARCHAR(256) COLLATE pg_catalog."default" not null,
+    layer_name VARCHAR(256) COLLATE pg_catalog."default" not null,
+    layer_index integer NOT NULL
+)
+TABLESPACE pg_default;'''
+    db_util.run_statement(sql_create_table)
