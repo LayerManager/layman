@@ -310,7 +310,7 @@ micka-bash-exec-demo:
 	docker compose -f docker-compose.deps.demo.yml exec micka bash
 
 micka-build:
-	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml build micka
+	docker compose -f docker-compose.deps.yml -f docker-compose.dev.yml build micka
 
 micka-logs:
 	mkdir -p deps/micka/log/micka
@@ -321,36 +321,36 @@ micka-logs:
 	docker cp micka:/var/log/nginx/. deps/micka/log/nginx
 
 nginx-bash:
-	docker-compose -f docker-compose.demo.yml -f docker-compose.deps.demo.yml run --rm --no-deps nginx sh
+	docker compose -f docker-compose.demo.yml -f docker-compose.deps.demo.yml run --rm --no-deps nginx sh
 
 nginx-bash-exec:
-	docker-compose -f docker-compose.demo.yml -f docker-compose.deps.demo.yml exec nginx sh
+	docker compose -f docker-compose.demo.yml -f docker-compose.deps.demo.yml exec nginx sh
 
 nginx-restart:
-	docker-compose -f docker-compose.demo.yml -f docker-compose.deps.demo.yml up --force-recreate --no-deps -d nginx
+	docker compose -f docker-compose.demo.yml -f docker-compose.deps.demo.yml up --force-recreate --no-deps -d nginx
 
 qgis-build:
-	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml build nginx-qgis qgis
+	docker compose -f docker-compose.deps.yml -f docker-compose.dev.yml build nginx-qgis qgis
 
 qgis-restart:
 	mkdir -p deps/qgis/data
-	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml up --force-recreate --no-deps -d nginx-qgis qgis
+	docker compose -f docker-compose.deps.yml -f docker-compose.dev.yml up --force-recreate --no-deps -d nginx-qgis qgis
 
 qgis-stop:
-	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml stop nginx-qgis qgis
+	docker compose -f docker-compose.deps.yml -f docker-compose.dev.yml stop nginx-qgis qgis
 
 qgis-reset-datadir:
 	mkdir -p deps/qgis/data
 	rm -rf deps/qgis/data/*
 
 qgis-bash:
-	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm qgis bash
+	docker compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm qgis bash
 
 qgis-bash-exec:
-	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml exec qgis bash
+	docker compose -f docker-compose.deps.yml -f docker-compose.dev.yml exec qgis bash
 
 qgis-bash-exec-root :
-	docker-compose -f docker-compose.deps.yml -f docker-compose.dev.yml exec -u root qgis bash
+	docker compose -f docker-compose.deps.yml -f docker-compose.dev.yml exec -u root qgis bash
 
 stop-all-docker-containers:
 	docker stop $$(docker ps -q)
