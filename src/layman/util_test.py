@@ -117,3 +117,20 @@ def test_publication_interface_methods():
 def test_url_for(endpoint, internal, params, expected_url):
     with app.app_context():
         assert util.url_for(endpoint, internal=internal, **params) == expected_url
+
+
+@pytest.mark.parametrize('endpoint, internal, params, expected_url', [
+    ('rest_workspace_maps.get', False, {'workspace': 'workspace_name'},
+     f'http://enjoychallenge.tech/rest/{settings.REST_WORKSPACES_PREFIX}/workspace_name/maps'),
+    ('rest_workspace_layers.get', False, {'workspace': 'workspace_name'},
+     f'http://enjoychallenge.tech/rest/{settings.REST_WORKSPACES_PREFIX}/workspace_name/layers'),
+    ('rest_about.get_version', True, {}, 'http://layman:8000/rest/about/version'),
+    ('rest_about.get_version', False, {}, 'http://enjoychallenge.tech/rest/about/version'),
+])
+def test__url_for(endpoint, internal, params, expected_url):
+    server_name = 'layman:8000'
+    proxy_server_name = 'enjoychallenge.tech'
+    with app.app_context():
+        # pylint: disable=protected-access
+        assert util._url_for(endpoint, server_name=server_name, proxy_server_name=proxy_server_name, internal=internal,
+                             **params) == expected_url

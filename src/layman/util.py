@@ -277,7 +277,7 @@ def call_modules_fn(modules, fn_name, args=None, kwargs=None, omit_duplicate_cal
 DUMB_MAP_ADAPTER_DICT = {}
 
 
-def url_for(endpoint, *, internal=False, x_forwarded_prefix=None, **values):
+def _url_for(endpoint, *, server_name, proxy_server_name, internal=False, x_forwarded_prefix=None, **values):
     assert not (internal and values.get('_external'))
     assert not (internal and x_forwarded_prefix)
     x_forwarded_prefix = x_forwarded_prefix or ''
@@ -285,19 +285,26 @@ def url_for(endpoint, *, internal=False, x_forwarded_prefix=None, **values):
     assert (current_app.config.get('SERVER_NAME', None) is not None) == (current_app.config['TESTING'] is True)
     # Flask does not accept SERVER_NAME without dot, and without SERVER_NAME url_for cannot be used
     # therefore DUMB_MAP_ADAPTER_DICT is created manually ...
-    dumb_map_adapter = DUMB_MAP_ADAPTER_DICT.get(x_forwarded_prefix)
+    dict_key = f"{proxy_server_name} {x_forwarded_prefix}"
+    dumb_map_adapter = DUMB_MAP_ADAPTER_DICT.get(dict_key)
     if dumb_map_adapter is None:
         dumb_map_adapter = current_app.url_map.bind(
-            settings.LAYMAN_PROXY_SERVER_NAME + x_forwarded_prefix,
+            proxy_server_name + x_forwarded_prefix,
             url_scheme=current_app.config['PREFERRED_URL_SCHEME']
         )
-        DUMB_MAP_ADAPTER_DICT[x_forwarded_prefix] = dumb_map_adapter
+        DUMB_MAP_ADAPTER_DICT[dict_key] = dumb_map_adapter
     result = dumb_map_adapter.build(endpoint, values=values, force_external=True)
     if internal:
         _, netloc, path, query, fragment = urllib.parse.urlsplit(result)
-        netloc = settings.LAYMAN_SERVER_NAME
+        netloc = server_name
         result = urllib.parse.urlunsplit(('http', netloc, path, query, fragment))
     return result
+
+
+def url_for(endpoint, *, internal=False, x_forwarded_prefix=None, **values):
+    return _url_for(endpoint, server_name=settings.LAYMAN_SERVER_NAME,
+                    proxy_server_name=settings.LAYMAN_PROXY_SERVER_NAME,
+                    internal=internal, x_forwarded_prefix=x_forwarded_prefix, **values)
 
 
 def get_internal_sources(publ_type):
