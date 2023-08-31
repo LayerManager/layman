@@ -6,7 +6,7 @@ from typing import List, Iterable
 
 from tests import PublicationValues
 from . import base_test_classes
-from .base_test_classes import RestArgs, RestMethod, PublicationByDefinitionBase, Parametrization, RestArgDomain
+from .base_test_classes import RestArgs, RestMethodBase, PublicationByDefinitionBase, Parametrization, RestArgDomain
 
 
 def get_dimension_enum(dimension):
@@ -20,7 +20,7 @@ def check_rest_parametrization(rest_parametrization):
     base_args = defaultdict(list)
 
     for val_idx, val in enumerate(rest_parametrization):
-        is_rest_method = val == RestMethod
+        is_rest_method = inspect.isclass(val) and issubclass(val, RestMethodBase)
         if is_rest_method:
             rest_methods.append(val)
 

@@ -48,13 +48,15 @@ class RestArgs(Enum):
         self.base_domain = base_domain or domain
 
 
-class RestMethod(Enum):
-    POST = ('post_publication', 'post')
-    PATCH = ('patch_publication', 'patch')
-
+class RestMethodBase(Enum):
     def __init__(self, function_name, publ_name_part):
         self.function_name = function_name
         self.publ_name_part = publ_name_part
+
+
+class RestMethod(RestMethodBase):
+    POST = ('post_publication', 'post')
+    PATCH = ('patch_publication', 'patch')
 
 
 class PublicationByDefinitionBase(Enum):
@@ -116,7 +118,7 @@ class Parametrization:
     @property
     def rest_method(self) -> Optional[RestMethod]:
         # pylint: disable=no-member
-        return next((v for v in self._values if isinstance(v, RestMethod)), None)
+        return next((v for v in self._values if isinstance(v, RestMethodBase)), None)
 
     @property
     def style_file(self) -> Optional[StyleFileDomainBase]:
