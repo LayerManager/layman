@@ -63,3 +63,5 @@ Currently, value of `X-Forwarded-Prefix` affects following URLs:
   * `file`.`url` key
   * `thumbnail`.`url` key
   * `metadata`.`comparison_url` key
+* [POST Workspace Layers](rest.md#post-workspace-layers)
+  * `url` key
