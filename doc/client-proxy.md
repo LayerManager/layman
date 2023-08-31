@@ -65,3 +65,5 @@ Currently, value of `X-Forwarded-Prefix` affects following URLs:
   * `metadata`.`comparison_url` key
 * [POST Workspace Layers](rest.md#post-workspace-layers)
   * `url` key
+* [DELETE Workspace Layer](rest.md#delete-workspace-layer)
+  * `url` key

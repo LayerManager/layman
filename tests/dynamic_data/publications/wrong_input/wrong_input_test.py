@@ -29,7 +29,7 @@ class Key(Enum):
     MANDATORY_CASES = 'mandatory_cases'
     RUN_ONLY_CASES = 'run_only_cases'
     SPECIFIC_CASES = 'specific_params'
-    POST_BEFORE_PATCH_ARGS = 'post_before_patch_args'
+    POST_BEFORE_TEST_ARGS = 'post_before_test_args'
 
 
 WORKSPACE = 'dynamic_test_workspace_wrong_input'
@@ -169,7 +169,7 @@ TESTCASES = {
         Key.REST_ARGS: {
             'file_paths': ['sample/layman.layer/sample_tif_grayscale_nodata_opaque.tif'],
         },
-        Key.POST_BEFORE_PATCH_ARGS: {
+        Key.POST_BEFORE_TEST_ARGS: {
             'file_paths': ['sample/layman.layer/sample_point_cz.geojson'],
             'style_file': 'sample/layman.layer/sample_point_cz.qml',
         },
@@ -607,7 +607,7 @@ TESTCASES = {
             'file_paths': [],
             'overview_resampling': 'mode',
         },
-        Key.POST_BEFORE_PATCH_ARGS: {
+        Key.POST_BEFORE_TEST_ARGS: {
             'file_paths': ['sample/layman.layer/sample_tif_grayscale_nodata_opaque.tif'],
             'overview_resampling': 'nearest',
         },
@@ -921,7 +921,7 @@ TESTCASES = {
         Key.REST_ARGS: {
             'time_regex': r'[0-9]{8}T[0-9]{6}Z(\?!.\*[0-9]{8}T[0-9]{6}Z.\*)',
         },
-        Key.POST_BEFORE_PATCH_ARGS: {
+        Key.POST_BEFORE_TEST_ARGS: {
             'time_regex': r'[0-9]{8}',
             'file_paths': [
                 'tests/dynamic_data/publications/layer_timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
@@ -1331,7 +1331,7 @@ def generate_test_cases():
             assert case not in specific_types, f'key={key},\ncase={case},\nspecific_types={specific_types}'
             specific_types[case] = EnumTestTypes.IGNORE
 
-        post_before_patch_args = test_case_params.pop(Key.POST_BEFORE_PATCH_ARGS, {})
+        post_before_test_args = test_case_params.pop(Key.POST_BEFORE_TEST_ARGS, {})
         publ_type = all_params.pop(Key.PUBLICATION_TYPE)
 
         publication_name = rest_args.pop('name', None)
@@ -1348,7 +1348,7 @@ def generate_test_cases():
                                            rest_args=rest_args,
                                            params=all_params,
                                            specific_params=all_params.pop(Key.SPECIFIC_CASES),
-                                           post_before_patch_args=post_before_patch_args,
+                                           post_before_test_args=post_before_test_args,
                                            marks=[pytest.mark.xfail(reason="Not yet implemented.")]
                                            if test_case_params.get('xfail') else []
                                            )

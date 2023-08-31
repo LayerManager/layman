@@ -843,7 +843,7 @@ def pytest_generate_tests(metafunc):
         assert not test_case.specific_params, f"Not yet implemented"
         assert not test_case.specific_types, f"Not yet implemented"
         assert not test_case.parametrization, f"Not yet implemented"
-        assert not test_case.post_before_patch_args, f"Not yet implemented"
+        assert not test_case.post_before_test_args, f"Not yet implemented"
         assert test_case.type == EnumTestTypes.MANDATORY, f"Other types then MANDATORY are not implemented yet"
         arg_name_to_value = {
             'params': copy.deepcopy(test_case.params),
