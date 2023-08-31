@@ -45,7 +45,7 @@ def generate_test_cases():
                                                                        name=layer_by_server.publ_name_part,
                                                                        ),
                                                type=EnumTestTypes.OPTIONAL,
-                                               post_before_patch_args=post_args,
+                                               post_before_test_args=post_args,
                                                rest_method=base_test.RestMethod.PATCH,
                                                rest_args=rest_args,
                                                params=all_params,
@@ -66,7 +66,7 @@ class TestLayer(base_test.TestSingleRestPublication):
 
     test_cases = generate_test_cases()
 
-    post_before_patch_scope = 'class'
+    post_before_test_scope = 'class'
 
     external_tables_to_create = base_test_classes.EXTERNAL_TABLE_FOR_LAYERS_BY_USED_SERVERS
 

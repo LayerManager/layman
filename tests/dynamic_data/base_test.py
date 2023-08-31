@@ -21,7 +21,7 @@ def pytest_generate_tests(metafunc):
     cls = metafunc.cls
     test_fn = metafunc.function
     arg_names = [a for a in inspect.getfullargspec(test_fn).args if a != 'self']
-    arg_names.append('post_before_patch')
+    arg_names.append('post_before_test')
     publ_type_name = cls.publication_type.split('.')[-1] if cls.publication_type else 'publication'
     argvalues = []
     ids = []
@@ -44,7 +44,7 @@ def pytest_generate_tests(metafunc):
             'rest_method': rest_method,
             'rest_args': rest_args,
             'parametrization': parametrization,
-            'post_before_patch': (test_case.publication, test_case.rest_method, test_case.post_before_patch_args),
+            'post_before_test': (test_case.publication, test_case.rest_method, test_case.post_before_test_args),
         }
         arg_values = [arg_name_to_value[n] for n in arg_names]
 
@@ -54,7 +54,7 @@ def pytest_generate_tests(metafunc):
         argnames=', '.join(arg_names),
         argvalues=argvalues,
         ids=ids,
-        indirect=['post_before_patch'],
+        indirect=['post_before_test'],
     )
 
 
@@ -79,7 +79,7 @@ class TestSingleRestPublication:
 
     usernames_to_reserve = []
 
-    post_before_patch_scope = 'function'
+    post_before_test_scope = 'function'
 
     @classmethod
     @final
@@ -137,7 +137,7 @@ class TestSingleRestPublication:
                                          key=input_test_case.key,
                                          rest_method=rest_method,
                                          rest_args=rest_args,
-                                         post_before_patch_args=input_test_case.post_before_patch_args,
+                                         post_before_test_args=input_test_case.post_before_test_args,
                                          params=params,
                                          type=test_type,
                                          marks=input_test_case.marks,
@@ -247,11 +247,11 @@ class TestSingleRestPublication:
         self.external_tables_to_cleanup_on_function_end.clear()
 
     @pytest.fixture(scope='function', autouse=True)
-    def post_before_patch(self, request):
+    def post_before_test(self, request):
         publication, method, patch_args = request.param
-        assert self.post_before_patch_scope in {'function', 'class'}
-        if method == RestMethod.PATCH:
-            if self.post_before_patch_scope == 'function':
+        assert self.post_before_test_scope in {'function', 'class'}
+        if method.name != RestMethod.POST.name:
+            if self.post_before_test_scope == 'function':
                 self.post_publication(publication, args=patch_args)
             else:
                 self.ensure_publication(publication, args=patch_args, scope='class')

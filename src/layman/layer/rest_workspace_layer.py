@@ -270,8 +270,9 @@ def patch(workspace, layername):
 @util.lock_decorator
 def delete_layer(workspace, layername):
     app.logger.info(f"DELETE Layer, actor={g.user}")
+    x_forwarded_prefix = layman_util.get_x_forwarded_prefix(request.headers)
 
-    info = util.get_complete_layer_info(workspace, layername)
+    info = util.get_complete_layer_info(workspace, layername, x_forwarded_prefix=x_forwarded_prefix)
 
     util.abort_layer_chain(workspace, layername)
 
