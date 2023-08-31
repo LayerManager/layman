@@ -40,6 +40,8 @@ def get(workspace):
 def post(workspace):
     app.logger.info(f"POST Layers, actor={g.user}")
 
+    x_forwarded_prefix = layman_util.get_x_forwarded_prefix(request.headers)
+
     # FILE
     sent_file_streams = []
     sent_file_paths = []
@@ -193,7 +195,7 @@ def post(workspace):
                                       task_options,
                                       )
 
-    layerurl = url_for('rest_workspace_layer.get', layername=layername, workspace=workspace)
+    layerurl = url_for('rest_workspace_layer.get', layername=layername, workspace=workspace, x_forwarded_prefix=x_forwarded_prefix)
 
     layer_result = {
         'name': layername,
