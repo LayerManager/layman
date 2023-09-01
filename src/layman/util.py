@@ -449,11 +449,11 @@ def delete_publications(workspace,
         {
             'name': info["name"],
             'title': info.get("title", None),
-            'url': url_for(**{'endpoint': url_path, publ_param: name, 'workspace': workspace}),
+            'url': url_for(**{'endpoint': url_path, publ_param: publication[2], 'workspace': publication[0]}),
             'uuid': info["uuid"],
             'access_rights': info['access_rights'],
         }
-        for (name, info) in whole_infos.items()
+        for (publication, info) in whole_infos.items()
     ]
     return jsonify(infos)
 
