@@ -425,6 +425,7 @@ def delete_publications(workspace,
                         method,
                         url_path,
                         publ_param,
+                        x_forwarded_prefix=None,
                         ):
     from layman import authn
     actor_name = authn.get_authn_username()
@@ -449,7 +450,7 @@ def delete_publications(workspace,
         {
             'name': info["name"],
             'title': info.get("title", None),
-            'url': url_for(**{'endpoint': url_path, publ_param: publication[2], 'workspace': publication[0]}),
+            'url': url_for(**{'endpoint': url_path, publ_param: publication[2], 'workspace': publication[0], 'x_forwarded_prefix': x_forwarded_prefix}),
             'uuid': info["uuid"],
             'access_rights': info['access_rights'],
         }
