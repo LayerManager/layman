@@ -7,18 +7,20 @@ import requests
 from jsonschema import validate, Draft7Validator
 from flask import current_app, request
 
+import layman_settings
 from layman import LaymanError, util as layman_util, celery as celery_util, settings
 from layman.authn.prime_db_schema import get_authn_info
 from layman.common.micka import util as micka_util
 from layman.common import redis as redis_util, tasks as tasks_util, metadata as metadata_common
 from layman.common.util import PUBLICATION_NAME_PATTERN, PUBLICATION_MAX_LENGTH, clear_publication_info as common_clear_publication_info
+from layman.layer.geoserver.util import get_gs_proxy_server_url
+from layman.layer.geoserver.wms import get_layman_workspace
 from layman.util import call_modules_fn, get_providers_from_source_names, get_internal_sources, \
-    to_safe_name, url_for
+    to_safe_name, url_for, WORKSPACE_NAME_PATTERN
 from . import get_map_sources, MAP_TYPE, get_map_type_def, get_map_info_keys
 from .filesystem import input_file
 from .micka import csw
 from .micka.csw import map_json_to_operates_on
-
 
 MAPNAME_PATTERN = PUBLICATION_NAME_PATTERN
 MAPNAME_MAX_LENGTH = PUBLICATION_MAX_LENGTH
@@ -357,11 +359,12 @@ def find_maps_by_grep(regexp):
 
 def get_layers_from_json(map_json):
     map_json = input_file.unquote_urls(map_json)
-    gs_url = settings.LAYMAN_GS_PROXY_BASE_URL
-    gs_url = gs_url if gs_url.endswith('/') else f"{gs_url}/"
-    gs_wms_url_pattern = r'^' + re.escape(gs_url) + r'(' + layman_util.WORKSPACE_NAME_ONLY_PATTERN + r')' + \
-                         settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX + r'/(?:ows|wms|wfs).*$'
-    layman_layer = set()
+    gs_server_url = get_gs_proxy_server_url()
+    gs_wms_url_pattern = r'^' + re.escape(gs_server_url) + layman_util.CLIENT_PROXY_ONLY_PATTERN + \
+                         re.escape(layman_settings.LAYMAN_GS_PATH) + \
+                         r'(?:(?P<workspace>' + layman_util.WORKSPACE_NAME_ONLY_PATTERN + r')/)?' \
+                         + r'(?:ows|wms|wfs).*$'
+    found_layers = set()
     for layer_idx, map_layer in enumerate(map_json['layers']):
         layer_url = map_layer.get('url', None)
         if not layer_url:
@@ -369,15 +372,26 @@ def get_layers_from_json(map_json):
         match = re.match(gs_wms_url_pattern, layer_url)
         if not match:
             continue
-        layer_workspace = match.group(1)
-        if not layer_workspace:
-            continue
+        url_geoserver_workspace = match.group('workspace')
         layer_names = [
             n for n in map_layer.get('params', {}).get('LAYERS', '').split(',')
             if len(n) > 0
         ]
-        if not layer_names:
-            continue
-        for layername in layer_names:
-            layman_layer.add((layer_workspace, layername, layer_idx))
-    return layman_layer
+        for full_layername in layer_names:
+            if not url_geoserver_workspace:
+                layername_parts = full_layername.split(':')
+                if len(layername_parts) != 2:
+                    continue
+                layer_geoserver_workspace, layername = layername_parts
+                match = re.match(WORKSPACE_NAME_PATTERN, layer_geoserver_workspace)
+                if not match:
+                    continue
+            else:
+                layer_geoserver_workspace = url_geoserver_workspace
+                layername = full_layername
+            match = re.match(PUBLICATION_NAME_PATTERN, layername)
+            if not match:
+                continue
+            layer_workspace = get_layman_workspace(layer_geoserver_workspace)
+            found_layers.add((layer_workspace, layername, layer_idx))
+    return found_layers

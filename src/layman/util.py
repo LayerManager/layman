@@ -20,8 +20,10 @@ from layman.http import LaymanError
 logger = logging.getLogger(__name__)
 
 WORKSPACE_NAME_ONLY_PATTERN = r"[a-z][a-z0-9]*(?:_[a-z0-9]+)*"
-
 WORKSPACE_NAME_PATTERN = r"^" + WORKSPACE_NAME_ONLY_PATTERN + r"$"
+
+CLIENT_PROXY_ONLY_PATTERN = r"(?:/[a-z0-9_-]+)*"
+CLIENT_PROXY_PATTERN = r"^" + CLIENT_PROXY_ONLY_PATTERN + r"$"
 
 FLASK_PROVIDERS_KEY = f'{__name__}:PROVIDERS'
 FLASK_PUBLICATION_TYPES_KEY = f'{__name__}:PUBLICATION_TYPES'
