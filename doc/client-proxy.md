@@ -69,3 +69,5 @@ Currently, value of `X-Forwarded-Prefix` affects following URLs:
   * `url` key
 * [DELETE Workspace Layers](rest.md#delete-workspace-layers)
   * `url` key
+* [DELETE Workspace Map](rest.md#delete-workspace-map)
+  * `url` key
