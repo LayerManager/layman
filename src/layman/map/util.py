@@ -357,26 +357,55 @@ def find_maps_by_grep(regexp):
     return maps
 
 
+def _get_layer_url_from_wms_json(map_layer):
+    return map_layer.get('url')
+
+
+def _get_layer_names_from_wms_json(map_layer):
+    return [
+        n for n in map_layer.get('params', {}).get('LAYERS', '').split(',')
+        if len(n) > 0
+    ]
+
+
+def _get_layer_url_from_vector_json(map_layer):
+    protocol = map_layer.get('protocol', {})
+    return protocol.get('url') if protocol.get('format', '').split('.')[-1] == 'WFS' else None
+
+
+def _get_layer_names_from_vector_json(map_layer):
+    return [
+        n for n in map_layer.get('name', '').split(',')
+        if len(n) > 0
+    ]
+
+
 def get_layers_from_json(map_json):
     map_json = input_file.unquote_urls(map_json)
     gs_server_url = get_gs_proxy_server_url()
-    gs_wms_url_pattern = r'^' + re.escape(gs_server_url) + layman_util.CLIENT_PROXY_ONLY_PATTERN + \
-                         re.escape(layman_settings.LAYMAN_GS_PATH) + \
-                         r'(?:(?P<workspace>' + layman_util.WORKSPACE_NAME_ONLY_PATTERN + r')/)?' \
-                         + r'(?:ows|wms|wfs).*$'
+    gs_url_pattern = r'^' + re.escape(gs_server_url) + layman_util.CLIENT_PROXY_ONLY_PATTERN + \
+                     re.escape(layman_settings.LAYMAN_GS_PATH) + \
+                     r'(?:(?P<workspace>' + layman_util.WORKSPACE_NAME_ONLY_PATTERN + r')/)?' \
+                     + r'(?:ows|wms|wfs).*$'
     found_layers = set()
     for layer_idx, map_layer in enumerate(map_json['layers']):
-        layer_url = map_layer.get('url', None)
+        class_name = map_layer.get('className', '').split('.')[-1]
+        layer_url_getter = {
+            'WMS': _get_layer_url_from_wms_json,
+            'Vector': _get_layer_url_from_vector_json,
+        }.get(class_name)
+        layer_url = layer_url_getter(map_layer)
         if not layer_url:
             continue
-        match = re.match(gs_wms_url_pattern, layer_url)
+        match = re.match(gs_url_pattern, layer_url)
         if not match:
             continue
         url_geoserver_workspace = match.group('workspace')
-        layer_names = [
-            n for n in map_layer.get('params', {}).get('LAYERS', '').split(',')
-            if len(n) > 0
-        ]
+        layer_names_getter = {
+            'WMS': _get_layer_names_from_wms_json,
+            'Vector': _get_layer_names_from_vector_json,
+        }.get(class_name)
+        layer_names = layer_names_getter(map_layer)
         for full_layername in layer_names:
             if not url_geoserver_workspace:
                 layername_parts = full_layername.split(':')
