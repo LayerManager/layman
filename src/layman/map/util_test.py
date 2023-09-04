@@ -1,4 +1,3 @@
-import json
 import pytest
 from . import util as map_util
 
@@ -27,6 +26,6 @@ from . import util as map_util
 ])
 def test_get_layers_from_json(json_path, exp_result):
     with open(json_path, 'r', encoding="utf-8") as map_file:
-        map_json = json.load(map_file)
+        map_json = map_util.check_file(map_file)
     result = map_util.get_layers_from_json(map_json)
     assert result == exp_result
