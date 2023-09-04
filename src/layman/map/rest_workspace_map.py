@@ -115,9 +115,10 @@ def patch(workspace, mapname):
 @util.lock_decorator
 def delete_map(workspace, mapname):
     app.logger.info(f"DELETE Map, actor={g.user}")
+    x_forwarded_prefix = layman_util.get_x_forwarded_prefix(request.headers)
 
     # raise exception if map does not exist
-    info = util.get_complete_map_info(workspace, mapname)
+    info = util.get_complete_map_info(workspace, mapname, x_forwarded_prefix=x_forwarded_prefix)
 
     util.abort_map_chain(workspace, mapname)
 
