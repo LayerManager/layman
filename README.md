@@ -123,7 +123,7 @@ Also, anytime you change `.env` file, remember to rebuild docker images as some 
 
 
 ## Dependencies
-Layman has [many dependencies](doc/dependencies.md). Most of them are shipped with Layman. However there are some **external dependencies** that should be treated carefully:
+Layman has [many dependencies](doc/dependencies.md). Most of them are shipped with Layman. However, there are some **external dependencies** that should be treated carefully:
 - PostgreSQL & PostGIS
 - QGIS Server
 - GeoServer
@@ -177,7 +177,7 @@ Within PostgreSQL, you need to provide one database for Layman and one database 
 
 Within QGIS Server, you do not need to provide anything special.
 
-Within GeoServer, you need to provide either admin password [GEOSERVER_ADMIN_PASSWORD](doc/env-settings.md#GEOSERVER_ADMIN_PASSWORD), or one Layman user [LAYMAN_GS_USER](doc/env-settings.md#LAYMAN_GS_USER) and one layman role [LAYMAN_GS_ROLE](doc/env-settings.md#LAYMAN_GS_ROLE). If admin password is provided, Layman will create the Layman user and the Layman role automatically.
+Within GeoServer, you need to provide either admin password [GEOSERVER_ADMIN_PASSWORD](doc/env-settings.md#GEOSERVER_ADMIN_PASSWORD), or one Layman user [LAYMAN_GS_USER](doc/env-settings.md#LAYMAN_GS_USER) and one layman role [LAYMAN_GS_ROLE](doc/env-settings.md#LAYMAN_GS_ROLE). If admin password is provided, Layman will create the Layman user and the Layman role automatically. URL path of the GeoServer must be `/geoserver/`.
 
 Within Redis, you need to provide two databases, one for Layman, second for Layman Test Client. Connection strings are defined by [LAYMAN_REDIS_URL](doc/env-settings.md#LAYMAN_REDIS_URL) and [LTC_REDIS_URL](doc/env-settings.md#LTC_REDIS_URL).
 
