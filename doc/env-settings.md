@@ -155,9 +155,6 @@ Internal URL host of GeoServer instance.
 ### LAYMAN_GS_PORT
 Internal URL port of GeoServer instance.
 
-### LAYMAN_GS_PATH
-URL path of GeoServer instance.
-
 ### LAYMAN_GS_USER
 Name of [GeoServer user](https://docs.geoserver.org/2.21.x/en/user/security/webadmin/ugr.html#add-user) that Layman uses for authentication and communication with GeoServer. The LAYMAN_GS_USER must be another user than default `admin` user. The LAYMAN_GS_USER user must have at least the [LAYMAN_GS_ROLE](#LAYMAN_GS_ROLE) and default [`ADMIN`](https://docs.geoserver.org/2.21.x/en/user/security/usergrouprole/roleservices.html#mapping-roles-to-system-roles) role (defined by `adminRoleName`). The user and his required roles will be created automatically on Layman's startup if [GEOSERVER_ADMIN_PASSWORD](#GEOSERVER_ADMIN_PASSWORD) is provided.
 
