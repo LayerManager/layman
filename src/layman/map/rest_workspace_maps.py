@@ -134,6 +134,7 @@ def post(workspace):
 def delete(workspace):
     app.logger.info(f"DELETE Maps, actor={g.user}")
 
+    x_forwarded_prefix = layman_util.get_x_forwarded_prefix(request.headers)
     infos = layman_util.delete_publications(workspace,
                                             MAP_TYPE,
                                             util.is_map_chain_ready,
@@ -142,6 +143,7 @@ def delete(workspace):
                                             request.method,
                                             'rest_workspace_map.get',
                                             'mapname',
+                                            x_forwarded_prefix=x_forwarded_prefix,
                                             )
 
     return infos, 200
