@@ -1,0 +1,43 @@
+{
+  "describedBy": "https://raw.githubusercontent.com/hslayers/map-compositions/2.0.0/schema.json",
+  "schema_version": "2.0.0",
+  "abstract": "Hranice",
+  "title": "Hranice",
+  "extent": [
+    -35.0,
+    -48.5,
+    179,
+    81.5
+  ],
+  "nativeExtent": [
+    -3896182.18,
+    -6190443.81,
+    19926188.85,
+    16579785.82
+  ],
+  "projection": "epsg:3857",
+  "layers": [
+    {
+      "className": "OpenLayers.Layer.Vector",
+      "dimensions": {},
+      "legends": [
+        ""
+      ],
+      "maxResolution": null,
+      "metadata": {},
+      "minResolution": 0,
+      "name": "testuser1:hranice",
+      "opacity": 1,
+      "path": "group2",
+      "protocol": {
+        "format": "hs.format.WFS",
+        "url": "http://localhost:8000/geoserver/wfs"
+      },
+      "ratio": 1.5,
+      "singleTile": true,
+      "title": "Hranice",
+      "visibility": false,
+      "wmsMaxScale": 0
+    }
+  ]
+}

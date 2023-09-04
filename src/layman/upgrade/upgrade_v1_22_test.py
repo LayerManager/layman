@@ -69,5 +69,6 @@ def test_insert_map_layer_relations():
         map_layers = db_util.run_query(query_map_layers)
     assert map_layers == [
         (map_id, 'testuser1', 'hranice', 1),
-        (map_id, 'testuser1', 'mista', 2)
+        (map_id, 'testuser1', 'mista', 2),
+        (map_id, 'testuser1', 'hranice', 3),
     ]
