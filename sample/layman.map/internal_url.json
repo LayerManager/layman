@@ -75,12 +75,12 @@
       "maxResolution": null,
       "metadata": {},
       "minResolution": 0,
-      "name": "Hranice",
+      "name": "hranice",
       "opacity": 1,
       "path": "group2",
       "protocol": {
         "format": "hs.format.WFS",
-        "url": "http://localhost:8000/geoserver/testuser1_wms/wfs"
+        "url": "http://localhost:8000/geoserver/testuser1/wfs"
       },
       "ratio": 1.5,
       "singleTile": true,
