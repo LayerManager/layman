@@ -41,7 +41,8 @@
 - Also referred to as **map composition**
 - Map is [publication](#publication) defined by JSON valid against [map-composition schema](https://github.com/hslayers/map-compositions) version 2 used by [Hslayers-ng](https://github.com/hslayers/hslayers-ng)
 - Map is collection of WMS layers and vector data
-- Maps composed from WMS layers only are fully supported
+- Maps composed of WMS layers only are fully supported
+- Each layer is either [internal](#internal-map-layer), or [external](#external-map-layer).
 - Documented [map publishing](publish-map.md) process 
 - Thumbnail image available
 - Map-related data is named and structured
@@ -54,6 +55,15 @@
   - one map file per map
   - one thumbnail per map
   - one metadata record per map
+
+### Internal map layer
+- Internal map layer is layer of the [map](#map) with valid [workspace](#workspace) name, valid [layer](#layer) name, and
+    - whose `className` is `WMS` (or ends with `.WMS`) and whose `url` points to the Layman instance,
+    - or whose `className` is `Vector` (or ends with `.Vector`), whose `protocol.format` is `WFS` (or ends with `.WFS`) and whose `protocol.url` points to the Layman instance.
+- Map layer is considered internal even if [layer](#layer) with given name in given [workspace](#workspace) does not currently exist in the Layman instance.
+
+### External map layer
+- External map layer is layer of the [map](#map) that is not [internal](#internal-map-layer).
 
 ## User
 - User is any person who communicates with Layman REST API through any client.
