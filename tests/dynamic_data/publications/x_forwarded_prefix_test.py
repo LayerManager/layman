@@ -33,9 +33,6 @@ class TestPublication(base_test.TestSingleRestPublication):
                                                                                        publ_def.type,
                                                                                        None),
                                          type=EnumTestTypes.MANDATORY,
-                                         specific_types={
-                                             (PublicationTypes.MAP, RestMethodLocal.POST): EnumTestTypes.IGNORE,
-                                         },
                                          )]
 
     @classmethod

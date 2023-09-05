@@ -42,6 +42,7 @@ def get(workspace):
 @bp.route(f"/{MAP_REST_PATH_NAME}", methods=['POST'])
 def post(workspace):
     app.logger.info(f"POST Maps, actor={g.user}")
+    x_forwarded_prefix = layman_util.get_x_forwarded_prefix(request.headers)
 
     # FILE
     if 'file' in request.files and not request.files['file'].filename == '':
@@ -74,7 +75,7 @@ def post(workspace):
     else:
         description = file_json.get('abstract', '')
 
-    mapurl = url_for('rest_workspace_map.get', mapname=mapname, workspace=workspace)
+    mapurl = url_for('rest_workspace_map.get', mapname=mapname, workspace=workspace, x_forwarded_prefix=x_forwarded_prefix)
 
     redis_util.create_lock(workspace, MAP_TYPE, mapname, request.method)
 
