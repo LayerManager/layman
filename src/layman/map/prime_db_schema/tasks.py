@@ -3,6 +3,7 @@ from celery.utils.log import get_task_logger
 from layman import celery_app
 from layman.celery import AbortedException
 from layman.common import empty_method_returns_true
+from .util import insert_internal_layers
 from .. import util, MAP_TYPE
 from ...common.prime_db_schema.publications import set_bbox
 
@@ -29,6 +30,9 @@ def refresh_file_data(
     native_bbox = util.get_native_bbox_from_json(mapjson)
     crs = util.get_crs_from_json(mapjson)
     set_bbox(workspace, MAP_TYPE, mapname, native_bbox, crs, )
+
+    map_layers = util.get_layers_from_json(mapjson)
+    insert_internal_layers(workspace, mapname, map_layers)
 
     if self.is_aborted():
         raise AbortedException
