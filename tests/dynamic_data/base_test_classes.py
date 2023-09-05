@@ -141,7 +141,7 @@ class TestCaseType:
     publication: Union[Publication, Callable[[dict], Publication]] = None
     publication_type: str = None
     key: str = None
-    rest_method: RestMethod = None
+    rest_method: RestMethodBase = None
     rest_args: dict = field(default_factory=dict)
     params: dict = field(default_factory=dict)
     specific_params: dict = field(default_factory=dict)
