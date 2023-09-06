@@ -1,22 +1,13 @@
 import logging
 from urllib.parse import urlparse
 
-from geoserver.util import get_proxy_base_url, wms_direct, wfs_direct
-from layman.cache.mem import CACHE as MEM_CACHE
+from geoserver.util import wms_direct, wfs_direct
 
 logger = logging.getLogger(__name__)
 CACHE_GS_PROXY_BASE_URL_KEY = f'{__name__}:GS_PROXY_BASE_URL'
 DEFAULT_EXTERNAL_DB_STORE_PREFIX = 'external_db'
 
 from layman import settings
-
-
-def get_gs_proxy_base_url():
-    proxy_base_url = MEM_CACHE.get(CACHE_GS_PROXY_BASE_URL_KEY)
-    if proxy_base_url is None:
-        proxy_base_url = get_proxy_base_url(settings.LAYMAN_GS_AUTH)
-        MEM_CACHE.set(CACHE_GS_PROXY_BASE_URL_KEY, proxy_base_url, ttl=settings.LAYMAN_CACHE_GS_TIMEOUT)
-    return proxy_base_url
 
 
 def get_gs_proxy_server_url():

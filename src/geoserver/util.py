@@ -1027,10 +1027,11 @@ def get_proxy_base_url(auth, global_settings=None):
 def ensure_proxy_base_url(proxy_base_url, auth):
     global_settings = get_global_settings(auth)
     current_url = get_proxy_base_url(auth, global_settings=global_settings)
-    url_equals = proxy_base_url == current_url
-    if not url_equals:
+    change_is_needed = not (proxy_base_url == current_url and global_settings['settings']['useHeadersProxyURL'])
+    if change_is_needed:
         global_settings['settings']['proxyBaseUrl'] = proxy_base_url
-        logger.info(f"Current Proxy Base URL {current_url} not equals to requested {proxy_base_url}, changing.")
+        global_settings['settings']['useHeadersProxyURL'] = True
+        logger.info(f"Current Proxy Base URL {current_url} not equals to requested {proxy_base_url} or useHeadersProxyURL is not set({global_settings['settings']['useHeadersProxyURL']}), changing.")
         r_url = GS_REST_SETTINGS
         response = requests.put(
             r_url,
@@ -1043,9 +1044,8 @@ def ensure_proxy_base_url(proxy_base_url, auth):
         )
         response.raise_for_status()
     else:
-        logger.info(f"Current Proxy Base URL {current_url} already corresponds with requested one.")
-    url_changed = not url_equals
-    return url_changed
+        logger.info(f"Current Proxy Base URL {current_url} already corresponds with requested one and useHeadersProxyURL is already set.")
+    return change_is_needed
 
 
 def reset(auth):

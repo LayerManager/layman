@@ -1,4 +1,5 @@
 # Endpoints
+To use [headers for GeoServer's Proxy URL](https://docs.geoserver.org/2.21.x/en/user/configuration/globalsettings.html#use-headers-for-proxy-url) see [client proxy documentation](client-proxy.md).
 
 ## Web Map Service
 [Web Map Service (WMS)](https://www.opengeospatial.org/standards/wms) endpoint is implemented using combination of Layman's authentication proxy, Layman's WMS proxy, and [GeoServer](https://docs.geoserver.org/2.21.x/en/user/services/wms/reference.html).

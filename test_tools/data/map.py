@@ -2,7 +2,7 @@ import json
 import os
 from pathlib import Path
 import crs as crs_def
-from layman import util as layman_util, app
+from layman import util as layman_util, app, settings
 from layman.common import bbox
 from layman.layer.geoserver import util as layer_gs_util, wms as geoserver_wms
 from .. import process_client
@@ -54,8 +54,7 @@ def get_map_with_internal_layers_json(layers, *, native_extent=None, native_crs=
             }
         ]
     }
-    gs_url = layer_gs_util.get_gs_proxy_base_url()
-    gs_url = gs_url if gs_url.endswith('/') else f"{gs_url}/"
+    gs_url = layer_gs_util.get_gs_proxy_server_url() + settings.LAYMAN_GS_PATH
     for workspace, layer in layers:
         geoserver_workspace = geoserver_wms.get_geoserver_workspace(workspace)
         map_json['layers'].append({
