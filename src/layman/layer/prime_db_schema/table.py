@@ -26,6 +26,8 @@ def get_layer_info(workspace, layername):
             primary_key_column=settings.OGR_DEFAULT_PRIMARY_KEY,
         ) if info['geodata_type'] == settings.GEODATA_TYPE_VECTOR and not info.get('_table_uri') else info.get('_table_uri')
 
+        info.pop('_map_layers', None)
+
     return info
 
 
