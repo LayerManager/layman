@@ -59,6 +59,13 @@ class RestMethod(RestMethodBase):
     PATCH = ('patch_publication', 'patch')
 
 
+class RestMethodAll(RestMethodBase):
+    POST = ('post_publication', 'post')
+    PATCH = ('patch_publication', 'patch')
+    DELETE = ('delete_workspace_publication', 'delete')
+    MULTI_DELETE = ('delete_workspace_publications', 'multi_delete')
+
+
 class PublicationByDefinitionBase(Enum):
     def __init__(self, publication_definition, publ_name_part):
         self.publication_definition = publication_definition
