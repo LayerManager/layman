@@ -248,6 +248,9 @@ lint-fix:
 postgresql-psql:
 	docker compose -f docker-compose.deps.yml run -e PGPASSWORD=docker --entrypoint "psql -U docker -p 5432 -h postgresql gis" --rm postgresql
 
+postgresql-psql-test:
+	docker compose -f docker-compose.deps.yml run -e PGPASSWORD=docker --entrypoint "psql -U docker -p 5432 -h postgresql layman_test" --rm postgresql
+
 redis-cli-db:
 	docker compose -f docker-compose.deps.yml exec redis redis-cli -h redis -p 6379 -n 0
 
