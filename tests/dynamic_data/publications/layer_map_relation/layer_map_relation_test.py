@@ -11,15 +11,9 @@ pytest_generate_tests = base_test.pytest_generate_tests
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
-
-class RestMethodLocal(base_test_classes.RestMethodBase):
-    POST = ('post_publication', 'post')
-    DELETE = ('delete_workspace_publication', 'delete')
-
-
 TEST_CASES = {
     'post': {
-        'rest_method': RestMethodLocal.POST,
+        'rest_method': base_test_classes.RestMethodAll.POST,
         'rest_args': {
             'file_paths': [os.path.join(DIRECTORY, 'internal_wms_and_wfs.json')],
         },
@@ -33,7 +27,7 @@ TEST_CASES = {
         },
     },
     'delete': {
-        'rest_method': RestMethodLocal.DELETE,
+        'rest_method': base_test_classes.RestMethodAll.DELETE,
         'rest_args': {},
         'post_before_test_args': {
             'file_paths': [os.path.join(DIRECTORY, 'internal_wms_and_wfs.json')],
@@ -98,7 +92,7 @@ class TestPublication(base_test.TestSingleRestPublication):
         self.assert_exp_map_layers(publ_info, params['exp_map_layers_before_rest_method'])
 
         rest_method(map, args=rest_args)
-        if parametrization.rest_method == RestMethodLocal.POST:
+        if parametrization.rest_method == base_test_classes.RestMethodAll.POST:
             assert_util.is_publication_valid_and_complete(map)
 
         with app.app_context():
