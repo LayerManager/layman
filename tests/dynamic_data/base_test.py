@@ -248,11 +248,11 @@ class TestSingleRestPublication:
 
     @pytest.fixture(scope='function', autouse=True)
     def post_before_test(self, request):
-        publication, method, patch_args = request.param
+        publication, method, post_before_test_args = request.param
         assert self.post_before_test_scope in {'function', 'class'}
         if method.name != RestMethod.POST.name:
             if self.post_before_test_scope == 'function':
-                self.post_publication(publication, args=patch_args)
+                self.post_publication(publication, args=post_before_test_args)
             else:
-                self.ensure_publication(publication, args=patch_args, scope='class')
+                self.ensure_publication(publication, args=post_before_test_args, scope='class')
         yield
