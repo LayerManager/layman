@@ -1,4 +1,5 @@
 from layman.common import empty_method_returns_dict
+from . import util
 from ...common.prime_db_schema import publications as pubs_util
 from .. import MAP_TYPE
 
@@ -75,4 +76,5 @@ def post_map(workspace,
 
 
 def delete_map(workspace, map_name):
+    util.delete_internal_layer_relations(workspace, map_name, )
     return pubs_util.delete_publication(workspace, MAP_TYPE, map_name)
