@@ -1,5 +1,4 @@
 from layman import settings
-from test_tools import process_client
 from tests import EnumTestTypes
 from tests.dynamic_data import base_test, base_test_classes
 from tests.dynamic_data.publications import common_publications
@@ -34,14 +33,6 @@ class TestPublication(base_test.TestSingleRestPublication):
                                                                                        None),
                                          type=EnumTestTypes.MANDATORY,
                                          )]
-
-    @classmethod
-    def delete_workspace_publication(cls, publication, args=None):
-        return process_client.delete_workspace_publication(publication.type, publication.workspace, publication.name, **args)
-
-    @classmethod
-    def delete_workspace_publications(cls, publication, args=None):
-        return process_client.delete_workspace_publications(publication.type, publication.workspace, **args)
 
     @staticmethod
     def test_publication(publication, rest_method):
