@@ -223,6 +223,19 @@ def proxy(subpath):
     if is_user_with_name(authn_username):
         headers_req[settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE] = authn_username
 
+    # adjust proxy base url headers
+    for header in [
+        'X-Forwarded-Proto',
+        'X-Forwarded-Host',
+        'X-Forwarded-For',
+        'X-Forwarded-Path',
+        'Forwarded',
+        'Host',
+    ]:
+        headers_req.pop(header, None)
+    x_forwarded_prefix = layman_util.get_x_forwarded_prefix(request.headers)
+    headers_req['X-Forwarded-Path'] = x_forwarded_prefix or ''
+
     # ensure layer attributes in case of WFS-T
     app.logger.info(f"{request.method} GeoServer proxy, headers_req={headers_req}, url={url}")
     wfs_t_layers = set()

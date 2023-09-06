@@ -75,3 +75,10 @@ Currently, value of `X-Forwarded-Prefix` affects following URLs:
   * `url` key
 * [POST Workspace Maps](rest.md#post-workspace-maps)
   * `url` key
+* [OGC endpoints](endpoints.md)
+  * Headers `X-Forwarded-Proto`, `X-Forwarded-Host`, `X-Forwarded-For`, `X-Forwarded-Path`, `Forwarded` and `Host` are ignored
+  * [WMS endpoints](endpoints.md#web-map-service)
+    * all requests URLs
+    * all legend URLs
+  * [WFS endpoints](endpoints.md#web-feature-service)
+    * all operations URLs
