@@ -77,10 +77,6 @@ class TestPublication(base_test.TestSingleRestPublication):
         }, scope='class')
         self.layer_uuids[layer_name] = resp['uuid']
 
-    @classmethod
-    def delete_workspace_publication(cls, publication, args=None):
-        return process_client.delete_workspace_publication(publication.type, publication.workspace, publication.name, **args)
-
     def assert_exp_map_layers(self, publ_info, exp_map_layers):
         if exp_map_layers is None:
             assert not publ_info

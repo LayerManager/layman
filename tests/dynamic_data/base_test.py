@@ -208,6 +208,14 @@ class TestSingleRestPublication:
     def patch_publication(cls, publication, args=None):
         return process_client.patch_workspace_publication(publication.type, publication.workspace, publication.name, **args)
 
+    @classmethod
+    def delete_workspace_publication(cls, publication, args=None):
+        return process_client.delete_workspace_publication(publication.type, publication.workspace, publication.name, **args)
+
+    @classmethod
+    def delete_workspace_publications(cls, publication, args=None):
+        return process_client.delete_workspace_publications(publication.type, publication.workspace, **args)
+
     @pytest.fixture(scope='class', autouse=True)
     def class_fixture(self, request):
         for table in self.external_tables_to_create:
