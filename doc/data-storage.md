@@ -51,11 +51,12 @@ Information about [maps](models.md#map) includes JSON definition.
 
 When user [publishes new map](rest.md#post-workspace-maps)
 - UUID and name is saved to [Redis](#redis) and [filesystem](#filesystem),
-- UUID, name, title, access rights, and relations to [internal layers](models.md#internal-map-layer) are saved to [PostgreSQL](#postgresql),
+- UUID, name, title, and access rights are saved to [PostgreSQL](#postgresql),
 - JSON file is saved to [filesystem](#filesystem),
 - and asynchronous [tasks](#tasks) are saved in [Redis](#redis).
 
 Subsequently, when asynchronous tasks run,
+- relations to [internal layers](models.md#internal-map-layer) are saved to [PostgreSQL](#postgresql)
 - thumbnail file is saved to [filesystem](#filesystem)
 - and metadata record is saved to [PostgreSQL](#postgresql) using Micka's CSW.
 
