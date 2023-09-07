@@ -108,7 +108,7 @@ def csw_insert(workspace, mapname, actor_name):
 
 def map_json_to_operates_on(map_json, operates_on_muuids_filter=None, editor=None):
     # Either caller know muuids or wants filter by editor, never both at the same time
-    assert not operates_on_muuids_filter or not editor
+    assert operates_on_muuids_filter is None or editor is None
     unquote_urls(map_json)
     gs_url = get_gs_proxy_base_url()
     gs_url = gs_url if gs_url.endswith('/') else f"{gs_url}/"
