@@ -20,7 +20,7 @@ from layman.util import call_modules_fn, get_providers_from_source_names, get_in
 from . import get_map_sources, MAP_TYPE, get_map_type_def, get_map_info_keys
 from .filesystem import input_file
 from .micka import csw
-from .micka.csw import map_json_to_operates_on
+from .micka.csw import map_to_operates_on
 
 MAPNAME_PATTERN = PUBLICATION_NAME_PATTERN
 MAPNAME_MAX_LENGTH = PUBLICATION_MAX_LENGTH
@@ -299,11 +299,11 @@ def get_crs_from_json(map_json):
     return map_json['projection'].upper()
 
 
-def map_file_to_metadata_properties(map_json, operates_on_muuids_filter):
+def map_file_to_metadata_properties(workspace, mapname, map_json, operates_on_muuids_filter):
     result = {
         'title': map_json['title'],
         'abstract': map_json['abstract'],
-        'operates_on': map_json_to_operates_on(map_json, operates_on_muuids_filter=operates_on_muuids_filter),
+        'operates_on': map_to_operates_on(workspace, mapname, operates_on_muuids_filter=operates_on_muuids_filter),
         'extent': list(get_bbox_from_json(map_json)),
         'reference_system': [get_crs_from_json(map_json)],
     }
@@ -325,7 +325,7 @@ def get_metadata_comparison(workspace, mapname):
     if map_json:
         soap_operates_on = next(iter(partial_infos[csw].values()))['operates_on'] if partial_infos[csw] else []
         operates_on_muuids_filter = micka_util.operates_on_values_to_muuids(soap_operates_on)
-        layman_file_props = map_file_to_metadata_properties(map_json, operates_on_muuids_filter)
+        layman_file_props = map_file_to_metadata_properties(workspace, mapname, map_json, operates_on_muuids_filter)
         map_file_url = url_for('rest_workspace_map_file.get', mapname=mapname, workspace=workspace)
         all_props[map_file_url] = layman_file_props
 
