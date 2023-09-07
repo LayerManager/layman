@@ -123,7 +123,7 @@ class Parametrization:
         return val.publication_definition if val is not None else None
 
     @property
-    def rest_method(self) -> Optional[RestMethod]:
+    def rest_method(self) -> Optional[RestMethodBase]:
         # pylint: disable=no-member
         return next((v for v in self._values if isinstance(v, RestMethodBase)), None)
 
