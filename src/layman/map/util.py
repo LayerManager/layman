@@ -387,7 +387,7 @@ def get_layers_from_json(map_json):
                      re.escape(layman_settings.LAYMAN_GS_PATH) + \
                      r'(?:(?P<workspace>' + layman_util.WORKSPACE_NAME_ONLY_PATTERN + r')/)?' \
                      + r'(?:ows|wms|wfs).*$'
-    found_layers = set()
+    found_layers = []
     for layer_idx, map_layer in enumerate(map_json['layers']):
         class_name = map_layer.get('className', '').split('.')[-1]
         layer_url_getter = {
@@ -422,5 +422,7 @@ def get_layers_from_json(map_json):
             if not match:
                 continue
             layer_workspace = get_layman_workspace(layer_geoserver_workspace)
-            found_layers.add((layer_workspace, layername, layer_idx))
+            layer_def = (layer_workspace, layername, layer_idx)
+            if layer_def not in found_layers:
+                found_layers.append(layer_def)
     return found_layers

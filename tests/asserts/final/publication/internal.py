@@ -459,5 +459,5 @@ def consistent_internal_map_layers(workspace, publ_type, name):
         pub_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['map_layers']})
         map_json = map_input_file.get_map_json(workspace, name)
     layers_from_file = map_util.get_layers_from_json(map_json)
-    layers_from_info = {(ml['workspace'], ml['name'], ml['index']) for ml in pub_info['_map_layers']}
+    layers_from_info = [(ml['workspace'], ml['name'], ml['index']) for ml in pub_info['_map_layers']]
     assert layers_from_file == layers_from_info

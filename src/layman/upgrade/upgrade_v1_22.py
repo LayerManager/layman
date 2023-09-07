@@ -95,7 +95,7 @@ def insert_map_layer_relations():
             map_layers = map_util.get_layers_from_json(map_json)
         except FileNotFoundError:
             logger.warning(f'File not found for map {workspace}.{map_name}, map file path {map_file_path}')
-            map_layers = set()
+            map_layers = []
         for layer_workspace, layer_name, layer_index in map_layers:
             insert_query = f'''
             insert into {DB_SCHEMA}.map_layer(id_map, layer_workspace, layer_name, layer_index) values (%s, %s, %s, %s);
