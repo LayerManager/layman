@@ -8,8 +8,9 @@ from layman import app, util as layman_util, settings, celery
 from layman.common import bbox as bbox_util
 from layman.common.prime_db_schema import publications
 from layman.layer import LAYER_TYPE, util as layer_util
-from layman.map import MAP_TYPE
 from layman.layer.filesystem import gdal, input_file
+from layman.map import MAP_TYPE, util as map_util
+from layman.map.filesystem import input_file as map_input_file
 from test_tools import process_client, util as test_util, assert_util
 from ... import util
 
@@ -451,3 +452,12 @@ def wfs_wms_status_available(workspace, publ_type, name):
         publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['wfs_wms_status']})
     wfs_wms_status = publ_info['_wfs_wms_status']
     assert wfs_wms_status == settings.EnumWfsWmsStatus.AVAILABLE
+
+
+def consistent_internal_map_layers(workspace, publ_type, name):
+    with app.app_context():
+        pub_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['map_layers']})
+        map_json = map_input_file.get_map_json(workspace, name)
+    layers_from_file = map_util.get_layers_from_json(map_json)
+    layers_from_info = {(ml['workspace'], ml['name'], ml['index']) for ml in pub_info['_map_layers']}
+    assert layers_from_file == layers_from_info
