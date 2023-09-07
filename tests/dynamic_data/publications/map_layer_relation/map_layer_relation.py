@@ -85,14 +85,14 @@ class TestPublication(base_test.TestSingleRestPublication):
             }
             assert found_map_layers == exp_map_layers
 
-    def test_publication(self, map, rest_method, rest_args, params, parametrization: base_test.Parametrization):
+    def test_publication(self, map, rest_method, rest_args, params):
         with app.app_context():
             publ_info = get_publication_info(map.workspace, map.type, map.name,
                                              context={'keys': ['map_layers']})
         self.assert_exp_map_layers(publ_info, params['exp_map_layers_before_rest_method'])
 
         rest_method(map, args=rest_args)
-        if parametrization.rest_method == base_test_classes.RestMethodAll.POST:
+        if params['rest_method'] == base_test_classes.RestMethodAll.POST:
             assert_util.is_publication_valid_and_complete(map)
 
         with app.app_context():
