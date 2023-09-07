@@ -44,6 +44,7 @@ IS_MAP_COMPLETE_AND_CONSISTENT = [
     Action(internal.mandatory_keys_in_primary_db_schema_of_actor, {}),
     Action(internal.other_keys_not_in_primary_db_schema_of_actor, {}),
     Action(internal.mandatory_keys_in_all_sources_of_actor, {}),
+    Action(internal.consistent_internal_map_layers, {}),
     Action(rest.is_complete_in_rest, {}),
     Action(rest.mandatory_keys_in_rest, {}),
 ]
