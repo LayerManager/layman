@@ -15,7 +15,7 @@ from layman import settings
 from layman.common.micka import util as common_util
 from layman.map.rest_workspace_test import wait_till_ready
 from test_tools.mock.micka import run
-from .csw import get_map_info, delete_map
+from .csw import get_map_info, delete_map, map_layers_to_operates_on_layers
 
 MICKA_PORT = 8020
 
@@ -184,3 +184,48 @@ def test_public_metadata(provide_map):
     response = requests.get(micka_url, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
     response.raise_for_status()
     assert muuid in response.text, f"Metadata record {muuid} is not public!"
+
+
+LAYER1_WS1_IDX0_EXISTING = {
+    'name': 'layer1',
+    'workspace': 'workspace1',
+    'index': 0,
+    'uuid': '9cfa8262-9910-4c4c-89a8-c665bcd5b88f',
+}
+LAYER2_WS1_IDX0_NON_EXISTENT = {
+    'name': 'layer2',
+    'workspace': 'workspace1',
+    'index': 0,
+    'uuid': None,
+}
+LAYER3_WS2_IDX2_EXISTING = {
+    'name': 'layer3',
+    'workspace': 'workspace2',
+    'index': 2,
+    'uuid': '36a9dec6-1a99-4ea4-88ef-bd88ba715b4c',
+}
+LAYER1_WS1_IDX2_EXISTING = {
+    'name': 'layer1',
+    'workspace': 'workspace1',
+    'index': 2,
+    'uuid': '9cfa8262-9910-4c4c-89a8-c665bcd5b88f',
+}
+
+
+@pytest.mark.parametrize('map_layers, exp_result', [
+    pytest.param([], [], id='empty_list'),
+    pytest.param([LAYER1_WS1_IDX0_EXISTING], [LAYER1_WS1_IDX0_EXISTING], id='one_existing_layer'),
+    pytest.param([LAYER2_WS1_IDX0_NON_EXISTENT], [], id='one_non_existent_layer'),
+    pytest.param([LAYER1_WS1_IDX0_EXISTING, LAYER3_WS2_IDX2_EXISTING],
+                 [LAYER1_WS1_IDX0_EXISTING, LAYER3_WS2_IDX2_EXISTING], id='two_existing_layers'),
+    pytest.param([LAYER1_WS1_IDX0_EXISTING, LAYER1_WS1_IDX2_EXISTING],
+                 [LAYER1_WS1_IDX0_EXISTING], id='one_existing_layer_twice'),
+    pytest.param([LAYER1_WS1_IDX2_EXISTING, LAYER3_WS2_IDX2_EXISTING],
+                 [LAYER1_WS1_IDX2_EXISTING, LAYER3_WS2_IDX2_EXISTING], id='two_existing_layers_at_same_index'),
+    pytest.param(
+        [LAYER1_WS1_IDX0_EXISTING, LAYER2_WS1_IDX0_NON_EXISTENT, LAYER3_WS2_IDX2_EXISTING, LAYER1_WS1_IDX2_EXISTING],
+        [LAYER1_WS1_IDX0_EXISTING, LAYER3_WS2_IDX2_EXISTING], id='complex'),
+])
+def test_map_layers_to_operates_on_layers(map_layers, exp_result):
+    result = map_layers_to_operates_on_layers(map_layers)
+    assert result == exp_result

@@ -1,6 +1,5 @@
 from datetime import datetime, date
 from functools import partial
-import re
 import os
 import traceback
 from xml.sax.saxutils import escape
@@ -9,16 +8,15 @@ from requests.exceptions import HTTPError, ConnectionError
 from flask import current_app
 
 import crs as crs_def
-from layman import common, settings
+from layman import common, settings, util as layman_util
 from layman.common import language as common_language, empty_method, empty_method_returns_none, bbox as bbox_util
 from layman.common.filesystem.uuid import get_publication_uuid_file
 from layman.common.micka import util as common_util, requests as micka_requests
+from layman.common.micka.util import get_metadata_uuid
+from layman.layer import LAYER_TYPE
 from layman.map import MAP_TYPE
 from layman.map.filesystem.uuid import get_map_uuid
-from layman.map.filesystem.input_file import get_map_json, unquote_urls
-from layman.layer import LAYER_TYPE
-from layman.layer.geoserver.util import get_gs_proxy_base_url
-from layman.util import url_for, WORKSPACE_NAME_ONLY_PATTERN, get_publication_info
+from layman.util import url_for, get_publication_info
 
 get_publication_uuid = empty_method_returns_none
 post_map = empty_method
@@ -106,40 +104,30 @@ def csw_insert(workspace, mapname, actor_name):
     return muuid
 
 
-def map_json_to_operates_on(map_json, operates_on_muuids_filter=None, editor=None):
+def map_layers_to_operates_on_layers(map_layers):
+    used_uuids = set()
+    operates_on = []
+    for map_layer in map_layers:
+        if not map_layer['uuid']:
+            continue
+        if map_layer['uuid'] not in used_uuids:
+            operates_on.append(map_layer)
+            used_uuids.add(map_layer['uuid'])
+    return operates_on
+
+
+def map_to_operates_on(workspace, mapname, operates_on_muuids_filter=None, editor=None):
     # Either caller know muuids or wants filter by editor, never both at the same time
     assert operates_on_muuids_filter is None or editor is None
-    unquote_urls(map_json)
-    gs_url = get_gs_proxy_base_url()
-    gs_url = gs_url if gs_url.endswith('/') else f"{gs_url}/"
-    gs_wms_url_pattern = r'^' + re.escape(gs_url) + r'(' + WORKSPACE_NAME_ONLY_PATTERN + r')' + \
-                         settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX + r'/(?:ows|wms|wfs).*$'
-    layman_layer_names = []
-    for map_layer in map_json['layers']:
-        layer_url = map_layer.get('url', None)
-        if not layer_url:
-            continue
-        # print(f"layer_url={layer_url}")
-        match = re.match(gs_wms_url_pattern, layer_url)
-        if not match:
-            continue
-        layer_workspace = match.group(1)
-        if not layer_workspace:
-            continue
-        # print(f"layer_workspace={layer_workspace}")
-        layer_names = [
-            n for n in map_layer.get('params', {}).get('LAYERS', '').split(',')
-            if len(n) > 0
-        ]
-        if not layer_names:
-            continue
-        for layername in layer_names:
-            layman_layer_names.append((layer_workspace, layername))
+    publ_info = layman_util.get_publication_info(workspace, MAP_TYPE, mapname, context={'keys': ['map_layers']})
+    operates_on_layers = map_layers_to_operates_on_layers(publ_info['_map_layers'])
+
     operates_on = []
     csw_url = settings.CSW_PROXY_URL
-    for (layer_workspace, layername) in layman_layer_names:
-        layer_md_info = get_publication_info(layer_workspace, LAYER_TYPE, layername, context={'keys': ['metadata', ], })
-        layer_muuid = layer_md_info.get('metadata', {}).get('identifier')
+    for internal_layer in operates_on_layers:
+        layer_workspace = internal_layer['workspace']
+        layername = internal_layer['name']
+        layer_muuid = get_metadata_uuid(internal_layer['uuid'])
         if operates_on_muuids_filter is not None:
             if layer_muuid not in operates_on_muuids_filter:
                 continue
@@ -163,8 +151,7 @@ def get_template_path_and_values(workspace, mapname, http_method=None, actor_nam
     uuid_file_path = get_publication_uuid_file(MAP_TYPE, workspace, mapname)
     publ_datetime = datetime.fromtimestamp(os.path.getmtime(uuid_file_path))
     revision_date = datetime.now()
-    map_json = get_map_json(workspace, mapname)
-    operates_on = map_json_to_operates_on(map_json, editor=actor_name)
+    operates_on = map_to_operates_on(workspace, mapname, editor=actor_name)
     publ_info = get_publication_info(workspace, MAP_TYPE, mapname, context={
         'keys': ['title', 'native_bounding_box', 'description', 'native_crs'],
     })
