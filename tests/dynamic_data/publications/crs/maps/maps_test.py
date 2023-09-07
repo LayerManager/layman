@@ -61,8 +61,11 @@ class TestMap(base_test.TestSingleRestPublication):
                                          type=tests.EnumTestTypes.MANDATORY,
                                          ) for key, params in TEST_CASES.items()]
 
+    layer_uuids = {}
+
     def before_class(self):
-        self.post_publication(Publication(self.workspace, process_client.LAYER_TYPE, LAYER_FOR_MAPS), scope='class')
+        resp = self.post_publication(Publication(self.workspace, process_client.LAYER_TYPE, LAYER_FOR_MAPS), scope='class')
+        self.layer_uuids[LAYER_FOR_MAPS] = resp['uuid']
 
     def test_input_crs(self, map, key, params, rest_method):
         """Parametrized using pytest_generate_tests"""
@@ -80,6 +83,12 @@ class TestMap(base_test.TestSingleRestPublication):
             'description': 'Map generated for internal layers',
             'native_crs': map_crs,
             'title': map.name,
+            '_map_layers': [{
+                'name': LAYER_FOR_MAPS,
+                'workspace': self.workspace,
+                'index': 1,
+                'uuid': self.layer_uuids[LAYER_FOR_MAPS],
+            }],
             **params.get(KEY_INFO_VALUES, {}).get('exp_publication_detail', {})
         }
         asserts_publ.internal.correct_values_in_detail(map.workspace, map.type, map.name,
