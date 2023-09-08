@@ -168,17 +168,15 @@ select p.id as id_publication,
         where r.id_publication = p.id
           and r.type = 'write') can_write_users,
        (select json_agg(json_build_object(
-           'name', ml.layer_name,
-           'workspace', ml.layer_workspace,
-           'index', ml.layer_index,
-           'uuid', lr.uuid
-           ) order by ml.layer_index, ml.layer_workspace, ml.layer_name)
-        from {DB_SCHEMA}.map_layer ml
-            left join {DB_SCHEMA}.workspaces lr_ws
-                on ml.layer_workspace = lr_ws.name
-            left join {DB_SCHEMA}.publications lr
-                on ml.layer_name = lr.name
-                        and lr_ws.id = lr.id_workspace
+                   'name', ml.layer_name,
+                   'workspace', ml.layer_workspace,
+                   'index', ml.layer_index,
+                   'uuid', lr.uuid
+                   ) order by ml.layer_index, ml.layer_workspace, ml.layer_name)
+        from {DB_SCHEMA}.map_layer ml left join
+             {DB_SCHEMA}.workspaces lr_ws on ml.layer_workspace = lr_ws.name left join
+             {DB_SCHEMA}.publications lr on ml.layer_name = lr.name
+                                        and lr_ws.id = lr.id_workspace
         where ml.id_map = p.id) map_layers,
        (select json_agg(json_build_object(
            'name', map_name,
