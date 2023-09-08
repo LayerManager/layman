@@ -1,8 +1,10 @@
 import os
 from layman import app
+from layman.common import REQUEST_METHOD_POST
 from layman.util import get_publication_info
 from test_tools import process_client
 from tests import EnumTestTypes, Publication
+from tests.asserts.final import publication as asserts_publ
 from tests.asserts.final.publication import util as assert_util
 from tests.dynamic_data import base_test, base_test_classes
 
@@ -94,6 +96,8 @@ class TestPublication(base_test.TestSingleRestPublication):
         rest_method(map, args=rest_args)
         if rest_method == self.post_publication:  # pylint: disable=W0143
             assert_util.is_publication_valid_and_complete(map)
+            asserts_publ.metadata.correct_values_in_metadata(map.workspace, map.type, map.name,
+                                                             http_method=REQUEST_METHOD_POST)
 
         with app.app_context():
             publ_info = get_publication_info(map.workspace, map.type, map.name,
