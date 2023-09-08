@@ -726,7 +726,8 @@ def test_map_composed_from_local_layers(client):
 
     with app.app_context():
         # assert metadata file is the same as filled template except for UUID and dates
-        template_path, prop_values = csw.get_template_path_and_values(workspace, mapname, http_method='post')
+        template_path, prop_values = csw.get_template_path_and_values(workspace, mapname, http_method='post',
+                                                                      actor_name=settings.ANONYM_USER)
         xml_file_object = micka_common_util.fill_xml_template_as_pretty_file_object(template_path, prop_values,
                                                                                     csw.METADATA_PROPERTIES)
         expected_path = 'src/layman/map/rest_test_filled_template.xml'
