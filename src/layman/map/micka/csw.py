@@ -128,16 +128,16 @@ def map_to_operates_on(workspace, mapname, operates_on_muuids_filter=None, edito
         layer_workspace = internal_layer['workspace']
         layername = internal_layer['name']
         layer_muuid = get_metadata_uuid(internal_layer['uuid'])
+        context = {'keys': ['title']}
         if operates_on_muuids_filter is not None:
             if layer_muuid not in operates_on_muuids_filter:
                 continue
-            layer_wms_info = get_publication_info(layer_workspace, LAYER_TYPE, layername, context={'keys': ['wms', ], })
         else:
-            layer_wms_info = get_publication_info(layer_workspace, LAYER_TYPE, layername, context={'keys': ['wfs', ],
-                                                                                                   'actor_name': editor, })
-            if not (layer_muuid and layer_wms_info):
-                continue
-        layer_title = layer_wms_info['title']
+            context['actor_name'] = editor
+        publ_info = get_publication_info(layer_workspace, LAYER_TYPE, layername, context=context)
+        if not (layer_muuid and publ_info):
+            continue
+        layer_title = publ_info['title']
         layer_csw_url = f"{csw_url}?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID={layer_muuid}#_{layer_muuid}"
         operates_on.append({
             'xlink:title': layer_title,
