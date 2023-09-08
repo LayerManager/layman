@@ -117,8 +117,8 @@ def map_layers_to_operates_on_layers(map_layers):
 
 
 def map_to_operates_on(workspace, mapname, operates_on_muuids_filter=None, editor=None):
-    # Either caller know muuids or wants filter by editor, never both at the same time
-    assert operates_on_muuids_filter is None or editor is None
+    # Either caller know muuids or wants filter by editor, never both at the same time, at least one must be used
+    assert (operates_on_muuids_filter is None) != (editor is None)
     publ_info = layman_util.get_publication_info(workspace, MAP_TYPE, mapname, context={'keys': ['map_layers']})
     operates_on_layers = map_layers_to_operates_on_layers(publ_info['_map_layers'])
 
@@ -146,7 +146,7 @@ def map_to_operates_on(workspace, mapname, operates_on_muuids_filter=None, edito
     return operates_on
 
 
-def get_template_path_and_values(workspace, mapname, http_method=None, actor_name=None):
+def get_template_path_and_values(workspace, mapname, *, http_method=None, actor_name):
     assert http_method in [common.REQUEST_METHOD_POST, common.REQUEST_METHOD_PATCH]
     uuid_file_path = get_publication_uuid_file(MAP_TYPE, workspace, mapname)
     publ_datetime = datetime.fromtimestamp(os.path.getmtime(uuid_file_path))
