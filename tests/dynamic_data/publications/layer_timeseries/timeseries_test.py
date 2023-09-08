@@ -369,7 +369,7 @@ class TestLayer(base_test.TestSingleRestPublication):
             else:
                 raise NotImplementedError(f"Unknown rest_method: {rest_method}")
 
-            asserts_publ.metadata.correct_values_in_layer_metadata(layer.workspace, layer.type, layer.name, http_method=http_method)
+            asserts_publ.metadata.correct_values_in_metadata(layer.workspace, layer.type, layer.name, http_method=http_method)
 
             process_client.patch_workspace_layer(layer.workspace,
                                                  layer.name,
