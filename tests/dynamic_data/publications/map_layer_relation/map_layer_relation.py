@@ -92,7 +92,7 @@ class TestPublication(base_test.TestSingleRestPublication):
         self.assert_exp_map_layers(publ_info, params['exp_map_layers_before_rest_method'])
 
         rest_method(map, args=rest_args)
-        if params['rest_method'] == base_test_classes.RestMethodAll.POST:
+        if rest_method == self.post_publication:  # pylint: disable=W0143
             assert_util.is_publication_valid_and_complete(map)
 
         with app.app_context():
