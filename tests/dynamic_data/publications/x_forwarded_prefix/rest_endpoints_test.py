@@ -2,7 +2,7 @@ from layman import settings
 from tests import EnumTestTypes
 from tests.dynamic_data import base_test, base_test_classes
 from tests.dynamic_data.publications import common_publications
-from ... import Publication
+from tests import Publication
 
 pytest_generate_tests = base_test.pytest_generate_tests
 
