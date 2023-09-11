@@ -27,9 +27,9 @@ def get_wfs_capabilities(workspace=None, service_endpoint='wfs', headers=None):
     return wfs_direct(wfs_url, headers=headers)
 
 
-def get_wms_capabilities(workspace=None, service_endpoint='ows', headers=None):
+def get_wms_capabilities(workspace=None, service_endpoint='ows', headers=None, version=None):
     wms_url = get_url(workspace, service_endpoint)
-    return wms_direct(wms_url, headers=headers)
+    return wms_direct(wms_url, headers=headers, version=version)
 
 
 def get_crs_urn(crs):
