@@ -180,6 +180,21 @@ select p.id as id_publication,
                 on ml.layer_name = lr.name
                         and lr_ws.id = lr.id_workspace
         where ml.id_map = p.id) map_layers,
+       (select json_agg(json_build_object(
+           'name', map_name,
+           'workspace', map_ws_name
+           ) order by map_ws_name, map_name)
+        from (
+                 select distinct map.name    map_name,
+                                 map_ws.name map_ws_name
+                 from {DB_SCHEMA}.map_layer ml left join
+                     {DB_SCHEMA}.publications map on ml.id_map = map.id inner join
+                     {DB_SCHEMA}.workspaces map_ws on map.id_workspace = map_ws.id
+                 where ml.layer_workspace = w.name
+                   and ml.layer_name = p.name
+                 order by map_ws_name, map_name
+             ) tmp_layer_maps
+           ) layer_maps,
        p.wfs_wms_status,
        count(*) OVER() AS full_count
 from {DB_SCHEMA}.workspaces w inner join
@@ -261,10 +276,11 @@ from {DB_SCHEMA}.workspaces w inner join
                                    'access_rights': {'read': can_read_users.split(','),
                                                      'write': can_write_users.split(',')},
                                    '_map_layers': map_layers or [],
+                                   '_layer_maps': layer_maps or [],
                                    '_wfs_wms_status': settings.EnumWfsWmsStatus(wfs_wms_status) if wfs_wms_status else None,
                                    }
              for id_publication, workspace_name, publication_type, publication_name, title, uuid, geodata_type, style_type, image_mosaic, updated_at, xmin, ymin, xmax, ymax,
-             srid, external_table_uri, can_read_users, can_write_users, map_layers, wfs_wms_status, _
+             srid, external_table_uri, can_read_users, can_write_users, map_layers, layer_maps, wfs_wms_status, _
              in values}
 
     infos = {key: {**value,
