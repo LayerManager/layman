@@ -22,9 +22,9 @@ def get_wfs_url(workspace, service_endpoint='wfs'):
     return get_url(workspace, service_endpoint)
 
 
-def get_wfs_capabilities(workspace=None, service_endpoint='wfs', headers=None):
+def get_wfs_capabilities(workspace=None, service_endpoint='wfs', headers=None, version=None):
     wfs_url = get_url(workspace, service_endpoint)
-    return wfs_direct(wfs_url, headers=headers)
+    return wfs_direct(wfs_url, headers=headers, version=version)
 
 
 def get_wms_capabilities(workspace=None, service_endpoint='ows', headers=None, version=None):
