@@ -1,6 +1,6 @@
 import pytest
 from layman import app
-from layman.publication_relation import util as pr_util
+from layman.util import get_publication_info
 from ... import static_data as data
 from ..data import ensure_all_publications
 
@@ -16,5 +16,8 @@ def test_find_maps_containing_layer():
                          if publ_type == data.MAP_TYPE and (l_workspace, l_type, layer) in values[data.TEST_DATA].get('layers', [])}
 
         with app.app_context():
-            result_maps = pr_util.find_maps_containing_layer(l_workspace, layer)
+            result_maps = {
+                (mo['workspace'], mo['name'])
+                for mo in get_publication_info(l_workspace, l_type, layer, context={'keys': ['layer_maps']})['_layer_maps']
+            }
         assert result_maps == expected_maps
