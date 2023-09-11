@@ -53,7 +53,8 @@ def expected_values_in_micka_metadata(workspace, publ_type, name, expected_value
                                             )
 
 
-def correct_values_in_metadata(workspace, publ_type, name, http_method):
+def correct_values_in_metadata(workspace, publ_type, name, http_method, *, exp_values=None):
+    exp_values = exp_values or {}
     md_props = {
         process_client.LAYER_TYPE: LAYER_METADATA_PROPERTIES,
         process_client.MAP_TYPE: MAP_METADATA_PROPERTIES,
@@ -74,4 +75,6 @@ def correct_values_in_metadata(workspace, publ_type, name, http_method):
     exp_metadata = {key: value for key, value in md_values.items() if key in md_props}
     if publ_type == process_client.LAYER_TYPE:
         exp_metadata['reference_system'] = [int(crs.split(':')[1]) for crs in exp_metadata['reference_system']]
+    for key, value in exp_values.items():
+        assert exp_metadata[key] == value, f"Template value differ from expected value, key={key}"
     expected_values_in_micka_metadata(workspace, publ_type, name, exp_metadata)
