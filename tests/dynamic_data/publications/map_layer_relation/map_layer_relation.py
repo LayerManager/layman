@@ -13,6 +13,10 @@ pytest_generate_tests = base_test.pytest_generate_tests
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
+WORKSPACE = 'layer_map_relation_workspace'
+
+LAYER_HRANICE = Publication(WORKSPACE, process_client.LAYER_TYPE, 'hranice')
+
 TEST_CASES = {
     'post': {
         'rest_method': base_test_classes.RestMethodAll.POST,
@@ -27,9 +31,9 @@ TEST_CASES = {
         'exp_after_rest_method': {
             'map_layers': {
                 # workspace, layer name, layer index, exists?
-                ('layer_map_relation_workspace', 'hranice', 1, True),
-                ('layer_map_relation_workspace', 'mista', 2, False),
-                ('layer_map_relation_workspace', 'hranice', 3, True),
+                (WORKSPACE, 'hranice', 1, True),
+                (WORKSPACE, 'mista', 2, False),
+                (WORKSPACE, 'hranice', 3, True),
             },
             'operates_on': ['hranice'],
         },
@@ -42,9 +46,9 @@ TEST_CASES = {
         },
         'exp_before_rest_method': {
             'map_layers': {
-                ('layer_map_relation_workspace', 'hranice', 1, True),
-                ('layer_map_relation_workspace', 'mista', 2, False),
-                ('layer_map_relation_workspace', 'hranice', 3, True),
+                (WORKSPACE, 'hranice', 1, True),
+                (WORKSPACE, 'mista', 2, False),
+                (WORKSPACE, 'hranice', 3, True),
             },
             'operates_on': ['hranice'],
         },
@@ -57,7 +61,7 @@ TEST_CASES = {
 
 
 class TestPublication(base_test.TestSingleRestPublication):
-    workspace = 'layer_map_relation_workspace'
+    workspace = WORKSPACE
     publication_type = process_client.MAP_TYPE
 
     rest_parametrization = []
@@ -73,8 +77,7 @@ class TestPublication(base_test.TestSingleRestPublication):
     layer_uuids = {}
 
     def before_class(self):
-        layer_name = 'hranice'
-        resp = self.post_publication(Publication(self.workspace, process_client.LAYER_TYPE, layer_name), args={
+        resp = self.post_publication(LAYER_HRANICE, args={
             'file_paths': [
                 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.cpg',
                 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.dbf',
@@ -83,9 +86,12 @@ class TestPublication(base_test.TestSingleRestPublication):
                 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.shx',
             ],
         }, scope='class')
-        self.layer_uuids[layer_name] = resp['uuid']
+        self.layer_uuids[LAYER_HRANICE.name] = resp['uuid']
 
-    def assert_exp_map_layers(self, map, publ_info, exp_map_layers, exp_operates_on):
+    def assert_exp_map_layers(self, map, exp_map_layers, exp_operates_on):
+        with app.app_context():
+            publ_info = get_publication_info(map.workspace, map.type, map.name,
+                                             context={'keys': ['map_layers']})
         if exp_map_layers is None:
             assert not publ_info
             assert exp_operates_on is None
@@ -112,19 +118,29 @@ class TestPublication(base_test.TestSingleRestPublication):
                     'operates_on': exp_operates_on,
                 })
 
-    def test_publication(self, map, rest_method, rest_args, params):
+    @staticmethod
+    def assert_exp_layer_maps(layer, map_operates_on_tuples):
+        exp_layer_maps = sorted([
+            (map.workspace, map.name)
+            for map, operates_on in map_operates_on_tuples
+            if layer.name in operates_on
+        ])
         with app.app_context():
-            publ_info = get_publication_info(map.workspace, map.type, map.name,
-                                             context={'keys': ['map_layers']})
-        self.assert_exp_map_layers(map, publ_info, params['exp_before_rest_method']['map_layers'],
-                                   params['exp_before_rest_method']['operates_on'])
+            found_layer_maps = [
+                (m['workspace'], m['name'])
+                for m in get_publication_info(*layer, context={'keys': ['layer_maps']})['_layer_maps']
+            ]
+        assert found_layer_maps == exp_layer_maps
+
+    def test_publication(self, map, rest_method, rest_args, params):
+        exp = params['exp_before_rest_method']
+        self.assert_exp_map_layers(map, exp['map_layers'], exp['operates_on'])
+        self.assert_exp_layer_maps(LAYER_HRANICE, [(map, exp['operates_on'] or [])])
 
         rest_method(map, args=rest_args)
         if rest_method == self.post_publication:  # pylint: disable=W0143
             assert_util.is_publication_valid_and_complete(map)
 
-        with app.app_context():
-            publ_info = get_publication_info(map.workspace, map.type, map.name,
-                                             context={'keys': ['map_layers']})
-        self.assert_exp_map_layers(map, publ_info, params['exp_after_rest_method']['map_layers'],
-                                   params['exp_after_rest_method']['operates_on'])
+        exp = params['exp_after_rest_method']
+        self.assert_exp_map_layers(map, exp['map_layers'], exp['operates_on'])
+        self.assert_exp_layer_maps(LAYER_HRANICE, [(map, exp['operates_on'] or [])])
