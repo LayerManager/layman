@@ -8,8 +8,9 @@ from .util import url_for
 
 
 def get_url(workspace, service_endpoint):
+    subpath = workspace + '/' + service_endpoint if workspace else service_endpoint
     with app.app_context():
-        wfs_url = url_for('geoserver_proxy_bp.proxy', subpath=workspace + '/' + service_endpoint)
+        wfs_url = url_for('geoserver_proxy_bp.proxy', subpath=subpath)
     return wfs_url
 
 
