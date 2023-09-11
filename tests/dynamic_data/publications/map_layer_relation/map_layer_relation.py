@@ -20,12 +20,18 @@ TEST_CASES = {
             'file_paths': [os.path.join(DIRECTORY, 'internal_wms_and_wfs.json')],
         },
         'post_before_test_args': {},
-        'exp_map_layers_before_rest_method': None,
-        'exp_map_layers_after_rest_method': {
-            # workspace, layer name, layer index, exists?
-            ('layer_map_relation_workspace', 'hranice', 1, True),
-            ('layer_map_relation_workspace', 'mista', 2, False),
-            ('layer_map_relation_workspace', 'hranice', 3, True),
+        'exp_before_rest_method': {
+            'map_layers': None,
+            'operates_on': None,
+        },
+        'exp_after_rest_method': {
+            'map_layers': {
+                # workspace, layer name, layer index, exists?
+                ('layer_map_relation_workspace', 'hranice', 1, True),
+                ('layer_map_relation_workspace', 'mista', 2, False),
+                ('layer_map_relation_workspace', 'hranice', 3, True),
+            },
+            'operates_on': ['hranice'],
         },
     },
     'delete': {
@@ -34,12 +40,18 @@ TEST_CASES = {
         'post_before_test_args': {
             'file_paths': [os.path.join(DIRECTORY, 'internal_wms_and_wfs.json')],
         },
-        'exp_map_layers_before_rest_method': {
-            ('layer_map_relation_workspace', 'hranice', 1, True),
-            ('layer_map_relation_workspace', 'mista', 2, False),
-            ('layer_map_relation_workspace', 'hranice', 3, True),
+        'exp_before_rest_method': {
+            'map_layers': {
+                ('layer_map_relation_workspace', 'hranice', 1, True),
+                ('layer_map_relation_workspace', 'mista', 2, False),
+                ('layer_map_relation_workspace', 'hranice', 3, True),
+            },
+            'operates_on': ['hranice'],
         },
-        'exp_map_layers_after_rest_method': None,
+        'exp_after_rest_method': {
+            'map_layers': None,
+            'operates_on': None,
+        },
     },
 }
 
@@ -73,9 +85,10 @@ class TestPublication(base_test.TestSingleRestPublication):
         }, scope='class')
         self.layer_uuids[layer_name] = resp['uuid']
 
-    def assert_exp_map_layers(self, publ_info, exp_map_layers):
+    def assert_exp_map_layers(self, map, publ_info, exp_map_layers, exp_operates_on):
         if exp_map_layers is None:
             assert not publ_info
+            assert exp_operates_on is None
         else:
             found_map_layers = {
                 (ml['workspace'], ml['name'], ml['index'], ml['uuid'])
@@ -87,19 +100,31 @@ class TestPublication(base_test.TestSingleRestPublication):
             }
             assert found_map_layers == exp_map_layers
 
+            exp_operates_on = [
+                {
+                    "xlink:href": f"http://localhost:3080/csw?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID=m-{self.layer_uuids[layer_name]}#_m-{self.layer_uuids[layer_name]}",
+                    "xlink:title": layer_name,
+                }
+                for layer_name in exp_operates_on
+            ]
+            asserts_publ.metadata.correct_values_in_metadata(
+                map.workspace, map.type, map.name, http_method=REQUEST_METHOD_POST, exp_values={
+                    'operates_on': exp_operates_on,
+                })
+
     def test_publication(self, map, rest_method, rest_args, params):
         with app.app_context():
             publ_info = get_publication_info(map.workspace, map.type, map.name,
                                              context={'keys': ['map_layers']})
-        self.assert_exp_map_layers(publ_info, params['exp_map_layers_before_rest_method'])
+        self.assert_exp_map_layers(map, publ_info, params['exp_before_rest_method']['map_layers'],
+                                   params['exp_before_rest_method']['operates_on'])
 
         rest_method(map, args=rest_args)
         if rest_method == self.post_publication:  # pylint: disable=W0143
             assert_util.is_publication_valid_and_complete(map)
-            asserts_publ.metadata.correct_values_in_metadata(map.workspace, map.type, map.name,
-                                                             http_method=REQUEST_METHOD_POST)
 
         with app.app_context():
             publ_info = get_publication_info(map.workspace, map.type, map.name,
                                              context={'keys': ['map_layers']})
-        self.assert_exp_map_layers(publ_info, params['exp_map_layers_after_rest_method'])
+        self.assert_exp_map_layers(map, publ_info, params['exp_after_rest_method']['map_layers'],
+                                   params['exp_after_rest_method']['operates_on'])
