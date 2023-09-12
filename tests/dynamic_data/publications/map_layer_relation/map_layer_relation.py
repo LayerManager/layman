@@ -1,6 +1,8 @@
 import os
+import pytest
+
 from layman import app
-from layman.common import REQUEST_METHOD_POST
+from layman.common import REQUEST_METHOD_POST, REQUEST_METHOD_PATCH
 from layman.util import get_publication_info
 from test_tools import process_client
 from tests import EnumTestTypes, Publication
@@ -14,8 +16,10 @@ pytest_generate_tests = base_test.pytest_generate_tests
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
 WORKSPACE = 'layer_map_relation_workspace'
+PRIVATE_WORKSPACE = 'layer_map_relation_user'
 
 LAYER_HRANICE = Publication(WORKSPACE, process_client.LAYER_TYPE, 'hranice')
+LAYER_HRANICE_PRIVATE = Publication(PRIVATE_WORKSPACE, process_client.LAYER_TYPE, 'hranice_private')
 LAYER_MISTA_NON_EXISTENT = Publication(WORKSPACE, process_client.LAYER_TYPE, 'mista')
 MAP_HRANICE = Publication(WORKSPACE, process_client.MAP_TYPE, 'map_hranice')
 MAP_HRANICE_OPERATES_ON = [LAYER_HRANICE]
@@ -60,14 +64,34 @@ TEST_CASES = {
             'operates_on': None,
         },
     },
+    'patch_map_with_unauthorized_layer': {
+        'post_before_test_args': {
+            'file_paths': [os.path.join(DIRECTORY, 'internal_hranice_private.json')],
+        },
+        'exp_before_rest_method': {
+            'map_layers': [(LAYER_HRANICE_PRIVATE, 1, True)],
+            'operates_on': [],
+        },
+        'rest_method': base_test_classes.RestMethodAll.PATCH,
+        'rest_args': {
+            'actor_name': PRIVATE_WORKSPACE,
+        },
+        'exp_after_rest_method': {
+            'map_layers': [(LAYER_HRANICE_PRIVATE, 1, True)],
+            'operates_on': [LAYER_HRANICE_PRIVATE],
+        },
+    },
 }
 
 
+@pytest.mark.usefixtures('oauth2_provider_mock')
 class TestPublication(base_test.TestSingleRestPublication):
     workspace = WORKSPACE
     publication_type = process_client.MAP_TYPE
 
     rest_parametrization = []
+
+    usernames_to_reserve = [PRIVATE_WORKSPACE]
 
     test_cases = [base_test.TestCaseType(key=key,
                                          params=params,
@@ -88,11 +112,23 @@ class TestPublication(base_test.TestSingleRestPublication):
             ],
         }, scope='class')
 
+        self.post_publication(LAYER_HRANICE_PRIVATE, args={
+            'file_paths': [
+                'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.cpg',
+                'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.dbf',
+                'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.prj',
+                'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.shp',
+                'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.shx',
+            ],
+            'access_rights': {'read': PRIVATE_WORKSPACE, 'write': PRIVATE_WORKSPACE},
+            'actor_name': PRIVATE_WORKSPACE,
+        }, scope='class')
+
         self.post_publication(MAP_HRANICE, args={
             'file_paths': [os.path.join(DIRECTORY, 'internal_hranice.json')],
         }, scope='class')
 
-    def assert_exp_map_layers(self, map, exp_map_layers, exp_operates_on):
+    def assert_exp_map_layers(self, map, exp_map_layers, exp_operates_on, http_method, actor_name):
         with app.app_context():
             publ_info = get_publication_info(map.workspace, map.type, map.name,
                                              context={'keys': ['map_layers']})
@@ -118,7 +154,7 @@ class TestPublication(base_test.TestSingleRestPublication):
                 for layer in exp_operates_on
             ]
             asserts_publ.metadata.correct_values_in_metadata(
-                map.workspace, map.type, map.name, http_method=REQUEST_METHOD_POST, exp_values={
+                map.workspace, map.type, map.name, http_method=http_method, actor_name=actor_name, exp_values={
                     'operates_on': exp_operates_on,
                 })
 
@@ -138,18 +174,21 @@ class TestPublication(base_test.TestSingleRestPublication):
 
     def test_publication(self, map, rest_method, rest_args, params):
         exp = params['exp_before_rest_method']
-        self.assert_exp_map_layers(map, exp['map_layers'], exp['operates_on'])
+        self.assert_exp_map_layers(map, exp['map_layers'], exp['operates_on'], http_method=REQUEST_METHOD_POST,
+                                   actor_name=params['post_before_test_args'].get('actor_name'))
         self.assert_exp_layer_maps(LAYER_HRANICE, [
             (MAP_HRANICE, MAP_HRANICE_OPERATES_ON),
             (map, exp['operates_on'] or []),
         ])
 
         rest_method(map, args=rest_args)
-        if rest_method == self.post_publication:  # pylint: disable=W0143
+        if rest_method in [self.post_publication, self.patch_publication]:
             assert_util.is_publication_valid_and_complete(map)
 
         exp = params['exp_after_rest_method']
-        self.assert_exp_map_layers(map, exp['map_layers'], exp['operates_on'])
+        http_method = REQUEST_METHOD_PATCH if rest_method == self.patch_publication else REQUEST_METHOD_POST  # pylint: disable=W0143
+        self.assert_exp_map_layers(map, exp['map_layers'], exp['operates_on'], http_method=http_method,
+                                   actor_name=rest_args.get('actor_name'))
         self.assert_exp_layer_maps(LAYER_HRANICE, [
             (MAP_HRANICE, MAP_HRANICE_OPERATES_ON),
             (map, exp['operates_on'] or []),

@@ -69,6 +69,7 @@ def oauth2_provider_mock():
                 'dynamic_test_workspace_geoserver_proxy_user_2': None,
                 'dynamic_test_layer_patch_without_data_user': None,
                 'test_fix_issuer_id_user': None,
+                'layer_map_relation_user': None,
             },
         },
         'host': '0.0.0.0',

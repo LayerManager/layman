@@ -29,6 +29,7 @@ headers_sld = {
 }
 
 
+@pytest.mark.timeout(600)
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_LAYERS)
 @pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman')
 def test_info(workspace, publ_type, publication):
