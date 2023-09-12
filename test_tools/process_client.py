@@ -172,6 +172,7 @@ def patch_workspace_publication(publication_type,
                                 file_paths=None,
                                 external_table_uri=None,
                                 headers=None,
+                                actor_name=None,
                                 access_rights=None,
                                 title=None,
                                 style_file=None,
@@ -189,6 +190,8 @@ def patch_workspace_publication(publication_type,
                                 skip_asserts=False,
                                 ):
     headers = headers or {}
+    if actor_name:
+        assert TOKEN_HEADER not in headers
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
 
     if not skip_asserts:
@@ -209,6 +212,9 @@ def patch_workspace_publication(publication_type,
 
         # Compress settings can be used only with compress option
         assert not compress_settings or compress
+
+    if actor_name and actor_name != settings.ANONYM_USER:
+        headers.update(get_authz_headers(actor_name))
 
     file_paths = [] if file_paths is None and not map_layers else file_paths
 
@@ -325,6 +331,7 @@ def publish_workspace_publication(publication_type,
                                   file_paths=None,
                                   external_table_uri=None,
                                   headers=None,
+                                  actor_name=None,
                                   access_rights=None,
                                   title=None,
                                   style_file=None,
@@ -344,6 +351,8 @@ def publish_workspace_publication(publication_type,
                                   ):
     title = title or name
     headers = headers or {}
+    if actor_name:
+        assert TOKEN_HEADER not in headers
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
 
     assert not map_layers or not file_paths
@@ -363,6 +372,9 @@ def publish_workspace_publication(publication_type,
     assert not compress_settings or compress
 
     assert not (time_regex and publication_type == MAP_TYPE)
+
+    if actor_name and actor_name != settings.ANONYM_USER:
+        headers.update(get_authz_headers(actor_name))
 
     with app.app_context():
         r_url = url_for(publication_type_def.post_workspace_publication_url, workspace=workspace)
@@ -557,7 +569,14 @@ assert_workspace_layers = partial(assert_workspace_publications, LAYER_TYPE)
 assert_workspace_maps = partial(assert_workspace_publications, MAP_TYPE)
 
 
-def get_workspace_publication_metadata_comparison(publication_type, workspace, name, headers=None):
+def get_workspace_publication_metadata_comparison(publication_type, workspace, name, headers=None, actor_name=None):
+    headers = headers or {}
+    if actor_name:
+        assert TOKEN_HEADER not in headers
+
+    if actor_name and actor_name != settings.ANONYM_USER:
+        headers.update(get_authz_headers(actor_name))
+
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
     with app.app_context():
         r_url = url_for(publication_type_def.get_workspace_metadata_comparison_url, **{publication_type_def.url_param_name: name}, workspace=workspace)
