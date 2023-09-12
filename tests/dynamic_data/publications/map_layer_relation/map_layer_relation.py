@@ -22,14 +22,14 @@ MAP_HRANICE_OPERATES_ON = [LAYER_HRANICE]
 
 TEST_CASES = {
     'post': {
-        'rest_method': base_test_classes.RestMethodAll.POST,
-        'rest_args': {
-            'file_paths': [os.path.join(DIRECTORY, 'internal_wms_and_wfs.json')],
-        },
         'post_before_test_args': {},
         'exp_before_rest_method': {
             'map_layers': None,
             'operates_on': None,
+        },
+        'rest_method': base_test_classes.RestMethodAll.POST,
+        'rest_args': {
+            'file_paths': [os.path.join(DIRECTORY, 'internal_wms_and_wfs.json')],
         },
         'exp_after_rest_method': {
             'map_layers': {
@@ -42,8 +42,6 @@ TEST_CASES = {
         },
     },
     'delete': {
-        'rest_method': base_test_classes.RestMethodAll.DELETE,
-        'rest_args': {},
         'post_before_test_args': {
             'file_paths': [os.path.join(DIRECTORY, 'internal_wms_and_wfs.json')],
         },
@@ -55,6 +53,8 @@ TEST_CASES = {
             },
             'operates_on': [LAYER_HRANICE],
         },
+        'rest_method': base_test_classes.RestMethodAll.DELETE,
+        'rest_args': {},
         'exp_after_rest_method': {
             'map_layers': None,
             'operates_on': None,
