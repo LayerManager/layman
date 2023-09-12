@@ -765,16 +765,6 @@ PUBLICATIONS = {
             'bbox': (1627490.9553976597, 6547334.172794042, 1716546.5480322787, 6589515.35758913),
         },
     },
-    (COMMON_WORKSPACE, MAP_TYPE, 'post_internal_layer'): {
-        DEFINITION: [
-            {'file_paths': ['sample/layman.map/internal_url_thumbnail.json', ]},
-        ],
-        TEST_DATA: {
-            'layers': [(COMMON_WORKSPACE, LAYER_TYPE, 'post_blue_style'), ],
-            'operates_on': {(COMMON_WORKSPACE, LAYER_TYPE, 'post_blue_style'), },
-            'thumbnail': 'sample/style/test_sld_style_applied_in_map_thumbnail_map.png',
-        },
-    },
     (OWNER, MAP_TYPE, 'post_private'): {
         DEFINITION: [
             {'headers': HEADERS[OWNER]},
@@ -848,7 +838,6 @@ PUBLICATIONS = {
 #                 if (ws, pt, pn) in {(COMMON_WORKSPACE, LAYER_TYPE, 'post_common_sld'),
 #                                     (COMMON_WORKSPACE, LAYER_TYPE, 'post_common_qml'),
 #                                     (COMMON_WORKSPACE, LAYER_TYPE, 'post_jp2'),
-#                                     (COMMON_WORKSPACE, MAP_TYPE, 'post_internal_layer'),
 #                                     (COMMON_WORKSPACE, LAYER_TYPE, 'post_blue_style'),
 #                                     (COMMON_WORKSPACE, LAYER_TYPE, 'post_10countries_sld'),
 #                                     }}

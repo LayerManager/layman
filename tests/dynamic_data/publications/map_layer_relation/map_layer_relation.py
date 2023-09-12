@@ -16,6 +16,9 @@ DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 WORKSPACE = 'layer_map_relation_workspace'
 
 LAYER_HRANICE = Publication(WORKSPACE, process_client.LAYER_TYPE, 'hranice')
+LAYER_MISTA_NON_EXISTENT = Publication(WORKSPACE, process_client.LAYER_TYPE, 'mista')
+MAP_HRANICE = Publication(WORKSPACE, process_client.MAP_TYPE, 'map_hranice')
+MAP_HRANICE_OPERATES_ON = [LAYER_HRANICE]
 
 TEST_CASES = {
     'post': {
@@ -30,12 +33,12 @@ TEST_CASES = {
         },
         'exp_after_rest_method': {
             'map_layers': {
-                # workspace, layer name, layer index, exists?
-                (WORKSPACE, 'hranice', 1, True),
-                (WORKSPACE, 'mista', 2, False),
-                (WORKSPACE, 'hranice', 3, True),
+                # layer, layer index, exists?
+                (LAYER_HRANICE, 1, True),
+                (LAYER_MISTA_NON_EXISTENT, 2, False),
+                (LAYER_HRANICE, 3, True),
             },
-            'operates_on': ['hranice'],
+            'operates_on': [LAYER_HRANICE],
         },
     },
     'delete': {
@@ -46,11 +49,11 @@ TEST_CASES = {
         },
         'exp_before_rest_method': {
             'map_layers': {
-                (WORKSPACE, 'hranice', 1, True),
-                (WORKSPACE, 'mista', 2, False),
-                (WORKSPACE, 'hranice', 3, True),
+                (LAYER_HRANICE, 1, True),
+                (LAYER_MISTA_NON_EXISTENT, 2, False),
+                (LAYER_HRANICE, 3, True),
             },
-            'operates_on': ['hranice'],
+            'operates_on': [LAYER_HRANICE],
         },
         'exp_after_rest_method': {
             'map_layers': None,
@@ -74,7 +77,7 @@ class TestPublication(base_test.TestSingleRestPublication):
                                          type=EnumTestTypes.MANDATORY,
                                          ) for key, params in TEST_CASES.items()]
 
-    layer_uuids = {}
+    publ_uuids = {}
 
     def before_class(self):
         resp = self.post_publication(LAYER_HRANICE, args={
@@ -86,7 +89,12 @@ class TestPublication(base_test.TestSingleRestPublication):
                 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.shx',
             ],
         }, scope='class')
-        self.layer_uuids[LAYER_HRANICE.name] = resp['uuid']
+        self.publ_uuids[LAYER_HRANICE] = resp['uuid']
+
+        resp = self.post_publication(MAP_HRANICE, args={
+            'file_paths': [os.path.join(DIRECTORY, 'internal_hranice.json')],
+        }, scope='class')
+        self.publ_uuids[MAP_HRANICE] = resp['uuid']
 
     def assert_exp_map_layers(self, map, exp_map_layers, exp_operates_on):
         with app.app_context():
@@ -101,17 +109,17 @@ class TestPublication(base_test.TestSingleRestPublication):
                 for ml in publ_info['_map_layers']
             }
             exp_map_layers = {
-                layer[:3] + ((self.layer_uuids[layer[1]] if layer[3] else None),)
-                for layer in exp_map_layers
+                (layer.workspace, layer.name, layer_index, self.publ_uuids[layer] if exists else None)
+                for layer, layer_index, exists in exp_map_layers
             }
             assert found_map_layers == exp_map_layers
 
             exp_operates_on = [
                 {
-                    "xlink:href": f"http://localhost:3080/csw?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID=m-{self.layer_uuids[layer_name]}#_m-{self.layer_uuids[layer_name]}",
-                    "xlink:title": layer_name,
+                    "xlink:href": f"http://localhost:3080/csw?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID=m-{self.publ_uuids[layer]}#_m-{self.publ_uuids[layer]}",
+                    "xlink:title": layer.name,
                 }
-                for layer_name in exp_operates_on
+                for layer in exp_operates_on
             ]
             asserts_publ.metadata.correct_values_in_metadata(
                 map.workspace, map.type, map.name, http_method=REQUEST_METHOD_POST, exp_values={
@@ -123,7 +131,7 @@ class TestPublication(base_test.TestSingleRestPublication):
         exp_layer_maps = sorted([
             (map.workspace, map.name)
             for map, operates_on in map_operates_on_tuples
-            if layer.name in operates_on
+            if layer in operates_on
         ])
         with app.app_context():
             found_layer_maps = [
@@ -135,7 +143,10 @@ class TestPublication(base_test.TestSingleRestPublication):
     def test_publication(self, map, rest_method, rest_args, params):
         exp = params['exp_before_rest_method']
         self.assert_exp_map_layers(map, exp['map_layers'], exp['operates_on'])
-        self.assert_exp_layer_maps(LAYER_HRANICE, [(map, exp['operates_on'] or [])])
+        self.assert_exp_layer_maps(LAYER_HRANICE, [
+            (MAP_HRANICE, MAP_HRANICE_OPERATES_ON),
+            (map, exp['operates_on'] or []),
+        ])
 
         rest_method(map, args=rest_args)
         if rest_method == self.post_publication:  # pylint: disable=W0143
@@ -143,4 +154,7 @@ class TestPublication(base_test.TestSingleRestPublication):
 
         exp = params['exp_after_rest_method']
         self.assert_exp_map_layers(map, exp['map_layers'], exp['operates_on'])
-        self.assert_exp_layer_maps(LAYER_HRANICE, [(map, exp['operates_on'] or [])])
+        self.assert_exp_layer_maps(LAYER_HRANICE, [
+            (MAP_HRANICE, MAP_HRANICE_OPERATES_ON),
+            (map, exp['operates_on'] or []),
+        ])
