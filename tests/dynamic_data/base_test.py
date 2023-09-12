@@ -81,6 +81,8 @@ class TestSingleRestPublication:
 
     post_before_test_scope = 'function'
 
+    publ_uuids = {}
+
     @classmethod
     @final
     def parametrize_test_cases(cls) -> [TestCaseType]:
@@ -185,8 +187,13 @@ class TestSingleRestPublication:
         else:
             cls.publications_to_cleanup_on_function_end.add(publication)
 
-        return process_client.publish_workspace_publication(publication.type, publication.workspace, publication.name,
+        resp = process_client.publish_workspace_publication(publication.type, publication.workspace, publication.name,
                                                             **args)
+        if isinstance(resp, dict):
+            maybe_uuid = resp.get('uuid', None)
+            if maybe_uuid:
+                cls.publ_uuids[publication] = maybe_uuid
+        return resp
 
     @classmethod
     def ensure_publication(cls, publication, args=None, scope='function'):

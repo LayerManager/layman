@@ -7,8 +7,8 @@ from tests.dynamic_data import base_test
 from ..... import Publication
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
-
-LAYER_FOR_MAPS = "layer_for_map_crs"
+WORKSPACE = 'dynamic_test_workspace_crs_maps'
+LAYER_FOR_MAPS = Publication(WORKSPACE, process_client.LAYER_TYPE, "layer_for_map_crs")
 
 KEY_INFO_VALUES = 'info_values'
 KEY_THUMBNAIL_TOLERANCE = 'thumbnail_tolerance'
@@ -48,7 +48,7 @@ pytest_generate_tests = base_test.pytest_generate_tests
 
 class TestMap(base_test.TestSingleRestPublication):
 
-    workspace = 'dynamic_test_workspace_crs_maps'
+    workspace = WORKSPACE
 
     publication_type = process_client.MAP_TYPE
 
@@ -61,18 +61,14 @@ class TestMap(base_test.TestSingleRestPublication):
                                          type=tests.EnumTestTypes.MANDATORY,
                                          ) for key, params in TEST_CASES.items()]
 
-    layer_uuids = {}
-
     def before_class(self):
-        resp = self.post_publication(Publication(self.workspace, process_client.LAYER_TYPE, LAYER_FOR_MAPS), scope='class')
-        self.layer_uuids[LAYER_FOR_MAPS] = resp['uuid']
+        self.post_publication(LAYER_FOR_MAPS, scope='class')
 
     def test_input_crs(self, map, key, params, rest_method):
         """Parametrized using pytest_generate_tests"""
         map_crs = key
-        layer_name = LAYER_FOR_MAPS
         map_args = {
-            'map_layers': [(self.workspace, layer_name)],
+            'map_layers': [(LAYER_FOR_MAPS.workspace, LAYER_FOR_MAPS.name)],
             'native_extent': params[KEY_INFO_VALUES]['exp_publication_detail']['native_bounding_box'],
             'crs': map_crs,
             'title': map.name,
@@ -84,10 +80,10 @@ class TestMap(base_test.TestSingleRestPublication):
             'native_crs': map_crs,
             'title': map.name,
             '_map_layers': [{
-                'name': LAYER_FOR_MAPS,
-                'workspace': self.workspace,
+                'name': LAYER_FOR_MAPS.name,
+                'workspace': LAYER_FOR_MAPS.workspace,
                 'index': 1,
-                'uuid': self.layer_uuids[LAYER_FOR_MAPS],
+                'uuid': self.publ_uuids[LAYER_FOR_MAPS],
             }],
             **params.get(KEY_INFO_VALUES, {}).get('exp_publication_detail', {})
         }
