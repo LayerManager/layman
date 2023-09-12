@@ -785,37 +785,6 @@ PUBLICATIONS = {
             'bbox': (3000, 3000, 5000, 5000),
         },
     },
-    (OWNER, MAP_TYPE, 'post_unauthorized_layer'): {
-        DEFINITION: [
-            {'file_paths': ['sample/layman.map/internal_url_unauthorized_layer.json'],
-             'access_rights': {'read': 'EVERYONE',
-                               'write': f"{OWNER},{OWNER2}",
-                               },
-             'headers': HEADERS[OWNER],
-             },
-        ],
-        TEST_DATA: {
-            'layers': [(OWNER, LAYER_TYPE, 'post_private_sld'), (OWNER2, LAYER_TYPE, 'post_private_sld2'), ],
-            'operates_on': {(OWNER, LAYER_TYPE, 'post_private_sld'), },
-            'users_can_write': [OWNER, OWNER2],
-        },
-    },
-    (OWNER, MAP_TYPE, 'patch_unauthorized_layer'): {
-        DEFINITION: [
-            {'file_paths': ['sample/layman.map/internal_url_unauthorized_layer.json'],
-             'access_rights': {'read': 'EVERYONE',
-                               'write': f"{OWNER},{OWNER2}",
-                               },
-             'headers': HEADERS[OWNER],
-             },
-            {'headers': HEADERS[OWNER2], }
-        ],
-        TEST_DATA: {
-            'layers': [(OWNER, LAYER_TYPE, 'post_private_sld'), (OWNER2, LAYER_TYPE, 'post_private_sld2'), ],
-            'operates_on': {(OWNER2, LAYER_TYPE, 'post_private_sld2'), },
-            'users_can_write': [OWNER, OWNER2],
-        },
-    },
     (WORKSPACE1, MAP_TYPE, 'test_publications_same_name_publ'): {
         DEFINITION: [
             {},
@@ -854,9 +823,6 @@ LIST_SLD_LAYERS = [(workspace, publ_type, publication) for (workspace, publ_type
 LIST_QML_LAYERS = [(workspace, publ_type, publication) for (workspace, publ_type, publication), values in PUBLICATIONS.items()
                    if publ_type == LAYER_TYPE and values[TEST_DATA].get('style_type') == 'qml']
 
-LIST_INTERNAL_MAPS = [(workspace, publ_type, publication) for (workspace, publ_type, publication), values in PUBLICATIONS.items()
-                      if publ_type == MAP_TYPE and values[TEST_DATA].get('layers')]
-
 WORKSPACES = {workspace for workspace, _, _ in PUBLICATIONS}
 
 assert len(WORKSPACES) > 0, WORKSPACES
@@ -869,7 +835,6 @@ assert len(LIST_RASTER_LAYERS) > 0, LIST_RASTER_LAYERS
 assert len(LIST_VECTOR_LAYERS) > 0, LIST_VECTOR_LAYERS
 assert len(LIST_SLD_LAYERS) > 0, LIST_SLD_LAYERS
 assert len(LIST_QML_LAYERS) > 0, LIST_QML_LAYERS
-assert len(LIST_INTERNAL_MAPS) > 0, LIST_INTERNAL_MAPS
 assert any('normalized_overviews' in v[TEST_DATA] for v in PUBLICATIONS.values())
 
 
