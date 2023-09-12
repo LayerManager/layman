@@ -77,10 +77,8 @@ class TestPublication(base_test.TestSingleRestPublication):
                                          type=EnumTestTypes.MANDATORY,
                                          ) for key, params in TEST_CASES.items()]
 
-    publ_uuids = {}
-
     def before_class(self):
-        resp = self.post_publication(LAYER_HRANICE, args={
+        self.post_publication(LAYER_HRANICE, args={
             'file_paths': [
                 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.cpg',
                 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.dbf',
@@ -89,12 +87,10 @@ class TestPublication(base_test.TestSingleRestPublication):
                 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.shx',
             ],
         }, scope='class')
-        self.publ_uuids[LAYER_HRANICE] = resp['uuid']
 
-        resp = self.post_publication(MAP_HRANICE, args={
+        self.post_publication(MAP_HRANICE, args={
             'file_paths': [os.path.join(DIRECTORY, 'internal_hranice.json')],
         }, scope='class')
-        self.publ_uuids[MAP_HRANICE] = resp['uuid']
 
     def assert_exp_map_layers(self, map, exp_map_layers, exp_operates_on):
         with app.app_context():
