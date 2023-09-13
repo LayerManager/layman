@@ -82,6 +82,11 @@ Currently, value of `X-Forwarded-Prefix` affects following URLs:
   * `style`.`url` key
   * `thumbnail`.`url` key
   * `metadata`.`comparison_url` key
+* [PATCH Workspace Map](rest.md#patch-workspace-map)
+  * `url` key
+  * `file`.`url` key
+  * `thumbnail`.`url` key
+  * `metadata`.`comparison_url` key
 * [OGC endpoints](endpoints.md)
   * Headers `X-Forwarded-Proto`, `X-Forwarded-Host`, `X-Forwarded-For`, `X-Forwarded-Path`, `Forwarded` and `Host` are ignored
   * [WMS endpoints](endpoints.md#web-map-service)
