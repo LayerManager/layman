@@ -50,7 +50,7 @@ class TestLayer(base_test.TestSingleRestPublication):
     @staticmethod
     def test_style_xml(layer: Publication, params, rest_method):
         """Parametrized using pytest_generate_tests"""
-        rest_method(layer, args={
+        rest_method.fn(layer, args={
             'file_paths': ['sample/layman.layer/small_layer.geojson'],
             'style_file': params.get('style_file'),
         })

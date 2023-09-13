@@ -54,6 +54,6 @@ class TestLayer(base_test.TestSingleRestPublication):
     @staticmethod
     def test_qml_style(layer: Publication, rest_args, rest_method):
         """Parametrized using pytest_generate_tests"""
-        rest_method(layer, args=rest_args)
+        rest_method.fn(layer, args=rest_args)
 
         assert_util.is_publication_valid_and_complete(layer)

@@ -30,7 +30,7 @@ class TestPublication(base_test.TestSingleRestPublication):
 
     def test_publication(self, publication, rest_method):
         proxy_prefix = '/layman-proxy'
-        response = rest_method(publication, args={'headers': {'X-Forwarded-Prefix': proxy_prefix}})
+        response = rest_method.fn(publication, args={'headers': {'X-Forwarded-Prefix': proxy_prefix}})
         publication_response = response[0] if isinstance(response, list) and len(response) == 1 else response
         if rest_method == self.patch_publication:  # pylint: disable=W0143
             if publication.type == process_client.LAYER_TYPE:

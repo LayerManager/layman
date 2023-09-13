@@ -157,3 +157,10 @@ class TestCaseType:
     marks: List[_pytest.mark.structures.Mark] = field(default_factory=list)
     parametrization: Parametrization = None
     post_before_test_args: dict = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class RestMethodParam:
+    # pylint: disable=invalid-name
+    enum_item: RestMethodBase = None
+    fn: callable = None

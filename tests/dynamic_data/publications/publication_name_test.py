@@ -66,7 +66,7 @@ class TestPublication(base_test.TestSingleRestPublication):
     def test_publication_name(publication, rest_method, rest_args, parametrization):
         """Parametrized using pytest_generate_tests"""
         publ_def = parametrization.publication_definition
-        rest_method(publication, args=rest_args)
+        rest_method.fn(publication, args=rest_args)
         assert_util.is_publication_valid_and_complete(publication)
         publ_asserts.internal.correct_values_in_detail(publication.workspace, publication.type, publication.name,
                                                        **publ_def.info_values)

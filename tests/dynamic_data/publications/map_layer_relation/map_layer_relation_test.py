@@ -181,8 +181,8 @@ class TestPublication(base_test.TestSingleRestPublication):
             (map, exp['operates_on'] or []),
         ])
 
-        rest_method(map, args=rest_args)
-        if rest_method in [self.post_publication, self.patch_publication]:
+        rest_method.fn(map, args=rest_args)
+        if rest_method.enum_item in [base_test_classes.RestMethodAll.POST, base_test_classes.RestMethodAll.PATCH]:
             assert_util.is_publication_valid_and_complete(map)
 
         exp = params['exp_after_rest_method']

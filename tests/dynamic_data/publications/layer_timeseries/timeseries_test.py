@@ -335,7 +335,7 @@ class TestLayer(base_test.TestSingleRestPublication):
     @pytest.mark.timeout(60)
     def test_timeseries_layer(self, layer: Publication, params, rest_method, rest_args):
         """Parametrized using pytest_generate_tests"""
-        rest_method(layer, args=rest_args)
+        rest_method.fn(layer, args=rest_args)
 
         asserts_util.is_publication_valid_and_complete(layer)
 
@@ -362,9 +362,9 @@ class TestLayer(base_test.TestSingleRestPublication):
                 exp_thumbnail = os.path.join(DIRECTORY, exp_thumbnail_file)
                 asserts_publ.internal.thumbnail_equals(layer.workspace, layer.type, layer.name, exp_thumbnail, max_diffs=1)
 
-            if rest_method == self.post_publication:  # pylint: disable=W0143
+            if rest_method.enum_item == base_test.RestMethod.POST:
                 http_method = common.REQUEST_METHOD_POST
-            elif rest_method == self.patch_publication:  # pylint: disable=W0143
+            elif rest_method.enum_item == base_test.RestMethod.PATCH:
                 http_method = common.REQUEST_METHOD_PATCH
             else:
                 raise NotImplementedError(f"Unknown rest_method: {rest_method}")

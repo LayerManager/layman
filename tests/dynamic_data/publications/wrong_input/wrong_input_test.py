@@ -1376,10 +1376,10 @@ class TestPublication(base_test.TestSingleRestPublication):
         format_exception(exp_exception, publication, parametrization)
         exception = pytest.raises(params[Key.EXCEPTION]) if is_sync else does_not_raise()
         with exception as exception_info:
-            response = rest_method(publication, args=rest_args)
+            response = rest_method.fn(publication, args=rest_args)
         if is_sync:
             processing.exception.response_exception(expected=exp_exception, thrown=exception_info)
-            if rest_method == self.patch_publication:  # pylint: disable=W0143
+            if rest_method.enum_item == base_test.RestMethod.PATCH:
                 assert_utils.is_publication_valid_and_complete(publication)
         else:
             processing.response.valid_post(workspace=publication.workspace,

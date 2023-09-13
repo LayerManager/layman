@@ -169,7 +169,7 @@ class TestLayer(base_test.TestSingleRestPublication):
             rel_file_path = os.path.relpath(abs_file_path, DIRECTORY)
             assert_input_file(abs_file_path, expected_input.get(rel_file_path, expected_input))
 
-        rest_method(layer, args=rest_args)
+        rest_method.fn(layer, args=rest_args)
 
         assert_util.is_publication_valid_and_complete(layer)
         base_file_name = '_'.join(layer.name.split('_')[1:])
