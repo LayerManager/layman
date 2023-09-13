@@ -1,16 +1,10 @@
 from layman import settings
-from tests import EnumTestTypes
+from tests import EnumTestTypes, Publication
 from tests.dynamic_data import base_test, base_test_classes
 from tests.dynamic_data.publications import common_publications
-from tests import Publication
+from test_tools import assert_util
 
 pytest_generate_tests = base_test.pytest_generate_tests
-
-
-class RestMethodLocal(base_test_classes.RestMethodBase):
-    POST = ('post_publication', 'post')
-    DELETE = ('delete_workspace_publication', 'delete')
-    MULTI_DELETE = ('delete_workspace_publications', 'multi_delete')
 
 
 class PublicationTypes(base_test_classes.PublicationByDefinitionBase):
@@ -23,7 +17,7 @@ class TestPublication(base_test.TestSingleRestPublication):
     publication_type = None
 
     rest_parametrization = [
-        RestMethodLocal,
+        base_test_classes.RestMethodAll,
         PublicationTypes,
     ]
 
@@ -32,11 +26,44 @@ class TestPublication(base_test.TestSingleRestPublication):
                                                                                        publ_def.type,
                                                                                        None),
                                          type=EnumTestTypes.MANDATORY,
+                                         specific_types={
+                                             (base_test_classes.RestMethodAll.PATCH, PublicationTypes.MAP): EnumTestTypes.IGNORE,
+                                         }
                                          )]
 
-    @staticmethod
-    def test_publication(publication, rest_method):
+    def test_publication(self, publication, rest_method):
         proxy_prefix = '/layman-proxy'
         response = rest_method(publication, args={'headers': {'X-Forwarded-Prefix': proxy_prefix}})
         publication_response = response[0] if isinstance(response, list) and len(response) == 1 else response
-        assert publication_response['url'] == f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{publication.workspace}/{publication.type.split(".")[1]}s/{publication.name}'
+        if rest_method == self.patch_publication:  # pylint: disable=W0143
+            exp_resp = {
+                'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{publication.workspace}/{publication.type.split(".")[1]}s/{publication.name}',
+                'thumbnail': {
+                  'url':   f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{publication.workspace}/layers/{publication.name}/thumbnail'
+                },
+                'metadata': {
+                    'comparison_url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{publication.workspace}/layers/{publication.name}/metadata-comparison',
+                },
+                'wms': {
+                    'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/geoserver/{publication.workspace}_wms/ows',
+                },
+                'sld': {
+                    'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{publication.workspace}/layers/{publication.name}/style',
+                },
+                'style': {
+                    'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{publication.workspace}/layers/{publication.name}/style',
+                },
+            }
+
+            geodata_type = response['geodata_type']
+            if geodata_type == settings.GEODATA_TYPE_VECTOR:
+                exp_resp['wfs'] = {
+                    'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/geoserver/{publication.workspace}/wfs'
+                }
+        else:
+            exp_resp = {'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{publication.workspace}/{publication.type.split(".")[1]}s/{publication.name}'}
+
+        assert_util.assert_same_values_for_keys(
+            expected=exp_resp,
+            tested=publication_response,
+        )
