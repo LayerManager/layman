@@ -37,28 +37,28 @@ class TestPublication(base_test.TestSingleRestPublication):
         publication_response = response[0] if isinstance(response, list) and len(response) == 1 else response
         if rest_method == self.patch_publication:  # pylint: disable=W0143
             exp_resp = {
-                'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{publication.workspace}/{publication.type.split(".")[1]}s/{publication.name}',
+                'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{publication.workspace}/{publication.type.split(".")[1]}s/{publication.name}',
                 'thumbnail': {
-                  'url':   f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{publication.workspace}/layers/{publication.name}/thumbnail'
+                    'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{publication.workspace}/layers/{publication.name}/thumbnail'
                 },
                 'metadata': {
-                    'comparison_url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{publication.workspace}/layers/{publication.name}/metadata-comparison',
+                    'comparison_url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{publication.workspace}/layers/{publication.name}/metadata-comparison',
                 },
                 'wms': {
-                    'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/geoserver/{publication.workspace}_wms/ows',
+                    'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/geoserver/{publication.workspace}_wms/ows',
                 },
                 'sld': {
-                    'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{publication.workspace}/layers/{publication.name}/style',
+                    'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{publication.workspace}/layers/{publication.name}/style',
                 },
                 'style': {
-                    'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{publication.workspace}/layers/{publication.name}/style',
+                    'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{publication.workspace}/layers/{publication.name}/style',
                 },
             }
 
             geodata_type = response['geodata_type']
             if geodata_type == settings.GEODATA_TYPE_VECTOR:
                 exp_resp['wfs'] = {
-                    'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/geoserver/{publication.workspace}/wfs'
+                    'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/geoserver/{publication.workspace}/wfs'
                 }
         else:
             exp_resp = {'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{publication.workspace}/{publication.type.split(".")[1]}s/{publication.name}'}
