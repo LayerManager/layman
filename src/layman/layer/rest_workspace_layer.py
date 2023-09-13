@@ -48,6 +48,8 @@ def get(workspace, layername):
 def patch(workspace, layername):
     app.logger.info(f"PATCH Layer, actor={g.user}")
 
+    x_forwarded_prefix = layman_util.get_x_forwarded_prefix(request.headers)
+
     info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername,
                                             context={'keys': ['title', 'name', 'description', 'table_uri', 'geodata_type', 'style_type',
                                                               'original_data_source', ]})
@@ -260,7 +262,7 @@ def patch(workspace, layername):
     )
 
     app.logger.info('PATCH Layer changes done')
-    info = util.get_complete_layer_info(workspace, layername)
+    info = util.get_complete_layer_info(workspace, layername, x_forwarded_prefix=x_forwarded_prefix)
     info.update(layer_result)
 
     return jsonify(info), 200
