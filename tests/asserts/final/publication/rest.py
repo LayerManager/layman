@@ -2,9 +2,44 @@ import copy
 
 from celery import states
 from layman import settings
-from test_tools import process_client, util as test_util
+from test_tools import process_client, util as test_util, assert_util
 
 PROXY_PREFIX = '/layman-proxy'
+
+
+def get_expected_urls_in_rest_response(workspace, publ_type, name, *, rest_method, proxy_prefix, geodata_type=None):
+    assert rest_method in {'post', 'patch', 'get', 'delete', 'multi_delete'}
+    publ_type_directory = f'{publ_type.split(".")[1]}s'
+    result = {
+        'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/{publ_type_directory}/{name}'
+    }
+    if rest_method in ['patch', 'get']:
+        result['thumbnail'] = {
+            'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/{publ_type_directory}/{name}/thumbnail'
+        }
+        result['metadata'] = {
+            'comparison_url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/{publ_type_directory}/{name}/metadata-comparison',
+        }
+        if publ_type == process_client.LAYER_TYPE:
+            result['wms'] = {
+                'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/geoserver/{workspace}_wms/ows',
+            }
+            result['sld'] = {
+                'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/{publ_type_directory}/{name}/style',
+            }
+            result['style'] = {
+                'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/{publ_type_directory}/{name}/style',
+            }
+            if geodata_type == settings.GEODATA_TYPE_VECTOR:
+                result['wfs'] = {
+                    'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/geoserver/{workspace}/wfs'
+                }
+        else:
+            result['file'] = {
+                'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/{publ_type_directory}/{name}/file',
+            }
+
+    return result
 
 
 def is_complete_in_rest(rest_publication_detail):
@@ -101,15 +136,17 @@ def get_layer_with_x_forwarded_prefix(workspace, name, headers, ):
         'X-Forwarded-Prefix': proxy_prefix,
     }
     rest_layer_info = process_client.get_workspace_layer(workspace, name, headers=headers)
-    assert rest_layer_info['url'] == f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/layers/{name}'
-    assert rest_layer_info['thumbnail']['url'] == f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/layers/{name}/thumbnail'
-    assert rest_layer_info['metadata']['comparison_url'] == f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/layers/{name}/metadata-comparison'
-    assert rest_layer_info['wms']['url'] == f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/geoserver/{workspace}_wms/ows'
     geodata_type = rest_layer_info['geodata_type']
-    if geodata_type == settings.GEODATA_TYPE_VECTOR:
-        assert rest_layer_info['wfs']['url'] == f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/geoserver/{workspace}/wfs'
-    assert rest_layer_info['sld']['url'] == f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/layers/{name}/style'
-    assert rest_layer_info['style']['url'] == f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/layers/{name}/style'
+
+    exp_resp = get_expected_urls_in_rest_response(workspace, process_client.LAYER_TYPE, name,
+                                                  rest_method='get',
+                                                  proxy_prefix=proxy_prefix,
+                                                  geodata_type=geodata_type,
+                                                  )
+    assert_util.assert_same_values_for_keys(
+        expected=exp_resp,
+        tested=rest_layer_info,
+    )
 
 
 def get_map_with_x_forwarded_prefix(workspace, name, headers, ):
@@ -119,7 +156,12 @@ def get_map_with_x_forwarded_prefix(workspace, name, headers, ):
         'X-Forwarded-Prefix': proxy_prefix,
     }
     rest_map_info = process_client.get_workspace_map(workspace, name, headers=headers)
-    assert rest_map_info['url'] == f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/maps/{name}'
-    assert rest_map_info['file']['url'] == f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/maps/{name}/file'
-    assert rest_map_info['thumbnail']['url'] == f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/maps/{name}/thumbnail'
-    assert rest_map_info['metadata']['comparison_url'] == f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/maps/{name}/metadata-comparison'
+    exp_resp = get_expected_urls_in_rest_response(workspace, process_client.MAP_TYPE, name,
+                                                  rest_method='get',
+                                                  proxy_prefix=proxy_prefix,
+                                                  geodata_type=None,
+                                                  )
+    assert_util.assert_same_values_for_keys(
+        expected=exp_resp,
+        tested=rest_map_info,
+    )
