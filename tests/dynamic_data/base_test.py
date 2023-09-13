@@ -7,7 +7,7 @@ import pytest
 from tests.asserts.util import recursive_dict_update
 from test_tools import process_client, cleanup, external_db
 from .base_test_classes import WithChunksDomain, CompressDomainBase, CompressDomain, RestArgs, RestMethod, PublicationByDefinitionBase, \
-    LayerByUsedServers, PublicationByUsedServers, TestCaseType, Parametrization, StyleFileDomainBase  # pylint: disable=unused-import
+    LayerByUsedServers, PublicationByUsedServers, TestCaseType, Parametrization, StyleFileDomainBase, RestMethodParam  # pylint: disable=unused-import
 from . import base_test_util as util
 from .base_test_classes import ExternalTableDef
 from .. import Publication, EnumTestTypes, EnumTestKeys, PublicationValues
@@ -41,7 +41,7 @@ def pytest_generate_tests(metafunc):
             publ_type_name: test_case.publication,
             'key': test_case.key,
             'params': copy.deepcopy(test_case.params),
-            'rest_method': rest_method,
+            'rest_method': RestMethodParam(test_case.rest_method, rest_method),
             'rest_args': rest_args,
             'parametrization': parametrization,
             'post_before_test': (test_case.publication, test_case.rest_method, test_case.post_before_test_args),

@@ -73,7 +73,7 @@ class TestMap(base_test.TestSingleRestPublication):
             'crs': map_crs,
             'title': map.name,
         }
-        rest_method(map, args=map_args)
+        rest_method.fn(map, args=map_args)
 
         exp_publication_detail = {
             'description': 'Map generated for internal layers',

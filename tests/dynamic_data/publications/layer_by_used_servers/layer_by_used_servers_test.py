@@ -64,7 +64,7 @@ class TestLayer(base_test.TestSingleRestPublication):
     def test_layer(layer, params, rest_args, rest_method, parametrization):
         """Parametrized using pytest_generate_tests"""
         publ_def = parametrization.publication_definition
-        rest_method(layer, args=rest_args)
+        rest_method.fn(layer, args=rest_args)
 
         assert_util.is_publication_valid_and_complete(layer)
 

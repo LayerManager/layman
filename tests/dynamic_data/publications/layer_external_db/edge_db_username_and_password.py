@@ -80,7 +80,7 @@ class TestEdge(base_test.TestSingleRestPublication):
         db_util.run_statement(statement, conn_cur=conn_cur)
 
         # publish layer from external DB table
-        rest_method(layer, args=rest_args)
+        rest_method.fn(layer, args=rest_args)
 
         # general checks
         assert_util.is_publication_valid_and_complete(layer)

@@ -33,7 +33,7 @@ class TestUpdatingLayer(base_test.TestSingleRestPublication):
     @staticmethod
     def test_layer(layer, params, rest_method):
         """Parametrized using pytest_generate_tests"""
-        rest_method(layer, args=params)
+        rest_method.fn(layer, args=params)
 
         exp_publication_detail = {
             'geodata_type': 'unknown',

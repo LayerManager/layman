@@ -38,7 +38,7 @@ class TestLayer(base_test.TestSingleRestPublication):
             'overview_resampling': overview_resampling_method,
             'style_file': os.path.join(DIRECTORY, 'style.sld'),
         }
-        rest_method(layer, args=layer_args)
+        rest_method.fn(layer, args=layer_args)
 
         assert_util.is_publication_valid_and_complete(layer)
         exp_thumbnail = os.path.join(DIRECTORY, f"thumbnail_{overview_resampling_method}.png")

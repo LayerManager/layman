@@ -225,7 +225,7 @@ class TestLayer(base_test.TestSingleRestPublication):
         assert result[0][0] == params['exp_geometry_type']
 
         # publish layer from external DB table
-        rest_method(layer, args=rest_args)
+        rest_method.fn(layer, args=rest_args)
 
         # general checks
         assert_util.is_publication_valid_and_complete(layer)

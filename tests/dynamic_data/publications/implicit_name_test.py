@@ -135,6 +135,6 @@ class TestLayer(base_test.TestSingleRestPublication):
     @staticmethod
     def test_implicit_name(publication: Publication, rest_method, rest_args):
         """Parametrized using pytest_generate_tests"""
-        rest_method(publication, args=rest_args)
+        rest_method.fn(publication, args=rest_args)
 
         asserts_util.is_publication_valid_and_complete(publication)
