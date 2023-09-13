@@ -46,6 +46,7 @@ def get(workspace, mapname):
 def patch(workspace, mapname):
     app.logger.info(f"PATCH Map, actor={g.user}")
 
+    x_forwarded_prefix = layman_util.get_x_forwarded_prefix(request.headers)
     info = util.get_complete_map_info(workspace, mapname)
 
     # FILE
@@ -106,7 +107,7 @@ def patch(workspace, mapname):
         'layman.map.filesystem.input_file' if file_changed else None
     )
 
-    info = util.get_complete_map_info(workspace, mapname)
+    info = util.get_complete_map_info(workspace, mapname, x_forwarded_prefix=x_forwarded_prefix)
 
     return jsonify(info), 200
 
