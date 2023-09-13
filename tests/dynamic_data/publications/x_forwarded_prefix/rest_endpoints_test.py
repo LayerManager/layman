@@ -1,8 +1,8 @@
-from layman import settings
 from tests import EnumTestTypes, Publication
+from tests.asserts.final.publication import rest as assert_rest
 from tests.dynamic_data import base_test, base_test_classes
 from tests.dynamic_data.publications import common_publications
-from test_tools import assert_util, process_client
+from test_tools import assert_util
 
 pytest_generate_tests = base_test.pytest_generate_tests
 
@@ -32,48 +32,12 @@ class TestPublication(base_test.TestSingleRestPublication):
         proxy_prefix = '/layman-proxy'
         response = rest_method.fn(publication, args={'headers': {'X-Forwarded-Prefix': proxy_prefix}})
         publication_response = response[0] if isinstance(response, list) and len(response) == 1 else response
-        if rest_method == self.patch_publication:  # pylint: disable=W0143
-            if publication.type == process_client.LAYER_TYPE:
-                exp_resp = {
-                    'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{publication.workspace}/{publication.type.split(".")[1]}s/{publication.name}',
-                    'thumbnail': {
-                        'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{publication.workspace}/layers/{publication.name}/thumbnail'
-                    },
-                    'metadata': {
-                        'comparison_url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{publication.workspace}/layers/{publication.name}/metadata-comparison',
-                    },
-                    'wms': {
-                        'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/geoserver/{publication.workspace}_wms/ows',
-                    },
-                    'sld': {
-                        'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{publication.workspace}/layers/{publication.name}/style',
-                    },
-                    'style': {
-                        'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{publication.workspace}/layers/{publication.name}/style',
-                    },
-                }
-
-                geodata_type = response['geodata_type']
-                if geodata_type == settings.GEODATA_TYPE_VECTOR:
-                    exp_resp['wfs'] = {
-                        'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/geoserver/{publication.workspace}/wfs'
-                    }
-            else:
-                exp_resp = {
-                    'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{publication.workspace}/{publication.type.split(".")[1]}s/{publication.name}',
-                    'thumbnail': {
-                        'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{publication.workspace}/{publication.type.split(".")[1]}s/{publication.name}/thumbnail'
-                    },
-                    'file': {
-                        'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{publication.workspace}/{publication.type.split(".")[1]}s/{publication.name}/file'
-                    },
-                    'metadata': {
-                        'comparison_url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{publication.workspace}/{publication.type.split(".")[1]}s/{publication.name}/metadata-comparison',
-                    },
-                }
-
-        else:
-            exp_resp = {'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{publication.workspace}/{publication.type.split(".")[1]}s/{publication.name}'}
+        geodata_type = publication_response.get('geodata_type')
+        exp_resp = assert_rest.get_expected_urls_in_rest_response(publication.workspace, publication.type, publication.name,
+                                                                  rest_method=rest_method.enum_item.publ_name_part,
+                                                                  proxy_prefix=proxy_prefix,
+                                                                  geodata_type=geodata_type,
+                                                                  )
 
         assert_util.assert_same_values_for_keys(
             expected=exp_resp,
