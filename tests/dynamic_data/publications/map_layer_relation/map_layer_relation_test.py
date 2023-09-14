@@ -81,6 +81,29 @@ TEST_CASES = {
             'operates_on': [LAYER_HRANICE_PRIVATE],
         },
     },
+    'patch_map_with_different_layers': {
+        'post_before_test_args': {
+            'file_paths': [os.path.join(DIRECTORY, 'internal_wms_and_wfs.json')],
+        },
+        'exp_before_rest_method': {
+            'map_layers': {
+                # layer, layer index, exists?
+                (LAYER_HRANICE, 1, True),
+                (LAYER_MISTA_NON_EXISTENT, 2, False),
+                (LAYER_HRANICE, 3, True),
+            },
+            'operates_on': [LAYER_HRANICE],
+        },
+        'rest_method': base_test_classes.RestMethodAll.PATCH,
+        'rest_args': {
+            'file_paths': [os.path.join(DIRECTORY, 'internal_hranice_private.json')],
+            'actor_name': PRIVATE_WORKSPACE,
+        },
+        'exp_after_rest_method': {
+            'map_layers': [(LAYER_HRANICE_PRIVATE, 1, True)],
+            'operates_on': [LAYER_HRANICE_PRIVATE],
+        },
+    },
 }
 
 
