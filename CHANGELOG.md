@@ -21,18 +21,22 @@
 - [#880](https://github.com/LayerManager/layman/issues/880) Use Docker Compose v2 (`docker compose`) in Makefile without `compatibility` flag and remove `Makefile_docker-compose_v1` file. Docker containers are named according to Docker Compose v2 and may have different name after upgrade.
 - [#765](https://github.com/LayerManager/layman/issues/765) Stop saving OAuth2 claims in filesystem, use prime DB schema only.
 - [#893](https://github.com/LayerManager/layman/issues/893) It is possible to specify logging level by new environment variable [LAYMAN_LOGLEVEL](doc/env-settings.md#LAYMAN_LOGLEVEL). Default level is `INFO`.
+- Add new test Python dependency:
+  - jsonpath-ng 1.6.0
 - Upgrade Python dependencies
   - certifi 2023.5.7 -> 2023.7.22 (suggested by dependabot)
+  - tornado 6.3.2 -> 6.3.3 (suggested by dependabot)
+  - flask 2.3.2 -> 2.3.3
   - jsonschema 4.17.3 -> 4.19.0
   - lxml 4.9.2 -> 4.9.3
   - owslib 0.28.1 -> 0.29.2
   - psycopg2-binary 2.9.5 -> 2.9.7
-  - redis 4.5.5 -> 4.6.0
-  - autopep8 2.0.1 -> 2.0.2
+  - redis 4.5.5 -> 5.0.0
+  - autopep8 2.0.1 -> 2.0.4
   - flake8 6.0.0 -> 6.1.0
   - pillow 9.3.0 -> 10.0.0
   - pycodestyle 2.10.0 -> 2.11.0 (to be consistent with GitHub Actions)
-  - pytest 7.2.0 -> 7.4.0
+  - pytest 7.2.0 -> 7.4.2
   - pytest-rerunfailures 10.3 -> 12.0
   - watchdog 2.2.0 -> 3.0.0
 
