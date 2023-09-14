@@ -28,7 +28,7 @@ MAP_METADATA_PROPERTIES = {
     'identifier',
     'map_endpoint',
     'map_file_endpoint',
-    'operates_on',
+    'operates_on',  # When sending map with no items after there were some items, items are not deleted (probably because of bug in Micka)
     'organisation_name',
     'publication_date',
     'reference_system',
