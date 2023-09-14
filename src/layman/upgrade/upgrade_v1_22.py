@@ -69,7 +69,8 @@ CREATE TABLE {DB_SCHEMA}.map_layer
     id_map integer not null REFERENCES {DB_SCHEMA}.publications (id),
     layer_workspace VARCHAR(256) COLLATE pg_catalog."default" not null,
     layer_name VARCHAR(256) COLLATE pg_catalog."default" not null,
-    layer_index integer NOT NULL
+    layer_index integer NOT NULL,
+    CONSTRAINT map_layer_unique_row UNIQUE (id_map, layer_workspace, layer_name, layer_index)
 )
 TABLESPACE pg_default;'''
     db_util.run_statement(sql_create_table)
