@@ -53,7 +53,7 @@ def expected_values_in_micka_metadata(workspace, publ_type, name, expected_value
                                             )
 
 
-def correct_values_in_metadata(workspace, publ_type, name, http_method, *, exp_values=None, actor_name=None):
+def correct_values_in_metadata(workspace, publ_type, name, http_method, *, exp_values=None, actor_name=None, headers=None):
     exp_values = exp_values or {}
     actor_name = actor_name or settings.ANONYM_USER
     md_props = {
@@ -62,7 +62,8 @@ def correct_values_in_metadata(workspace, publ_type, name, http_method, *, exp_v
     }[publ_type]
     with app.app_context():
         resp_json = process_client.get_workspace_publication_metadata_comparison(publ_type, workspace, name,
-                                                                                 actor_name=actor_name)
+                                                                                 actor_name=actor_name,
+                                                                                 headers=headers)
         assert md_props.issubset(set(resp_json['metadata_properties'].keys()))
         for key, value in resp_json['metadata_properties'].items():
             assert value['equal_or_null'] is True, f'key={key}, value={value}'
@@ -80,3 +81,27 @@ def correct_values_in_metadata(workspace, publ_type, name, http_method, *, exp_v
     for key, value in exp_values.items():
         assert exp_metadata[key] == value, f"Template value differ from expected value, key={key}"
     expected_values_in_micka_metadata(workspace, publ_type, name, exp_metadata)
+
+
+def correct_layer_comparison_response_with_x_forwarded_prefix_header(workspace, name, *, actor_name=None, headers=None):
+    proxy_prefix = '/layman-proxy'
+    headers = headers or {}
+    actor_name = actor_name or settings.ANONYM_USER
+    md_props = LAYER_METADATA_PROPERTIES
+    headers_with_header = {**headers,
+                           'X-Forwarded-Prefix': proxy_prefix,
+                           }
+    with app.app_context():
+        resp_json_with_proxy = process_client.get_workspace_publication_metadata_comparison(process_client.LAYER_TYPE, workspace, name,
+                                                                                            actor_name=actor_name,
+                                                                                            headers=headers_with_header)
+        resp_json_without_proxy = process_client.get_workspace_publication_metadata_comparison(process_client.LAYER_TYPE, workspace,
+                                                                                               name,
+                                                                                               actor_name=actor_name,
+                                                                                               headers=headers)
+    assert md_props.issubset(set(resp_json_with_proxy['metadata_properties'].keys()))
+    for key, value in resp_json_with_proxy['metadata_properties'].items():
+        assert value['equal_or_null'] is True, f'key={key}, value={value}'
+        assert value['equal'] is True, f'key={key}, value={value}'
+
+    assert resp_json_with_proxy == resp_json_without_proxy
