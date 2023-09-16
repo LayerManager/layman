@@ -209,7 +209,7 @@ class TestPublication(base_test.TestSingleRestPublication):
             assert_util.is_publication_valid_and_complete(map)
 
         exp = params['exp_after_rest_method']
-        http_method = REQUEST_METHOD_PATCH if rest_method == self.patch_publication else REQUEST_METHOD_POST  # pylint: disable=W0143
+        http_method = REQUEST_METHOD_PATCH if rest_method.enum_item == base_test_classes.RestMethodAll.PATCH else REQUEST_METHOD_POST
         self.assert_exp_map_layers(map, exp['map_layers'], exp['operates_on'], http_method=http_method,
                                    actor_name=rest_args.get('actor_name'))
         self.assert_exp_layer_maps(LAYER_HRANICE, [
