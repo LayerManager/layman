@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import pytest
@@ -16,6 +17,14 @@ WORKSPACE = 'map_file_workspace'
 
 LAYER_HRANICE = Publication(WORKSPACE, process_client.LAYER_TYPE, 'hranice')
 MAP = Publication(WORKSPACE, process_client.MAP_TYPE, 'map_hranice')
+MAP_FILE_PATH = os.path.join(DIRECTORY, 'internal_wms_and_wfs.json')
+
+
+def _find_single_value_in_json(json_path_str, json_obj):
+    json_path_expr = jp.parse(json_path_str)
+    values = [m.value for m in json_path_expr.find(json_obj)]
+    assert len(values) == 1, f"key={json_path_str}"
+    return values[0]
 
 
 @pytest.mark.usefixtures('oauth2_provider_mock')
@@ -27,7 +36,7 @@ class TestPublication(base_test.TestSingleRestPublication):
 
     def before_class(self):
         self.post_publication(MAP, args={
-            'file_paths': [os.path.join(DIRECTORY, 'internal_wms_and_wfs.json')],
+            'file_paths': [MAP_FILE_PATH],
         }, scope='class')
 
     @pytest.mark.parametrize('headers', [
@@ -47,9 +56,18 @@ class TestPublication(base_test.TestSingleRestPublication):
 
         x_forwarded_prefix = headers.get('X-Forwarded-Prefix', '')
         for json_path_str, exp_url_postfix in exp_adjusted_urls:
-            json_path_expr = jp.parse(json_path_str)
-            values = [m.value for m in json_path_expr.find(resp)]
-            assert len(values) == 1, f"key={json_path_str}"
-            found_value = values[0]
+            found_value = _find_single_value_in_json(json_path_str, resp)
             exp_value = f"http://{settings.LAYMAN_PROXY_SERVER_NAME}{x_forwarded_prefix}{exp_url_postfix}"
             assert found_value == exp_value, f"key={json_path_str}"
+
+        with open(MAP_FILE_PATH, encoding='utf-8') as file:
+            orig_json = json.load(file)
+
+        exp_unchanged_urls = [
+            '$.layers[0].url',
+            '$.layers[0].legends[0]',
+        ]
+        for json_path_str in exp_unchanged_urls:
+            exp_url = _find_single_value_in_json(json_path_str, orig_json)
+            found_value = _find_single_value_in_json(json_path_str, resp)
+            assert found_value == exp_url, f"key={json_path_str}"
