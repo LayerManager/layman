@@ -339,8 +339,11 @@ def get_same_or_missing_prop_names(workspace, mapname):
     return metadata_common.get_same_or_missing_prop_names(prop_names, md_comparison)
 
 
-def _adjust_url(*, url_obj, url_key, proxy_prefix):
-    url_str = url_obj.get(url_key, '')
+def _adjust_url(*, url_obj=None, url_key=None, url_list=None, url_idx=None, proxy_prefix):
+    assert (url_obj is None) == (url_key is None)
+    assert (url_list is None) == (url_idx is None)
+    assert (url_obj is None) != (url_list is None)
+    url_str = url_obj.get(url_key, '') if url_obj is not None else url_list[url_idx]
     if not url_str:
         return
     gs_path_pattern = r'^' + layman_util.CLIENT_PROXY_ONLY_PATTERN + \
@@ -354,7 +357,10 @@ def _adjust_url(*, url_obj, url_key, proxy_prefix):
             netloc=settings.LAYMAN_PROXY_SERVER_NAME,
             path=proxy_prefix + layman_settings.LAYMAN_GS_PATH + match.group('path_postfix'),
         )
-        url_obj[url_key] = new_url.geturl()
+        if url_obj is not None:
+            url_obj[url_key] = new_url.geturl()
+        else:
+            url_list[url_idx] = new_url.geturl()
 
 
 def get_map_file_json(workspace, mapname, *, adjust_urls=True, x_forwarded_prefix=None):
