@@ -675,3 +675,20 @@ def patch_after_feature_change(workspace, publ_type, name):
     queue = LAYMAN_CELERY_QUEUE
     with app.app_context():
         layman_util.patch_after_feature_change(workspace, publ_type, name, queue=queue)
+
+
+def get_workspace_map_file(publication_type, workspace, name, headers=None, actor_name=None):
+    headers = headers or {}
+    assert publication_type == MAP_TYPE
+    publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
+    if actor_name:
+        assert TOKEN_HEADER not in headers
+
+    if actor_name and actor_name != settings.ANONYM_USER:
+        headers.update(get_authz_headers(actor_name))
+
+    with app.app_context():
+        r_url = url_for('rest_workspace_map_file.get', **{publication_type_def.url_param_name: name}, workspace=workspace)
+    response = requests.get(r_url, headers=headers, timeout=HTTP_TIMEOUT)
+    raise_layman_error(response)
+    return response.json()

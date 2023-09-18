@@ -3,6 +3,7 @@ import json
 import os
 import re
 import subprocess
+from urllib.parse import urlparse
 import requests
 from jsonschema import validate, Draft7Validator
 from flask import current_app, request
@@ -338,8 +339,38 @@ def get_same_or_missing_prop_names(workspace, mapname):
     return metadata_common.get_same_or_missing_prop_names(prop_names, md_comparison)
 
 
-def get_map_file_json(workspace, mapname):
+def _adjust_url(*, url_obj, url_key, proxy_prefix):
+    url_str = url_obj.get(url_key, '')
+    if not url_str:
+        return
+    gs_path_pattern = r'^' + layman_util.CLIENT_PROXY_ONLY_PATTERN + \
+                      re.escape(layman_settings.LAYMAN_GS_PATH) + r'(?P<path_postfix>.*)$'
+    parsed_url = urlparse(url_str)
+    match = re.match(gs_path_pattern, parsed_url.path)
+    if match:
+        # replace scheme and netloc, because LAYMAN_PUBLIC_URL_SCHEME or LAYMAN_PROXY_SERVER_NAME may have changed
+        new_url = parsed_url._replace(
+            scheme=settings.LAYMAN_PUBLIC_URL_SCHEME,
+            netloc=settings.LAYMAN_PROXY_SERVER_NAME,
+            path=proxy_prefix + layman_settings.LAYMAN_GS_PATH + match.group('path_postfix'),
+        )
+        url_obj[url_key] = new_url.geturl()
+
+
+def get_map_file_json(workspace, mapname, *, adjust_urls=True, x_forwarded_prefix=None):
+    x_forwarded_prefix = x_forwarded_prefix or ''
     map_json = input_file.get_map_json(workspace, mapname)
+
+    if adjust_urls:
+        input_file.unquote_urls(map_json)
+        map_layers = layman_util.get_publication_info(workspace, MAP_TYPE, mapname, context={'keys': ['map_layers']})['_map_layers']
+        ml_indices = {ml['index'] for ml in map_layers}
+
+        for ml_idx in ml_indices:
+            map_layer = map_json['layers'][ml_idx]
+            _adjust_url(url_obj=map_layer, url_key='url', proxy_prefix=x_forwarded_prefix)
+            _adjust_url(url_obj=map_layer.get('protocol', {}), url_key='url', proxy_prefix=x_forwarded_prefix)
+
     if map_json is not None:
         map_json['user'] = get_map_owner_info(workspace)
         map_json.pop("groups", None)

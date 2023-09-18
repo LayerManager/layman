@@ -58,7 +58,7 @@ def adjust_maps():
     for workspace, publication in publications:
         logger.info(f'      Adjusting {workspace}.{publication}')
         map_file_path = input_file.get_map_file(workspace, publication)
-        mapjson = map_util.get_map_file_json(workspace, publication)
+        mapjson = map_util.get_map_file_json(workspace, publication, adjust_urls=False)
         bbox_json = map_util.get_bbox_from_json(mapjson)
         crs = map_util.get_crs_from_json(mapjson)
         assert crs in settings.INPUT_SRS_LIST
