@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, current_app as app, g
+from flask import Blueprint, jsonify, current_app as app, g, request
 
 from layman import LaymanError, util as layman_util
 from layman.util import check_workspace_name_decorator
@@ -28,7 +28,9 @@ def after_request(response):
 def get(workspace, mapname):
     app.logger.info(f"GET Map File, actor={g.user}")
 
-    map_json = util.get_map_file_json(workspace, mapname)
+    x_forwarded_prefix = layman_util.get_x_forwarded_prefix(request.headers)
+
+    map_json = util.get_map_file_json(workspace, mapname, x_forwarded_prefix=x_forwarded_prefix)
 
     if map_json is not None:
         return jsonify(map_json), 200

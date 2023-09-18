@@ -26,7 +26,7 @@ def refresh_file_data(
     if self.is_aborted():
         raise AbortedException
 
-    mapjson = util.get_map_file_json(workspace, mapname)
+    mapjson = util.get_map_file_json(workspace, mapname, adjust_urls=False)
     native_bbox = util.get_native_bbox_from_json(mapjson)
     crs = util.get_crs_from_json(mapjson)
     set_bbox(workspace, MAP_TYPE, mapname, native_bbox, crs, )
