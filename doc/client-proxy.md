@@ -95,4 +95,4 @@ Currently, value of `X-Forwarded-Prefix` affects following URLs:
   * [WFS endpoints](endpoints.md#web-feature-service)
     * all operations URLs
 
-Value of `X-Forwarded-Prefix` does not affects response values of [GET Workspace Layer Metadata Comparison](rest.md#get-workspace-layer-metadata-comparison).
+Value of `X-Forwarded-Prefix` does not affects response values of [GET Workspace Layer Metadata Comparison](rest.md#get-workspace-layer-metadata-comparison) and [GET Workspace Map Metadata Comparison](rest.md#get-workspace-map-metadata-comparison).
