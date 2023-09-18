@@ -263,11 +263,12 @@ class TestSingleRestPublication:
 
     @pytest.fixture(scope='function', autouse=True)
     def post_before_test(self, request):
-        publication, method, post_before_test_args = request.param
-        assert self.post_before_test_scope in {'function', 'class'}
-        if method.name != RestMethod.POST.name:
-            if self.post_before_test_scope == 'function':
-                self.post_publication(publication, args=post_before_test_args)
-            else:
-                self.ensure_publication(publication, args=post_before_test_args, scope='class')
+        if hasattr(request, 'param'):
+            publication, method, post_before_test_args = request.param
+            assert self.post_before_test_scope in {'function', 'class'}
+            if method.name != RestMethod.POST.name:
+                if self.post_before_test_scope == 'function':
+                    self.post_publication(publication, args=post_before_test_args)
+                else:
+                    self.ensure_publication(publication, args=post_before_test_args, scope='class')
         yield
