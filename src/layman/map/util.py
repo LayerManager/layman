@@ -345,11 +345,12 @@ def _adjust_url(*, url_obj=None, url_key=None, url_list=None, url_idx=None, prox
     assert (url_obj is None) != (url_list is None)
     url_str = url_obj.get(url_key, '') if url_obj is not None else url_list[url_idx]
     if not url_str:
-        return
+        return None
     gs_path_pattern = r'^' + layman_util.CLIENT_PROXY_ONLY_PATTERN + \
                       re.escape(layman_settings.LAYMAN_GS_PATH) + r'(?P<path_postfix>.*)$'
     parsed_url = urlparse(url_str)
     match = re.match(gs_path_pattern, parsed_url.path)
+    found_original_base_url = None
     if match:
         # replace scheme and netloc, because LAYMAN_PUBLIC_URL_SCHEME or LAYMAN_PROXY_SERVER_NAME may have changed
         new_url = parsed_url._replace(
@@ -361,6 +362,8 @@ def _adjust_url(*, url_obj=None, url_key=None, url_list=None, url_idx=None, prox
             url_obj[url_key] = new_url.geturl()
         else:
             url_list[url_idx] = new_url.geturl()
+        found_original_base_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
+    return found_original_base_url
 
 
 def get_map_file_json(workspace, mapname, *, adjust_urls=True, x_forwarded_prefix=None):
@@ -374,8 +377,15 @@ def get_map_file_json(workspace, mapname, *, adjust_urls=True, x_forwarded_prefi
 
         for ml_idx in ml_indices:
             map_layer = map_json['layers'][ml_idx]
-            _adjust_url(url_obj=map_layer, url_key='url', proxy_prefix=x_forwarded_prefix)
-            _adjust_url(url_obj=map_layer.get('protocol', {}), url_key='url', proxy_prefix=x_forwarded_prefix)
+            orig_base_url = _adjust_url(url_obj=map_layer, url_key='url', proxy_prefix=x_forwarded_prefix)
+            orig_base_url = _adjust_url(url_obj=map_layer.get('protocol', {}), url_key='url',
+                                        proxy_prefix=x_forwarded_prefix) or orig_base_url
+            if orig_base_url:
+                legends = map_layer.get('legends', [])
+                for idx, legend_url in enumerate(legends):
+                    # use orig_base_url, because LAYMAN_PUBLIC_URL_SCHEME or LAYMAN_PROXY_SERVER_NAME may have changed
+                    if legend_url.startswith(orig_base_url):
+                        _adjust_url(url_list=legends, url_idx=idx, proxy_prefix=x_forwarded_prefix)
 
     if map_json is not None:
         map_json['user'] = get_map_owner_info(workspace)

@@ -50,6 +50,7 @@ class TestPublication(base_test.TestSingleRestPublication):
 
         exp_adjusted_urls = [
             ('$.layers[1].url', '/geoserver/ows'),
+            ('$.layers[1].legends[0]', '/geoserver/ows?service=WMS&version=1.3.0&request=GetLegendGraphic&format=image%2Fpng&width=20&height=20&layer=map_file_workspace_wms%3Ahranice'),
             ('$.layers[2].url', '/geoserver/map_file_workspace_wms/ows'),
             ('$.layers[3].protocol.url', '/geoserver/map_file_workspace_workspace/wfs'),
         ]
@@ -66,6 +67,7 @@ class TestPublication(base_test.TestSingleRestPublication):
         exp_unchanged_urls = [
             '$.layers[0].url',
             '$.layers[0].legends[0]',
+            '$.layers[1].legends[1]',
         ]
         for json_path_str in exp_unchanged_urls:
             exp_url = _find_single_value_in_json(json_path_str, orig_json)
