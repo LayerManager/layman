@@ -83,20 +83,22 @@ def correct_values_in_metadata(workspace, publ_type, name, http_method, *, exp_v
     expected_values_in_micka_metadata(workspace, publ_type, name, exp_metadata)
 
 
-def correct_layer_comparison_response_with_x_forwarded_prefix_header(workspace, name, *, actor_name=None, headers=None):
+def correct_comparison_response_with_x_forwarded_prefix_header(workspace, publ_type, name, *, actor_name=None, headers=None):
     proxy_prefix = '/layman-proxy'
     headers = headers or {}
     actor_name = actor_name or settings.ANONYM_USER
-    md_props = LAYER_METADATA_PROPERTIES
+    md_props = {
+        process_client.LAYER_TYPE: LAYER_METADATA_PROPERTIES,
+        process_client.MAP_TYPE: MAP_METADATA_PROPERTIES,
+    }[publ_type]
     headers_with_header = {**headers,
                            'X-Forwarded-Prefix': proxy_prefix,
                            }
     with app.app_context():
-        resp_json_with_proxy = process_client.get_workspace_publication_metadata_comparison(process_client.LAYER_TYPE, workspace, name,
+        resp_json_with_proxy = process_client.get_workspace_publication_metadata_comparison(publ_type, workspace, name,
                                                                                             actor_name=actor_name,
                                                                                             headers=headers_with_header)
-        resp_json_without_proxy = process_client.get_workspace_publication_metadata_comparison(process_client.LAYER_TYPE, workspace,
-                                                                                               name,
+        resp_json_without_proxy = process_client.get_workspace_publication_metadata_comparison(publ_type, workspace, name,
                                                                                                actor_name=actor_name,
                                                                                                headers=headers)
     assert md_props.issubset(set(resp_json_with_proxy['metadata_properties'].keys()))
