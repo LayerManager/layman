@@ -55,7 +55,8 @@
       "legends": [
         "http://localhost:8000/client-proxy-365/geoserver/ows?service=WMS&version=1.3.0&request=GetLegendGraphic&format=image%2Fpng&width=20&height=20&layer=map_file_workspace_wms%3Ahranice",
         "https://example.com/legend.png"
-      ]
+      ],
+      "style": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <StyledLayerDescriptor version=\"1.0.0\" xsi:schemaLocation=\"http://www.opengis.net/sld StyledLayerDescriptor.xsd\" xmlns=\"http://www.opengis.net/sld\" xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"> <NamedLayer> <Name>GeoServer SLD Cook Book: Simple point with stroke</Name> <UserStyle> <Name>GeoServer SLD Cook Book: Simple point with stroke</Name> <Title>GeoServer SLD Cook Book: Simple point with stroke</Title> <FeatureTypeStyle> <Rule> <Name/> <PointSymbolizer> <Graphic> <Mark> <WellKnownName>circle</WellKnownName> <Fill> <CssParameter name=\"fill\">#FF0000</CssParameter> </Fill> <Stroke> <CssParameter name=\"stroke\">#000000</CssParameter> <CssParameter name=\"stroke-width\">2</CssParameter> </Stroke> </Mark> <Size>18</Size> </Graphic> </PointSymbolizer> </Rule> </FeatureTypeStyle> </UserStyle> </NamedLayer> </StyledLayerDescriptor>"
     },
     {
       "metadata": {},
@@ -68,7 +69,8 @@
       "params": {
         "LAYERS": "mista",
         "FORMAT": "image\/png"
-      }
+      },
+      "style": "http://localhost:8000/client-proxy-abcd/rest/workspaces/map_file_workspace/layers/mista/style"
     },
     {
       "className": "OpenLayers.Layer.Vector",
@@ -89,7 +91,16 @@
       "singleTile": true,
       "title": "Hranice",
       "visibility": false,
-      "wmsMaxScale": 0
+      "wmsMaxScale": 0,
+      "style": {
+        "stroke": {
+          "color": "rgba(238, 156, 150, 1)",
+          "width": 23
+        },
+        "fill": {
+          "color": "rgba(238, 156, 150, 1)"
+        }
+      }
     }
   ]
 }
