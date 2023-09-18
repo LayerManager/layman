@@ -51,7 +51,11 @@
       "params": {
         "LAYERS": "map_file_workspace_wms:hranice",
         "FORMAT": "image\/png"
-      }
+      },
+      "legends": [
+        "http://localhost:8000/client-proxy-365/geoserver/ows?service=WMS&version=1.3.0&request=GetLegendGraphic&format=image%2Fpng&width=20&height=20&layer=map_file_workspace_wms%3Ahranice",
+        "https://example.com/legend.png"
+      ]
     },
     {
       "metadata": {},
