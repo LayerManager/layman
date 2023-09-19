@@ -1,6 +1,5 @@
 from lxml import etree as ET
 import requests
-import pytest
 
 from geoserver import util as gs_util
 from micka import NAMESPACES
@@ -9,7 +8,6 @@ from tests import Publication
 from tests.dynamic_data import base_test
 
 
-@pytest.mark.xfail(reason="Geoserver removes default values.")
 class TestPublication(base_test.TestSingleRestPublication):
     workspace = 'dynamic_test_workspace_sld_wellknownname'
     publication_type = process_client.LAYER_TYPE

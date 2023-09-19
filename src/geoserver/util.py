@@ -405,6 +405,7 @@ def post_workspace_sld_style(geoserver_workspace, layername, sld_file, launder_f
             'Content-type': sld_content_type,
         },
         auth=GS_AUTH,
+        params={'raw': True},
         timeout=GS_REST_TIMEOUT,
     )
     if response.status_code == 400:
