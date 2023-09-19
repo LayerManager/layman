@@ -368,15 +368,6 @@ def post_workspace_sld_style(geoserver_workspace, layername, sld_file, launder_f
         )
         response.raise_for_status()
         sld_file = io.BytesIO(response.content)
-    response = requests.post(
-        get_workspace_style_url(geoserver_workspace),
-        data=f"<style><name>{layername}</name><filename>{layername}.sld</filename></style>",
-        headers=headers_xml,
-        auth=GS_AUTH,
-        timeout=GS_REST_TIMEOUT,
-    )
-    response.raise_for_status()
-
     tree = ET.parse(sld_file)
     root = tree.getroot()
     if 'version' in root.attrib and root.attrib['version'] == '1.1.0':
@@ -397,15 +388,16 @@ def post_workspace_sld_style(geoserver_workspace, layername, sld_file, launder_f
     )
     sld_file.seek(0)
 
-    response = requests.put(
-        get_workspace_style_url(geoserver_workspace, layername),
+    response = requests.post(
+        get_workspace_style_url(geoserver_workspace),
         data=sld_file.read(),
         headers={
             'Accept': 'application/json',
             'Content-type': sld_content_type,
         },
         auth=GS_AUTH,
-        params={'raw': True},
+        params={'raw': True,
+                'name': layername, },
         timeout=GS_REST_TIMEOUT,
     )
     if response.status_code == 400:
