@@ -578,6 +578,7 @@ Content-Type: `multipart/form-data`
 Body parameters:
 - **file**, JSON file
    - must be valid against [map-composition schema](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema)
+   - URLs of [internal layers](models.md#internal-map-layer) may contain [client-proxy prefix](client-proxy.md)
 - *name*, string
    - computer-friendly identifier of the map
    - must be unique among all maps of one workspace
@@ -738,6 +739,7 @@ Notice that some JSON properties are automatically updated by layman, so file ob
    - **email** set to email of the owner, or empty string if not known
    - other properties will be deleted
 - **groups** are removed
+- [some layer URLs](client-proxy.md#x-forwarded-prefix-http-header) according to `X-Forwarded-Prefix` header
 
 #### Request
 No action parameters.
