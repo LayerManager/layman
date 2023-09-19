@@ -101,6 +101,20 @@
           "color": "rgba(238, 156, 150, 1)"
         }
       }
+    },
+    {
+      "metadata": {},
+      "visibility": true,
+      "opacity": 1,
+      "title": "Mista from another Layman instance",
+      "className": "HSLayers.Layer.WMS",
+      "singleTile": true,
+      "url": "http://anotherdomain/geoserver/map_file_workspace_wms/ows",
+      "params": {
+        "LAYERS": "mista",
+        "FORMAT": "image\/png"
+      },
+      "style": "http://anotherdomain/client-proxy-abcd/rest/workspaces/map_file_workspace/layers/mista/style"
     }
   ]
 }
