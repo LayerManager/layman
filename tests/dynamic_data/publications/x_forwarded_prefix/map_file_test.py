@@ -71,6 +71,8 @@ class TestPublication(base_test.TestSingleRestPublication):
             '$.layers[1].legends[1]',
             '$.layers[1].style',
             '$.layers[3].style',
+            '$.layers[4].url',
+            '$.layers[4].style',
         ]
         for json_path_str in exp_unchanged_urls:
             exp_url = _find_single_value_in_json(json_path_str, orig_json)
