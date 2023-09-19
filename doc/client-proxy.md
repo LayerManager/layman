@@ -63,6 +63,13 @@ Currently, value of `X-Forwarded-Prefix` affects following URLs:
   * `file`.`url` key
   * `thumbnail`.`url` key
   * `metadata`.`comparison_url` key
+* [GET Workspace Map File](rest.md#get-workspace-map-file)
+  * some URLs of each [internal layer](models.md#internal-map-layer):
+    * `url` key
+    * `protocol`.`url` key
+    * each `legends` key if its HTTP protocol and netloc corresponds with `url` or `protocol`.`url`
+    * `style` key if its HTTP protocol and netloc corresponds with `url` or `protocol`.`url`
+  * NOTE: If client proxy prefix was used in URLs in uploaded file, then such prefix is also replaced with prefix according to `X-Forwarded-Prefix` header value. Such prefix is removed for requests without `X-Forwarded-Prefix` header.
 * [POST Workspace Layers](rest.md#post-workspace-layers)
   * `url` key
 * [DELETE Workspace Layer](rest.md#delete-workspace-layer)

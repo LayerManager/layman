@@ -19,6 +19,7 @@
   - GET [Publications](doc/rest.md#get-publications), [Layers](doc/rest.md#get-layers), [Workspace Layers](doc/rest.md#get-workspace-layers), [Maps](doc/rest.md#get-maps), and [Workspace Maps](doc/rest.md#get-workspace-maps)
   - [GET](doc/rest.md#get-workspace-layer), [PATCH](doc/rest.md#patch-workspace-layer), and [DELETE](doc/rest.md#delete-workspace-layer) Workspace Layer
   - [GET](doc/rest.md#get-workspace-map), [PATCH](doc/rest.md#patch-workspace-map), and [DELETE](doc/rest.md#delete-workspace-map) Workspace Map
+  - [GET Workspace Map File](doc/rest.md#get-workspace-map-file)
   - [POST](doc/rest.md#post-workspace-layers) and [DELETE](doc/rest.md#delete-workspace-layers) Workspace Layers
   - [POST](doc/rest.md#post-workspace-maps) and [DELETE](doc/rest.md#delete-workspace-maps) Workspace Maps
   - requests to [WMS](doc/endpoints.md#web-map-service) and [WFS](doc/endpoints.md#web-feature-service) endpoints
