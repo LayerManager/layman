@@ -14,6 +14,7 @@ NAMESPACES = {
     'srv': 'http://www.isotc211.org/2005/srv',
     'soap': 'http://www.w3.org/2003/05/soap-envelope',
     'hs': 'http://www.hsrs.cz/micka',
+    'sld': "http://www.opengis.net/sld"
 }
 
 
