@@ -384,8 +384,8 @@ def post_workspace_sld_style(geoserver_workspace, layername, sld_file, launder_f
     else:
         sld_content_type = 'application/vnd.ogc.sld+xml'
 
-    propertname_els = tree.findall('.//{http://www.opengis.net/ogc}PropertyName')
     if launder_function:
+        propertname_els = tree.findall('.//{http://www.opengis.net/ogc}PropertyName')
         for element in propertname_els:
             element.text = launder_function(element.text)
 
