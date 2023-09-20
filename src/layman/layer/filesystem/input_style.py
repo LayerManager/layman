@@ -73,14 +73,20 @@ def get_layer_file(workspace, layername):
 
 def get_style_type_from_file_storage(file_storage):
     if file_storage:
-        xml = file_storage.read()
-        file_storage.seek(0)
-        xml_tree = etree.fromstring(xml)
-        root_tag = xml_tree.tag
-        root_attribute = etree.QName(root_tag).localname
-        result = next((sd for sd in layer.STYLE_TYPES_DEF if sd.root_element == root_attribute), None)
-        if not result:
-            raise LaymanError(46)
+        try:
+            xml = file_storage.read()
+            file_storage.seek(0)
+            xml_tree = etree.fromstring(xml)
+            root_tag = xml_tree.tag
+            root_attribute = etree.QName(root_tag).localname
+            result = next((sd for sd in layer.STYLE_TYPES_DEF if sd.root_element == root_attribute), None)
+            if not result:
+                raise LaymanError(46, {
+                    'message': f"Unknown root element.",
+                    'expected': f"Root element is one of {[sd.root_element for sd in layer.STYLE_TYPES_DEF if sd.root_element]}",
+                })
+        except etree.XMLSyntaxError as exc:
+            raise LaymanError(46, "Unable to parse style file.",) from exc
     else:
         result = layer.NO_STYLE_DEF
     return result
