@@ -134,3 +134,12 @@ def test__url_for(endpoint, internal, params, expected_url):
         # pylint: disable=protected-access
         assert util._url_for(endpoint, server_name=server_name, proxy_server_name=proxy_server_name, internal=internal,
                              **params) == expected_url
+
+
+@pytest.mark.parametrize('headers, exp_result', [
+    pytest.param({'X-Forwarded-Prefix': '/layman-proxy'}, '/layman-proxy', id='simple_header'),
+    pytest.param({}, None, id='without_header'),
+])
+def test_get_x_forwarded_prefix(headers, exp_result):
+    result = util.get_x_forwarded_prefix(headers)
+    assert result == exp_result
