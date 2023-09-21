@@ -548,4 +548,15 @@ def ensure_home_dir():
 
 
 def get_x_forwarded_prefix(request_headers):
-    return request_headers.get('X-Forwarded-Prefix')
+    header_key = 'X-Forwarded-Prefix'
+    header_value = request_headers.get(header_key)
+    if header_value and not re.match(CLIENT_PROXY_PATTERN, header_value):
+        raise LaymanError(54,
+                          {'header': header_key,
+                           'message': f'Optional header {header_key} is expected to be valid URL subpath starting with slash, or empty string.',
+                           'expected': f'Expected header matching regular expression {CLIENT_PROXY_PATTERN}',
+                           'found': header_value,
+
+                           }
+                          )
+    return header_value

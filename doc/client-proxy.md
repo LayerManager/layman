@@ -23,7 +23,7 @@ By default, Layman will not adjust URLs in its response to contain also URL path
 
 ## X-Forwarded-Prefix HTTP header
 
-The value of the `X-Forwarded-Prefix` HTTP header will be used as prefix in some URL paths of Layman response.
+The value of the `X-Forwarded-Prefix` HTTP header will be used as prefix in some URL paths of Layman response and is required to match regular expression `^(?:/[a-z0-9_-]+)*$`.
 
 For example, if you send request to `/layman-client-proxy/rest/publications` with HTTP header `X-Forwarded-Prefix=/layman-client-proxy` then response will change to
 
