@@ -1,6 +1,7 @@
 import importlib
 import pytest
 
+from test_tools import util as test_util
 from . import app, settings, LaymanError, util
 
 
@@ -143,3 +144,23 @@ def test__url_for(endpoint, internal, params, expected_url):
 def test_get_x_forwarded_prefix(headers, exp_result):
     result = util.get_x_forwarded_prefix(headers)
     assert result == exp_result
+
+
+@pytest.mark.parametrize('headers, exp_error', [
+    pytest.param(
+        {'X-Forwarded-Prefix': 'layman-proxy'},
+        {
+            'http_code': 400,
+            'code': 54,
+            'data': {
+                'header': 'X-Forwarded-Prefix',
+                'message': 'Optional header X-Forwarded-Prefix is expected to be valid URL subpath starting with slash, or empty string.',
+                'expected': 'Expected header matching regular expression ^(?:/[a-z0-9_-]+)*$',
+                'found': 'layman-proxy',
+            },
+        }, id='without_slash'),
+])
+def test_get_x_forwarded_prefix_raises(headers, exp_error):
+    with pytest.raises(LaymanError) as exc_info:
+        util.get_x_forwarded_prefix(headers)
+    test_util.assert_error(exp_error, exc_info)
