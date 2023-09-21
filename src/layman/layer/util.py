@@ -290,7 +290,7 @@ def parse_and_validate_external_table_uri_str(external_table_uri_str):
         })
 
     try:
-        conn_cur = db_util.get_connection_cursor(db_uri_str, encapsulate_exception=False)
+        db_util.get_connection_pool(db_uri_str=db_uri_str, encapsulate_exception=False)
     except psycopg2.OperationalError as exc:
         raise LaymanError(2, {
             'parameter': 'external_table_uri',
@@ -304,7 +304,7 @@ def parse_and_validate_external_table_uri_str(external_table_uri_str):
 
     if not geo_column:
         query = f'''select f_geometry_column from geometry_columns where f_table_schema = %s and f_table_name = %s order by f_geometry_column asc'''
-        query_res = db_util.run_query(query, (schema, table), conn_cur=conn_cur)
+        query_res = db_util.run_query(query, (schema, table), uri_str=db_uri_str, )
         if len(query_res) == 0:
             raise LaymanError(2, {
                 'parameter': 'external_table_uri',
@@ -332,10 +332,10 @@ def parse_and_validate_external_table_uri_str(external_table_uri_str):
             })
 
     query = f'''select count(*) from information_schema.tables WHERE table_schema=%s and table_name=%s'''
-    query_res = db_util.run_query(query, (schema, table,), conn_cur=conn_cur)
+    query_res = db_util.run_query(query, (schema, table,), uri_str=db_uri_str, )
     if not query_res[0][0]:
         query = f'''select table_schema, table_name from information_schema.tables WHERE lower(table_schema)=lower(%s) and lower(table_name)=lower(%s)'''
-        query_res = db_util.run_query(query, (schema, table,), conn_cur=conn_cur)
+        query_res = db_util.run_query(query, (schema, table,), uri_str=db_uri_str, )
         suggestion = f" Did you mean \"{query_res[0][0]}\".\"{query_res[0][1]}\"?" if query_res else ''
         raise LaymanError(2, {
             'parameter': 'external_table_uri',
@@ -349,7 +349,7 @@ def parse_and_validate_external_table_uri_str(external_table_uri_str):
         })
 
     query = f'''select count(*) from geometry_columns where f_table_schema = %s and f_table_name = %s and f_geometry_column = %s'''
-    query_res = db_util.run_query(query, (schema, table, geo_column), conn_cur=conn_cur)
+    query_res = db_util.run_query(query, (schema, table, geo_column), uri_str=db_uri_str, )
     if not query_res[0][0]:
         raise LaymanError(2, {
             'parameter': 'external_table_uri',
@@ -363,7 +363,7 @@ def parse_and_validate_external_table_uri_str(external_table_uri_str):
             }
         })
 
-    crs = get_table_crs(schema, table, conn_cur=conn_cur, column=geo_column, use_internal_srid=False)
+    crs = get_table_crs(schema, table, uri_str=db_uri_str, column=geo_column, use_internal_srid=False)
     if crs not in settings.INPUT_SRS_LIST:
         raise LaymanError(2, {
             'parameter': 'external_table_uri',
@@ -386,7 +386,7 @@ WHERE
   idx.indisprimary AND
   cls.relname = %s AND
   nspace.nspname = %s'''
-    query_res = db_util.run_query(query, (table, schema), conn_cur=conn_cur, log_query=True)
+    query_res = db_util.run_query(query, (table, schema), uri_str=db_uri_str, log_query=True)
     primary_key_columns = [r[0] for r in query_res]
     if len(query_res) == 0:
         raise LaymanError(2, {
@@ -413,7 +413,7 @@ WHERE
             }
         })
 
-    column_names = get_all_table_column_names(schema, table, conn_cur=conn_cur)
+    column_names = get_all_table_column_names(schema, table, uri_str=db_uri_str)
     unsafe_column_names = [c for c in column_names if not re.match(SAFE_PG_IDENTIFIER_PATTERN, c)]
     if unsafe_column_names:
         raise LaymanError(2, {

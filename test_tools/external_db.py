@@ -24,23 +24,21 @@ def ensure_db():
     with app.app_context():
         db_util.run_statement(statement)
 
-    conn_cur = db_util.get_connection_cursor(URI_STR)
     statement = f"""
 CREATE USER {READ_ONLY_USER} WITH PASSWORD '{READ_ONLY_PASSWORD}';
 GRANT CONNECT ON DATABASE {EXTERNAL_DB_NAME} TO {READ_ONLY_USER};
 ALTER DEFAULT PRIVILEGES GRANT SELECT ON TABLES TO {READ_ONLY_USER};
 """
-    db_util.run_statement(statement, conn_cur=conn_cur)
+    db_util.run_statement(statement, uri_str=URI_STR)
 
     yield
 
 
 def ensure_schema(schema):
-    conn_cur = db_util.get_connection_cursor(URI_STR)
     statement = sql.SQL(f'CREATE SCHEMA IF NOT EXISTS {{schema}} AUTHORIZATION {settings.LAYMAN_PG_USER}').format(
         schema=sql.Identifier(schema),
     )
-    db_util.run_statement(statement, conn_cur=conn_cur)
+    db_util.run_statement(statement, uri_str=URI_STR)
 
 
 def ensure_table(schema, name, geo_column, *, primary_key_columns=None, other_columns=None, srid=4326):
@@ -71,8 +69,7 @@ def ensure_table(schema, name, geo_column, *, primary_key_columns=None, other_co
         table=sql.Identifier(schema, name),
         columns=sql.SQL(',').join(columns),
     )
-    conn_cur = db_util.get_connection_cursor(URI_STR)
-    db_util.run_statement(statement, conn_cur=conn_cur, log_query=True)
+    db_util.run_statement(statement, uri_str=URI_STR, log_query=True)
 
 
 def import_table(input_file_path, *, table=None, schema='public', geo_column=settings.OGR_DEFAULT_GEOMETRY_COLUMN,
@@ -110,27 +107,25 @@ def import_table(input_file_path, *, table=None, schema='public', geo_column=set
     assert return_code == 0 and not stdout and not stderr, f"return_code={return_code}, stdout={stdout}, stderr={stderr}"
 
     if primary_key_column is None:
-        conn_cur = db_util.get_connection_cursor(URI_STR)
         statement = sql.SQL("alter table {table} drop column {primary_key}").format(
             table=sql.Identifier(schema, table),
             primary_key=sql.Identifier(primary_key_to_later_drop),
         )
-        db_util.run_statement(statement, conn_cur=conn_cur)
+        db_util.run_statement(statement, uri_str=URI_STR, )
 
     if additional_geo_column:
-        conn_cur = db_util.get_connection_cursor(URI_STR)
         statement = sql.SQL("alter table {table} add column {geo_column_2} GEOMETRY").format(
             table=sql.Identifier(schema, table),
             geo_column_2=sql.Identifier(additional_geo_column),
         )
-        db_util.run_statement(statement, conn_cur=conn_cur)
+        db_util.run_statement(statement, uri_str=URI_STR, )
 
         statement = sql.SQL("update {table} set {geo_column_2} = st_buffer({geo_column}, 15)").format(
             table=sql.Identifier(schema, table),
             geo_column_2=sql.Identifier(additional_geo_column),
             geo_column=sql.Identifier(geo_column),
         )
-        db_util.run_statement(statement, conn_cur=conn_cur)
+        db_util.run_statement(statement, uri_str=URI_STR, )
 
     return schema, table
 
@@ -140,5 +135,4 @@ def drop_table(schema, name, *, if_exists=False):
     statement = sql.SQL(f'drop table {if_exists_str} {{table}}').format(
         table=sql.Identifier(schema, name)
     )
-    conn_cur = db_util.get_connection_cursor(URI_STR)
-    db_util.run_statement(statement, conn_cur=conn_cur)
+    db_util.run_statement(statement, uri_str=URI_STR, )

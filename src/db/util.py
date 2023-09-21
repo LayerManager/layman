@@ -1,7 +1,8 @@
 import logging
 import re
+from urllib import parse
 import psycopg2
-from flask import g
+import psycopg2.pool
 
 import crs as crs_def
 from . import PG_URI_STR
@@ -9,38 +10,35 @@ from .error import Error
 
 logger = logging.getLogger(__name__)
 
-FLASK_CONN_CUR_KEY = f'{__name__}:CONN_CUR'
+CONNECTION_POOL_DICT = {}
 
 
-def create_connection_cursor(db_uri_str=None, encapsulate_exception=True):
+def get_connection_pool(db_uri_str=None, encapsulate_exception=True):
     db_uri_str = db_uri_str or PG_URI_STR
-    try:
-        connection = psycopg2.connect(db_uri_str)
-        connection.set_session(autocommit=True)
-    except BaseException as exc:
-        if encapsulate_exception:
-            raise Error(1) from exc
-        raise exc
-    cursor = connection.cursor()
-    return connection, cursor
+    connection_pool = CONNECTION_POOL_DICT.get(db_uri_str)
+    if not connection_pool:
+        db_uri_parsed = parse.urlparse(db_uri_str)
+        try:
+            connection_pool = psycopg2.pool.ThreadedConnectionPool(3, 20,
+                                                                   user=db_uri_parsed.username,
+                                                                   password=db_uri_parsed.password,
+                                                                   host=db_uri_parsed.hostname,
+                                                                   port=db_uri_parsed.port,
+                                                                   database=db_uri_parsed.path[1:],
+                                                                   )
+        except BaseException as exc:
+            if encapsulate_exception:
+                raise Error(1) from exc
+            raise exc
+        CONNECTION_POOL_DICT[db_uri_str] = connection_pool
+    return connection_pool
 
 
-def get_connection_cursor(db_uri_str=None, encapsulate_exception=True):
-    if db_uri_str is None or db_uri_str == PG_URI_STR:
-        key = FLASK_CONN_CUR_KEY
-        if key not in g:
-            conn_cur = create_connection_cursor(encapsulate_exception=encapsulate_exception)
-            g.setdefault(key, conn_cur)
-        result = g.get(key)
-    else:
-        result = create_connection_cursor(db_uri_str=db_uri_str, encapsulate_exception=encapsulate_exception)
-    return result
-
-
-def run_query(query, data=None, conn_cur=None, encapsulate_exception=True, log_query=False):
-    if conn_cur is None:
-        conn_cur = get_connection_cursor()
-    conn, cur = conn_cur
+def run_query(query, data=None, uri_str=None, encapsulate_exception=True, log_query=False):
+    pool = get_connection_pool(db_uri_str=uri_str, encapsulate_exception=encapsulate_exception, )
+    conn = pool.getconn()
+    conn.autocommit = True
+    cur = conn.cursor()
     try:
         if log_query:
             logger.info(f"query={cur.mogrify(query, data).decode()}")
@@ -52,14 +50,17 @@ def run_query(query, data=None, conn_cur=None, encapsulate_exception=True, log_q
             logger.error(f"run_query, query={query}, data={data}, exc={exc}")
             raise Error(2) from exc
         raise exc
+    finally:
+        pool.putconn(conn)
 
     return rows
 
 
-def run_statement(query, data=None, conn_cur=None, encapsulate_exception=True, log_query=False):
-    if conn_cur is None:
-        conn_cur = get_connection_cursor()
-    conn, cur = conn_cur
+def run_statement(query, data=None, uri_str=None, encapsulate_exception=True, log_query=False):
+    pool = get_connection_pool(db_uri_str=uri_str, encapsulate_exception=encapsulate_exception, )
+    conn = pool.getconn()
+    conn.autocommit = True
+    cur = conn.cursor()
     try:
         if log_query:
             logger.info(f"query={cur.mogrify(query, data).decode()}")
@@ -71,6 +72,9 @@ def run_statement(query, data=None, conn_cur=None, encapsulate_exception=True, l
             logger.error(f"run_query, query={query}, data={data}, exc={exc}")
             raise Error(2) from exc
         raise exc
+    finally:
+        pool.putconn(conn)
+
     return rows
 
 
@@ -93,14 +97,14 @@ def get_internal_srid(crs):
     return srid
 
 
-def get_crs_from_srid(srid, conn_cur=None, *, use_internal_srid):
+def get_crs_from_srid(srid, uri_str=None, *, use_internal_srid):
     crs = next((
         crs_code for crs_code, crs_item_def in crs_def.CRSDefinitions.items()
         if crs_item_def.internal_srid == srid
     ), None) if use_internal_srid else None
     if not crs:
         sql = 'select auth_name, auth_srid from spatial_ref_sys where srid = %s;'
-        auth_name, auth_srid = run_query(sql, (srid, ), conn_cur=conn_cur)[0]
+        auth_name, auth_srid = run_query(sql, (srid, ), uri_str=uri_str)[0]
         if auth_name or auth_srid:
             crs = f'{auth_name}:{auth_srid}'
     return crs

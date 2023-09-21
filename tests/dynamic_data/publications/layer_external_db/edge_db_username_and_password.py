@@ -55,7 +55,6 @@ class TestEdge(base_test.TestSingleRestPublication):
 
     def test_layer(self, layer: Publication, rest_method, rest_args, ):
         """Parametrized using pytest_generate_tests"""
-        conn_cur = db_util.get_connection_cursor(external_db.URI_STR)
         statement = sql.SQL(f"""
         DO
         $$BEGIN
@@ -77,7 +76,7 @@ class TestEdge(base_test.TestSingleRestPublication):
             schema=sql.Identifier(SCHEMA),
             table=sql.Identifier(TABLE),
         )
-        db_util.run_statement(statement, conn_cur=conn_cur)
+        db_util.run_statement(statement, uri_str=external_db.URI_STR)
 
         # publish layer from external DB table
         rest_method.fn(layer, args=rest_args)

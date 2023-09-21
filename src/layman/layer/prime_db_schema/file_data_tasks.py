@@ -1,6 +1,5 @@
 from celery.utils.log import get_task_logger
 
-from db import util as db_util
 from layman.celery import AbortedException
 from layman import celery_app, util as layman_util, settings
 from .. import LAYER_TYPE
@@ -30,8 +29,7 @@ def patch_after_feature_change(
     assert geodata_type == settings.GEODATA_TYPE_VECTOR
 
     table_uri = info['_table_uri']
-    conn_cur = db_util.get_connection_cursor(db_uri_str=table_uri.db_uri_str)
-    bbox = db_get_bbox(table_uri.schema, table_uri.table, conn_cur=conn_cur, column=table_uri.geo_column)
+    bbox = db_get_bbox(table_uri.schema, table_uri.table, uri_str=table_uri.db_uri_str, column=table_uri.geo_column)
 
     if self.is_aborted():
         raise AbortedException

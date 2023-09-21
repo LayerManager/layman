@@ -1,3 +1,4 @@
+import logging
 from psycopg2 import sql
 
 from db import util as db_util
@@ -7,6 +8,7 @@ from layman.http import LaymanError
 from . import get_internal_table_name
 from .. import LAYER_TYPE, util as layer_util
 
+logger = logging.getLogger(__name__)
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
 
@@ -23,10 +25,11 @@ def get_layer_info(workspace, layername,):
     result = {}
     if table_uri:
         if layer_info['original_data_source'] == settings.EnumOriginalDataSource.FILE.value:
-            conn_cur = db_util.get_connection_cursor()
+            db_uri_str = None
         else:
+            db_uri_str = table_uri.db_uri_str
             try:
-                conn_cur = db_util.get_connection_cursor(db_uri_str=table_uri.db_uri_str,)
+                db_util.get_connection_pool(db_uri_str=db_uri_str,)
             except BaseException:
                 result['db'] = {
                     'schema': table_uri.schema,
@@ -37,18 +40,15 @@ def get_layer_info(workspace, layername,):
                     'error': 'Cannot connect to DB.',
                 }
                 return result
-
-        _, cur = conn_cur
         try:
-            cur.execute(f"""
+            rows = db_util.run_query(f"""
     SELECT schemaname, tablename, tableowner
     FROM pg_tables
     WHERE schemaname = %s
         AND tablename = %s
-    """, (table_uri.schema, table_uri.table, ))
+    """, (table_uri.schema, table_uri.table, ), uri_str=db_uri_str)
         except BaseException as exc:
             raise LaymanError(7) from exc
-        rows = cur.fetchall()
         if len(rows) > 0:
             result['db'] = {
                 'schema': table_uri.schema,
@@ -70,26 +70,22 @@ def get_layer_info(workspace, layername,):
     return result
 
 
-def delete_layer(workspace, layername, conn_cur=None):
+def delete_layer(workspace, layername, ):
     """Deletes table from internal DB only"""
     table_name = get_internal_table_name(workspace, layername)
     if table_name:
-        if conn_cur is None:
-            conn_cur = db_util.get_connection_cursor()
-        conn, cur = conn_cur
         query = sql.SQL("""
         DROP TABLE IF EXISTS {table} CASCADE
         """).format(
             table=sql.Identifier(workspace, table_name),
         )
         try:
-            cur.execute(query)
-            conn.commit()
+            db_util.run_statement(query)
         except BaseException as exc:
             raise LaymanError(7)from exc
 
 
-def set_internal_table_layer_srid(schema, table_name, srid, *, conn_cur=None):
+def set_internal_table_layer_srid(schema, table_name, srid, ):
     query = '''SELECT UpdateGeometrySRID(%s, %s, %s, %s);'''
     params = (schema, table_name, settings.OGR_DEFAULT_GEOMETRY_COLUMN, srid)
-    db_util.run_query(query, params, conn_cur=conn_cur)
+    db_util.run_query(query, params)
