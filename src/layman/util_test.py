@@ -138,11 +138,12 @@ def test__url_for(endpoint, internal, params, expected_url):
 
 
 @pytest.mark.parametrize('headers, exp_result', [
-    pytest.param({'X-Forwarded-Prefix': '/layman-proxy'}, '/layman-proxy', id='simple_header'),
-    pytest.param({}, None, id='without_header'),
+    pytest.param({'X-Forwarded-Prefix': '/layman-proxy'}, util.XForwardedClass(prefix='/layman-proxy'),
+                 id='simple_header'),
+    pytest.param({}, util.XForwardedClass(), id='without_header'),
 ])
-def test_get_x_forwarded_prefix(headers, exp_result):
-    result = util.get_x_forwarded_prefix(headers)
+def test_get_x_forwarded_items(headers, exp_result):
+    result = util.get_x_forwarded_items(headers)
     assert result == exp_result
 
 
@@ -160,7 +161,7 @@ def test_get_x_forwarded_prefix(headers, exp_result):
             },
         }, id='without_slash'),
 ])
-def test_get_x_forwarded_prefix_raises(headers, exp_error):
+def test_get_x_forwarded_items_raises(headers, exp_error):
     with pytest.raises(LaymanError) as exc_info:
-        util.get_x_forwarded_prefix(headers)
+        util.get_x_forwarded_items(headers)
     test_util.assert_error(exp_error, exc_info)

@@ -231,7 +231,7 @@ def proxy(subpath):
         'Host',
     ]:
         headers_req.pop(header, None)
-    x_forwarded_prefix = layman_util.get_x_forwarded_prefix(request.headers)
+    x_forwarded_prefix = layman_util.get_x_forwarded_items(request.headers)
     headers_req['X-Forwarded-Path'] = x_forwarded_prefix or ''
 
     # ensure layer attributes in case of WFS-T

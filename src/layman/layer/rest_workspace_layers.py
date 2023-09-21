@@ -32,7 +32,7 @@ def get(workspace):
     app.logger.info(f"GET Layers, actor={g.user}")
 
     actor = get_authn_username()
-    x_forwarded_prefix = layman_util.get_x_forwarded_prefix(request.headers)
+    x_forwarded_prefix = layman_util.get_x_forwarded_items(request.headers)
     return rest_common.get_publications(LAYER_TYPE, actor, request_args=request.args, workspace=workspace, x_forwarded_prefix=x_forwarded_prefix)
 
 
@@ -40,7 +40,7 @@ def get(workspace):
 def post(workspace):
     app.logger.info(f"POST Layers, actor={g.user}")
 
-    x_forwarded_prefix = layman_util.get_x_forwarded_prefix(request.headers)
+    x_forwarded_prefix = layman_util.get_x_forwarded_items(request.headers)
 
     # FILE
     sent_file_streams = []
@@ -253,7 +253,7 @@ def post(workspace):
 def delete(workspace):
     app.logger.info(f"DELETE Layers, actor={g.user}")
 
-    x_forwarded_prefix = layman_util.get_x_forwarded_prefix(request.headers)
+    x_forwarded_prefix = layman_util.get_x_forwarded_items(request.headers)
     infos = layman_util.delete_publications(workspace,
                                             LAYER_TYPE,
                                             util.is_layer_chain_ready,

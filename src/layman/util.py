@@ -1,7 +1,9 @@
+from dataclasses import dataclass
 from functools import wraps
 import importlib
 import copy
 import inspect
+import json
 import os
 import pathlib
 import re
@@ -53,6 +55,33 @@ class SimpleCounter:
 
     def get(self):
         return self.counter
+
+
+@dataclass(frozen=True)
+class XForwardedClass:
+    def __init__(self, *, prefix=None):
+        object.__setattr__(self, '_prefix', prefix)
+
+    @property
+    def prefix(self):
+        # pylint: disable=no-member
+        return self._prefix
+
+    def __bool__(self):
+        return self.prefix is not None
+
+    def __eq__(self, other):
+        return isinstance(other, XForwardedClass) and self.prefix == other.prefix
+
+    def __repr__(self):
+        parts = []
+        if self.prefix is not None:
+            parts.append(('prefix', json.dumps(self.prefix)))
+        parts_str = ', '.join(f"{key}={value}" for key, value in parts)
+        return f"XForwardedClass({parts_str})"
+
+    def __str__(self):
+        return self.__repr__()
 
 
 def slugify(value):
@@ -547,16 +576,17 @@ def ensure_home_dir():
         os.environ['HOME'] = homedir
 
 
-def get_x_forwarded_prefix(request_headers):
-    header_key = 'X-Forwarded-Prefix'
-    header_value = request_headers.get(header_key)
-    if header_value and not re.match(CLIENT_PROXY_PATTERN, header_value):
-        raise LaymanError(54,
-                          {'header': header_key,
-                           'message': f'Optional header {header_key} is expected to be valid URL subpath starting with slash, or empty string.',
-                           'expected': f'Expected header matching regular expression {CLIENT_PROXY_PATTERN}',
-                           'found': header_value,
-
-                           }
-                          )
-    return header_value
+def get_x_forwarded_items(request_headers):
+    prefix = None
+    prefix_key = 'X-Forwarded-Prefix'
+    if prefix_key in request_headers:
+        prefix = request_headers[prefix_key]
+        if not re.match(CLIENT_PROXY_PATTERN, prefix):
+            raise LaymanError(54,
+                              {'header': prefix_key,
+                               'message': f'Optional header {prefix_key} is expected to be valid URL subpath starting with slash, or empty string.',
+                               'expected': f'Expected header matching regular expression {CLIENT_PROXY_PATTERN}',
+                               'found': prefix,
+                               }
+                              )
+    return XForwardedClass(prefix=prefix)
