@@ -399,7 +399,7 @@ def test_parse_external_table_uri_str(external_table_uri_str, exp_result):
         'code': 2,
         'data': {
             'parameter': 'external_table_uri',
-            'message': 'Expected table with all column names mathing regular expression ^[a-zA-Z_][a-zA-Z_0-9]*$',
+            'message': 'Expected table with all column names matching regular expression ^[a-zA-Z_][a-zA-Z_0-9]*$',
             'found': {
                 'external_table_uri': 'postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=table_with_unsafe_column_name&geo_column=geo_wkb_column',
                 'schema': 'schema_name',

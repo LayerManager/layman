@@ -418,7 +418,7 @@ WHERE
     if unsafe_column_names:
         raise LaymanError(2, {
             'parameter': 'external_table_uri',
-            'message': 'Expected table with all column names mathing regular expression ' + SAFE_PG_IDENTIFIER_PATTERN,
+            'message': 'Expected table with all column names matching regular expression ' + SAFE_PG_IDENTIFIER_PATTERN,
             'found': {
                 'external_table_uri': external_table_uri_str,
                 'schema': schema,
