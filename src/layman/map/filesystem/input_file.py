@@ -36,7 +36,7 @@ def get_map_file(workspace, mapname):
     return mapfile_path
 
 
-def get_map_info(workspace, mapname, *, x_forwarded_prefix=None):
+def get_map_info(workspace, mapname, *, x_forwarded_items=None):
     map_file_path = get_map_file(workspace, mapname)
     result = {}
     if os.path.exists(map_file_path):
@@ -46,7 +46,7 @@ def get_map_info(workspace, mapname, *, x_forwarded_prefix=None):
         result = {
             'file': {
                 'path': map_file_path,
-                'url': url_for('rest_workspace_map_file.get', mapname=mapname, workspace=workspace, x_forwarded_prefix=x_forwarded_prefix),
+                'url': url_for('rest_workspace_map_file.get', mapname=mapname, workspace=workspace, x_forwarded_items=x_forwarded_items),
             },
             '_file': {
                 'url': url_for('rest_workspace_map_file.get', mapname=mapname, workspace=workspace, internal=True),

@@ -32,14 +32,14 @@ def ensure_layer_thumbnail_dir(workspace, layername):
     return thumbnail_dir
 
 
-def get_layer_info(workspace, layername, *, x_forwarded_prefix=None):
+def get_layer_info(workspace, layername, *, x_forwarded_items=None):
     thumbnail_path = get_layer_thumbnail_path(workspace, layername)
     if os.path.exists(thumbnail_path):
         return {
             'thumbnail': {
                 'url': url_for('rest_workspace_layer_thumbnail.get', workspace=workspace,
                                layername=layername,
-                               x_forwarded_prefix=x_forwarded_prefix),
+                               x_forwarded_items=x_forwarded_items),
                 'path': os.path.relpath(thumbnail_path, common_util.get_workspace_dir(workspace))
             },
             '_thumbnail': {

@@ -154,5 +154,5 @@ STYLE_TYPES_DEF = [StyleTypeDef('sld',
 NO_STYLE_DEF = STYLE_TYPES_DEF[0]
 
 
-def get_workspace_publication_url(workspace, publication_name, *, x_forwarded_prefix=None):
-    return url_for('rest_workspace_layer.get', layername=publication_name, workspace=workspace, x_forwarded_prefix=x_forwarded_prefix)
+def get_workspace_publication_url(workspace, publication_name, *, x_forwarded_items=None):
+    return url_for('rest_workspace_layer.get', layername=publication_name, workspace=workspace, x_forwarded_items=x_forwarded_items)

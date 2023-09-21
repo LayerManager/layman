@@ -85,5 +85,5 @@ PUBLICATION_TYPES = {
 }
 
 
-def get_workspace_publication_url(workspace, publication_name, *, x_forwarded_prefix=None):
-    return url_for('rest_workspace_map.get', mapname=publication_name, workspace=workspace, x_forwarded_prefix=x_forwarded_prefix)
+def get_workspace_publication_url(workspace, publication_name, *, x_forwarded_items=None):
+    return url_for('rest_workspace_map.get', mapname=publication_name, workspace=workspace, x_forwarded_items=x_forwarded_items)

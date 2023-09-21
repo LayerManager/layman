@@ -17,11 +17,11 @@ patch_layer = empty_method
 get_publication_uuid = empty_method_returns_none
 
 
-def get_layer_info(workspace, layername, *, x_forwarded_prefix=None):
+def get_layer_info(workspace, layername, *, x_forwarded_items=None):
     input_file_dir = qgis.get_layer_dir(workspace, layername)
     result = {}
     if os.path.exists(input_file_dir):
-        url = layman_util.url_for('rest_workspace_layer_style.get', workspace=workspace, layername=layername, x_forwarded_prefix=x_forwarded_prefix)
+        url = layman_util.url_for('rest_workspace_layer_style.get', workspace=workspace, layername=layername, x_forwarded_items=x_forwarded_items)
         result = {
             'name': layername,
             'style': {

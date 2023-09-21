@@ -27,7 +27,7 @@ get_publication_uuid = empty_method_returns_none
 post_layer = empty_method
 
 
-def get_layer_info(workspace, layername, *, x_forwarded_prefix=None):
+def get_layer_info(workspace, layername, *, x_forwarded_items=None):
     uuid = get_layer_uuid(workspace, layername)
     try:
         csw = common_util.create_csw()
@@ -50,7 +50,7 @@ def get_layer_info(workspace, layername, *, x_forwarded_prefix=None):
                 'csw_url': settings.CSW_PROXY_URL,
                 'record_url': common_util.get_metadata_url(uuid, url_type=common_util.RecordUrlType.BASIC),
                 'comparison_url': url_for('rest_workspace_layer_metadata_comparison.get', workspace=workspace, layername=layername,
-                                          x_forwarded_prefix=x_forwarded_prefix),
+                                          x_forwarded_items=x_forwarded_items),
             }
         }
     return {}

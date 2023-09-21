@@ -35,13 +35,13 @@ def ensure_map_thumbnail_dir(workspace, mapname):
     return thumbnail_dir
 
 
-def get_map_info(workspace, mapname, *, x_forwarded_prefix=None):
+def get_map_info(workspace, mapname, *, x_forwarded_items=None):
     thumbnail_path = get_map_thumbnail_path(workspace, mapname)
     if os.path.exists(thumbnail_path):
         return {
             'thumbnail': {
                 'url': url_for('rest_workspace_map_thumbnail.get', workspace=workspace,
-                               mapname=mapname, x_forwarded_prefix=x_forwarded_prefix),
+                               mapname=mapname, x_forwarded_items=x_forwarded_items),
                 'path': os.path.relpath(thumbnail_path, common_util.get_workspace_dir(workspace))
             },
             '_thumbnail': {

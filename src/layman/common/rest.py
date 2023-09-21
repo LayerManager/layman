@@ -157,7 +157,7 @@ def get_integer_from_param(request_args, param_name, negative=True, zero=True, p
     return result
 
 
-def get_publications(publication_type, actor, request_args=None, workspace=None, *, x_forwarded_prefix=None):
+def get_publications(publication_type, actor, request_args=None, workspace=None, *, x_forwarded_items=None):
     request_args = request_args or {}
     known_order_by_values = [consts.ORDER_BY_TITLE, consts.ORDER_BY_FULL_TEXT, consts.ORDER_BY_LAST_CHANGE,
                              consts.ORDER_BY_BBOX, ]
@@ -251,7 +251,7 @@ def get_publications(publication_type, actor, request_args=None, workspace=None,
             'workspace': res_workspace,
             'publication_type': info['type'].split('.')[1],
             'title': info.get("title"),
-            'url': layman_util.get_workspace_publication_url(info['type'], res_workspace, name, x_forwarded_prefix=x_forwarded_prefix),
+            'url': layman_util.get_workspace_publication_url(info['type'], res_workspace, name, x_forwarded_items=x_forwarded_items),
             'uuid': info["uuid"],
             'access_rights': info['access_rights'],
             'updated_at': info['updated_at'].isoformat(),
