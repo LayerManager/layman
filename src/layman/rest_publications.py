@@ -20,5 +20,5 @@ def get():
     app.logger.info(f"GET Publications, actor={g.user}")
 
     actor = get_authn_username()
-    x_forwarded_prefix = util.get_x_forwarded_prefix(request.headers)
+    x_forwarded_prefix = util.get_x_forwarded_items(request.headers)
     return rest_common.get_publications(publication_type=None, actor=actor, request_args=request.args, x_forwarded_prefix=x_forwarded_prefix)
