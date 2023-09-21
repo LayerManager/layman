@@ -29,12 +29,8 @@ def get_internal_table_name(workspace, layer):
     return table_name
 
 
-def get_workspaces(conn_cur=None):
+def get_workspaces():
     """Returns workspaces from internal DB only"""
-    if conn_cur is None:
-        conn_cur = db_util.get_connection_cursor()
-    _, cur = conn_cur
-
     query = sql.SQL("""select schema_name
     from information_schema.schemata
     where schema_name NOT IN ({schemas}) AND schema_owner = {layman_pg_user}""").format(
@@ -42,11 +38,10 @@ def get_workspaces(conn_cur=None):
         layman_pg_user=sql.Literal(settings.LAYMAN_PG_USER),
     )
     try:
-        cur.execute(query)
+        rows = db_util.run_query(query)
     except BaseException as exc:
         logger.error(f'get_workspaces ERROR')
         raise LaymanError(7) from exc
-    rows = cur.fetchall()
     return [
         r[0] for r in rows
     ]
@@ -61,36 +56,26 @@ def check_workspace_name(workspace):
         raise LaymanError(35, {'reserved_by': __name__, 'schema': workspace})
 
 
-def ensure_workspace(workspace, conn_cur=None):
+def ensure_workspace(workspace, ):
     """Ensures workspace in internal DB only"""
-    if conn_cur is None:
-        conn_cur = db_util.get_connection_cursor()
-    conn, cur = conn_cur
-
     statement = sql.SQL("""CREATE SCHEMA IF NOT EXISTS {schema} AUTHORIZATION {user}""").format(
         schema=sql.Identifier(workspace),
         user=sql.Identifier(settings.LAYMAN_PG_USER),
     )
     try:
-        cur.execute(statement)
-        conn.commit()
+        db_util.run_statement(statement)
     except BaseException as exc:
         logger.error(f'ensure_workspace ERROR')
         raise LaymanError(7) from exc
 
 
-def delete_workspace(workspace, conn_cur=None):
+def delete_workspace(workspace, ):
     """Deletes workspace from internal DB only"""
-    if conn_cur is None:
-        conn_cur = db_util.get_connection_cursor()
-    conn, cur = conn_cur
-
     statement = sql.SQL("""DROP SCHEMA IF EXISTS {schema} RESTRICT""").format(
         schema=sql.Identifier(workspace),
     )
     try:
-        cur.execute(statement, (workspace, ))
-        conn.commit()
+        db_util.run_statement(statement, (workspace, ))
     except BaseException as exc:
         logger.error(f'delete_workspace ERROR')
         raise LaymanError(7) from exc
@@ -203,9 +188,7 @@ def import_layer_vector_file_to_internal_table_async(schema, table_name, main_fi
     return process
 
 
-def get_text_column_names(schema, table_name, conn_cur=None):
-    _, cur = conn_cur or db_util.get_connection_cursor()
-
+def get_text_column_names(schema, table_name, uri_str=None):
     statement = """
 SELECT column_name
 FROM information_schema.columns
@@ -214,25 +197,23 @@ AND table_name = %s
 AND data_type IN ('character varying', 'varchar', 'character', 'char', 'text')
 """
     try:
-        cur.execute(statement, (schema, table_name))
+        rows = db_util.run_query(statement, (schema, table_name), uri_str=uri_str)
     except BaseException as exc:
         logger.error(f'get_text_column_names ERROR')
         raise LaymanError(7) from exc
-    rows = cur.fetchall()
     return [r[0] for r in rows]
 
 
-def get_internal_table_all_column_names(workspace, layername, conn_cur=None):
+def get_internal_table_all_column_names(workspace, layername, ):
     table_name = get_internal_table_name(workspace, layername)
-    return get_all_table_column_names(workspace, table_name, conn_cur=conn_cur)
+    return get_all_table_column_names(workspace, table_name, )
 
 
-def get_all_table_column_names(schema, table_name, conn_cur=None):
-    return [col.name for col in get_all_column_infos(schema, table_name, conn_cur=conn_cur)]
+def get_all_table_column_names(schema, table_name, uri_str=None):
+    return [col.name for col in get_all_column_infos(schema, table_name, uri_str=uri_str)]
 
 
-def get_all_column_infos(schema, table_name, *, conn_cur=None, omit_geometry_columns=False):
-    _, cur = conn_cur or db_util.get_connection_cursor()
+def get_all_column_infos(schema, table_name, *, uri_str=None, omit_geometry_columns=False):
     query = """
 SELECT inf.column_name, inf.data_type
 FROM information_schema.columns inf
@@ -247,17 +228,14 @@ AND table_name = %s
         query += " AND gc.f_geometry_column is null"
 
     try:
-        cur.execute(query, (schema, table_name))
+        rows = db_util.run_query(query, (schema, table_name), uri_str=uri_str)
     except BaseException as exc:
         logger.error(f'get_all_column_names ERROR')
         raise LaymanError(7) from exc
-    rows = cur.fetchall()
     return [ColumnInfo(name=r[0], data_type=r[1]) for r in rows]
 
 
-def get_number_of_features(schema, table_name, conn_cur=None):
-    _, cur = conn_cur or db_util.get_connection_cursor()
-
+def get_number_of_features(schema, table_name, uri_str=None):
     statement = sql.SQL("""
 select count(*)
 from {table}
@@ -265,20 +243,18 @@ from {table}
         table=sql.Identifier(schema, table_name),
     )
     try:
-        cur.execute(statement)
+        rows = db_util.run_query(statement, uri_str=uri_str)
     except BaseException as exc:
         logger.error(f'get_number_of_features ERROR')
         raise LaymanError(7) from exc
-    rows = cur.fetchall()
     return rows[0][0]
 
 
-def get_text_data(schema, table_name, primary_key, conn_cur=None):
-    _, cur = conn_cur or db_util.get_connection_cursor()
-    col_names = get_text_column_names(schema, table_name, conn_cur=conn_cur)
+def get_text_data(schema, table_name, primary_key, uri_str=None):
+    col_names = get_text_column_names(schema, table_name, uri_str=uri_str)
     if len(col_names) == 0:
         return [], 0
-    num_features = get_number_of_features(schema, table_name, conn_cur=conn_cur)
+    num_features = get_number_of_features(schema, table_name, uri_str=uri_str)
     if num_features == 0:
         return [], 0
     limit = max(100, num_features // 10)
@@ -294,11 +270,10 @@ limit {limit}
         limit=sql.Literal(limit),
     )
     try:
-        cur.execute(statement)
+        rows = db_util.run_query(statement, uri_str=uri_str)
     except BaseException as exc:
         logger.error(f'get_text_data ERROR')
         raise LaymanError(7) from exc
-    rows = cur.fetchall()
     col_texts = defaultdict(list)
     for row in rows:
         for idx, col_name in enumerate(col_names):
@@ -313,8 +288,8 @@ limit {limit}
     return col_texts, limit
 
 
-def get_text_languages(schema, table_name, primary_key, *, conn_cur=None):
-    texts, num_rows = get_text_data(schema, table_name, primary_key, conn_cur)
+def get_text_languages(schema, table_name, primary_key, *, uri_str=None):
+    texts, num_rows = get_text_data(schema, table_name, primary_key, uri_str)
     all_langs = set()
     for text in texts:
         # skip short texts
@@ -424,20 +399,17 @@ limit 1
     return query
 
 
-def get_most_frequent_lower_distance(schema, table_name, primary_key, geometry_column, conn_cur=None):
-    _, cur = conn_cur or db_util.get_connection_cursor()
-
+def get_most_frequent_lower_distance(schema, table_name, primary_key, geometry_column, uri_str=None):
     query = get_most_frequent_lower_distance_query(schema, table_name, primary_key, geometry_column)
 
     # print(f"\nget_most_frequent_lower_distance v1\nusername={username}, layername={layername}")
     # print(query)
 
     try:
-        cur.execute(query)
+        rows = db_util.run_query(query, uri_str=uri_str)
     except BaseException as exc:
         logger.error(f'get_most_frequent_lower_distance ERROR')
         raise LaymanError(7) from exc
-    rows = cur.fetchall()
     # for row in rows:
     #     print(f"row={row}")
     result = None
@@ -466,8 +438,8 @@ SCALE_DENOMINATORS = [
 ]
 
 
-def guess_scale_denominator(schema, table_name, primary_key, geometry_column, *, conn_cur=None):
-    distance = get_most_frequent_lower_distance(schema, table_name, primary_key, geometry_column, conn_cur=conn_cur)
+def guess_scale_denominator(schema, table_name, primary_key, geometry_column, *, uri_str=None):
+    distance = get_most_frequent_lower_distance(schema, table_name, primary_key, geometry_column, uri_str=uri_str)
     log_sd_list = [math.log10(sd) for sd in SCALE_DENOMINATORS]
     if distance is not None:
         coef = 2000 if distance > 100 else 1000
@@ -480,8 +452,7 @@ def guess_scale_denominator(schema, table_name, primary_key, geometry_column, *,
     return scale_denominator
 
 
-def create_string_attributes(attribute_tuples, conn_cur=None):
-    _, cur = conn_cur or db_util.get_connection_cursor()
+def create_string_attributes(attribute_tuples, uri_str=None):
     query = sql.SQL('{alters} \n COMMIT;').format(
         alters=sql.SQL('\n').join(
             [sql.SQL("""ALTER TABLE {table} ADD COLUMN {fattrname} VARCHAR(1024);""").format(
@@ -491,7 +462,7 @@ def create_string_attributes(attribute_tuples, conn_cur=None):
         )
     )
     try:
-        cur.execute(query)
+        db_util.run_statement(query, uri_str=uri_str, encapsulate_exception=False)
     except InsufficientPrivilege as exc:
         raise LaymanError(7, data={
             'reason': 'Insufficient privilege',
@@ -501,9 +472,7 @@ def create_string_attributes(attribute_tuples, conn_cur=None):
         raise LaymanError(7) from exc
 
 
-def get_missing_attributes(attribute_tuples, conn_cur=None):
-    _, cur = conn_cur or db_util.get_connection_cursor()
-
+def get_missing_attributes(attribute_tuples, uri_str=None):
     # Find all foursomes which do not already exist
     query = sql.SQL("""select attribs.*
 from ({selects}) attribs left join
@@ -520,13 +489,12 @@ where c.column_name is null""").format(
 
     try:
         if attribute_tuples:
-            cur.execute(query)
+            rows = db_util.run_query(query, uri_str=uri_str)
     except BaseException as exc:
         logger.error(f'get_missing_attributes ERROR')
         raise LaymanError(7) from exc
 
     missing_attributes = set()
-    rows = cur.fetchall()
     for row in rows:
         missing_attributes.add((row[0],
                                 row[1],
@@ -534,8 +502,8 @@ where c.column_name is null""").format(
     return missing_attributes
 
 
-def ensure_attributes(attribute_tuples, conn_cur):
-    missing_attributes = get_missing_attributes(attribute_tuples, conn_cur)
+def ensure_attributes(attribute_tuples, db_uri_str):
+    missing_attributes = get_missing_attributes(attribute_tuples, db_uri_str)
     if missing_attributes:
         dangerous_attribute_names = {
             a for _, _, a in missing_attributes
@@ -546,11 +514,11 @@ def ensure_attributes(attribute_tuples, conn_cur):
                 'expected': r'Attribute names matching regex ^[a-zA-Z_][a-zA-Z_0-9]*$',
                 'found': sorted(dangerous_attribute_names),
             })
-        create_string_attributes(missing_attributes, conn_cur)
+        create_string_attributes(missing_attributes, db_uri_str)
     return missing_attributes
 
 
-def get_bbox(schema, table_name, conn_cur=None, column=settings.OGR_DEFAULT_GEOMETRY_COLUMN):
+def get_bbox(schema, table_name, uri_str=None, column=settings.OGR_DEFAULT_GEOMETRY_COLUMN):
     query = sql.SQL('''
     with tmp as (select ST_Extent(l.{column}) as bbox
                  from {table} l
@@ -564,24 +532,23 @@ def get_bbox(schema, table_name, conn_cur=None, column=settings.OGR_DEFAULT_GEOM
         table=sql.Identifier(schema, table_name),
         column=sql.Identifier(column),
     )
-    result = db_util.run_query(query, conn_cur=conn_cur)[0]
+    result = db_util.run_query(query, uri_str=uri_str)[0]
     return result
 
 
-def get_table_crs(schema, table_name, conn_cur=None, column=settings.OGR_DEFAULT_GEOMETRY_COLUMN, *, use_internal_srid):
-    srid = get_column_srid(schema, table_name, column, conn_cur=conn_cur)
-    crs = db_util.get_crs_from_srid(srid, conn_cur, use_internal_srid=use_internal_srid)
+def get_table_crs(schema, table_name, uri_str=None, column=settings.OGR_DEFAULT_GEOMETRY_COLUMN, *, use_internal_srid):
+    srid = get_column_srid(schema, table_name, column, uri_str=uri_str)
+    crs = db_util.get_crs_from_srid(srid, uri_str, use_internal_srid=use_internal_srid)
     return crs
 
 
-def get_column_srid(schema, table, column, *, conn_cur=None):
+def get_column_srid(schema, table, column, *, uri_str=None):
     query = 'select Find_SRID(%s, %s, %s);'
-    srid = db_util.run_query(query, (schema, table, column), conn_cur=conn_cur)[0][0]
+    srid = db_util.run_query(query, (schema, table, column), uri_str=uri_str)[0][0]
     return srid
 
 
-def get_geometry_types(schema, table_name, *, column_name=settings.OGR_DEFAULT_GEOMETRY_COLUMN, conn_cur=None):
-    conn, cur = conn_cur or db_util.get_connection_cursor()
+def get_geometry_types(schema, table_name, *, column_name=settings.OGR_DEFAULT_GEOMETRY_COLUMN, uri_str=None):
     query = sql.SQL("""
     select distinct ST_GeometryType({column}) as geometry_type_name
     from {table}
@@ -590,11 +557,9 @@ def get_geometry_types(schema, table_name, *, column_name=settings.OGR_DEFAULT_G
         column=sql.Identifier(column_name),
     )
     try:
-        cur.execute(query)
+        rows = db_util.run_query(query, uri_str=uri_str)
     except BaseException as exc:
         logger.error(f'get_geometry_types ERROR')
         raise LaymanError(7) from exc
-    rows = cur.fetchall()
-    conn.commit()
     result = [row[0] for row in rows]
     return result

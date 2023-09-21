@@ -22,7 +22,7 @@ def ensure_schema(db_schema):
             db_util.run_statement(model.CREATE_SCHEMA_SQL)
             db_util.run_statement(model.setup_codelists_data())
         except BaseException as exc:
-            db_util.run_statement(model.DROP_SCHEMA_SQL, conn_cur=db_util.get_connection_cursor())
+            db_util.run_statement(model.DROP_SCHEMA_SQL, )
             raise exc
     else:
         logger.info(f"Layman DB schema already exists, schema_name={db_schema}")

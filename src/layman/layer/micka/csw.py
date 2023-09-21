@@ -8,7 +8,6 @@ from lxml import etree as ET
 from flask import current_app
 
 import crs as crs_def
-from db import util as db_util
 from layman.common.filesystem.uuid import get_publication_uuid_file
 from layman.common.micka import util as common_util, requests as micka_requests
 from layman.common import language as common_language, empty_method, empty_method_returns_none, bbox as bbox_util
@@ -138,15 +137,14 @@ def get_template_path_and_values(workspace, layername, http_method):
     if geodata_type == settings.GEODATA_TYPE_VECTOR:
         table_uri = publ_info['_table_uri']
         table_name = table_uri.table
-        conn_cur = db_util.get_connection_cursor(db_uri_str=table_uri.db_uri_str)
         try:
             languages = db.get_text_languages(table_uri.schema, table_name, table_uri.primary_key_column,
-                                              conn_cur=conn_cur)
+                                              uri_str=table_uri.db_uri_str)
         except LaymanError:
             languages = []
         try:
             scale_denominator = db.guess_scale_denominator(table_uri.schema, table_name, table_uri.primary_key_column,
-                                                           table_uri.geo_column, conn_cur=conn_cur)
+                                                           table_uri.geo_column, uri_str=table_uri.db_uri_str)
         except LaymanError:
             scale_denominator = None
         spatial_resolution = {

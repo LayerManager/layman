@@ -10,7 +10,6 @@ from lxml import etree as ET
 from flask import Blueprint, g, current_app as app, request, Response
 
 import crs as crs_def
-from db import util as db_util
 from geoserver.util import reset as gs_reset
 from layman import authn, authz, settings, util as layman_util, LaymanError
 from layman.authn import authenticate, is_user_with_name
@@ -89,9 +88,8 @@ def ensure_attributes_in_db(attributes_by_db):
             (schema, table, attr): (workspace, layer, attr)
             for workspace, layer, attr, schema, table in attr_tuples
         }
-        conn_cur = db_util.get_connection_cursor(db_uri_str=db_uri_str)
         db_attr_tuples = list(db_layman_attr_mapping.keys())
-        created_db_attr_tuples = db.ensure_attributes(db_attr_tuples, conn_cur)
+        created_db_attr_tuples = db.ensure_attributes(db_attr_tuples, db_uri_str=db_uri_str)
         all_created_attr_tuples.update({db_layman_attr_mapping[a] for a in created_db_attr_tuples})
     return all_created_attr_tuples
 

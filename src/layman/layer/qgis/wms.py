@@ -2,7 +2,6 @@ import os
 from owslib.wms import WebMapService
 
 import crs as crs_def
-from db import util as db_util
 from layman import patch_mode, settings, util as layman_util
 from layman.common import bbox as bbox_util, empty_method, empty_method_returns_none, empty_method_returns_dict
 from . import util, LAYER_TYPE
@@ -71,15 +70,14 @@ def save_qgs_file(workspace, layer):
     db_schema = table_uri.schema
     layer_bbox = layer_bbox if not bbox_util.is_empty(layer_bbox) else crs_def.CRSDefinitions[crs].default_bbox
     qml = util.get_original_style_xml(workspace, layer)
-    conn_cur = db_util.get_connection_cursor(db_uri_str=table_uri.db_uri_str)
-    db_types = db.get_geometry_types(db_schema, table_name, column_name=table_uri.geo_column, conn_cur=conn_cur)
+    db_types = db.get_geometry_types(db_schema, table_name, column_name=table_uri.geo_column, uri_str=table_uri.db_uri_str)
     qml_geometry = util.get_geometry_from_qml_and_db_types(qml, db_types)
     db_cols = [
-        col for col in db.get_all_column_infos(db_schema, table_name, conn_cur=conn_cur, omit_geometry_columns=True)
+        col for col in db.get_all_column_infos(db_schema, table_name, uri_str=table_uri.db_uri_str, omit_geometry_columns=True)
         if col.name != table_uri.primary_key_column
     ]
     source_type = util.get_source_type(db_types, qml_geometry)
-    column_srid = db.get_column_srid(db_schema, table_name, table_uri.geo_column, conn_cur=conn_cur)
+    column_srid = db.get_column_srid(db_schema, table_name, table_uri.geo_column, uri_str=table_uri.db_uri_str)
     layer_qml = util.fill_layer_template(layer, uuid, layer_bbox, crs, qml, source_type, db_cols, table_uri,
                                          column_srid, db_types)
     qgs_str = util.fill_project_template(layer, uuid, layer_qml, crs, settings.LAYMAN_OUTPUT_SRS_LIST,

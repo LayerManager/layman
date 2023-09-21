@@ -3,7 +3,6 @@ import copy
 from owslib.feature.schema import get_schema as get_wfs_schema
 import pytest
 
-from db import util as db_util
 from layman import app, settings
 from layman.layer import db
 from layman.layer.geoserver import wfs as geoserver_wfs
@@ -245,7 +244,6 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
         style_type = parametrization.style_file.style_type
         wfs_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{workspace}/wfs"
         table_uris = {}
-        conn_cur = None
 
         # get current attributes and assert that new attributes are not yet present
         old_db_attributes = {}
@@ -255,10 +253,9 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
             with app.app_context():
                 table_uri = get_publication_info(workspace, process_client.LAYER_TYPE, layer_name,
                                                  context={'keys': ['table_uri']})['_table_uri']
-                conn_cur = conn_cur or db_util.get_connection_cursor(table_uri.db_uri_str)
             table_uris[layer_name] = table_uri
             old_db_attributes[layer_name] = db.get_all_table_column_names(table_uri.schema, table_uri.table,
-                                                                          conn_cur=conn_cur)
+                                                                          uri_str=table_uri.db_uri_str, )
             for attr_name in attr_names:
                 assert attr_name not in old_db_attributes[layer_name], \
                     f"old_db_attributes={old_db_attributes[layer_name]}, attr_name={attr_name}"
@@ -287,7 +284,7 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
         for layer_name, attr_names in new_attributes:
             # assert that exactly all attr_names were created in DB table
             table_uri = table_uris[layer_name]
-            db_attributes = db.get_all_table_column_names(table_uri.schema, table_uri.table, conn_cur=conn_cur)
+            db_attributes = db.get_all_table_column_names(table_uri.schema, table_uri.table, uri_str=table_uri.db_uri_str)
             for attr_name in attr_names:
                 assert attr_name in db_attributes, f"db_attributes={db_attributes}, attr_name={attr_name}"
             assert set(attr_names).union(set(old_db_attributes[layer_name])) == set(db_attributes)
