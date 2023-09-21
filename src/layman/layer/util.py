@@ -84,8 +84,8 @@ def clear_publication_info(layer_info, file_type):
     return clear_info
 
 
-def get_complete_layer_info(workspace, layername, *, x_forwarded_prefix=None):
-    partial_info = get_layer_info(workspace, layername, context={'x_forwarded_prefix': x_forwarded_prefix})
+def get_complete_layer_info(workspace, layername, *, x_forwarded_items=None):
+    partial_info = get_layer_info(workspace, layername, context={'x_forwarded_items': x_forwarded_items})
 
     if not any(partial_info):
         raise LaymanError(15, {'layername': layername})
@@ -100,7 +100,7 @@ def get_complete_layer_info(workspace, layername, *, x_forwarded_prefix=None):
 
     complete_info.update({
         'name': layername,
-        'url': url_for('rest_workspace_layer.get', layername=layername, workspace=workspace, x_forwarded_prefix=x_forwarded_prefix),
+        'url': url_for('rest_workspace_layer.get', layername=layername, workspace=workspace, x_forwarded_items=x_forwarded_items),
         'title': layername,
         'description': '',
     })

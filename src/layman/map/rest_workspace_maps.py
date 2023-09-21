@@ -35,14 +35,14 @@ def get(workspace):
     app.logger.info(f"GET Maps, actor={g.user}")
 
     actor = get_authn_username()
-    x_forwarded_prefix = layman_util.get_x_forwarded_items(request.headers)
-    return rest_common.get_publications(MAP_TYPE, actor, request_args=request.args, workspace=workspace, x_forwarded_prefix=x_forwarded_prefix)
+    x_forwarded_items = layman_util.get_x_forwarded_items(request.headers)
+    return rest_common.get_publications(MAP_TYPE, actor, request_args=request.args, workspace=workspace, x_forwarded_items=x_forwarded_items)
 
 
 @bp.route(f"/{MAP_REST_PATH_NAME}", methods=['POST'])
 def post(workspace):
     app.logger.info(f"POST Maps, actor={g.user}")
-    x_forwarded_prefix = layman_util.get_x_forwarded_items(request.headers)
+    x_forwarded_items = layman_util.get_x_forwarded_items(request.headers)
 
     # FILE
     if 'file' in request.files and not request.files['file'].filename == '':
@@ -75,7 +75,7 @@ def post(workspace):
     else:
         description = file_json.get('abstract', '')
 
-    mapurl = url_for('rest_workspace_map.get', mapname=mapname, workspace=workspace, x_forwarded_prefix=x_forwarded_prefix)
+    mapurl = url_for('rest_workspace_map.get', mapname=mapname, workspace=workspace, x_forwarded_items=x_forwarded_items)
 
     redis_util.create_lock(workspace, MAP_TYPE, mapname, request.method)
 
@@ -135,7 +135,7 @@ def post(workspace):
 def delete(workspace):
     app.logger.info(f"DELETE Maps, actor={g.user}")
 
-    x_forwarded_prefix = layman_util.get_x_forwarded_items(request.headers)
+    x_forwarded_items = layman_util.get_x_forwarded_items(request.headers)
     infos = layman_util.delete_publications(workspace,
                                             MAP_TYPE,
                                             util.is_map_chain_ready,
@@ -144,7 +144,7 @@ def delete(workspace):
                                             request.method,
                                             'rest_workspace_map.get',
                                             'mapname',
-                                            x_forwarded_prefix=x_forwarded_prefix,
+                                            x_forwarded_items=x_forwarded_items,
                                             )
 
     return infos, 200

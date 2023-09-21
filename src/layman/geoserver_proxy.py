@@ -231,8 +231,8 @@ def proxy(subpath):
         'Host',
     ]:
         headers_req.pop(header, None)
-    x_forwarded_prefix = layman_util.get_x_forwarded_items(request.headers)
-    headers_req['X-Forwarded-Path'] = x_forwarded_prefix or ''
+    x_forwarded_items = layman_util.get_x_forwarded_items(request.headers)
+    headers_req['X-Forwarded-Path'] = x_forwarded_items.prefix or ''
 
     # ensure layer attributes in case of WFS-T
     app.logger.info(f"{request.method} GeoServer proxy, headers_req={headers_req}, url={url}")

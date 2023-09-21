@@ -21,5 +21,5 @@ def get():
     app.logger.info(f"GET Layers, actor={g.user}")
 
     actor = get_authn_username()
-    x_forwarded_prefix = layman_util.get_x_forwarded_items(request.headers)
-    return rest_common.get_publications(LAYER_TYPE, actor, request_args=request.args, x_forwarded_prefix=x_forwarded_prefix)
+    x_forwarded_items = layman_util.get_x_forwarded_items(request.headers)
+    return rest_common.get_publications(LAYER_TYPE, actor, request_args=request.args, x_forwarded_items=x_forwarded_items)

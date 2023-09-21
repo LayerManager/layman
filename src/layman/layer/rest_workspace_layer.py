@@ -37,8 +37,8 @@ def get(workspace, layername):
     # pylint: disable=unused-argument
     app.logger.info(f"GET Layer, actor={g.user}")
 
-    x_forwarded_prefix = layman_util.get_x_forwarded_items(request.headers)
-    info = util.get_complete_layer_info(workspace, layername, x_forwarded_prefix=x_forwarded_prefix)
+    x_forwarded_items = layman_util.get_x_forwarded_items(request.headers)
+    info = util.get_complete_layer_info(workspace, layername, x_forwarded_items=x_forwarded_items)
 
     return jsonify(info), 200
 
@@ -48,7 +48,7 @@ def get(workspace, layername):
 def patch(workspace, layername):
     app.logger.info(f"PATCH Layer, actor={g.user}")
 
-    x_forwarded_prefix = layman_util.get_x_forwarded_items(request.headers)
+    x_forwarded_items = layman_util.get_x_forwarded_items(request.headers)
 
     info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername,
                                             context={'keys': ['title', 'name', 'description', 'table_uri', 'geodata_type', 'style_type',
@@ -262,7 +262,7 @@ def patch(workspace, layername):
     )
 
     app.logger.info('PATCH Layer changes done')
-    info = util.get_complete_layer_info(workspace, layername, x_forwarded_prefix=x_forwarded_prefix)
+    info = util.get_complete_layer_info(workspace, layername, x_forwarded_items=x_forwarded_items)
     info.update(layer_result)
 
     return jsonify(info), 200
@@ -272,9 +272,9 @@ def patch(workspace, layername):
 @util.lock_decorator
 def delete_layer(workspace, layername):
     app.logger.info(f"DELETE Layer, actor={g.user}")
-    x_forwarded_prefix = layman_util.get_x_forwarded_items(request.headers)
+    x_forwarded_items = layman_util.get_x_forwarded_items(request.headers)
 
-    info = util.get_complete_layer_info(workspace, layername, x_forwarded_prefix=x_forwarded_prefix)
+    info = util.get_complete_layer_info(workspace, layername, x_forwarded_items=x_forwarded_items)
 
     util.abort_layer_chain(workspace, layername)
 

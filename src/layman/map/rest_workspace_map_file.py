@@ -28,9 +28,9 @@ def after_request(response):
 def get(workspace, mapname):
     app.logger.info(f"GET Map File, actor={g.user}")
 
-    x_forwarded_prefix = layman_util.get_x_forwarded_items(request.headers)
+    x_forwarded_items = layman_util.get_x_forwarded_items(request.headers)
 
-    map_json = util.get_map_file_json(workspace, mapname, x_forwarded_prefix=x_forwarded_prefix)
+    map_json = util.get_map_file_json(workspace, mapname, x_forwarded_items=x_forwarded_items)
 
     if map_json is not None:
         return jsonify(map_json), 200

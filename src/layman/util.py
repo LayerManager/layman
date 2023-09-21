@@ -253,9 +253,9 @@ def get_publication_module(publication_type, use_cache=True):
     return module
 
 
-def get_workspace_publication_url(publication_type, workspace, publication_name, use_cache=True, *, x_forwarded_prefix=None):
+def get_workspace_publication_url(publication_type, workspace, publication_name, use_cache=True, *, x_forwarded_items=None):
     publ_module = get_publication_module(publication_type, use_cache=use_cache)
-    return publ_module.get_workspace_publication_url(workspace, publication_name, x_forwarded_prefix=x_forwarded_prefix)
+    return publ_module.get_workspace_publication_url(workspace, publication_name, x_forwarded_items=x_forwarded_items)
 
 
 def get_providers_from_source_names(source_names, skip_modules=None):
@@ -308,10 +308,11 @@ def call_modules_fn(modules, fn_name, args=None, kwargs=None, omit_duplicate_cal
 DUMB_MAP_ADAPTER_DICT = {}
 
 
-def _url_for(endpoint, *, server_name, proxy_server_name, internal=False, x_forwarded_prefix=None, **values):
+def _url_for(endpoint, *, server_name, proxy_server_name, internal=False, x_forwarded_items=None, **values):
+    x_forwarded_items = x_forwarded_items or XForwardedClass()
     assert not (internal and values.get('_external'))
-    assert not (internal and x_forwarded_prefix)
-    x_forwarded_prefix = x_forwarded_prefix or ''
+    assert not (internal and x_forwarded_items)
+    x_forwarded_prefix = x_forwarded_items.prefix or ''
     # It seems SERVER_NAME is not None only in some tests. It also seems TESTING is True only in the same tests.
     assert (current_app.config.get('SERVER_NAME', None) is not None) == (current_app.config['TESTING'] is True)
     # Flask does not accept SERVER_NAME without dot, and without SERVER_NAME url_for cannot be used
@@ -332,10 +333,10 @@ def _url_for(endpoint, *, server_name, proxy_server_name, internal=False, x_forw
     return result
 
 
-def url_for(endpoint, *, internal=False, x_forwarded_prefix=None, **values):
+def url_for(endpoint, *, internal=False, x_forwarded_items=None, **values):
     return _url_for(endpoint, server_name=settings.LAYMAN_SERVER_NAME,
                     proxy_server_name=settings.LAYMAN_PROXY_SERVER_NAME,
-                    internal=internal, x_forwarded_prefix=x_forwarded_prefix, **values)
+                    internal=internal, x_forwarded_items=x_forwarded_items, **values)
 
 
 def get_internal_sources(publ_type):
@@ -386,7 +387,7 @@ def get_publication_info(workspace, publ_type, publ_name, context=None):
     }[publ_type]
     partial_infos = call_modules_fn(sources, info_method, [workspace, publ_name], kwargs={
         'extra_keys': context.get('extra_keys', []),
-        'x_forwarded_prefix': context.get('x_forwarded_prefix'),
+        'x_forwarded_items': context.get('x_forwarded_items'),
     })
 
     result = {}
@@ -456,7 +457,7 @@ def delete_publications(workspace,
                         method,
                         url_path,
                         publ_param,
-                        x_forwarded_prefix=None,
+                        x_forwarded_items=None,
                         ):
     from layman import authn
     actor_name = authn.get_authn_username()
@@ -481,7 +482,7 @@ def delete_publications(workspace,
         {
             'name': info["name"],
             'title': info.get("title", None),
-            'url': url_for(**{'endpoint': url_path, publ_param: publication[2], 'workspace': publication[0], 'x_forwarded_prefix': x_forwarded_prefix}),
+            'url': url_for(**{'endpoint': url_path, publ_param: publication[2], 'workspace': publication[0], 'x_forwarded_items': x_forwarded_items}),
             'uuid': info["uuid"],
             'access_rights': info['access_rights'],
         }

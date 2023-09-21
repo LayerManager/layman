@@ -35,8 +35,8 @@ def get(workspace, mapname):
     # pylint: disable=unused-argument
     app.logger.info(f"GET Map, actor={g.user}")
 
-    x_forwarded_prefix = layman_util.get_x_forwarded_items(request.headers)
-    info = util.get_complete_map_info(workspace, mapname, x_forwarded_prefix=x_forwarded_prefix)
+    x_forwarded_items = layman_util.get_x_forwarded_items(request.headers)
+    info = util.get_complete_map_info(workspace, mapname, x_forwarded_items=x_forwarded_items)
 
     return jsonify(info), 200
 
@@ -46,7 +46,7 @@ def get(workspace, mapname):
 def patch(workspace, mapname):
     app.logger.info(f"PATCH Map, actor={g.user}")
 
-    x_forwarded_prefix = layman_util.get_x_forwarded_items(request.headers)
+    x_forwarded_items = layman_util.get_x_forwarded_items(request.headers)
     info = util.get_complete_map_info(workspace, mapname)
 
     # FILE
@@ -107,7 +107,7 @@ def patch(workspace, mapname):
         'layman.map.filesystem.input_file' if file_changed else None
     )
 
-    info = util.get_complete_map_info(workspace, mapname, x_forwarded_prefix=x_forwarded_prefix)
+    info = util.get_complete_map_info(workspace, mapname, x_forwarded_items=x_forwarded_items)
 
     return jsonify(info), 200
 
@@ -116,10 +116,10 @@ def patch(workspace, mapname):
 @util.lock_decorator
 def delete_map(workspace, mapname):
     app.logger.info(f"DELETE Map, actor={g.user}")
-    x_forwarded_prefix = layman_util.get_x_forwarded_items(request.headers)
+    x_forwarded_items = layman_util.get_x_forwarded_items(request.headers)
 
     # raise exception if map does not exist
-    info = util.get_complete_map_info(workspace, mapname, x_forwarded_prefix=x_forwarded_prefix)
+    info = util.get_complete_map_info(workspace, mapname, x_forwarded_items=x_forwarded_items)
 
     util.abort_map_chain(workspace, mapname)
 

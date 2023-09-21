@@ -17,7 +17,7 @@ from layman.common.util import PUBLICATION_NAME_PATTERN, PUBLICATION_MAX_LENGTH,
 from layman.layer.geoserver.util import get_gs_proxy_server_url
 from layman.layer.geoserver.wms import get_layman_workspace
 from layman.util import call_modules_fn, get_providers_from_source_names, get_internal_sources, \
-    to_safe_name, url_for, WORKSPACE_NAME_PATTERN
+    to_safe_name, url_for, WORKSPACE_NAME_PATTERN, XForwardedClass
 from . import get_map_sources, MAP_TYPE, get_map_type_def, get_map_info_keys
 from .filesystem import input_file
 from .micka import csw
@@ -135,8 +135,8 @@ def clear_publication_info(layer_info):
     return clear_info
 
 
-def get_complete_map_info(workspace, mapname, *, x_forwarded_prefix=None):
-    partial_info = get_map_info(workspace, mapname, context={'x_forwarded_prefix': x_forwarded_prefix})
+def get_complete_map_info(workspace, mapname, *, x_forwarded_items=None):
+    partial_info = get_map_info(workspace, mapname, context={'x_forwarded_items': x_forwarded_items})
 
     if not any(partial_info):
         raise LaymanError(26, {'mapname': mapname})
@@ -145,7 +145,7 @@ def get_complete_map_info(workspace, mapname, *, x_forwarded_prefix=None):
 
     complete_info = {
         'name': mapname,
-        'url': url_for('rest_workspace_map.get', mapname=mapname, workspace=workspace, x_forwarded_prefix=x_forwarded_prefix),
+        'url': url_for('rest_workspace_map.get', mapname=mapname, workspace=workspace, x_forwarded_items=x_forwarded_items),
         'title': mapname,
         'description': '',
     }
@@ -365,8 +365,9 @@ def _adjust_url(*, url_obj=None, url_key=None, url_list=None, url_idx=None, prox
     return found_original_base_url
 
 
-def get_map_file_json(workspace, mapname, *, adjust_urls=True, x_forwarded_prefix=None):
-    x_forwarded_prefix = x_forwarded_prefix or ''
+def get_map_file_json(workspace, mapname, *, adjust_urls=True, x_forwarded_items=None):
+    x_forwarded_items = x_forwarded_items or XForwardedClass()
+    x_forwarded_prefix = x_forwarded_items.prefix or ''
     map_json = input_file.get_map_json(workspace, mapname)
 
     if adjust_urls:
