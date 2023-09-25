@@ -79,6 +79,17 @@ class XForwardedClass:
         # pylint: disable=no-member
         return self._prefix
 
+    @property
+    def headers(self):
+        result = {}
+        if self.proto is not None:
+            result['X-Forwarded-Proto'] = self.proto
+        if self.host is not None:
+            result['X-Forwarded-Host'] = self.host
+        if self.prefix is not None:
+            result['X-Forwarded-Prefix'] = self.prefix
+        return result
+
     def __bool__(self):
         return self.proto is not None or self.host is not None or self.prefix is not None
 
