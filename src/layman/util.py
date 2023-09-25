@@ -331,17 +331,20 @@ def _url_for(endpoint, *, server_name, proxy_server_name, internal=False, x_forw
     x_forwarded_items = x_forwarded_items or XForwardedClass()
     assert not (internal and values.get('_external'))
     assert not (internal and x_forwarded_items)
-    x_forwarded_prefix = x_forwarded_items.prefix or ''
+    protocol = x_forwarded_items.proto or current_app.config['PREFERRED_URL_SCHEME']
+    host = x_forwarded_items.host or proxy_server_name
+    path_prefix = x_forwarded_items.prefix or ''
     # It seems SERVER_NAME is not None only in some tests. It also seems TESTING is True only in the same tests.
     assert (current_app.config.get('SERVER_NAME', None) is not None) == (current_app.config['TESTING'] is True)
     # Flask does not accept SERVER_NAME without dot, and without SERVER_NAME url_for cannot be used
     # therefore DUMB_MAP_ADAPTER_DICT is created manually ...
-    dict_key = f"{proxy_server_name} {x_forwarded_prefix}"
+    dict_key = f"{protocol} {host} {path_prefix}"
     dumb_map_adapter = DUMB_MAP_ADAPTER_DICT.get(dict_key)
     if dumb_map_adapter is None:
         dumb_map_adapter = current_app.url_map.bind(
-            proxy_server_name + x_forwarded_prefix,
-            url_scheme=current_app.config['PREFERRED_URL_SCHEME']
+            host,
+            script_name=path_prefix,
+            url_scheme=protocol,
         )
         DUMB_MAP_ADAPTER_DICT[dict_key] = dumb_map_adapter
     result = dumb_map_adapter.build(endpoint, values=values, force_external=True)

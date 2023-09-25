@@ -3,6 +3,7 @@ import pytest
 
 from test_tools import util as test_util
 from . import app, settings, LaymanError, util
+from .util import XForwardedClass
 
 
 @pytest.mark.parametrize('unsafe_input, exp_output', [
@@ -120,21 +121,39 @@ def test_url_for(endpoint, internal, params, expected_url):
         assert util.url_for(endpoint, internal=internal, **params) == expected_url
 
 
-@pytest.mark.parametrize('endpoint, internal, params, expected_url', [
-    ('rest_workspace_maps.get', False, {'workspace': 'workspace_name'},
-     f'http://enjoychallenge.tech/rest/{settings.REST_WORKSPACES_PREFIX}/workspace_name/maps'),
-    ('rest_workspace_layers.get', False, {'workspace': 'workspace_name'},
-     f'http://enjoychallenge.tech/rest/{settings.REST_WORKSPACES_PREFIX}/workspace_name/layers'),
-    ('rest_about.get_version', True, {}, 'http://layman:8000/rest/about/version'),
-    ('rest_about.get_version', False, {}, 'http://enjoychallenge.tech/rest/about/version'),
+@pytest.mark.parametrize('endpoint, internal, x_forwarded_items, params, expected_url', [
+    pytest.param('rest_workspace_maps.get', False, None, {'workspace': 'workspace_name'},
+                 f'http://enjoychallenge.tech/rest/{settings.REST_WORKSPACES_PREFIX}/workspace_name/maps',
+                 id='get-workspace-maps-external'),
+    pytest.param('rest_about.get_version', True, None, {}, 'http://layman:8000/rest/about/version',
+                 id='get-version-internal'),
+    pytest.param('rest_about.get_version', False, None, {}, 'http://enjoychallenge.tech/rest/about/version',
+                 id='get-version-external'),
+    pytest.param('rest_workspace_layers.get', False, XForwardedClass(proto='https'), {'workspace': 'workspace_name'},
+                 f'https://enjoychallenge.tech/rest/{settings.REST_WORKSPACES_PREFIX}/workspace_name/layers',
+                 id='get-workspace-layers-x-forwarded-proto'),
+    pytest.param('rest_workspace_layers.get', False, XForwardedClass(prefix='/proxy'), {'workspace': 'workspace_name'},
+                 f'http://enjoychallenge.tech/proxy/rest/{settings.REST_WORKSPACES_PREFIX}/workspace_name/layers',
+                 id='get-workspace-layers-x-forwarded-prefix'),
+    pytest.param('rest_workspace_layers.get', False, XForwardedClass(prefix=''), {'workspace': 'workspace_name'},
+                 f'http://enjoychallenge.tech/rest/{settings.REST_WORKSPACES_PREFIX}/workspace_name/layers',
+                 id='get-workspace-layers-x-forwarded-prefix-empty-string'),
+    pytest.param('rest_workspace_layers.get', False, XForwardedClass(proto='https', host='foo.com', prefix='/proxy'),
+                 {'workspace': 'workspace_name'},
+                 f'https://foo.com/proxy/rest/{settings.REST_WORKSPACES_PREFIX}/workspace_name/layers',
+                 id='get-workspace-layers-x-forwarded-proto-host-prefix'),
+    pytest.param('rest_workspace_layers.get', False, XForwardedClass(host='localhost:3001'),
+                 {'workspace': 'workspace_name'},
+                 f'http://localhost:3001/rest/{settings.REST_WORKSPACES_PREFIX}/workspace_name/layers',
+                 id='get-workspace-layers-x-forwarded-host-port'),
 ])
-def test__url_for(endpoint, internal, params, expected_url):
+def test__url_for(endpoint, internal, x_forwarded_items, params, expected_url):
     server_name = 'layman:8000'
     proxy_server_name = 'enjoychallenge.tech'
     with app.app_context():
         # pylint: disable=protected-access
         assert util._url_for(endpoint, server_name=server_name, proxy_server_name=proxy_server_name, internal=internal,
-                             **params) == expected_url
+                             x_forwarded_items=x_forwarded_items, **params) == expected_url
 
 
 @pytest.mark.parametrize('headers, exp_result', [
