@@ -2,41 +2,46 @@ import copy
 
 from celery import states
 from layman import settings
+from layman.util import XForwardedClass
 from test_tools import process_client, util as test_util, assert_util
 
-PROXY_PREFIX = '/layman-proxy'
+X_FORWARDED_ITEMS = XForwardedClass(proto='https', host='abc.cz:3001', prefix='/layman-proxy')
 
 
-def get_expected_urls_in_rest_response(workspace, publ_type, name, *, rest_method, proxy_prefix, geodata_type=None):
+def get_expected_urls_in_rest_response(workspace, publ_type, name, *, rest_method, x_forwarded_items=None, geodata_type=None):
+    x_forwarded_items = x_forwarded_items or XForwardedClass()
+    proxy_proto = x_forwarded_items.proto or settings.LAYMAN_PUBLIC_URL_SCHEME
+    proxy_host = x_forwarded_items.host or settings.LAYMAN_PROXY_SERVER_NAME
+    proxy_prefix = x_forwarded_items.prefix or ''
     assert rest_method in {'post', 'patch', 'get', 'delete', 'multi_delete'}
     publ_type_directory = f'{publ_type.split(".")[1]}s'
     result = {
-        'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/{publ_type_directory}/{name}'
+        'url': f'{proxy_proto}://{proxy_host}{proxy_prefix}/rest/workspaces/{workspace}/{publ_type_directory}/{name}'
     }
     if rest_method in ['patch', 'get']:
         result['thumbnail'] = {
-            'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/{publ_type_directory}/{name}/thumbnail'
+            'url': f'{proxy_proto}://{proxy_host}{proxy_prefix}/rest/workspaces/{workspace}/{publ_type_directory}/{name}/thumbnail'
         }
         result['metadata'] = {
-            'comparison_url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/{publ_type_directory}/{name}/metadata-comparison',
+            'comparison_url': f'{proxy_proto}://{proxy_host}{proxy_prefix}/rest/workspaces/{workspace}/{publ_type_directory}/{name}/metadata-comparison',
         }
         if publ_type == process_client.LAYER_TYPE:
             result['wms'] = {
-                'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/geoserver/{workspace}_wms/ows',
+                'url': f'{proxy_proto}://{proxy_host}{proxy_prefix}/geoserver/{workspace}_wms/ows',
             }
             result['sld'] = {
-                'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/{publ_type_directory}/{name}/style',
+                'url': f'{proxy_proto}://{proxy_host}{proxy_prefix}/rest/workspaces/{workspace}/{publ_type_directory}/{name}/style',
             }
             result['style'] = {
-                'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/{publ_type_directory}/{name}/style',
+                'url': f'{proxy_proto}://{proxy_host}{proxy_prefix}/rest/workspaces/{workspace}/{publ_type_directory}/{name}/style',
             }
             if geodata_type == settings.GEODATA_TYPE_VECTOR:
                 result['wfs'] = {
-                    'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/geoserver/{workspace}/wfs'
+                    'url': f'{proxy_proto}://{proxy_host}{proxy_prefix}/geoserver/{workspace}/wfs'
                 }
         else:
             result['file'] = {
-                'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/{publ_type_directory}/{name}/file',
+                'url': f'{proxy_proto}://{proxy_host}{proxy_prefix}/rest/workspaces/{workspace}/{publ_type_directory}/{name}/file',
             }
 
     return result
@@ -109,10 +114,10 @@ def same_values_in_detail_and_multi(workspace, publ_type, name, rest_publication
 
 
 def multi_url_with_x_forwarded_prefix(workspace, publ_type, name, headers, ):
-    proxy_prefix = PROXY_PREFIX
+    proxy_items = X_FORWARDED_ITEMS
     headers = {
         **(headers or {}),
-        'X-Forwarded-Prefix': proxy_prefix,
+        **proxy_items.headers,
     }
     short_publ_type = publ_type.split('.')[1]
     multi_requests = [
@@ -126,21 +131,21 @@ def multi_url_with_x_forwarded_prefix(workspace, publ_type, name, headers, ):
                                     if info['workspace'] == workspace and info['name'] == name and info['publication_type']
                                     == short_publ_type))
         url = rest_multi_info['url']
-        assert url == f'http://{settings.LAYMAN_PROXY_SERVER_NAME}{proxy_prefix}/rest/workspaces/{workspace}/{short_publ_type}s/{name}'
+        assert url == f'{proxy_items.proto}://{proxy_items.host}{proxy_items.prefix}/rest/workspaces/{workspace}/{short_publ_type}s/{name}'
 
 
 def get_layer_with_x_forwarded_prefix(workspace, name, headers, ):
-    proxy_prefix = PROXY_PREFIX
+    proxy_items = X_FORWARDED_ITEMS
     headers = {
         **(headers or {}),
-        'X-Forwarded-Prefix': proxy_prefix,
+        **proxy_items.headers,
     }
     rest_layer_info = process_client.get_workspace_layer(workspace, name, headers=headers)
     geodata_type = rest_layer_info['geodata_type']
 
     exp_resp = get_expected_urls_in_rest_response(workspace, process_client.LAYER_TYPE, name,
                                                   rest_method='get',
-                                                  proxy_prefix=proxy_prefix,
+                                                  x_forwarded_items=proxy_items,
                                                   geodata_type=geodata_type,
                                                   )
     assert_util.assert_same_values_for_keys(
@@ -150,15 +155,15 @@ def get_layer_with_x_forwarded_prefix(workspace, name, headers, ):
 
 
 def get_map_with_x_forwarded_prefix(workspace, name, headers, ):
-    proxy_prefix = PROXY_PREFIX
+    proxy_items = X_FORWARDED_ITEMS
     headers = {
         **(headers or {}),
-        'X-Forwarded-Prefix': proxy_prefix,
+        **proxy_items.headers,
     }
     rest_map_info = process_client.get_workspace_map(workspace, name, headers=headers)
     exp_resp = get_expected_urls_in_rest_response(workspace, process_client.MAP_TYPE, name,
                                                   rest_method='get',
-                                                  proxy_prefix=proxy_prefix,
+                                                  x_forwarded_items=proxy_items,
                                                   geodata_type=None,
                                                   )
     assert_util.assert_same_values_for_keys(

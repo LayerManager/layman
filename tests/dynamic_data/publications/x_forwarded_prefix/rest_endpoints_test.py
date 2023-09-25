@@ -1,3 +1,4 @@
+from layman.util import XForwardedClass
 from tests import EnumTestTypes, Publication
 from tests.asserts.final.publication import rest as assert_rest
 from tests.dynamic_data import base_test, base_test_classes
@@ -29,13 +30,13 @@ class TestPublication(base_test.TestSingleRestPublication):
                                          )]
 
     def test_publication(self, publication, rest_method):
-        proxy_prefix = '/layman-proxy'
-        response = rest_method.fn(publication, args={'headers': {'X-Forwarded-Prefix': proxy_prefix}})
+        x_forwarded_items = XForwardedClass(proto='https', host='localhost:4142', prefix='/layman-proxy')
+        response = rest_method.fn(publication, args={'headers': x_forwarded_items.headers})
         publication_response = response[0] if isinstance(response, list) and len(response) == 1 else response
         geodata_type = publication_response.get('geodata_type')
         exp_resp = assert_rest.get_expected_urls_in_rest_response(publication.workspace, publication.type, publication.name,
                                                                   rest_method=rest_method.enum_item.publ_name_part,
-                                                                  proxy_prefix=proxy_prefix,
+                                                                  x_forwarded_items=x_forwarded_items,
                                                                   geodata_type=geodata_type,
                                                                   )
 
