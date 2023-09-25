@@ -1,17 +1,20 @@
 import logging
 from urllib.parse import urlparse
-
+from layman import settings
+from layman.util import XForwardedClass
 from geoserver.util import wms_direct, wfs_direct
 
 logger = logging.getLogger(__name__)
 CACHE_GS_PROXY_BASE_URL_KEY = f'{__name__}:GS_PROXY_BASE_URL'
 DEFAULT_EXTERNAL_DB_STORE_PREFIX = 'external_db'
 
-from layman import settings
 
-
-def get_gs_proxy_server_url():
-    proxy_base_url = f'{settings.LAYMAN_PUBLIC_URL_SCHEME}://{settings.LAYMAN_PROXY_SERVER_NAME}'
+def get_gs_proxy_server_url(*, x_forwarded_items=None):
+    x_forwarded_items = x_forwarded_items or XForwardedClass()
+    protocol = x_forwarded_items.proto or settings.LAYMAN_PUBLIC_URL_SCHEME
+    host = x_forwarded_items.host or settings.LAYMAN_PROXY_SERVER_NAME
+    path_prefix = x_forwarded_items.prefix or ''
+    proxy_base_url = f'{protocol}://{host}{path_prefix}'
     return proxy_base_url
 
 
