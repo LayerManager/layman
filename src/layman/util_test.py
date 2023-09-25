@@ -139,7 +139,23 @@ def test__url_for(endpoint, internal, params, expected_url):
 
 @pytest.mark.parametrize('headers, exp_result', [
     pytest.param({'X-Forwarded-Prefix': '/layman-proxy'}, util.XForwardedClass(prefix='/layman-proxy'),
-                 id='simple_header'),
+                 id='prefix_header'),
+    pytest.param({
+        'X-Forwarded-Proto': 'https',
+        'X-Forwarded-Host': 'example.com',
+        'X-Forwarded-Prefix': '/another-layman-proxy',
+    }, util.XForwardedClass(proto='https', host='example.com', prefix='/another-layman-proxy'), id='three_headers'),
+    pytest.param({
+        'X-Forwarded-Host': 'localhost:3000',
+    }, util.XForwardedClass(host='localhost:3000'), id='host_header_with_port'),
+    pytest.param({
+        'X-Forwarded-Proto': 'https',
+        'X-Forwarded-Prefix': '/another-layman-proxy',
+    }, util.XForwardedClass(proto='https', prefix='/another-layman-proxy'), id='proto_prefix_headers'),
+    pytest.param({
+        'X-Forwarded-Proto': 'https',
+        'X-Forwarded-Host': 'example.com',
+    }, util.XForwardedClass(proto='https', host='example.com'), id='proto_host_headers'),
     pytest.param({}, util.XForwardedClass(), id='without_header'),
 ])
 def test_get_x_forwarded_items(headers, exp_result):

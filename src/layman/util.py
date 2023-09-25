@@ -59,8 +59,20 @@ class SimpleCounter:
 
 @dataclass(frozen=True)
 class XForwardedClass:
-    def __init__(self, *, prefix=None):
+    def __init__(self, *, proto=None, host=None, prefix=None):
+        object.__setattr__(self, '_proto', proto)
+        object.__setattr__(self, '_host', host)
         object.__setattr__(self, '_prefix', prefix)
+
+    @property
+    def proto(self):
+        # pylint: disable=no-member
+        return self._proto
+
+    @property
+    def host(self):
+        # pylint: disable=no-member
+        return self._host
 
     @property
     def prefix(self):
@@ -68,13 +80,20 @@ class XForwardedClass:
         return self._prefix
 
     def __bool__(self):
-        return self.prefix is not None
+        return self.proto is not None or self.host is not None or self.prefix is not None
 
     def __eq__(self, other):
-        return isinstance(other, XForwardedClass) and self.prefix == other.prefix
+        return isinstance(other, XForwardedClass) \
+            and self.proto == other.proto \
+            and self.host == other.host \
+            and self.prefix == other.prefix
 
     def __repr__(self):
         parts = []
+        if self.proto is not None:
+            parts.append(('proto', json.dumps(self.proto)))
+        if self.host is not None:
+            parts.append(('host', json.dumps(self.host)))
         if self.prefix is not None:
             parts.append(('prefix', json.dumps(self.prefix)))
         parts_str = ', '.join(f"{key}={value}" for key, value in parts)
@@ -578,8 +597,10 @@ def ensure_home_dir():
 
 
 def get_x_forwarded_items(request_headers):
-    prefix = None
+    proto_key = 'X-Forwarded-Proto'
+    host_key = 'X-Forwarded-Host'
     prefix_key = 'X-Forwarded-Prefix'
+    prefix = None
     if prefix_key in request_headers:
         prefix = request_headers[prefix_key]
         if not re.match(CLIENT_PROXY_PATTERN, prefix):
@@ -590,4 +611,4 @@ def get_x_forwarded_items(request_headers):
                                'found': prefix,
                                }
                               )
-    return XForwardedClass(prefix=prefix)
+    return XForwardedClass(proto=request_headers.get(proto_key), host=request_headers.get(host_key), prefix=prefix)
