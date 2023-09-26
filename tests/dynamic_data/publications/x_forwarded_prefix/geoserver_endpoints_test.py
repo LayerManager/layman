@@ -17,8 +17,10 @@ def test_wms_get_capabilities(version):
                                                      version=version,
                                                      headers=headers,
                                                      )
-    assert all(m.get('url').startswith(f'http://localhost:8000{PROXY_PREFIX}/geoserver/') for operation in
-               ['GetCapabilities', 'GetMap', 'GetFeatureInfo'] for m in wms_inst.getOperationByName(operation).methods)
+    assert all(m.get('url').startswith(f'http://localhost:8000{PROXY_PREFIX}/geoserver/')
+               for operation in ['GetCapabilities', 'GetMap', 'GetFeatureInfo']
+               for m in wms_inst.getOperationByName(operation).methods
+               ), f"{wms_inst.getServiceXML()}"
 
 
 @pytest.mark.parametrize('version', [
@@ -31,5 +33,7 @@ def test_wfs_get_capabilities(version):
                                                      version=version,
                                                      headers=headers,
                                                      )
-    assert all(m.get('url').startswith(f'http://localhost:8000{PROXY_PREFIX}/geoserver/') for operation in
-               ['GetCapabilities', 'DescribeFeatureType', 'GetFeature'] for m in wfs_inst.getOperationByName(operation).methods)
+    assert all(m.get('url').startswith(f'http://localhost:8000{PROXY_PREFIX}/geoserver/')
+               for operation in ['GetCapabilities', 'DescribeFeatureType', 'GetFeature']
+               for m in wfs_inst.getOperationByName(operation).methods
+               ), f"{getattr(wfs_inst, '_capabilities')}"
