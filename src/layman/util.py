@@ -34,6 +34,7 @@ FLASK_PUBLICATION_MODULES_KEY = f'{__name__}:PUBLICATION_MODULES'
 HEADER_X_FORWARDED_PROTO_KEY = 'X-Forwarded-Proto'
 HEADER_X_FORWARDED_HOST_KEY = 'X-Forwarded-Host'
 HEADER_X_FORWARDED_PREFIX_KEY = 'X-Forwarded-Prefix'
+HOST_NAME_PATTERN = r'^(?=.{1,253}\.?(?:\:[0-9]{1,5})?$)(?:(?!-|[^.]+_)[a-z0-9-_]{1,63}(?<!-)(?:\.|(?:\:[0-9]{1,5})?$))+$'
 
 
 class SimpleStorage:
@@ -622,6 +623,31 @@ def ensure_home_dir():
 
 
 def get_x_forwarded_items(request_headers):
+    proto_key = HEADER_X_FORWARDED_PROTO_KEY
+    if proto_key in request_headers:
+        proto = request_headers[proto_key]
+        allowed_proto_values = ['http', 'https']
+        if proto not in allowed_proto_values:
+            raise LaymanError(54,
+                              {'header': proto_key,
+                               'message': f'Optional header {proto_key} contains unsupported value.',
+                               'expected': f'One of {allowed_proto_values}',
+                               'found': proto,
+                               }
+                              )
+
+    host_key = HEADER_X_FORWARDED_HOST_KEY
+    if host_key in request_headers:
+        host = request_headers[host_key]
+        if not re.match(HOST_NAME_PATTERN, host):
+            raise LaymanError(54,
+                              {'header': host_key,
+                               'message': f'Optional header {host_key} contains unsupported value.',
+                               'expected': f'Expected header matching regular expression {HOST_NAME_PATTERN}',
+                               'found': host,
+                               }
+                              )
+
     prefix_key = HEADER_X_FORWARDED_PREFIX_KEY
     if prefix_key in request_headers:
         prefix = request_headers[prefix_key]
