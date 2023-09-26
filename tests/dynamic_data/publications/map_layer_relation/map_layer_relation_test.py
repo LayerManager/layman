@@ -126,6 +126,7 @@ class TestPublication(base_test.TestSingleRestPublication):
     usernames_to_reserve = [PRIVATE_WORKSPACE]
 
     test_cases = [base_test.TestCaseType(key=key,
+                                         publication=Publication(f'{WORKSPACE}_{key}', None, None),
                                          params=params,
                                          rest_args=params['rest_args'],
                                          rest_method=params['rest_method'],
@@ -191,7 +192,7 @@ class TestPublication(base_test.TestSingleRestPublication):
                 })
 
     @staticmethod
-    def assert_exp_layer_maps(layer, map_operates_on_tuples):
+    def assert_exp_layer_maps(layer, map_operates_on_tuples, workspaces_to_check):
         exp_layer_maps = sorted([
             (map.workspace, map.name)
             for map, operates_on in map_operates_on_tuples
@@ -201,6 +202,7 @@ class TestPublication(base_test.TestSingleRestPublication):
             found_layer_maps = [
                 (m['workspace'], m['name'])
                 for m in get_publication_info(*layer, context={'keys': ['layer_maps']})['_layer_maps']
+                if m['workspace'] in workspaces_to_check
             ]
         assert found_layer_maps == exp_layer_maps
 
@@ -217,7 +219,7 @@ class TestPublication(base_test.TestSingleRestPublication):
         self.assert_exp_layer_maps(LAYER_HRANICE, [
             (MAP_HRANICE, MAP_HRANICE_OPERATES_ON),
             (map, exp['operates_on'] or []),
-        ])
+        ], workspaces_to_check=[map.workspace, MAP_HRANICE.workspace, PRIVATE_WORKSPACE])
         self.assert_exp_map_thumbnail(map, exp['thumbnail'])
 
         rest_method.fn(map, args=rest_args)
@@ -232,5 +234,5 @@ class TestPublication(base_test.TestSingleRestPublication):
         self.assert_exp_layer_maps(LAYER_HRANICE, [
             (MAP_HRANICE, MAP_HRANICE_OPERATES_ON),
             (map, exp['operates_on'] or []),
-        ])
+        ], workspaces_to_check=[map.workspace, MAP_HRANICE.workspace, PRIVATE_WORKSPACE])
         self.assert_exp_map_thumbnail(map, exp['thumbnail'])
