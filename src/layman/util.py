@@ -31,6 +31,10 @@ FLASK_PROVIDERS_KEY = f'{__name__}:PROVIDERS'
 FLASK_PUBLICATION_TYPES_KEY = f'{__name__}:PUBLICATION_TYPES'
 FLASK_PUBLICATION_MODULES_KEY = f'{__name__}:PUBLICATION_MODULES'
 
+HEADER_X_FORWARDED_PROTO_KEY = 'X-Forwarded-Proto'
+HEADER_X_FORWARDED_HOST_KEY = 'X-Forwarded-Host'
+HEADER_X_FORWARDED_PREFIX_KEY = 'X-Forwarded-Prefix'
+
 
 class SimpleStorage:
     def __init__(self):
@@ -89,6 +93,13 @@ class XForwardedClass:
         if self.prefix is not None:
             result['X-Forwarded-Prefix'] = self.prefix
         return result
+
+    @staticmethod
+    def from_headers(headers):
+        return XForwardedClass(proto=headers.get(HEADER_X_FORWARDED_PROTO_KEY),
+                               host=headers.get(HEADER_X_FORWARDED_HOST_KEY),
+                               prefix=headers.get(HEADER_X_FORWARDED_PREFIX_KEY),
+                               )
 
     def __bool__(self):
         return self.proto is not None or self.host is not None or self.prefix is not None
@@ -611,10 +622,7 @@ def ensure_home_dir():
 
 
 def get_x_forwarded_items(request_headers):
-    proto_key = 'X-Forwarded-Proto'
-    host_key = 'X-Forwarded-Host'
-    prefix_key = 'X-Forwarded-Prefix'
-    prefix = None
+    prefix_key = HEADER_X_FORWARDED_PREFIX_KEY
     if prefix_key in request_headers:
         prefix = request_headers[prefix_key]
         if not re.match(CLIENT_PROXY_PATTERN, prefix):
@@ -625,4 +633,4 @@ def get_x_forwarded_items(request_headers):
                                'found': prefix,
                                }
                               )
-    return XForwardedClass(proto=request_headers.get(proto_key), host=request_headers.get(host_key), prefix=prefix)
+    return XForwardedClass.from_headers(request_headers)
