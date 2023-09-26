@@ -92,6 +92,7 @@ def patch(workspace, mapname):
         'http_method': 'patch',
         'metadata_properties_to_refresh': metadata_properties_to_refresh,
         'actor_name': authn.get_authn_username(),
+        'x_forwarded_headers': x_forwarded_items.headers,
     }
 
     rest_util.setup_patch_access_rights(request.form, kwargs)

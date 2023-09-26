@@ -90,7 +90,8 @@ def post(workspace):
         kwargs = {
             'title': title,
             'description': description,
-            'actor_name': actor_name
+            'actor_name': actor_name,
+            'x_forwarded_headers': x_forwarded_items.headers,
         }
 
         rest_common.setup_post_access_rights(request.form, kwargs, actor_name)

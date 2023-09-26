@@ -339,7 +339,7 @@ def get_same_or_missing_prop_names(workspace, mapname):
     return metadata_common.get_same_or_missing_prop_names(prop_names, md_comparison)
 
 
-def _adjust_url(*, url_obj=None, url_key=None, url_list=None, url_idx=None, proxy_prefix, path_prefix):
+def _adjust_url(*, url_obj=None, url_key=None, url_list=None, url_idx=None, proxy_items, path_prefix):
     assert (url_obj is None) == (url_key is None)
     assert (url_list is None) == (url_idx is None)
     assert (url_obj is None) != (url_list is None)
@@ -353,9 +353,9 @@ def _adjust_url(*, url_obj=None, url_key=None, url_list=None, url_idx=None, prox
     if match:
         # replace scheme and netloc, because LAYMAN_PUBLIC_URL_SCHEME or LAYMAN_PROXY_SERVER_NAME may have changed
         new_url = parsed_url._replace(
-            scheme=settings.LAYMAN_PUBLIC_URL_SCHEME,
-            netloc=settings.LAYMAN_PROXY_SERVER_NAME,
-            path=proxy_prefix + path_prefix + match.group('path_postfix'),
+            scheme=proxy_items.proto or settings.LAYMAN_PUBLIC_URL_SCHEME,
+            netloc=proxy_items.host or settings.LAYMAN_PROXY_SERVER_NAME,
+            path=(proxy_items.prefix or '') + path_prefix + match.group('path_postfix'),
         )
         if url_obj is not None:
             url_obj[url_key] = new_url.geturl()
@@ -367,7 +367,6 @@ def _adjust_url(*, url_obj=None, url_key=None, url_list=None, url_idx=None, prox
 
 def get_map_file_json(workspace, mapname, *, adjust_urls=True, x_forwarded_items=None):
     x_forwarded_items = x_forwarded_items or XForwardedClass()
-    x_forwarded_prefix = x_forwarded_items.prefix or ''
     map_json = input_file.get_map_json(workspace, mapname)
 
     if adjust_urls:
@@ -377,21 +376,21 @@ def get_map_file_json(workspace, mapname, *, adjust_urls=True, x_forwarded_items
 
         for ml_idx in ml_indices:
             map_layer = map_json['layers'][ml_idx]
-            orig_base_url = _adjust_url(url_obj=map_layer, url_key='url', proxy_prefix=x_forwarded_prefix,
+            orig_base_url = _adjust_url(url_obj=map_layer, url_key='url', proxy_items=x_forwarded_items,
                                         path_prefix=layman_settings.LAYMAN_GS_PATH)
             orig_base_url = _adjust_url(url_obj=map_layer.get('protocol', {}), url_key='url',
-                                        proxy_prefix=x_forwarded_prefix, path_prefix=layman_settings.LAYMAN_GS_PATH
+                                        proxy_items=x_forwarded_items, path_prefix=layman_settings.LAYMAN_GS_PATH
                                         ) or orig_base_url
             if orig_base_url:
                 legends = map_layer.get('legends', [])
                 for idx, legend_url in enumerate(legends):
                     # use orig_base_url, because LAYMAN_PUBLIC_URL_SCHEME or LAYMAN_PROXY_SERVER_NAME may have changed
                     if legend_url.startswith(orig_base_url):
-                        _adjust_url(url_list=legends, url_idx=idx, proxy_prefix=x_forwarded_prefix,
+                        _adjust_url(url_list=legends, url_idx=idx, proxy_items=x_forwarded_items,
                                     path_prefix=layman_settings.LAYMAN_GS_PATH)
                 maybe_style = map_layer.get('style')
                 if isinstance(maybe_style, str) and maybe_style.startswith(orig_base_url):
-                    _adjust_url(url_obj=map_layer, url_key='style', proxy_prefix=x_forwarded_prefix,
+                    _adjust_url(url_obj=map_layer, url_key='style', proxy_items=x_forwarded_items,
                                 path_prefix='/rest/')
 
     if map_json is not None:
