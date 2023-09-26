@@ -434,11 +434,15 @@ def _get_layer_names_from_vector_json(map_layer):
     ]
 
 
-def get_layers_from_json(map_json):
+def get_layers_from_json(map_json, *, x_forwarded_items=None):
+    x_forwarded_items = x_forwarded_items or XForwardedClass()
     map_json = input_file.unquote_urls(map_json)
-    gs_server_url = get_gs_proxy_server_url()
-    gs_url_pattern = r'^' + re.escape(gs_server_url) + layman_util.CLIENT_PROXY_ONLY_PATTERN + \
-                     re.escape(layman_settings.LAYMAN_GS_PATH) + \
+    gs_server_raw_url = get_gs_proxy_server_url()
+    gs_server_proxy_url = get_gs_proxy_server_url(
+        x_forwarded_items=XForwardedClass(proto=x_forwarded_items.proto, host=x_forwarded_items.host)
+    )
+    gs_url_pattern = r'^(?:' + re.escape(gs_server_raw_url) + '|' + re.escape(gs_server_proxy_url) + ')' + \
+                     layman_util.CLIENT_PROXY_ONLY_PATTERN + re.escape(layman_settings.LAYMAN_GS_PATH) + \
                      r'(?:(?P<workspace>' + layman_util.WORKSPACE_NAME_ONLY_PATTERN + r')/)?' \
                      + r'(?:ows|wms|wfs).*$'
     found_layers = []
