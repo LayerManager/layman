@@ -106,6 +106,8 @@ def get_wms_proxy(workspace):
     headers = {
         settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE: settings.LAYMAN_GS_USER,
         'X-Forwarded-Path': '',
+        'X-Forwarded-Proto': settings.LAYMAN_PUBLIC_URL_SCHEME,
+        'X-Forwarded-Host': settings.LAYMAN_PROXY_SERVER_NAME,
     }
     key = get_flask_proxy_key(workspace)
 
