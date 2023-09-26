@@ -194,7 +194,55 @@ def test_get_x_forwarded_items(headers, exp_result):
                 'expected': 'Expected header matching regular expression ^(?:/[a-z0-9_-]+)*$',
                 'found': 'layman-proxy',
             },
-        }, id='without_slash'),
+        }, id='prefix-without-slash'),
+    pytest.param(
+        {'X-Forwarded-Proto': ''},
+        {
+            'http_code': 400,
+            'code': 54,
+            'data': {
+                'header': 'X-Forwarded-Proto',
+                'message': 'Optional header X-Forwarded-Proto contains unsupported value.',
+                'expected': "One of ['http', 'https']",
+                'found': '',
+            },
+        }, id='empty-proto'),
+    pytest.param(
+        {'X-Forwarded-Proto': 'ftp'},
+        {
+            'http_code': 400,
+            'code': 54,
+            'data': {
+                'header': 'X-Forwarded-Proto',
+                'message': 'Optional header X-Forwarded-Proto contains unsupported value.',
+                'expected': "One of ['http', 'https']",
+                'found': 'ftp',
+            },
+        }, id='unsupported-proto'),
+    pytest.param(
+        {'X-Forwarded-Host': 'ABZ.COM'},
+        {
+            'http_code': 400,
+            'code': 54,
+            'data': {
+                'header': 'X-Forwarded-Host',
+                'message': 'Optional header X-Forwarded-Host contains unsupported value.',
+                'expected': r'Expected header matching regular expression ^(?=.{1,253}\.?(?:\:[0-9]{1,5})?$)(?:(?!-|[^.]+_)[a-z0-9-_]{1,63}(?<!-)(?:\.|(?:\:[0-9]{1,5})?$))+$',
+                'found': 'ABZ.COM',
+            },
+        }, id='uppercase-host'),
+    pytest.param(
+        {'X-Forwarded-Host': ''},
+        {
+            'http_code': 400,
+            'code': 54,
+            'data': {
+                'header': 'X-Forwarded-Host',
+                'message': 'Optional header X-Forwarded-Host contains unsupported value.',
+                'expected': r'Expected header matching regular expression ^(?=.{1,253}\.?(?:\:[0-9]{1,5})?$)(?:(?!-|[^.]+_)[a-z0-9-_]{1,63}(?<!-)(?:\.|(?:\:[0-9]{1,5})?$))+$',
+                'found': '',
+            },
+        }, id='empty-host'),
 ])
 def test_get_x_forwarded_items_raises(headers, exp_error):
     with pytest.raises(LaymanError) as exc_info:
