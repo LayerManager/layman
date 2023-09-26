@@ -78,4 +78,4 @@ class TestLayer(base_test.TestSingleRestPublication):
         asserts_publ.geoserver_proxy.is_complete_in_workspace_wms(layer.workspace, layer.type, layer.name,
                                                                   version='1.1.1')
         asserts_publ.geoserver_proxy.wms_legend_url_with_x_forwarded_headers(layer.workspace, layer.type, layer.name, )
-        asserts_publ.metadata.correct_comparison_response_with_x_forwarded_prefix_header(layer.workspace, layer.type, layer.name, )
+        asserts_publ.metadata.correct_comparison_response_with_x_forwarded_headers(layer.workspace, layer.type, layer.name, )
