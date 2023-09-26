@@ -80,6 +80,8 @@ def get_wfs_direct(workspace):
 def get_wfs_proxy(workspace):
     headers = {
         settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE: settings.LAYMAN_GS_USER,
+        'X-Forwarded-Proto': settings.LAYMAN_PUBLIC_URL_SCHEME,
+        'X-Forwarded-Host': settings.LAYMAN_PROXY_SERVER_NAME,
         'X-Forwarded-Path': '',
     }
     key = get_flask_proxy_key(workspace)

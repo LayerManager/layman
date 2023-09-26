@@ -233,6 +233,8 @@ def proxy(subpath):
     ]:
         headers_req.pop(header, None)
     x_forwarded_items = layman_util.get_x_forwarded_items(request.headers)
+    headers_req['X-Forwarded-Proto'] = x_forwarded_items.proto or settings.LAYMAN_PUBLIC_URL_SCHEME
+    headers_req['X-Forwarded-Host'] = x_forwarded_items.host or settings.LAYMAN_PROXY_SERVER_NAME
     headers_req['X-Forwarded-Path'] = x_forwarded_items.prefix or ''
 
     # ensure layer attributes in case of WFS-T
