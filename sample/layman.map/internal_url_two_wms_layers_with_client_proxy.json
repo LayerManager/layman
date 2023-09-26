@@ -37,9 +37,22 @@
       "title": "Mista",
       "className": "HSLayers.Layer.WMS",
       "singleTile": true,
-      "url": "http://localhost:8000/client-proxy/client-proxy-subdir/geoserver/ows",
+      "url": "https://laymanproxy.com/client-proxy/client-proxy-subdir/geoserver/ows",
       "params": {
         "LAYERS": "testuser1_wms:mista",
+        "FORMAT": "image\/png"
+      }
+    },
+    {
+      "metadata": {},
+      "visibility": true,
+      "opacity": 1,
+      "title": "Hranice",
+      "className": "HSLayers.Layer.WMS",
+      "singleTile": true,
+      "url": "https://anotherlayman.org/client-proxy/geoserver/testuser1_wms/ows",
+      "params": {
+        "LAYERS": "hranice",
         "FORMAT": "image\/png"
       }
     }
