@@ -19,13 +19,21 @@ Imagine request e.g. to [GET Publications](rest.md#get-publications) sent throug
 ]
 ```
 
-By default, Layman will not adjust URLs in its response to contain also URL path prefix of the client proxy (`/layman-proxy` in above example). If you prefer to adjust URLs in Layman responses to contain also URL path prefix of the client proxy, you need to send also `X-Forwarded-Prefix` HTTP header with the request.
+By default, Layman will not adjust URLs in its response to contain also URL path prefix of the client proxy (`/layman-proxy` in above example). If you prefer to adjust URLs in Layman responses to contain also URL path prefix of the client proxy (or even host and protocol), you need to send also [X-Forwarded HTTP headers](#x-forwarded-http-headers) with the request.
 
-## X-Forwarded-Prefix HTTP header
+## X-Forwarded HTTP headers
 
-The value of the `X-Forwarded-Prefix` HTTP header will be used as prefix in some URL paths of Layman response and is required to match regular expression `^(?:/[a-z0-9_-]+)*$`.
+Layman supports three optional X-Forwarded HTTP headers, whose values will be used in some URLs in Layman responses:
+- `X-Forwarded-Proto`: The value will be used as protocol in some URLs, and it is required to be `http` or `https`.
+- `X-Forwarded-Host`: The value will be used as host in some URLs, and it is required to match regular expression `^(?=.{1,253}\.?(?:\:[0-9]{1,5})?$)(?:(?!-|[^.]+_)[a-z0-9-_]{1,63}(?<!-)(?:\.|(?:\:[0-9]{1,5})?$))+$`.
+- `X-Forwarded-Prefix`: The value will be used as prefix in some URL paths, and it is required to match regular expression `^(?:/[a-z0-9_-]+)*$`.
 
-For example, if you send request to `/layman-client-proxy/rest/publications` with HTTP header `X-Forwarded-Prefix=/layman-client-proxy` then response will change to
+For example, consider there is layman running at `https://enjoychallenge.tech/rest` and client proxy running at `https://laymanproxy.com/layman-client-proxy`. If you send request to your Layman proxy `https://laymanproxy.com/layman-client-proxy/rest/publications` with HTTP headers
+```
+X-Forwarded-Host=laymanproxy.com
+X-Forwarded-Prefix=/layman-client-proxy
+```
+then response will change to
 
 ```json
 [
@@ -33,14 +41,14 @@ For example, if you send request to `/layman-client-proxy/rest/publications` wit
     "workspace": "my_workspace",
     "publication_type": "layer",
     "name": "my_layer",
-    "url": "https://mylaymandomain.com/layman-client-proxy/rest/publications",
+    "url": "https://laymanproxy.com/layman-client-proxy/rest/publications",
     ...
   },
   ...
 ]
 ```
 
-Currently, value of `X-Forwarded-Prefix` affects following URLs:
+Currently, value of X-Forwarded headers affects following URLs:
 * [GET Publications](rest.md#get-publications)
   * `url` key
 * [GET Layers](rest.md#get-layers)
@@ -69,7 +77,7 @@ Currently, value of `X-Forwarded-Prefix` affects following URLs:
     * `protocol`.`url` key
     * each `legends` key if its HTTP protocol and netloc corresponds with `url` or `protocol`.`url`
     * `style` key if its HTTP protocol and netloc corresponds with `url` or `protocol`.`url`
-  * NOTE: If client proxy prefix was used in URLs in uploaded file, then such prefix is also replaced with prefix according to `X-Forwarded-Prefix` header value. Such prefix is removed for requests without `X-Forwarded-Prefix` header.
+  * NOTE: If client proxy protocol, host, or URL path prefix was used in URLs in uploaded file, then such values are also replaced with values according to X-Forwarded header values. Default values are used for requests without X-Forwarded headers (protocol is the one from [LAYMAN_CLIENT_PUBLIC_URL](env-settings.md#layman_client_public_url), host is [LAYMAN_PROXY_SERVER_NAME](env-settings.md#layman_proxy_server_name), and path prefix is empty string).
 * [POST Workspace Layers](rest.md#post-workspace-layers)
   * `url` key
 * [DELETE Workspace Layer](rest.md#delete-workspace-layer)
@@ -95,11 +103,11 @@ Currently, value of `X-Forwarded-Prefix` affects following URLs:
   * `thumbnail`.`url` key
   * `metadata`.`comparison_url` key
 * [OGC endpoints](endpoints.md)
-  * Headers `X-Forwarded-Proto`, `X-Forwarded-Host`, `X-Forwarded-For`, `X-Forwarded-Path`, `Forwarded` and `Host` are ignored
+  * Headers `X-Forwarded-For`, `X-Forwarded-Path`, `Forwarded` and `Host` are ignored
   * [WMS endpoints](endpoints.md#web-map-service)
     * all requests URLs
     * all legend URLs
   * [WFS endpoints](endpoints.md#web-feature-service)
     * all operations URLs
 
-Value of `X-Forwarded-Prefix` does not affects response values of [GET Workspace Layer Metadata Comparison](rest.md#get-workspace-layer-metadata-comparison) and [GET Workspace Map Metadata Comparison](rest.md#get-workspace-map-metadata-comparison).
+Values of X-Forwarded headers does not affect response values of [GET Workspace Layer Metadata Comparison](rest.md#get-workspace-layer-metadata-comparison) and [GET Workspace Map Metadata Comparison](rest.md#get-workspace-map-metadata-comparison).
