@@ -30,6 +30,7 @@ TEST_CASES = {
         'exp_before_rest_method': {
             'map_layers': None,
             'operates_on': None,
+            'thumbnail': None,
         },
         'rest_method': base_test_classes.RestMethodAll.POST,
         'rest_args': {
@@ -43,6 +44,7 @@ TEST_CASES = {
                 (LAYER_HRANICE, 3, True),
             },
             'operates_on': [LAYER_HRANICE],
+            'thumbnail': os.path.join(DIRECTORY, 'map_liberec_hranice_thumbnail.png'),
         },
     },
     'delete': {
@@ -56,12 +58,14 @@ TEST_CASES = {
                 (LAYER_HRANICE, 3, True),
             },
             'operates_on': [LAYER_HRANICE],
+            'thumbnail': os.path.join(DIRECTORY, 'map_liberec_hranice_thumbnail.png'),
         },
         'rest_method': base_test_classes.RestMethodAll.DELETE,
         'rest_args': {},
         'exp_after_rest_method': {
             'map_layers': None,
             'operates_on': None,
+            'thumbnail': None,
         },
     },
     'patch_map_with_unauthorized_layer': {
@@ -71,14 +75,17 @@ TEST_CASES = {
         'exp_before_rest_method': {
             'map_layers': [(LAYER_HRANICE_PRIVATE, 1, True)],
             'operates_on': [],
+            'thumbnail': os.path.join(DIRECTORY, 'map_liberec_thumbnail.png'),
         },
         'rest_method': base_test_classes.RestMethodAll.PATCH,
         'rest_args': {
+            'file_paths': [os.path.join(DIRECTORY, 'internal_hranice_private.json')],
             'actor_name': PRIVATE_WORKSPACE,
         },
         'exp_after_rest_method': {
             'map_layers': [(LAYER_HRANICE_PRIVATE, 1, True)],
             'operates_on': [LAYER_HRANICE_PRIVATE],
+            'thumbnail': os.path.join(DIRECTORY, 'map_liberec_hranice_thumbnail.png'),
         },
     },
     'patch_map_with_different_layers': {
@@ -93,6 +100,7 @@ TEST_CASES = {
                 (LAYER_HRANICE, 3, True),
             },
             'operates_on': [LAYER_HRANICE],
+            'thumbnail': os.path.join(DIRECTORY, 'map_liberec_hranice_thumbnail.png'),
         },
         'rest_method': base_test_classes.RestMethodAll.PATCH,
         'rest_args': {
@@ -102,6 +110,7 @@ TEST_CASES = {
         'exp_after_rest_method': {
             'map_layers': [(LAYER_HRANICE_PRIVATE, 1, True)],
             'operates_on': [LAYER_HRANICE_PRIVATE],
+            'thumbnail': os.path.join(DIRECTORY, 'map_liberec_hranice_thumbnail.png'),
         },
     },
 }
@@ -195,6 +204,12 @@ class TestPublication(base_test.TestSingleRestPublication):
             ]
         assert found_layer_maps == exp_layer_maps
 
+    @staticmethod
+    def assert_exp_map_thumbnail(map, exp_thumbnail):
+        if exp_thumbnail:
+            asserts_publ.internal.thumbnail_equals(map.workspace, map.type, map.name, exp_thumbnail,
+                                                   max_diffs=0)
+
     def test_publication(self, map, rest_method, rest_args, params):
         exp = params['exp_before_rest_method']
         self.assert_exp_map_layers(map, exp['map_layers'], exp['operates_on'], http_method=REQUEST_METHOD_POST,
@@ -203,6 +218,7 @@ class TestPublication(base_test.TestSingleRestPublication):
             (MAP_HRANICE, MAP_HRANICE_OPERATES_ON),
             (map, exp['operates_on'] or []),
         ])
+        self.assert_exp_map_thumbnail(map, exp['thumbnail'])
 
         rest_method.fn(map, args=rest_args)
         if rest_method.enum_item in [base_test_classes.RestMethodAll.POST, base_test_classes.RestMethodAll.PATCH]:
@@ -217,3 +233,4 @@ class TestPublication(base_test.TestSingleRestPublication):
             (MAP_HRANICE, MAP_HRANICE_OPERATES_ON),
             (map, exp['operates_on'] or []),
         ])
+        self.assert_exp_map_thumbnail(map, exp['thumbnail'])
