@@ -227,6 +227,7 @@ def proxy(subpath):
         'X-Forwarded-Host',
         'X-Forwarded-For',
         'X-Forwarded-Path',
+        'X-Forwarded-Prefix',
         'Forwarded',
         'Host',
     ]:
