@@ -1,8 +1,9 @@
 import pytest
+from layman.util import XForwardedClass
 from test_tools import geoserver_client
 
-PROXY_PREFIX = '/layman-proxy'
-headers = {'X-Forwarded-Prefix': PROXY_PREFIX,
+X_FORWARDED_ITEMS = XForwardedClass(proto='https', host='localhost:4143', prefix='/layman-proxy')
+headers = {**X_FORWARDED_ITEMS.headers,
            'X-Forwarded-Path': '/some-other-proxy',
            }
 
@@ -17,7 +18,7 @@ def test_wms_get_capabilities(version):
                                                      version=version,
                                                      headers=headers,
                                                      )
-    assert all(m.get('url').startswith(f'http://localhost:8000{PROXY_PREFIX}/geoserver/')
+    assert all(m.get('url').startswith(f'https://localhost:4143/layman-proxy/geoserver/')
                for operation in ['GetCapabilities', 'GetMap', 'GetFeatureInfo']
                for m in wms_inst.getOperationByName(operation).methods
                ), f"{wms_inst.getServiceXML()}"
@@ -33,7 +34,7 @@ def test_wfs_get_capabilities(version):
                                                      version=version,
                                                      headers=headers,
                                                      )
-    assert all(m.get('url').startswith(f'http://localhost:8000{PROXY_PREFIX}/geoserver/')
+    assert all(m.get('url').startswith(f'https://localhost:4143/layman-proxy/geoserver/')
                for operation in ['GetCapabilities', 'DescribeFeatureType', 'GetFeature']
                for m in wfs_inst.getOperationByName(operation).methods
                ), f"{getattr(wfs_inst, '_capabilities')}"

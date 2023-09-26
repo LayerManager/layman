@@ -1,5 +1,6 @@
 from layman import app, settings, util as layman_util
 from layman.layer.geoserver import util as gs_util
+from layman.util import XForwardedClass
 from test_tools import util as test_util, process_client, geoserver_client
 from . import geoserver_util
 
@@ -37,20 +38,20 @@ def workspace_wfs_2_0_0_capabilities_available_if_vector(workspace, publ_type, n
         assert wfs_layer.metadataUrls[0]['url'].startswith('http://localhost:3080/record/xml/m-')
 
 
-def wms_legend_url_with_x_forwarded_prefix(workspace, publ_type, name, headers=None):
+def wms_legend_url_with_x_forwarded_headers(workspace, publ_type, name, headers=None):
     assert publ_type == process_client.LAYER_TYPE
-    proxy_prefix = '/layman-proxy'
+    x_forwarded_items = XForwardedClass(proto='https', host='abc.cz:4142', prefix='/layman-proxy')
     headers = headers or {}
 
     for input_workspace, key in [(workspace + settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX, name),
                                  ('', f'{workspace + settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}:{name}'), ]:
         for version in ['1.3.0', '1.1.1']:
             wms_inst = geoserver_client.get_wms_capabilities(input_workspace,
-                                                             headers={'X-Forwarded-Prefix': proxy_prefix,
+                                                             headers={**x_forwarded_items.headers,
                                                                       'X-Forwarded-Path': '/some-other-proxy',
                                                                       **headers,
                                                                       },
                                                              version=version,
                                                              )
             for style_content in wms_inst.contents[key].styles.values():
-                assert style_content['legend'].startswith(f'http://localhost:8000{proxy_prefix}/geoserver/')
+                assert style_content['legend'].startswith(f'https://abc.cz:4142/layman-proxy/geoserver/')
