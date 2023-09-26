@@ -103,7 +103,7 @@ def correct_comparison_response_with_x_forwarded_prefix_header(workspace, publ_t
                                                                                                headers=headers)
     assert md_props.issubset(set(resp_json_with_proxy['metadata_properties'].keys()))
     for key, value in resp_json_with_proxy['metadata_properties'].items():
-        assert value['equal_or_null'] is True, f'key={key}, value={value}'
-        assert value['equal'] is True, f'key={key}, value={value}'
+        assert value['equal_or_null'] is True, f"key={key}, value={value}, sources={resp_json_with_proxy['metadata_sources']}"
+        assert value['equal'] is True, f"key={key}, value={value}, sources={resp_json_with_proxy['metadata_sources']}"
 
     assert resp_json_with_proxy == resp_json_without_proxy
