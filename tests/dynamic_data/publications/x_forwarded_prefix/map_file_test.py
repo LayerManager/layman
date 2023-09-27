@@ -4,7 +4,6 @@ import os
 import pytest
 
 import jsonpath_ng as jp
-from layman import settings
 from test_tools import process_client
 from tests import Publication
 from tests.dynamic_data import base_test
@@ -39,16 +38,17 @@ class TestPublication(base_test.TestSingleRestPublication):
             'file_paths': [MAP_FILE_PATH],
         }, scope='class')
 
-    @pytest.mark.parametrize('headers', [
-        pytest.param({}, id='no-client-proxy-prefix'),
-        pytest.param({'X-Forwarded-Prefix': ''}, id='empty-client-proxy-prefix'),
-        pytest.param({'X-Forwarded-Prefix': '/some-client-proxy'}, id='some-client-proxy-prefix'),
+    @pytest.mark.parametrize('headers, exp_url_prefix', [
+        pytest.param({}, 'http://localhost:8000', id='no-client-proxy-prefix'),
+        pytest.param({'X-Forwarded-Prefix': ''}, 'http://localhost:8000', id='empty-client-proxy-prefix'),
+        pytest.param({'X-Forwarded-Prefix': '/some-client-proxy'}, 'http://localhost:8000/some-client-proxy',
+                     id='some-client-proxy-prefix'),
         pytest.param({'X-Forwarded-Proto': 'https',
                       'X-Forwarded-Host': 'enjoychallenge.tech',
                       'X-Forwarded-Prefix': '/some-client-proxy',
-                      }, id='full-client-proxy-prefix'),
+                      }, 'https://enjoychallenge.tech/some-client-proxy', id='full-client-proxy-prefix'),
     ])
-    def test_x_forwarded_prefix(self, headers):
+    def test_x_forwarded_prefix(self, headers, exp_url_prefix):
         map = MAP
         resp = process_client.get_workspace_map_file(map.type, map.workspace, map.name, headers=headers)
 
@@ -60,12 +60,9 @@ class TestPublication(base_test.TestSingleRestPublication):
             ('$.layers[3].protocol.url', '/geoserver/map_file_workspace_workspace/wfs'),
         ]
 
-        x_forwarded_proto = headers.get('X-Forwarded-Proto', settings.LAYMAN_PUBLIC_URL_SCHEME)
-        x_forwarded_host = headers.get('X-Forwarded-Host', settings.LAYMAN_PROXY_SERVER_NAME)
-        x_forwarded_prefix = headers.get('X-Forwarded-Prefix', '')
         for json_path_str, exp_url_postfix in exp_adjusted_urls:
             found_value = _find_single_value_in_json(json_path_str, resp)
-            exp_value = f"{x_forwarded_proto}://{x_forwarded_host}{x_forwarded_prefix}{exp_url_postfix}"
+            exp_value = f"{exp_url_prefix}{exp_url_postfix}"
             assert found_value == exp_value, f"key={json_path_str}"
 
         with open(MAP_FILE_PATH, encoding='utf-8') as file:
