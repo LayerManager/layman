@@ -39,7 +39,7 @@
   
 ## Map
 - Also referred to as **map composition**
-- Map is [publication](#publication) defined by JSON valid against [map-composition schema](https://github.com/hslayers/map-compositions) version 2 used by [Hslayers-ng](https://github.com/hslayers/hslayers-ng)
+- Map is [publication](#publication) defined by JSON valid against [map-composition schema](https://github.com/hslayers/map-compositions) version 2 or 3 used by [Hslayers-ng](https://github.com/hslayers/hslayers-ng)
 - Map is collection of WMS layers and vector data
 - Maps composed of WMS layers only are fully supported
 - Each layer is either [internal](#internal-map-layer), or [external](#external-map-layer).

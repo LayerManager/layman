@@ -556,7 +556,7 @@ Get list of published maps (map compositions).
 Have the same request parameters and response structure and headers as [GET Maps](#get-maps).
 
 ### POST Workspace Maps
-Publish new map composition. Accepts JSON valid against [map-composition schema](https://github.com/hslayers/map-compositions) version 2 used by [Hslayers-ng](https://github.com/hslayers/hslayers-ng). Exact version of schema is defined by `describedBy` key of JSON data file.
+Publish new map composition. Accepts JSON valid against [map-composition schema](https://github.com/hslayers/map-compositions) version 2 or 3 used by [Hslayers-ng](https://github.com/hslayers/hslayers-ng). Exact version of schema is defined by `describedBy` key of JSON data file.
 
 Processing chain consists of few steps:
 - validate JSON file against schema defined by `describedBy` key
