@@ -476,7 +476,7 @@ TESTCASES = {
             'http_code': 400,
             'sync': True,
             'code': 2,
-            'data': {'expected': 'JSON file according schema `https://github.com/hslayers/map-compositions`, version 2',
+            'data': {'expected': 'JSON file according schema `https://github.com/hslayers/map-compositions`, version 2 or 3',
                      'parameter': 'file',
                      'reason': 'Missing key `describedBy`'},
         },
@@ -484,11 +484,11 @@ TESTCASES = {
         Key.RUN_ONLY_CASES: frozenset([RestMethod.POST, WithChunksDomain.FALSE, CompressDomain.FALSE]),
         Key.SPECIFIC_CASES: {},
     },
-    'map_schema_3_0_0': {
+    'map_schema_4_0_0': {
         Key.PUBLICATION_TYPE: process_client.MAP_TYPE,
         Key.REST_ARGS: {
             'file_paths': [
-                f'{DIRECTORY}/map_schema_3_0_0.json',
+                f'{DIRECTORY}/map_schema_4_0_0.json',
             ],
         },
         Key.EXCEPTION: LaymanError,
@@ -497,7 +497,7 @@ TESTCASES = {
             'http_code': 400,
             'sync': True,
             'code': 2,
-            'data': {'expected': '2.x.x',
+            'data': {'expected': '2.x.x or 3.x.x',
                      'parameter': 'file',
                      'reason': 'Invalid schema version'},
         },

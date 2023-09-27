@@ -175,8 +175,10 @@ const json_to_wms_layer = (layer_json, gs_public_url, gs_url, headers) => {
 
 
 const json_to_layer = (layer_json, gs_public_url, gs_url, headers) => {
-  switch (layer_json.className) {
-    case "HSLayers.Layer.WMS":
+  const class_name_split = layer_json.className.split('.')
+  const class_name_last = class_name_split[class_name_split.length-1]
+  switch (class_name_last) {
+    case "WMS":
       return json_to_wms_layer(layer_json, gs_public_url, gs_url, headers);
       break;
     // case 'OpenLayers.Layer.Vector':

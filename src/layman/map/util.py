@@ -27,7 +27,7 @@ MAPNAME_PATTERN = PUBLICATION_NAME_PATTERN
 MAPNAME_MAX_LENGTH = PUBLICATION_MAX_LENGTH
 SCHEMA_URL_PATTERN = r'^https://raw.githubusercontent.com/hslayers/map-compositions/(([0-9]{1,}.[0-9]{1,}.[0-9]{1,})|([a-zA-Z]*?))/schema.json$'
 _SCHEMA_CACHE_PATH = 'tmp'
-_ACCEPTED_SCHEMA_MAJOR_VERSION = '2'
+_ACCEPTED_SCHEMA_MAJOR_VERSION_LIST = ['2', '3']
 
 FLASK_PROVIDERS_KEY = f'{__name__}:PROVIDERS'
 FLASK_SOURCES_KEY = f'{__name__}:SOURCES'
@@ -172,11 +172,11 @@ def get_composition_schema(url):
             'regular_expression': SCHEMA_URL_PATTERN,
         })
     version = url.split('/')[-2]
-    if version.split('.')[0] != _ACCEPTED_SCHEMA_MAJOR_VERSION:
+    if version.split('.')[0] not in _ACCEPTED_SCHEMA_MAJOR_VERSION_LIST:
         raise LaymanError(2, {
             'parameter': 'file',
             'reason': 'Invalid schema version',
-            'expected': _ACCEPTED_SCHEMA_MAJOR_VERSION + '.x.x',
+            'expected': ' or '.join([v + '.x.x' for v in _ACCEPTED_SCHEMA_MAJOR_VERSION_LIST]),
         })
 
     schema_file_name = os.path.join(*url.split('/')[-1:])
@@ -214,7 +214,7 @@ def check_file(file):
         raise LaymanError(2, {
             'parameter': 'file',
             'reason': 'Missing key `describedBy`',
-            'expected': 'JSON file according schema `https://github.com/hslayers/map-compositions`, version ' + _ACCEPTED_SCHEMA_MAJOR_VERSION,
+            'expected': 'JSON file according schema `https://github.com/hslayers/map-compositions`, version ' + ' or '.join(_ACCEPTED_SCHEMA_MAJOR_VERSION_LIST),
         }) from exc
 
     schema_json = get_composition_schema(schema_url)
