@@ -25,7 +25,7 @@ By default, Layman will not adjust URLs in its response to contain also URL path
 
 Layman supports three optional X-Forwarded HTTP headers, whose values will be used in some URLs in Layman responses:
 - `X-Forwarded-Proto`: The value will be used as protocol in some URLs, and it is required to be `http` or `https`.
-- `X-Forwarded-Host`: The value will be used as host in some URLs, and it is required to match regular expression `^(?=.{1,253}\.?(?:\:[0-9]{1,5})?$)(?:(?!-|[^.]+_)[a-z0-9-_]{1,63}(?<!-)(?:\.|(?:\:[0-9]{1,5})?$))+$`.
+- `X-Forwarded-Host`: The value will be used as host in some URLs, and it is required to match regular expression `^(?=.{1,253}\.?(?:\:[0-9]{1,5})?$)(?:(?!-)[a-z0-9-_]{1,63}(?<!-)(?:\.|(?:\:[0-9]{1,5})?$))+$`.
 - `X-Forwarded-Prefix`: The value will be used as prefix in some URL paths, and it is required to match regular expression `^(?:/[a-z0-9_-]+)*$`.
 
 For example, consider there is layman running at `https://enjoychallenge.tech/rest` and client proxy running at `https://laymanproxy.com/layman-client-proxy`. If you send request to your Layman proxy `https://laymanproxy.com/layman-client-proxy/rest/publications` with HTTP headers
