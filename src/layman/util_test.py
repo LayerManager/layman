@@ -227,7 +227,7 @@ def test_get_x_forwarded_items(headers, exp_result):
             'data': {
                 'header': 'X-Forwarded-Host',
                 'message': 'Optional header X-Forwarded-Host contains unsupported value.',
-                'expected': r'Expected header matching regular expression ^(?=.{1,253}\.?(?:\:[0-9]{1,5})?$)(?:(?!-)[a-z0-9-_]{1,63}(?<!-)(?:\.|(?:\:[0-9]{1,5})?$))+$',
+                'expected': r'Expected header matching regular expression ^(?=.{1,253}(?:\:|$))(?:(?!-)[a-z0-9-_]{1,63}(?<!-)(?:\.|(?:\:[0-9]{1,5})?$))+$',
                 'found': 'ABZ.COM',
             },
         }, id='uppercase-host'),
@@ -239,7 +239,7 @@ def test_get_x_forwarded_items(headers, exp_result):
             'data': {
                 'header': 'X-Forwarded-Host',
                 'message': 'Optional header X-Forwarded-Host contains unsupported value.',
-                'expected': r'Expected header matching regular expression ^(?=.{1,253}\.?(?:\:[0-9]{1,5})?$)(?:(?!-)[a-z0-9-_]{1,63}(?<!-)(?:\.|(?:\:[0-9]{1,5})?$))+$',
+                'expected': r'Expected header matching regular expression ^(?=.{1,253}(?:\:|$))(?:(?!-)[a-z0-9-_]{1,63}(?<!-)(?:\.|(?:\:[0-9]{1,5})?$))+$',
                 'found': '',
             },
         }, id='empty-host'),
