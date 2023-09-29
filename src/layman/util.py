@@ -34,7 +34,7 @@ FLASK_PUBLICATION_MODULES_KEY = f'{__name__}:PUBLICATION_MODULES'
 HEADER_X_FORWARDED_PROTO_KEY = 'X-Forwarded-Proto'
 HEADER_X_FORWARDED_HOST_KEY = 'X-Forwarded-Host'
 HEADER_X_FORWARDED_PREFIX_KEY = 'X-Forwarded-Prefix'
-HOST_NAME_PATTERN = r'^(?=.{1,253}\.?(?:\:[0-9]{1,5})?$)(?:(?!-)[a-z0-9-_]{1,63}(?<!-)(?:\.|(?:\:[0-9]{1,5})?$))+$'
+HOST_NAME_PATTERN = r'^(?=.{1,253}(?:\:|$))(?:(?!-)[a-z0-9-_]{1,63}(?<!-)(?:\.|(?:\:[0-9]{1,5})?$))+$'
 
 
 class SimpleStorage:
