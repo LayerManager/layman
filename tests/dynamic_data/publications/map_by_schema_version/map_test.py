@@ -1,3 +1,4 @@
+import json
 import os
 
 from layman import app
@@ -19,9 +20,11 @@ LAYER_HRANICE = Publication(WORKSPACE, process_client.LAYER_TYPE, 'hranice')
 TEST_CASES = {
     'v2_0_0': {
         'file_path': os.path.join(DIRECTORY, '2_0_0_external_wms_internal_wms_internal_wfs.json'),
+        'exp_map_file': os.path.join(DIRECTORY, 'exp_2_0_0_map_file.json'),
     },
     'v3_0_0': {
         'file_path': os.path.join(DIRECTORY, '3_0_0_external_wms_internal_wms_internal_wfs.json'),
+        'exp_map_file': os.path.join(DIRECTORY, 'exp_3_0_0_map_file.json'),
     },
 }
 
@@ -41,6 +44,7 @@ class TestPublication(base_test.TestSingleRestPublication):
                                          rest_args={
                                              'file_paths': [params['file_path']]
                                          },
+                                         params=params,
                                          specific_types={
                                              (base_test_classes.RestMethod.POST, ): EnumTestTypes.MANDATORY
                                          }
@@ -57,8 +61,19 @@ class TestPublication(base_test.TestSingleRestPublication):
             ],
         }, scope='class')
 
+    @staticmethod
+    def assert_get_workspace_map_file(map, exp_file):
+        headers = {'X-Forwarded-Proto': 'https',
+                   'X-Forwarded-Host': 'enjoychallenge.tech',
+                   'X-Forwarded-Prefix': '/new-client-proxy',
+                   }
 
-    def test_publication(self, map, rest_method, rest_args):
+        resp = process_client.get_workspace_map_file(map.type, map.workspace, map.name, headers=headers)
+        with open(exp_file, encoding='utf-8') as file:
+            orig_json = json.load(file)
+        assert resp == orig_json
+
+    def test_publication(self, map, rest_method, rest_args, params):
         rest_method.fn(map, args=rest_args)
         assert_util.is_publication_valid_and_complete(map)
 
@@ -80,3 +95,5 @@ class TestPublication(base_test.TestSingleRestPublication):
         exp_thumbnail = os.path.join(DIRECTORY, 'exp_thumbnail.png')
         asserts_publ.internal.thumbnail_equals(map.workspace, map.type, map.name, exp_thumbnail,
                                                max_diffs=0)
+
+        self.assert_get_workspace_map_file(map, params['exp_map_file'])
