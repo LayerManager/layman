@@ -48,7 +48,7 @@ class TestPublication(base_test.TestSingleRestPublication):
                       'X-Forwarded-Prefix': '/some-client-proxy',
                       }, 'https://enjoychallenge.tech/some-client-proxy', id='full-client-proxy-prefix'),
     ])
-    def test_x_forwarded_prefix(self, headers, exp_url_prefix):
+    def test_x_forwarded_headers(self, headers, exp_url_prefix):
         map = MAP
         resp = process_client.get_workspace_map_file(map.type, map.workspace, map.name, headers=headers)
 
