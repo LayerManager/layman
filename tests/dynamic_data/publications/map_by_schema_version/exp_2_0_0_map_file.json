@@ -2,7 +2,6 @@
   "describedBy": "https://raw.githubusercontent.com/hslayers/map-compositions/2.0.0/schema.json",
   "schema_version": "2.0.0",
   "abstract": "World places and boundaries abstract",
-  "title": "map_v2_0_0_post",
   "extent": [
     -35.0,
     -48.5,
@@ -75,7 +74,6 @@
       "wmsMaxScale": 0
     }
   ],
-  "name": "map_v2_0_0_post",
   "user": {
     "email": "",
     "name": "test_map_json_workspace"
