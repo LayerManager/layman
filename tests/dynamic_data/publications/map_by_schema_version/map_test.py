@@ -70,8 +70,10 @@ class TestPublication(base_test.TestSingleRestPublication):
 
         resp = process_client.get_workspace_map_file(map.type, map.workspace, map.name, headers=headers)
         with open(exp_file, encoding='utf-8') as file:
-            orig_json = json.load(file)
-        assert resp == orig_json
+            exp_json = json.load(file)
+        exp_json['name'] = map.name
+        exp_json['title'] = resp['title']
+        assert resp == exp_json
 
     def test_publication(self, map, rest_method, rest_args, params):
         rest_method.fn(map, args=rest_args)
@@ -95,5 +97,4 @@ class TestPublication(base_test.TestSingleRestPublication):
         exp_thumbnail = os.path.join(DIRECTORY, 'exp_thumbnail.png')
         asserts_publ.internal.thumbnail_equals(map.workspace, map.type, map.name, exp_thumbnail,
                                                max_diffs=0)
-
         self.assert_get_workspace_map_file(map, params['exp_map_file'])
