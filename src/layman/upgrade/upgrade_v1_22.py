@@ -31,9 +31,10 @@ def fix_issuer_id():
 
     query = f'''select distinct issuer_id from {DB_SCHEMA}.users;'''
     issuer_id_rows = db_util.run_query(query)
-    assert len(issuer_id_rows) <= 1, f"More than one issuer_id was found: {[r[0] for r in issuer_id_rows]}"
-    if issuer_id_rows:
-        assert issuer_id_rows[0][0] == 'layman.authn.oauth2.liferay', f"Unexpected issuer_id was found: {issuer_id_rows[0][0]}"
+    found_issuer_ids = {row[0] for row in issuer_id_rows}
+    known_issuer_ids = {'layman.authn.oauth2.liferay', 'layman.authn.oauth2'}
+    unknown_issuer_ids = found_issuer_ids - known_issuer_ids
+    assert len(unknown_issuer_ids) == 0, f"Unknown value(s) of issuer_id found: {unknown_issuer_ids}"
 
     statement = f'''update {DB_SCHEMA}.users set issuer_id = 'layman.authn.oauth2';'''
     db_util.run_statement(statement)
