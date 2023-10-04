@@ -15,6 +15,7 @@
 #### Schema migrations
 - [#868](https://github.com/LayerManager/layman/issues/868) Create new table `map_layer` in prime DB schema.
 #### Data migrations
+- [#887](https://github.com/LayerManager/layman/issues/887) Create unique DB index on `users` table on (`sub`, `issuer_id`) column. 
 - [#765](https://github.com/LayerManager/layman/issues/765) Fix `issuer_id` values in `users` table that were broken since v1.21.0.
 - [#765](https://github.com/LayerManager/layman/issues/765) Remove `authn.txt` files from workspace directories. The same information as in `authn.txt` files is saved in prime DB schema.
 - [#868](https://github.com/LayerManager/layman/issues/868) Fill table `map_layer` with relations between maps and [internal layers](doc/models.md#internal-map-layer) (layers published on this Layman instance). Relations to [external layers](doc/models.md#internal-map-layer) (layers of other servers) are not imported into the table.
