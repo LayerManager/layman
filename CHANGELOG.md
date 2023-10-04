@@ -54,6 +54,14 @@
   - pytest-rerunfailures 10.3 -> 12.0
   - watchdog 2.2.0 -> 3.0.0
 
+## v1.21.1
+ 2023-07-21
+### Migrations and checks
+#### Data migrations
+- [#887](https://github.com/LayerManager/layman/issues/887) Creating unique DB index on `users.sub` column. 
+### Changes
+- [#887](https://github.com/LayerManager/layman/issues/887) Fix creating new user workspaces for existing users that happened in v1.21.0.
+
 ## v1.21.0
  2023-07-06
 ### Upgrade requirements
