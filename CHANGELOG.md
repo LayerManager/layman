@@ -15,7 +15,7 @@
 #### Schema migrations
 - [#868](https://github.com/LayerManager/layman/issues/868) Create new table `map_layer` in prime DB schema.
 #### Data migrations
-- [#887](https://github.com/LayerManager/layman/issues/887) Create unique DB index on `users` table on (`sub`, `issuer_id`) column. 
+- [#887](https://github.com/LayerManager/layman/issues/887) Drop unique DB index on `users` table on `sub` column. Create unique DB index on `users` table on (`sub`, `issuer_id`) columns. 
 - [#765](https://github.com/LayerManager/layman/issues/765) Fix `issuer_id` values in `users` table that were broken since v1.21.0.
 - [#765](https://github.com/LayerManager/layman/issues/765) Remove `authn.txt` files from workspace directories. The same information as in `authn.txt` files is saved in prime DB schema.
 - [#868](https://github.com/LayerManager/layman/issues/868) Fill table `map_layer` with relations between maps and [internal layers](doc/models.md#internal-map-layer) (layers published on this Layman instance). Relations to [external layers](doc/models.md#internal-map-layer) (layers of other servers) are not imported into the table.
@@ -59,7 +59,7 @@
  2023-07-21
 ### Migrations and checks
 #### Data migrations
-- [#887](https://github.com/LayerManager/layman/issues/887) Creating unique DB index on `users.sub` column. 
+- [#887](https://github.com/LayerManager/layman/issues/887) Drop unique DB index on `users` table on (`sub`, `issuer_id`) columns. Create unique DB index on `users` table on `sub` column.
 ### Changes
 - [#887](https://github.com/LayerManager/layman/issues/887) Fix creating new user workspaces for existing users that happened in v1.21.0.
 
