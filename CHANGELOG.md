@@ -5,7 +5,7 @@
 ### Upgrade requirements
 - Change environment variable [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION):
   ```
-  LAYMAN_CLIENT_VERSION=2e7447d701c6246cd7f624510146ad6c32a9b426
+  LAYMAN_CLIENT_VERSION=v1.17.0
   ```
 - Stop using environment variable `LAYMAN_GS_PROXY_BASE_URL`, it has no effect to Layman anymore.
   - GeoServer's [Proxy Base URL](https://docs.geoserver.org/2.21.x/en/user/configuration/globalsettings.html) is now automatically set by Layman on each start. Value is automatically derived from environment variables [`LAYMAN_CLIENT_PUBLIC_URL`](doc/env-settings.md#layman_client_public_url) (protocol) and [`LAYMAN_PROXY_SERVER_NAME`](doc/env-settings.md#layman_proxy_server_name) (domain and port). URL path is always `/geoserver/`.
