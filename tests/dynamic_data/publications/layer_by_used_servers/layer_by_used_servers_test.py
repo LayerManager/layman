@@ -79,3 +79,4 @@ class TestLayer(base_test.TestSingleRestPublication):
                                                                   version='1.1.1')
         asserts_publ.geoserver_proxy.wms_legend_url_with_x_forwarded_headers(layer.workspace, layer.type, layer.name, )
         asserts_publ.metadata.correct_comparison_response_with_x_forwarded_headers(layer.workspace, layer.type, layer.name, )
+        asserts_publ.metadata.correct_values_in_metadata(layer.workspace, layer.type, layer.name, http_method=rest_method.enum_item.publ_name_part)
