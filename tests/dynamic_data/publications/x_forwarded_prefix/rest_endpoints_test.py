@@ -26,7 +26,10 @@ class TestPublication(base_test.TestSingleRestPublication):
                                          publication=lambda publ_def, cls: Publication(cls.workspace,
                                                                                        publ_def.type,
                                                                                        None),
-                                         type=EnumTestTypes.MANDATORY,
+                                         type=EnumTestTypes.OPTIONAL,
+                                         specific_types={
+                                             (base_test_classes.RestMethodAll.POST, PublicationTypes.LAYER): EnumTestTypes.MANDATORY
+                                         },
                                          )]
 
     def test_publication(self, publication, rest_method):
