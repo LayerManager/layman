@@ -26,6 +26,7 @@ MAP_HRANICE_OPERATES_ON = [LAYER_HRANICE]
 
 TEST_CASES = {
     'post': {
+        'test_type': EnumTestTypes.MANDATORY,
         'post_before_test_args': {},
         'exp_before_rest_method': {
             'map_layers': None,
@@ -48,6 +49,7 @@ TEST_CASES = {
         },
     },
     'delete': {
+        'test_type': EnumTestTypes.OPTIONAL,
         'post_before_test_args': {
             'file_paths': [os.path.join(DIRECTORY, 'internal_wms_and_wfs.json')],
         },
@@ -69,6 +71,7 @@ TEST_CASES = {
         },
     },
     'patch_map_with_unauthorized_layer': {
+        'test_type': EnumTestTypes.OPTIONAL,
         'post_before_test_args': {
             'file_paths': [os.path.join(DIRECTORY, 'internal_hranice_private.json')],
         },
@@ -89,6 +92,7 @@ TEST_CASES = {
         },
     },
     'patch_map_with_different_layers': {
+        'test_type': EnumTestTypes.OPTIONAL,
         'post_before_test_args': {
             'file_paths': [os.path.join(DIRECTORY, 'internal_wms_and_wfs.json')],
         },
@@ -131,7 +135,7 @@ class TestPublication(base_test.TestSingleRestPublication):
                                          rest_args=params['rest_args'],
                                          rest_method=params['rest_method'],
                                          post_before_test_args=params['post_before_test_args'],
-                                         type=EnumTestTypes.MANDATORY,
+                                         type=params['test_type'],
                                          ) for key, params in TEST_CASES.items()]
 
     def before_class(self):
