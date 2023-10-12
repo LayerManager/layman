@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.22.1
+ {release-date}
+### Upgrade requirements
+### Migrations and checks
+#### Schema migrations
+#### Data migrations
+### Changes
+
 ## v1.22.0
  2023-10-05
 ### Upgrade requirements
