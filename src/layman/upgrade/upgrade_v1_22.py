@@ -89,6 +89,7 @@ def insert_map_layer_relations():
     maps = db_util.run_query(query, (MAP_TYPE, ))
 
     for map_id, workspace, map_name in maps:
+        logger.info(f'        Import map-layer relations for map {workspace}.{map_name}')
         map_file_path = os.path.join(settings.LAYMAN_DATA_DIR, 'workspaces', workspace, 'maps', map_name, 'input_file', map_name + '.json')
         try:
             with open(map_file_path, 'r', encoding="utf-8") as map_file:
@@ -103,4 +104,4 @@ def insert_map_layer_relations():
             insert into {DB_SCHEMA}.map_layer(id_map, layer_workspace, layer_name, layer_index) values (%s, %s, %s, %s);
             '''
             db_util.run_statement(insert_query, (map_id, layer_workspace, layer_name, layer_index, ))
-        logger.info(f'        Number of imported map-layer relations for map {workspace}.{map_name}: {len(map_layers)}')
+        logger.info(f'          Number of imported relations: {len(map_layers)}')
