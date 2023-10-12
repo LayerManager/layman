@@ -451,6 +451,8 @@ def get_layers_from_json(map_json, *, x_forwarded_items=None):
             'WMS': _get_layer_url_from_wms_json,
             'Vector': _get_layer_url_from_vector_json,
         }.get(class_name)
+        if not layer_url_getter:
+            continue
         layer_url = layer_url_getter(map_layer)
         if not layer_url:
             continue

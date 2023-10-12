@@ -87,6 +87,29 @@
       "title": "Hranice",
       "visibility": false,
       "wmsMaxScale": 0
+    },
+    {
+      "metadata": {},
+      "visibility": true,
+      "opacity": 1.0,
+      "title": "OpenStreetMap",
+      "className": "XYZ",
+      "singleTile": false,
+      "greyscale": false,
+      "base": false,
+      "wmsMaxScale": 0,
+      "maxResolution": null,
+      "minResolution": 0,
+      "url": "https://tile.openstreetmap.org/%7Bz%7D/%7Bx%7D/%7By%7D.png",
+      "params": {
+        "LAYERS": "",
+        "INFO_FORMAT": "application/vnd.ogc.gml",
+        "FORMAT": "",
+        "VERSION": "1.3.0"
+      },
+      "ratio": 1.5,
+      "dimensions": {},
+      "path": ""
     }
   ]
 }

@@ -8,6 +8,11 @@
 #### Data migrations
 ### Changes
 
+## v1.22.1
+ 2023-10-12
+### Changes
+- [#949](https://github.com/LayerManager/layman/issues/949) Fix reading map-layer relations from map composition that includes also other than WMS and Vector layers.
+
 ## v1.22.0
  2023-10-05
 ### Upgrade requirements
