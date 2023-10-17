@@ -211,6 +211,13 @@ def patch(workspace, layername):
 
     layer_result = {}
 
+    kwargs.update({'actor_name': authn.get_authn_username()})
+    rest_util.setup_patch_access_rights(request.form, kwargs)
+    util.pre_publication_action_check(workspace,
+                                      layername,
+                                      kwargs,
+                                      )
+
     if delete_from is not None:
         request_method = request.method.lower()
         deleted = util.delete_layer(workspace, layername, source=delete_from, http_method=request_method)
@@ -245,13 +252,6 @@ def patch(workspace, layername):
             elif input_files:
                 shutil.move(temp_dir, input_file.get_layer_input_file_dir(workspace, layername))
         publications.set_wfs_wms_status(workspace, LAYER_TYPE, layername, settings.EnumWfsWmsStatus.PREPARING)
-    kwargs.update({'actor_name': authn.get_authn_username()})
-
-    rest_util.setup_patch_access_rights(request.form, kwargs)
-    util.pre_publication_action_check(workspace,
-                                      layername,
-                                      kwargs,
-                                      )
 
     util.patch_layer(
         workspace,

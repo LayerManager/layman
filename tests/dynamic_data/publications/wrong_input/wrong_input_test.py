@@ -1353,6 +1353,44 @@ TESTCASES = {
         Key.RUN_ONLY_CASES: frozenset([RestMethod.PATCH, WithChunksDomain.FALSE, CompressDomain.FALSE]),
         Key.SPECIFIC_CASES: {},
     },
+    # issue 952
+    'patch_layer_write_rights_without_owner': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.WORKSPACE: OWNER,
+        Key.POST_BEFORE_TEST_ARGS: {
+            'access_rights': {
+                'read': 'EVERYONE',
+                'write': 'EVERYONE',
+            },
+            'actor_name': OWNER,
+        },
+        Key.REST_ARGS: {
+            'file_paths': ['sample/layman.layer/small_layer.geojson'],
+            'access_rights': {
+                'read': 'EVERYONE',
+                'write': EDITOR,
+            },
+            'actor_name': EDITOR,
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 43,
+            'message': 'Wrong access rights.',
+            'data': {
+                'access_rights': {'read': ['EVERYONE'], 'write': ['wrong_input_editor']},
+                'message': 'Owner of the personal workspace have to keep write right.',
+                'actor_name': 'wrong_input_editor',
+                'owner': 'wrong_input_owner',
+                'publication_name': '{publication_name}',
+                'workspace_name': '{workspace}',
+            },
+        },
+        Key.MANDATORY_CASES: frozenset([RestMethod.PATCH, WithChunksDomain.FALSE, CompressDomain.FALSE]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod.PATCH, WithChunksDomain.FALSE, CompressDomain.FALSE]),
+        Key.SPECIFIC_CASES: {},
+    },
 }
 
 
