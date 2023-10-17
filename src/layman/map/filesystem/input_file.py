@@ -37,18 +37,21 @@ def get_map_file(workspace, mapname):
 
 
 def get_map_info(workspace, mapname, *, x_forwarded_items=None):
-    map_file_path = get_map_file(workspace, mapname)
+    map_file_path_absolute = get_map_file(workspace, mapname)
     result = {}
-    if os.path.exists(map_file_path):
-        with open(map_file_path, 'r', encoding="utf-8") as map_file:
+    if os.path.exists(map_file_path_absolute):
+        with open(map_file_path_absolute, 'r', encoding="utf-8") as map_file:
             map_json = json.load(map_file)
-        map_file_path = os.path.relpath(map_file_path, common_util.get_workspace_dir(workspace))
+        map_file_path = os.path.relpath(map_file_path_absolute, common_util.get_workspace_dir(workspace))
         result = {
             'file': {
                 'path': map_file_path,
                 'url': url_for('rest_workspace_map_file.get', mapname=mapname, workspace=workspace, x_forwarded_items=x_forwarded_items),
             },
             '_file': {
+                'paths': {
+                    'absolute': [map_file_path_absolute],
+                },
                 'url': url_for('rest_workspace_map_file.get', mapname=mapname, workspace=workspace, internal=True),
             },
             'title': map_json['title'] or '',
