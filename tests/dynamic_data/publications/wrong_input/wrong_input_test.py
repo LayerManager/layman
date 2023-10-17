@@ -30,9 +30,12 @@ class Key(Enum):
     RUN_ONLY_CASES = 'run_only_cases'
     SPECIFIC_CASES = 'specific_params'
     POST_BEFORE_TEST_ARGS = 'post_before_test_args'
+    WORKSPACE = 'workspace'
 
 
 WORKSPACE = 'dynamic_test_workspace_wrong_input'
+OWNER = 'wrong_input_owner'
+EDITOR = 'wrong_input_editor'
 
 
 ALL_CASES = frozenset([RestMethod, WithChunksDomain, CompressDomain])
@@ -1312,6 +1315,44 @@ TESTCASES = {
         Key.RUN_ONLY_CASES: frozenset([RestMethod, WithChunksDomain.FALSE, CompressDomain.FALSE]),
         Key.SPECIFIC_CASES: {},
     },
+    # issue 952
+    'patch_map_write_rights_without_owner': {
+        Key.PUBLICATION_TYPE: process_client.MAP_TYPE,
+        Key.WORKSPACE: OWNER,
+        Key.POST_BEFORE_TEST_ARGS: {
+            'access_rights': {
+                'read': 'EVERYONE',
+                'write': 'EVERYONE',
+            },
+            'actor_name': OWNER,
+        },
+        Key.REST_ARGS: {
+            'file_paths': ['sample/layman.map/small_map.json'],
+            'access_rights': {
+                'read': 'EVERYONE',
+                'write': EDITOR,
+            },
+            'actor_name': EDITOR,
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 43,
+            'message': 'Wrong access rights.',
+            'data': {
+                'access_rights': {'read': ['EVERYONE'], 'write': ['wrong_input_editor']},
+                'message': 'Owner of the personal workspace have to keep write right.',
+                'actor_name': 'wrong_input_editor',
+                'owner': 'wrong_input_owner',
+                'publication_name': 'patch_map_write_rights_without_owner_patch',
+                'workspace_name': 'wrong_input_owner'
+            },
+        },
+        Key.MANDATORY_CASES: frozenset([RestMethod.PATCH, WithChunksDomain.FALSE, CompressDomain.FALSE]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod.PATCH, WithChunksDomain.FALSE, CompressDomain.FALSE]),
+        Key.SPECIFIC_CASES: {},
+    },
 }
 
 
@@ -1335,10 +1376,10 @@ def generate_test_cases():
         publ_type = all_params.pop(Key.PUBLICATION_TYPE)
 
         publication_name = rest_args.pop('name', None)
-        publication = Publication(workspace=WORKSPACE,
+        publication = Publication(workspace=test_case_params.get(Key.WORKSPACE, WORKSPACE),
                                   type=publ_type,
-                                  name=publication_name,
-                                  ) if publication_name else None
+                                  name=publication_name if publication_name else None,
+                                  )
 
         test_case = base_test.TestCaseType(key=key,
                                            publication=publication,
@@ -1356,11 +1397,12 @@ def generate_test_cases():
     return tc_list
 
 
-@pytest.mark.usefixtures('ensure_external_db')
+@pytest.mark.usefixtures('ensure_external_db', 'oauth2_provider_mock')
 class TestPublication(base_test.TestSingleRestPublication):
     workspace = WORKSPACE
     test_cases = generate_test_cases()
     publication_type = None
+    usernames_to_reserve = [OWNER, EDITOR]
     rest_parametrization = [
         RestMethod,
         WithChunksDomain,
