@@ -1375,11 +1375,19 @@ class TestPublication(base_test.TestSingleRestPublication):
         is_sync = exp_exception.pop('sync')
         format_exception(exp_exception, publication, parametrization)
         exception = pytest.raises(params[Key.EXCEPTION]) if is_sync else does_not_raise()
+        if rest_method.enum_item == base_test.RestMethod.PATCH:
+            with app.app_context():
+                publ_info = layman_util.get_publication_info(publication.workspace, publication.type, publication.name, context={'keys': ['file']})
+            file_path = publ_info['_file']['paths']['absolute'][0] if 'absolute' in publ_info['_file']['paths'] else None
+            pre_stamp = os.stat(file_path).st_mtime if file_path else None
+
         with exception as exception_info:
             response = rest_method.fn(publication, args=rest_args)
         if is_sync:
             processing.exception.response_exception(expected=exp_exception, thrown=exception_info)
             if rest_method.enum_item == base_test.RestMethod.PATCH:
+                post_stamp = os.stat(file_path).st_mtime if file_path else None
+                assert pre_stamp == post_stamp
                 assert_utils.is_publication_valid_and_complete(publication)
         else:
             processing.response.valid_post(workspace=publication.workspace,
