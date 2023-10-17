@@ -1345,8 +1345,8 @@ TESTCASES = {
                 'message': 'Owner of the personal workspace have to keep write right.',
                 'actor_name': 'wrong_input_editor',
                 'owner': 'wrong_input_owner',
-                'publication_name': 'patch_map_write_rights_without_owner_patch',
-                'workspace_name': 'wrong_input_owner'
+                'publication_name': '{publication_name}',
+                'workspace_name': '{workspace}',
             },
         },
         Key.MANDATORY_CASES: frozenset([RestMethod.PATCH, WithChunksDomain.FALSE, CompressDomain.FALSE]),
