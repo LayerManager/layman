@@ -29,3 +29,7 @@ def format_exception(exception_info: dict, publication: Publication, parametriza
         if 'similar_filenames_mapping' in exception_info['data']:
             exception_info['data']['similar_filenames_mapping'] = {key.format(**format_variables): value.format(**format_variables) for
                                                                    key, value in exception_info['data']['similar_filenames_mapping'].items()}
+        if 'publication_name' in exception_info['data']:
+            exception_info['data']['publication_name'] = exception_info['data']['publication_name'].format(**format_variables)
+        if 'workspace_name' in exception_info['data']:
+            exception_info['data']['workspace_name'] = exception_info['data']['workspace_name'].format(**format_variables)
