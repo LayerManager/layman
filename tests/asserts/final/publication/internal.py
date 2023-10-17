@@ -303,6 +303,9 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                    {
                                        '_file': {
                                            'url': f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/{workspace}/{publ_type_dir}/{name}/file',
+                                           'paths': {
+                                               'absolute': [f'/layman_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/input_file/{name}.json']
+                                           },
                                        },
                                        'file': {
                                            'path': f'{publ_type_dir}/{name}/input_file/{name}.json',
