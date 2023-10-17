@@ -75,15 +75,6 @@ def patch(workspace, mapname):
 
     props_to_refresh = util.get_same_or_missing_prop_names(workspace, mapname)
     metadata_properties_to_refresh = props_to_refresh
-    if file is not None:
-        thumbnail.delete_map(workspace, mapname)
-        file = FileStorage(
-            io.BytesIO(json.dumps(file_json).encode()),
-            file.filename
-        )
-        input_file.save_map_files(
-            workspace, mapname, [file])
-
     file_changed = file is not None
     kwargs = {
         'title': title,
@@ -100,6 +91,15 @@ def patch(workspace, mapname):
                                       mapname,
                                       kwargs,
                                       )
+
+    if file is not None:
+        thumbnail.delete_map(workspace, mapname)
+        file = FileStorage(
+            io.BytesIO(json.dumps(file_json).encode()),
+            file.filename
+        )
+        input_file.save_map_files(
+            workspace, mapname, [file])
 
     util.patch_map(
         workspace,
