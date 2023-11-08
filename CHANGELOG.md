@@ -3,6 +3,7 @@
 ## v1.22.2
  {release-date}
 ### Changes
+- [#956](https://github.com/LayerManager/layman/issues/956) Fix login to GeoServer with https protocol.
 - [#952](https://github.com/LayerManager/layman/issues/952) Fix patch saving publication files before access right validation.
 
 ## v1.22.1
