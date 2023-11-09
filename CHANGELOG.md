@@ -3,10 +3,15 @@
 ## v1.23.0
  {release-date}
 ### Upgrade requirements
+- Change environment variable [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION):
+  ```
+  LAYMAN_CLIENT_VERSION=v1.17.1
+  ```
 ### Migrations and checks
 #### Schema migrations
 #### Data migrations
 ### Changes
+- [#958](https://github.com/LayerManager/layman/issues/958) Fix `X-Forwarded-Proto` on LTC proxy with https protocol in demo environment.
 - [#956](https://github.com/LayerManager/layman/issues/956) Fix login to GeoServer with https protocol.
 - [#952](https://github.com/LayerManager/layman/issues/952) Fix patch saving publication files before access right validation.
 
