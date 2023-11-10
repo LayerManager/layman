@@ -7,12 +7,12 @@
 #### Schema migrations
 #### Data migrations
 ### Changes
+- [#952](https://github.com/LayerManager/layman/issues/952) Fix patch saving publication files before access right validation.
 
 ## v1.22.1
  2023-10-12
 ### Changes
 - [#949](https://github.com/LayerManager/layman/issues/949) Fix reading map-layer relations from map composition that includes also other than WMS and Vector layers.
-- [#952](https://github.com/LayerManager/layman/issues/952) Fix patch saving publication files before access right validation.
 
 ## v1.22.0
  2023-10-05
