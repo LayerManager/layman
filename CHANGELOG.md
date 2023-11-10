@@ -1,7 +1,7 @@
 # Changelog
 
 ## v1.22.2
- {release-date}
+ 2023-11-10
 ### Upgrade requirements
 - Change environment variable [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION):
   ```
