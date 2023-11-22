@@ -31,6 +31,7 @@ def test_wrong_sld_causes_no_thumbnail():
                                            file_paths=geojson_file,
                                            style_file=style_file,
                                            check_response_fn=wait_for_thumbnail_error,
+                                           raise_if_not_complete=False,
                                            )
 
     layer_info = process_client.get_workspace_layer(workspace, layer)

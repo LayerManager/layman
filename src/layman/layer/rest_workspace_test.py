@@ -958,7 +958,8 @@ def test_post_layers_zero_length_attribute():
         info = response.json()
         return info.get('db', {}).get('status', '') == 'FAILURE'
 
-    process_client.publish_workspace_layer(workspace, layername, file_paths=file_paths, check_response_fn=wait_for_db_finish)
+    process_client.publish_workspace_layer(workspace, layername, file_paths=file_paths,
+                                           check_response_fn=wait_for_db_finish, raise_if_not_complete=False)
 
     layer_info = util.get_layer_info(workspace, layername)
     assert layer_info['db']['status'] == 'FAILURE', f'layer_info={layer_info}'

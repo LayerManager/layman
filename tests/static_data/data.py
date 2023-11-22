@@ -91,14 +91,16 @@ def publish_publications_step(publications_set, step_num):
     for workspace, publ_type, publication in publications_set:
         data_def = data.PUBLICATIONS[(workspace, publ_type, publication)][data.DEFINITION]
         params = data_def[step_num]
-        write_method(publ_type, workspace, publication, **params, check_response_fn=empty_method_returns_true)
+        write_method(publ_type, workspace, publication, **params, check_response_fn=empty_method_returns_true,
+                     raise_if_not_complete=False)
         if len(data_def) == step_num + 1:
             done_publications.add((workspace, publ_type, publication))
     for workspace, publ_type, publication in publications_set:
         params = data.PUBLICATIONS[(workspace, publ_type, publication)][data.DEFINITION][step_num]
         headers = params.get('headers')
         try:
-            process_client.wait_for_publication_status(workspace, publ_type, publication, headers=headers, check_response_fn=check_publication_status)
+            process_client.wait_for_publication_status(workspace, publ_type, publication, headers=headers,
+                                                       check_response_fn=check_publication_status)
         except AssertionError as ex:
             print(f"AssertionError in publication {workspace, publ_type, publication}, step_num={step_num}.")
             raise ex

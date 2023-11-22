@@ -15,6 +15,7 @@ def generate(workspace):
                             'tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson',
                         ],
                         'check_response_fn': empty_method_returns_true,
+                        'raise_if_not_complete': False,
 
                     }),
                     consts.KEY_RESPONSE_ASSERTS: [

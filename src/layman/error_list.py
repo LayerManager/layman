@@ -55,4 +55,5 @@ ERROR_LIST = {
     52: (400, 'GeoServer HTTP or connection error'),
     53: (500, 'Error when publishing on GeoServer. It happens for example for raster files with wrong explicit CRS.'),
     54: (400, 'Wrong header value'),
+    55: (400, 'Publication is not complete'),  # raised by process_client only
 }

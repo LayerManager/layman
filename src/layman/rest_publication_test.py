@@ -119,7 +119,8 @@ def test_get_publication_layman_status(publ_type, error_params):
     workspace = 'test_get_publication_layman_status_workspace'
     publication = 'test_get_publication_layman_status_publication'
 
-    process_client.publish_workspace_publication(publ_type, workspace, publication, check_response_fn=common.empty_method_returns_true,)
+    process_client.publish_workspace_publication(publ_type, workspace, publication, check_response_fn=common.empty_method_returns_true,
+                                                 raise_if_not_complete=False)
 
     info = process_client.get_workspace_publication(publ_type, workspace, publication,)
     assert 'layman_metadata' in info, f'info={info}'
@@ -134,7 +135,8 @@ def test_get_publication_layman_status(publ_type, error_params):
     assert info['layman_metadata']['publication_status'] == 'COMPLETE', f'info={info}'
 
     if error_params:
-        process_client.patch_workspace_publication(publ_type, workspace, publication, **error_params, )
+        process_client.patch_workspace_publication(publ_type, workspace, publication, **error_params,
+                                                   raise_if_not_complete=False)
         info = process_client.get_workspace_publication(publ_type, workspace, publication, )
         assert 'layman_metadata' in info, f'info={info}'
         assert 'publication_status' in info['layman_metadata'], f'info={info}'

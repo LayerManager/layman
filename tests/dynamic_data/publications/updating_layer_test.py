@@ -27,6 +27,7 @@ class TestUpdatingLayer(base_test.TestSingleRestPublication):
                                          params={'compress': True,
                                                  'with_chunks': True,
                                                  'do_not_upload_chunks': True,
+                                                 'raise_if_not_complete': False,
                                                  }
                                          )]
 

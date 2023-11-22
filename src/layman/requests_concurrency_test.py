@@ -25,7 +25,8 @@ def test_patch_after_feature_change_concurrency(publication_type):
     assert lock == common_const.PUBLICATION_LOCK_FEATURE_CHANGE
 
     process_client.patch_workspace_publication(publication_type, workspace, publication, title='New title',
-                                               check_response_fn=empty_method_returns_true)
+                                               check_response_fn=empty_method_returns_true,
+                                               raise_if_not_complete=False)
     queue = celery.get_run_after_chain_queue(workspace, publication_type, publication)
     assert len(queue) == 0, queue
     lock = redis.get_publication_lock(workspace, publication_type, publication)

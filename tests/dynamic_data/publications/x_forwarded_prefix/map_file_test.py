@@ -36,6 +36,7 @@ class TestPublication(base_test.TestSingleRestPublication):
     def before_class(self):
         self.post_publication(MAP, args={
             'file_paths': [MAP_FILE_PATH],
+            'raise_if_not_complete': False,  # timgen fails, because one URL points to non-existent service
         }, scope='class')
 
     @pytest.mark.parametrize('headers, exp_url_prefix', [
