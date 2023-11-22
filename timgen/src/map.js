@@ -91,11 +91,11 @@ const proxify_layer_loader = (layer, tiled, gs_public_url, gs_url, headers) => {
       }).then(res => {
         const headers = [...res.headers];
         log(`load_fn.fetch_retry, res.status=${res.status}, headers=${JSON.stringify(headers, null, 2)}, image_url=${image_url}`)
-        if(res.headers.get('content-type').includes('text/xml')) {
-          return Promise.all([false, res.text()])
-        } else {
-          return Promise.all([true, res.blob()])
-        }
+        const is_xml = (res.headers.get('content-type') || '').includes('text/xml')
+        const ok = res.status < 400 && !is_xml
+        return Promise.all([ok, (ok ? res.blob() : res.text())])
+      }).catch(reason => {
+        log(`load_fn.fetch_retry, catch reason=${reason}`)
       });
 
       log(`load_fn.fetch_retry, loaded, ok=${ok}, image_url=${image_url}`)
