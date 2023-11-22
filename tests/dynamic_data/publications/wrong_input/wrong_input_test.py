@@ -1399,6 +1399,7 @@ def generate_test_cases():
     for key, test_case_params in TESTCASES.items():
         all_params = deepcopy(test_case_params)
         rest_args = all_params.pop(Key.REST_ARGS)
+        rest_args['raise_if_not_complete'] = False
 
         mandatory_cases = all_params.pop(Key.MANDATORY_CASES)
         specific_types = {mandatory_cases: EnumTestTypes.MANDATORY} if mandatory_cases else {}

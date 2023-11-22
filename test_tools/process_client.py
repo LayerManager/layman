@@ -114,6 +114,7 @@ def wait_for_rest(url, max_attempts, sleeping_time, check_response, headers=None
         if attempts > max_attempts:
             logger.error(f"r.status_code={response.status_code}\nrltest={response.text}")
             raise Exception('Max attempts reached!')
+    return response
 
 
 def raise_layman_error(response, status_codes_to_skip=None):
@@ -130,6 +131,20 @@ def raise_layman_error(response, status_codes_to_skip=None):
         response.raise_for_status()
     assert response.status_code in status_codes_to_skip, f"response.status_code={response.status_code}\nresponse.text={response.text}"
     assert 'Deprecation' not in response.headers, f'This is deprecated URL! Use new one. headers={response.headers}'
+
+
+def raise_if_not_complete_status(response):
+    resp_json = response.json()
+    status = resp_json.get('layman_metadata', {}).get('publication_status')
+    if status != 'COMPLETE':
+        failed_source_key = next((k for k, v in resp_json.items() if isinstance(v, dict) and v.get('status') == 'FAILURE'), None)
+        if failed_source_key and resp_json[failed_source_key].get('error').get('code'):
+            failed_source = resp_json[failed_source_key]
+            error_desc = failed_source['error']
+            raise LaymanError(error_desc['code'],
+                              error_desc.get('detail'),
+                              sub_code=error_desc.get('sub_code'))
+        raise LaymanError(55, data=resp_json)
 
 
 def upload_file_chunks(publication_type,
@@ -177,6 +192,7 @@ def patch_workspace_publication(publication_type,
                                 title=None,
                                 style_file=None,
                                 check_response_fn=None,
+                                raise_if_not_complete=True,
                                 compress=False,
                                 compress_settings=None,
                                 with_chunks=False,
@@ -201,6 +217,8 @@ def patch_workspace_publication(publication_type,
 
         assert not (not with_chunks and do_not_upload_chunks)
         assert not (check_response_fn and do_not_upload_chunks)  # because check_response_fn is not called when do_not_upload_chunks
+        assert not (raise_if_not_complete and do_not_upload_chunks)
+        assert not (check_response_fn and raise_if_not_complete)
 
         assert not (time_regex and publication_type == MAP_TYPE)
         assert not (publication_type == LAYER_TYPE and crs and not file_paths)
@@ -281,7 +299,8 @@ def patch_workspace_publication(publication_type,
                            file_paths, )
 
     if not do_not_upload_chunks:
-        wait_for_publication_status(workspace, publication_type, name, check_response_fn=check_response_fn, headers=headers)
+        wait_for_publication_status(workspace, publication_type, name, check_response_fn=check_response_fn,
+                                    headers=headers, raise_if_not_complete=raise_if_not_complete)
     wfs.clear_cache(workspace)
     wms.clear_cache(workspace)
     if temp_dir:
@@ -337,6 +356,7 @@ def publish_workspace_publication(publication_type,
                                   style_file=None,
                                   description=None,
                                   check_response_fn=None,
+                                  raise_if_not_complete=True,
                                   with_chunks=False,
                                   compress=False,
                                   compress_settings=None,
@@ -360,6 +380,8 @@ def publish_workspace_publication(publication_type,
 
     assert not (not with_chunks and do_not_upload_chunks)
     assert not (check_response_fn and do_not_upload_chunks)  # because check_response_fn is not called when do_not_upload_chunks
+    assert not (raise_if_not_complete and do_not_upload_chunks)
+    assert not (check_response_fn and raise_if_not_complete)
 
     file_paths = [publication_type_def.source_path] if file_paths is None and external_table_uri is None and not map_layers else file_paths
 
@@ -440,7 +462,8 @@ def publish_workspace_publication(publication_type,
                            file_paths, )
 
     if not do_not_upload_chunks:
-        wait_for_publication_status(workspace, publication_type, name, check_response_fn=check_response_fn, headers=headers)
+        wait_for_publication_status(workspace, publication_type, name, check_response_fn=check_response_fn,
+                                    headers=headers, raise_if_not_complete=raise_if_not_complete)
     if temp_dir:
         shutil.rmtree(temp_dir)
     return response.json()[0]
@@ -661,14 +684,17 @@ def check_publication_status(response):
     return current_status in {'COMPLETE', 'INCOMPLETE'}
 
 
-def wait_for_publication_status(workspace, publication_type, publication, *, check_response_fn=None, headers=None,):
+def wait_for_publication_status(workspace, publication_type, publication, *, check_response_fn=None, headers=None,
+                                raise_if_not_complete=True):
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
     with app.app_context():
         url = url_for(publication_type_def.get_workspace_publication_url,
                       workspace=workspace,
                       **{publication_type_def.url_param_name: publication})
     check_response_fn = check_response_fn or check_publication_status
-    wait_for_rest(url, 60, 0.5, check_response=check_response_fn, headers=headers)
+    response = wait_for_rest(url, 60, 0.5, check_response=check_response_fn, headers=headers)
+    if raise_if_not_complete:
+        raise_if_not_complete_status(response)
 
 
 def patch_after_feature_change(workspace, publ_type, name):
