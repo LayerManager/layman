@@ -13,6 +13,7 @@
 #### Data migrations
 ### Changes
 - All changes from [v1.22.1](#v1221) and [v1.22.2](#v1222).
+- [#960](https://github.com/LayerManager/layman/issues/960) Handle WMS requests with HTTP error more efficiently in timgen.
 
 ## v1.22.2
  2023-11-10
