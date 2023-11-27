@@ -909,10 +909,13 @@ def test_post_layers_long_and_delete_it(client):
 
     chain_info = util.get_layer_chain(workspace, layername)
     assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
-    layer_info = util.get_layer_info(workspace, layername)
-    keys_to_check = ['db', 'wms', 'wfs', 'thumbnail', 'metadata']
-    for key_to_check in keys_to_check:
-        assert 'status' in layer_info[key_to_check]
+    layer_info = util.get_complete_layer_info(workspace, layername)
+
+    # sometimes, "long" post is not long enough and the layer is already in COMPLETE state
+    if layer_info['layman_metadata']['publication_status'] == 'UPDATING':
+        keys_to_check = ['db', 'wms', 'wfs', 'thumbnail', 'metadata']
+        for key_to_check in keys_to_check:
+            assert 'status' in layer_info[key_to_check]
 
     rest_path = url_for('rest_workspace_layer.delete_layer', workspace=workspace, layername=layername)
     response = client.delete(rest_path)
