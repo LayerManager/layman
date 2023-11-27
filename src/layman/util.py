@@ -551,7 +551,7 @@ def patch_after_feature_change(workspace, publication_type, publication, *, queu
     celery_util.set_publication_chain_info(workspace, publication_type, publication, task_methods, res)
 
 
-def get_publication_status(workspace, publication_type, publication_name, complete_info, item_keys, ):
+def is_publication_updating(workspace, publication_type, publication_name):
     chain_info = celery_util.get_publication_chain_info(workspace, publication_type, publication_name)
     current_lock = redis.get_publication_lock(
         workspace,
@@ -559,7 +559,11 @@ def get_publication_status(workspace, publication_type, publication_name, comple
         publication_name,
     )
 
-    if (chain_info and not celery_util.is_chain_ready(chain_info)) or current_lock:
+    return bool((chain_info and not celery_util.is_chain_ready(chain_info)) or current_lock)
+
+
+def get_publication_status(workspace, publication_type, publication_name, complete_info, item_keys, ):
+    if is_publication_updating(workspace, publication_type, publication_name):
         publication_status = 'UPDATING'
     elif any(complete_info.get(v, {}).get('status') for v in item_keys if isinstance(complete_info.get(v, {}), dict)):
         publication_status = 'INCOMPLETE'
