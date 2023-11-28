@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 def insert_rights(id_publication,
                   users,
+                  roles,
                   type,
                   ):
     sql = f'''insert into {DB_SCHEMA}.rights (id_user, id_publication, type)
@@ -24,6 +25,15 @@ returning id
         db_util.run_query(sql, (id_publication,
                                 type,
                                 username,
+                                ))
+    sql = f'''insert into {DB_SCHEMA}.rights (role_name, id_publication, type)
+        values (%s, %s, %s)
+returning id
+;'''
+    for role_name in roles:
+        db_util.run_query(sql, (role_name,
+                                id_publication,
+                                type,
                                 ))
 
 
