@@ -250,6 +250,7 @@ def test_insert_rights():
     workspace_name = 'test_insert_rights_workspace'
     username = 'test_insert_rights_user'
     username2 = 'test_insert_rights_user2'
+    role1 = 'TEST_INSERT_RIGHTS_ROLE1'
 
     publication_name = 'test_insert_rights_publication_name'
     publication_type = MAP_TYPE
@@ -308,6 +309,15 @@ def test_insert_rights():
                                 [username, username2, ],
                                 )
 
+        case_test_insert_rights(username,
+                                publication_info,
+                                {"read": {username, username2, role1, },
+                                 "write": {username, username2, role1, },
+                                 },
+                                [username, role1, username2, ],
+                                [username, role1, username2, ],
+                                )
+
         case_test_insert_rights(workspace_name,
                                 publication_info,
                                 {"read": {settings.RIGHTS_EVERYONE_ROLE, username, },
@@ -324,6 +334,15 @@ def test_insert_rights():
                                  },
                                 [settings.RIGHTS_EVERYONE_ROLE, ],
                                 [settings.RIGHTS_EVERYONE_ROLE, ],
+                                )
+
+        case_test_insert_rights(workspace_name,
+                                publication_info,
+                                {"read": {settings.RIGHTS_EVERYONE_ROLE, role1, },
+                                 "write": {settings.RIGHTS_EVERYONE_ROLE, role1, },
+                                 },
+                                [role1, settings.RIGHTS_EVERYONE_ROLE, ],
+                                [role1, settings.RIGHTS_EVERYONE_ROLE, ],
                                 )
 
         users.delete_user(username)
