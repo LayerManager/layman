@@ -135,7 +135,7 @@ def clear_publication_info(layer_info):
     return clear_info
 
 
-def get_complete_map_info(workspace, mapname, *, x_forwarded_items=None):
+def _get_complete_map_info(workspace, mapname, *, x_forwarded_items=None):
     partial_info = get_map_info(workspace, mapname, context={'x_forwarded_items': x_forwarded_items})
 
     if not any(partial_info):
@@ -161,6 +161,12 @@ def get_complete_map_info(workspace, mapname, *, x_forwarded_items=None):
     complete_info = clear_publication_info(complete_info)
 
     return complete_info
+
+
+def get_complete_map_info(workspace, layername, *, x_forwarded_items=None):
+    return layman_util.get_complete_publication_info(workspace, MAP_TYPE, layername,
+                                                     x_forwarded_items=x_forwarded_items,
+                                                     complete_info_method=_get_complete_map_info)
 
 
 def get_composition_schema(url):
