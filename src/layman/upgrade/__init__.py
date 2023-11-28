@@ -2,7 +2,7 @@ import logging
 
 from db import util as db_util
 from layman.upgrade import upgrade_v1_8, upgrade_v1_9, upgrade_v1_10, upgrade_v1_12, upgrade_v1_16, upgrade_v1_17, upgrade_v1_18, \
-    upgrade_v1_20, upgrade_v1_21, upgrade_v1_22
+    upgrade_v1_20, upgrade_v1_21, upgrade_v1_22, upgrade_v1_23
 from layman import settings
 from . import consts
 
@@ -40,6 +40,9 @@ MIGRATIONS = {
         ]),
         ((1, 22, 0), [
             upgrade_v1_22.create_map_layer_relation_table,
+        ]),
+        ((1, 23, 0), [
+            upgrade_v1_23.adjust_db_for_roles,
         ]),
     ],
     consts.MIGRATION_TYPE_DATA: [
