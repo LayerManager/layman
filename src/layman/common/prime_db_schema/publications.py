@@ -426,8 +426,8 @@ def check_publication_info(workspace_name, info):
                                }) from exc_info
 
 
-def clear_roles(users_list, workspace_name):
-    result_set = set(users_list)
+def get_user_and_role_names_for_db(users_and_roles_list, workspace_name):
+    result_set = set(users_and_roles_list)
     result_set.discard(ROLE_EVERYONE)
     user_info = users.get_user_infos(workspace_name)
     if user_info:
@@ -469,8 +469,8 @@ returning id
             )
     pub_id = db_util.run_query(insert_publications_sql, data)[0][0]
 
-    read_users = clear_roles(info['access_rights']['read'], workspace_name)
-    write_users = clear_roles(info['access_rights']['write'], workspace_name)
+    read_users = get_user_and_role_names_for_db(info['access_rights']['read'], workspace_name)
+    write_users = get_user_and_role_names_for_db(info['access_rights']['write'], workspace_name)
     rights.insert_rights(pub_id,
                          read_users,
                          'read')
@@ -514,8 +514,8 @@ def update_publication(workspace_name, info):
             if info['access_rights'].get(right_type):
                 usernames_list = info["access_rights"].get(right_type)
                 access_rights_changes[right_type]['EVERYONE'] = ROLE_EVERYONE in usernames_list
-                usernames_list_clear = clear_roles(usernames_list, workspace_name)
-                usernames_old_list_clear = clear_roles(access_rights_changes[right_type]['username_list_old'], workspace_name)
+                usernames_list_clear = get_user_and_role_names_for_db(usernames_list, workspace_name)
+                usernames_old_list_clear = get_user_and_role_names_for_db(access_rights_changes[right_type]['username_list_old'], workspace_name)
                 access_rights_changes[right_type]['add'] = usernames_list_clear.difference(usernames_old_list_clear)
                 access_rights_changes[right_type]['remove'] = usernames_old_list_clear.difference(usernames_list_clear)
 
