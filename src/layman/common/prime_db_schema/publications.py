@@ -150,23 +150,23 @@ select p.id as id_publication,
        p.srid as srid,
        PGP_SYM_DECRYPT(p.external_table_uri, p.uuid::text)::json external_table_uri,
        (select rtrim(concat(case when u.id is not null then w.name || ',' end,
-                            string_agg(w2.name, ',') || ',',
+                            string_agg(COALESCE(w2.name, r.role_name), ',' ORDER BY COALESCE(w2.name, r.role_name)) || ',',
                             case when p.everyone_can_read then %s || ',' end
                             ), ',')
-        from {DB_SCHEMA}.rights r inner join
-             {DB_SCHEMA}.users u2 on r.id_user = u2.id inner join
+        from {DB_SCHEMA}.rights r left join
+             {DB_SCHEMA}.users u2 on r.id_user = u2.id left join
              {DB_SCHEMA}.workspaces w2 on w2.id = u2.id_workspace
         where r.id_publication = p.id
-          and r.type = 'read') can_read_users,
+          and r.type = 'read') read_users_roles,
        (select rtrim(concat(case when u.id is not null then w.name || ',' end,
-                            string_agg(w2.name, ',') || ',',
+                            string_agg(COALESCE(w2.name, r.role_name), ',' ORDER BY COALESCE(w2.name, r.role_name)) || ',',
                             case when p.everyone_can_write then %s || ',' end
                             ), ',')
-        from {DB_SCHEMA}.rights r inner join
-             {DB_SCHEMA}.users u2 on r.id_user = u2.id inner join
+        from {DB_SCHEMA}.rights r left join
+             {DB_SCHEMA}.users u2 on r.id_user = u2.id left join
              {DB_SCHEMA}.workspaces w2 on w2.id = u2.id_workspace
         where r.id_publication = p.id
-          and r.type = 'write') can_write_users,
+          and r.type = 'write') write_users_roles,
        (select json_agg(json_build_object(
                    'name', ml.layer_name,
                    'workspace', ml.layer_workspace,
@@ -271,14 +271,14 @@ from {DB_SCHEMA}.workspaces w inner join
                                    'original_data_source': settings.EnumOriginalDataSource.TABLE.value if external_table_uri else settings.EnumOriginalDataSource.FILE.value,
                                    'native_bounding_box': [xmin, ymin, xmax, ymax],
                                    'native_crs': db_util.get_crs_from_srid(srid, use_internal_srid=True) if srid else None,
-                                   'access_rights': {'read': can_read_users.split(','),
-                                                     'write': can_write_users.split(',')},
+                                   'access_rights': {'read': read_users_roles.split(','),
+                                                     'write': write_users_roles.split(',')},
                                    '_map_layers': map_layers or [],
                                    '_layer_maps': layer_maps or [],
                                    '_wfs_wms_status': settings.EnumWfsWmsStatus(wfs_wms_status) if wfs_wms_status else None,
                                    }
              for id_publication, workspace_name, publication_type, publication_name, title, uuid, geodata_type, style_type, image_mosaic, updated_at, xmin, ymin, xmax, ymax,
-             srid, external_table_uri, can_read_users, can_write_users, map_layers, layer_maps, wfs_wms_status, _
+             srid, external_table_uri, read_users_roles, write_users_roles, map_layers, layer_maps, wfs_wms_status, _
              in values}
 
     infos = {key: {**value,

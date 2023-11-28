@@ -74,6 +74,7 @@ def oauth2_provider_mock():
                 'wrong_input_editor': None,
                 'test_adjust_db_for_roles_ws': None,
                 'test_adjust_db_for_roles_ws2': None,
+                'test_access_rights_role_user1': None,
             },
         },
         'host': '0.0.0.0',
