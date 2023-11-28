@@ -173,9 +173,9 @@ def test_owner_can_still_write():
     assert exc_info.value.code == 43
 
 
-def test_clear_roles():
-    workspace_name = 'test_clear_roles_workspace'
-    username = 'test_clear_roles_user'
+def test_get_user_and_role_names_for_db():
+    workspace_name = 'test_get_user_and_role_names_for_db_workspace'
+    username = 'test_get_user_and_role_names_for_db_user'
 
     with app.app_context():
         workspaces.ensure_workspace(workspace_name)
@@ -184,22 +184,22 @@ def test_clear_roles():
         userinfo['sub'] = '20'
         users.ensure_user(id_workspace_user, userinfo)
 
-        list = publications.clear_roles({username, }, workspace_name)
+        list = publications.get_user_and_role_names_for_db({username, }, workspace_name)
         assert list == {username, }, list
 
-        list = publications.clear_roles({username, workspace_name, }, workspace_name)
+        list = publications.get_user_and_role_names_for_db({username, workspace_name, }, workspace_name)
         assert list == {username, workspace_name, }, list
 
-        list = publications.clear_roles({username, }, username)
+        list = publications.get_user_and_role_names_for_db({username, }, username)
         assert list == set(), list
 
-        list = publications.clear_roles({username, workspace_name, }, username)
+        list = publications.get_user_and_role_names_for_db({username, workspace_name, }, username)
         assert list == {workspace_name, }, list
 
-        list = publications.clear_roles({username, settings.RIGHTS_EVERYONE_ROLE, }, workspace_name)
+        list = publications.get_user_and_role_names_for_db({username, settings.RIGHTS_EVERYONE_ROLE, }, workspace_name)
         assert list == {username, }, list
 
-        list = publications.clear_roles({username, settings.RIGHTS_EVERYONE_ROLE, }, username)
+        list = publications.get_user_and_role_names_for_db({username, settings.RIGHTS_EVERYONE_ROLE, }, username)
         assert list == set(), list
 
         users.delete_user(username)
