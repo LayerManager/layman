@@ -99,11 +99,11 @@ def test_who_can_write_can_read():
     assert exc_info.value.code == 43
 
     with pytest.raises(LaymanError) as exc_info:
-        publications.who_can_write_can_read(username, {settings.RIGHTS_EVERYONE_ROLE, })
+        publications.who_can_write_can_read({username}, {settings.RIGHTS_EVERYONE_ROLE, })
     assert exc_info.value.code == 43
 
     with pytest.raises(LaymanError) as exc_info:
-        publications.who_can_write_can_read(username, {workspace_name, })
+        publications.who_can_write_can_read({username}, {workspace_name, })
     assert exc_info.value.code == 43
 
 
