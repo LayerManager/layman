@@ -126,31 +126,9 @@ def _get_complete_layer_info(workspace, layername, *, x_forwarded_items=None):
 
 
 def get_complete_layer_info(workspace, layername, *, x_forwarded_items=None):
-    is_updating_before = layman_util.is_publication_updating(workspace, LAYER_TYPE, layername)
-    is_updating_after = None
-
-    complete_info = {}
-
-    logger.debug(f"get_complete_layer_info START, workspace,layername={workspace, layername}, is_updating_before={is_updating_before}")
-
-    # In the result of _get_complete_layer_info, an inconsistency may occur between `status` key of internal sources
-    # (e.g. `db`, `wms`, `thumbnail`, or `metadata` keys) and global `layman_metadata.publication_status` key,
-    # because some time passes between computation of their values.
-    # To ensure more consistent result, we check that layer is either updating before and after
-    # _get_complete_layer_info call, or it is not updating before and after _get_complete_layer_info call.
-    # If this check is negative, we repeat _get_complete_layer_info call.
-    while is_updating_before != is_updating_after:
-        if is_updating_after is not None:
-            is_updating_before = is_updating_after
-
-        complete_info = _get_complete_layer_info(workspace, layername, x_forwarded_items=x_forwarded_items)
-
-        publication_status = complete_info['layman_metadata']['publication_status']
-        is_updating_after = publication_status == 'UPDATING'
-
-        logger.debug(f"get_complete_layer_info, workspace,layername={workspace, layername}, publication_status={publication_status}, is_updating_after={is_updating_after}")
-
-    return complete_info
+    return layman_util.get_complete_publication_info(workspace, LAYER_TYPE, layername,
+                                                     x_forwarded_items=x_forwarded_items,
+                                                     complete_info_method=_get_complete_layer_info)
 
 
 def pre_publication_action_check(workspace, layername, task_options):
