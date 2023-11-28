@@ -474,13 +474,15 @@ returning id
             )
     pub_id = db_util.run_query(insert_publications_sql, data)[0][0]
 
-    read_users = get_user_and_role_names_for_db(info['access_rights']['read'], workspace_name)[0]
-    write_users = get_user_and_role_names_for_db(info['access_rights']['write'], workspace_name)[0]
+    read_users, read_roles = get_user_and_role_names_for_db(info['access_rights']['read'], workspace_name)
+    write_users, write_roles = get_user_and_role_names_for_db(info['access_rights']['write'], workspace_name)
     rights.insert_rights(pub_id,
                          read_users,
+                         read_roles,
                          'read')
     rights.insert_rights(pub_id,
                          write_users,
+                         write_roles,
                          'write')
     return pub_id
 
@@ -553,7 +555,7 @@ returning id
     pub_id = db_util.run_query(update_publications_sql, data)[0][0]
 
     for right_type in right_type_list:
-        rights.insert_rights(pub_id, access_rights_changes[right_type]['add'], right_type)
+        rights.insert_rights(pub_id, access_rights_changes[right_type]['add'], set(), right_type)
         rights.remove_rights(pub_id, access_rights_changes[right_type]['remove'], right_type)
 
     return pub_id
