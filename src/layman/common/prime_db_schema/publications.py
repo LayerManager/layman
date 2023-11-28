@@ -427,12 +427,17 @@ def check_publication_info(workspace_name, info):
 
 
 def get_user_and_role_names_for_db(users_and_roles_list, workspace_name):
-    result_set = set(users_and_roles_list)
-    result_set.discard(ROLE_EVERYONE)
+    user_names, role_names = split_user_and_role_names(users_and_roles_list)
+
+    users_set = set(user_names)
     user_info = users.get_user_infos(workspace_name)
     if user_info:
-        result_set.discard(workspace_name)
-    return result_set
+        users_set.discard(workspace_name)
+
+    roles_set = set(role_names)
+    roles_set.discard(ROLE_EVERYONE)
+
+    return users_set, roles_set
 
 
 def insert_publication(workspace_name, info):
@@ -469,8 +474,8 @@ returning id
             )
     pub_id = db_util.run_query(insert_publications_sql, data)[0][0]
 
-    read_users = get_user_and_role_names_for_db(info['access_rights']['read'], workspace_name)
-    write_users = get_user_and_role_names_for_db(info['access_rights']['write'], workspace_name)
+    read_users = get_user_and_role_names_for_db(info['access_rights']['read'], workspace_name)[0]
+    write_users = get_user_and_role_names_for_db(info['access_rights']['write'], workspace_name)[0]
     rights.insert_rights(pub_id,
                          read_users,
                          'read')
@@ -514,8 +519,8 @@ def update_publication(workspace_name, info):
             if info['access_rights'].get(right_type):
                 usernames_list = info["access_rights"].get(right_type)
                 access_rights_changes[right_type]['EVERYONE'] = ROLE_EVERYONE in usernames_list
-                usernames_list_clear = get_user_and_role_names_for_db(usernames_list, workspace_name)
-                usernames_old_list_clear = get_user_and_role_names_for_db(access_rights_changes[right_type]['username_list_old'], workspace_name)
+                usernames_list_clear = get_user_and_role_names_for_db(usernames_list, workspace_name)[0]
+                usernames_old_list_clear = get_user_and_role_names_for_db(access_rights_changes[right_type]['username_list_old'], workspace_name)[0]
                 access_rights_changes[right_type]['add'] = usernames_list_clear.difference(usernames_old_list_clear)
                 access_rights_changes[right_type]['remove'] = usernames_old_list_clear.difference(usernames_list_clear)
 

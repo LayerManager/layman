@@ -184,23 +184,33 @@ def test_get_user_and_role_names_for_db():
         userinfo['sub'] = '20'
         users.ensure_user(id_workspace_user, userinfo)
 
-        list = publications.get_user_and_role_names_for_db({username, }, workspace_name)
-        assert list == {username, }, list
+        user_names, role_names = publications.get_user_and_role_names_for_db({username, }, workspace_name)
+        assert user_names == {username}
+        assert role_names == set()
 
-        list = publications.get_user_and_role_names_for_db({username, workspace_name, }, workspace_name)
-        assert list == {username, workspace_name, }, list
+        user_names, role_names = publications.get_user_and_role_names_for_db({username, workspace_name, }, workspace_name)
+        assert user_names == {username, workspace_name}
+        assert role_names == set()
 
-        list = publications.get_user_and_role_names_for_db({username, }, username)
-        assert list == set(), list
+        user_names, role_names = publications.get_user_and_role_names_for_db({username, }, username)
+        assert user_names == set()
+        assert role_names == set()
 
-        list = publications.get_user_and_role_names_for_db({username, workspace_name, }, username)
-        assert list == {workspace_name, }, list
+        user_names, role_names = publications.get_user_and_role_names_for_db({username, workspace_name, }, username)
+        assert user_names == {workspace_name}
+        assert role_names == set()
 
-        list = publications.get_user_and_role_names_for_db({username, settings.RIGHTS_EVERYONE_ROLE, }, workspace_name)
-        assert list == {username, }, list
+        user_names, role_names = publications.get_user_and_role_names_for_db({username, settings.RIGHTS_EVERYONE_ROLE, }, workspace_name)
+        assert user_names == {username}
+        assert role_names == set()
 
-        list = publications.get_user_and_role_names_for_db({username, settings.RIGHTS_EVERYONE_ROLE, }, username)
-        assert list == set(), list
+        user_names, role_names = publications.get_user_and_role_names_for_db({username, settings.RIGHTS_EVERYONE_ROLE, }, username)
+        assert user_names == set()
+        assert role_names == set()
+
+        user_names, role_names = publications.get_user_and_role_names_for_db({workspace_name, settings.RIGHTS_EVERYONE_ROLE, 'ROLE1'}, username)
+        assert user_names == {workspace_name}
+        assert role_names == {'ROLE1'}
 
         users.delete_user(username)
         workspaces.delete_workspace(workspace_name)
