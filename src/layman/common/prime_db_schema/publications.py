@@ -339,17 +339,21 @@ def secure_bbox_transform(bbox_crs):
     return bbox_sql
 
 
-def only_valid_names(users_list):
+def only_valid_user_names(users_list):
     usernames_for_check = set(users_list)
-    usernames_for_check.discard(ROLE_EVERYONE)
     for username in usernames_for_check:
         info = users.get_user_infos(username)
         if not info:
             raise LaymanError(43, f'Not existing user. Username={username}')
 
 
-def at_least_one_can_write(can_write):
-    if not can_write:
+# pylint: disable=unused-argument
+def only_valid_role_names(roles_list):
+    pass
+
+
+def at_least_one_can_write(user_names, role_names):
+    if not user_names and ROLE_EVERYONE not in role_names:
         raise LaymanError(43, f'At least one user have to have write rights.')
 
 
@@ -383,11 +387,15 @@ def check_rights_axioms(can_read,
                         can_read_old=None,
                         can_write_old=None):
     if can_read:
-        only_valid_names(can_read)
+        read_users, read_roles = split_user_and_role_names(can_read)
+        only_valid_user_names(read_users)
+        only_valid_role_names(read_roles)
     if can_write:
-        only_valid_names(can_write)
+        write_users, write_roles = split_user_and_role_names(can_write)
+        only_valid_user_names(write_users)
+        only_valid_role_names(write_roles)
         owner_can_still_write(owner, can_write)
-        at_least_one_can_write(can_write)
+        at_least_one_can_write(write_users, write_roles)
         i_can_still_write(actor_name, can_write)
     if can_read or can_write:
         can_read_check = can_read or can_read_old

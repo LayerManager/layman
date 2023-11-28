@@ -29,26 +29,19 @@ def test_only_valid_names():
         userinfo['sub'] = '10'
         users.ensure_user(id_workspace_user, userinfo)
 
-        publications.only_valid_names(set())
-        publications.only_valid_names({username, })
-        publications.only_valid_names({settings.RIGHTS_EVERYONE_ROLE, })
-        publications.only_valid_names({settings.RIGHTS_EVERYONE_ROLE, username, })
-        publications.only_valid_names({username, settings.RIGHTS_EVERYONE_ROLE, })
+        publications.only_valid_user_names(set())
+        publications.only_valid_user_names({username, })
 
         with pytest.raises(LaymanError) as exc_info:
-            publications.only_valid_names({username, workspace_name})
+            publications.only_valid_user_names({username, workspace_name})
         assert exc_info.value.code == 43
 
         with pytest.raises(LaymanError) as exc_info:
-            publications.only_valid_names({workspace_name, username})
+            publications.only_valid_user_names({workspace_name, username})
         assert exc_info.value.code == 43
 
         with pytest.raises(LaymanError) as exc_info:
-            publications.only_valid_names({workspace_name, settings.RIGHTS_EVERYONE_ROLE, })
-        assert exc_info.value.code == 43
-
-        with pytest.raises(LaymanError) as exc_info:
-            publications.only_valid_names({settings.RIGHTS_EVERYONE_ROLE, 'skaljgdalskfglshfgd', })
+            publications.only_valid_user_names({'skaljgdalskfglshfgd', })
         assert exc_info.value.code == 43
 
         users.delete_user(username)
@@ -59,14 +52,18 @@ def test_at_least_one_can_write():
     workspace_name = 'test_at_least_one_can_write_workspace'
     username = 'test_at_least_one_can_write_user'
 
-    publications.at_least_one_can_write({username, })
-    publications.at_least_one_can_write({settings.RIGHTS_EVERYONE_ROLE, })
-    publications.at_least_one_can_write({username, settings.RIGHTS_EVERYONE_ROLE, })
-    publications.at_least_one_can_write({workspace_name, })
-    publications.at_least_one_can_write({'lusfjdiaurghalskug', })
+    publications.at_least_one_can_write({username}, set())
+    publications.at_least_one_can_write(set(), {settings.RIGHTS_EVERYONE_ROLE})
+    publications.at_least_one_can_write({username}, set())
+    publications.at_least_one_can_write({workspace_name}, set())
+    publications.at_least_one_can_write({'lusfjdiaurghalskug'}, set())
 
     with pytest.raises(LaymanError) as exc_info:
-        publications.at_least_one_can_write(set())
+        publications.at_least_one_can_write(set(), set())
+    assert exc_info.value.code == 43
+
+    with pytest.raises(LaymanError) as exc_info:
+        publications.at_least_one_can_write(set(), {'ROLE1'})
     assert exc_info.value.code == 43
 
 
@@ -85,6 +82,8 @@ def test_who_can_write_can_read():
     publications.who_can_write_can_read({settings.RIGHTS_EVERYONE_ROLE, username, }, {settings.RIGHTS_EVERYONE_ROLE, })
     publications.who_can_write_can_read({settings.RIGHTS_EVERYONE_ROLE, username, }, set())
     publications.who_can_write_can_read({workspace_name, }, {workspace_name, })
+    publications.who_can_write_can_read({'ROLE1'}, {'ROLE1'})
+    publications.who_can_write_can_read({settings.RIGHTS_EVERYONE_ROLE}, {'ROLE1'})
 
     with pytest.raises(LaymanError) as exc_info:
         publications.who_can_write_can_read(set(), {workspace_name, })
@@ -104,6 +103,18 @@ def test_who_can_write_can_read():
 
     with pytest.raises(LaymanError) as exc_info:
         publications.who_can_write_can_read({username}, {workspace_name, })
+    assert exc_info.value.code == 43
+
+    with pytest.raises(LaymanError) as exc_info:
+        publications.who_can_write_can_read({username}, {'ROLE1'})
+    assert exc_info.value.code == 43
+
+    with pytest.raises(LaymanError) as exc_info:
+        publications.who_can_write_can_read({'ROLE2'}, {'ROLE1'})
+    assert exc_info.value.code == 43
+
+    with pytest.raises(LaymanError) as exc_info:
+        publications.who_can_write_can_read({'ROLE2'}, {settings.RIGHTS_EVERYONE_ROLE})
     assert exc_info.value.code == 43
 
 
@@ -133,6 +144,10 @@ def test_i_can_still_write():
         publications.i_can_still_write(username, {workspace_name, })
     assert exc_info.value.code == 43
 
+    with pytest.raises(LaymanError) as exc_info:
+        publications.i_can_still_write(username, {'ROLE1'})
+    assert exc_info.value.code == 43
+
 
 def test_owner_can_still_write():
     workspace_name = 'test_owner_can_still_write_workspace'
@@ -151,6 +166,10 @@ def test_owner_can_still_write():
 
     with pytest.raises(LaymanError) as exc_info:
         publications.owner_can_still_write(username, {workspace_name, })
+    assert exc_info.value.code == 43
+
+    with pytest.raises(LaymanError) as exc_info:
+        publications.owner_can_still_write(username, {'ROLE1'})
     assert exc_info.value.code == 43
 
 
