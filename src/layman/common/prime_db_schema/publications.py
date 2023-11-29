@@ -495,8 +495,10 @@ def update_publication(workspace_name, info):
     for right_type in right_type_list:
         access_rights_changes[right_type] = {
             'EVERYONE': None,
-            'add': set(),
-            'remove': set(),
+            'add_users': set(),
+            'add_roles': set(),
+            'remove_users': set(),
+            'remove_roles': set(),
         }
 
     external_table_uri = psycopg2.extras.Json({
@@ -521,10 +523,12 @@ def update_publication(workspace_name, info):
             if info['access_rights'].get(right_type):
                 usernames_list = info["access_rights"].get(right_type)
                 access_rights_changes[right_type]['EVERYONE'] = ROLE_EVERYONE in usernames_list
-                usernames_list_clear = get_user_and_role_names_for_db(usernames_list, workspace_name)[0]
-                usernames_old_list_clear = get_user_and_role_names_for_db(access_rights_changes[right_type]['username_list_old'], workspace_name)[0]
-                access_rights_changes[right_type]['add'] = usernames_list_clear.difference(usernames_old_list_clear)
-                access_rights_changes[right_type]['remove'] = usernames_old_list_clear.difference(usernames_list_clear)
+                usernames_list_clear, roles_list_clear = get_user_and_role_names_for_db(usernames_list, workspace_name)
+                usernames_old_list_clear, roles_old_list_clear = get_user_and_role_names_for_db(access_rights_changes[right_type]['username_list_old'], workspace_name)
+                access_rights_changes[right_type]['add_users'] = usernames_list_clear.difference(usernames_old_list_clear)
+                access_rights_changes[right_type]['add_roles'] = roles_list_clear.difference(roles_old_list_clear)
+                access_rights_changes[right_type]['remove_users'] = usernames_old_list_clear.difference(usernames_list_clear)
+                access_rights_changes[right_type]['remove_roles'] = roles_old_list_clear.difference(roles_list_clear)
 
     update_publications_sql = f'''update {DB_SCHEMA}.publications set
     title = coalesce(%s, title),
@@ -555,8 +559,8 @@ returning id
     pub_id = db_util.run_query(update_publications_sql, data)[0][0]
 
     for right_type in right_type_list:
-        rights.insert_rights(pub_id, access_rights_changes[right_type]['add'], set(), right_type)
-        rights.remove_rights(pub_id, access_rights_changes[right_type]['remove'], right_type)
+        rights.insert_rights(pub_id, access_rights_changes[right_type]['add_users'], access_rights_changes[right_type]['add_roles'], right_type)
+        rights.remove_rights(pub_id, access_rights_changes[right_type]['remove_users'], access_rights_changes[right_type]['remove_roles'], right_type)
 
     return pub_id
 
