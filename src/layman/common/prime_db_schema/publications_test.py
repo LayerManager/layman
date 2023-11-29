@@ -226,27 +226,7 @@ def assert_access_rights(workspace_name,
     assert pubs[(workspace_name, publication_type, publication_name)]["access_rights"]["write"] == write_to_test
 
 
-def test_insert_rights():
-    def case_test_insert_rights(username,
-                                publication_info_original,
-                                access_rights,
-                                read_to_test,
-                                write_to_test,
-                                ):
-        publication_info = publication_info_original.copy()
-        publication_info.update({"access_rights": access_rights})
-        if users.get_user_infos(username):
-            publication_info.update({"actor_name": username})
-        publication_info['image_mosaic'] = False
-        publications.insert_publication(username, publication_info)
-        assert_access_rights(username,
-                             publication_info_original["name"],
-                             publication_info_original["publ_type_name"],
-                             read_to_test,
-                             write_to_test,
-                             )
-        publications.delete_publication(username, publication_info["publ_type_name"], publication_info["name"])
-
+class TestInsertRights:
     workspace_name = 'test_insert_rights_workspace'
     username = 'test_insert_rights_user'
     username2 = 'test_insert_rights_user2'
@@ -255,99 +235,111 @@ def test_insert_rights():
     publication_name = 'test_insert_rights_publication_name'
     publication_type = MAP_TYPE
 
-    with app.app_context():
-        workspaces.ensure_workspace(workspace_name)
-        id_workspace_user = workspaces.ensure_workspace(username)
-        userinfo = userinfo_baseline.copy()
-        userinfo['sub'] = '30'
-        users.ensure_user(id_workspace_user, userinfo)
-        id_workspace_user2 = workspaces.ensure_workspace(username2)
-        userinfo = userinfo_baseline.copy()
-        userinfo['sub'] = '40'
-        users.ensure_user(id_workspace_user2, userinfo)
+    publication_info = {"name": publication_name,
+                        "title": publication_name,
+                        "actor_name": username,
+                        "publ_type_name": publication_type,
+                        "uuid": uuid.uuid4(),
+                        }
 
-        publication_info = {"name": publication_name,
-                            "title": publication_name,
-                            "actor_name": username,
-                            "publ_type_name": publication_type,
-                            "uuid": uuid.uuid4(),
-                            }
+    @pytest.fixture(scope="function", autouse=True)
+    def provide_data(self, request):
+        with app.app_context():
+            workspaces.ensure_workspace(self.workspace_name)
+            id_workspace_user = workspaces.ensure_workspace(self.username)
+            userinfo = userinfo_baseline.copy()
+            userinfo['sub'] = '30'
+            users.ensure_user(id_workspace_user, userinfo)
+            id_workspace_user2 = workspaces.ensure_workspace(self.username2)
+            userinfo = userinfo_baseline.copy()
+            userinfo['sub'] = '40'
+            users.ensure_user(id_workspace_user2, userinfo)
+        yield
+        if request.node.session.testsfailed == 0:
+            with app.app_context():
+                users.delete_user(self.username)
+                users.delete_user(self.username2)
+                workspaces.delete_workspace(self.workspace_name)
 
-        case_test_insert_rights(username,
-                                publication_info,
-                                {"read": {username, },
-                                 "write": {username, },
-                                 },
-                                [username, ],
-                                [username, ],
-                                )
-
-        case_test_insert_rights(username,
-                                publication_info,
-                                {"read": {settings.RIGHTS_EVERYONE_ROLE, },
-                                 "write": {settings.RIGHTS_EVERYONE_ROLE, },
-                                 },
-                                [username, settings.RIGHTS_EVERYONE_ROLE, ],
-                                [username, settings.RIGHTS_EVERYONE_ROLE, ],
-                                )
-
-        case_test_insert_rights(username,
-                                publication_info,
-                                {"read": {settings.RIGHTS_EVERYONE_ROLE, username, },
-                                 "write": {settings.RIGHTS_EVERYONE_ROLE, username, },
-                                 },
-                                [username, settings.RIGHTS_EVERYONE_ROLE, ],
-                                [username, settings.RIGHTS_EVERYONE_ROLE, ],
-                                )
-
-        case_test_insert_rights(username,
-                                publication_info,
-                                {"read": {username, username2, },
-                                 "write": {username, username2, },
-                                 },
-                                [username, username2, ],
-                                [username, username2, ],
-                                )
-
-        case_test_insert_rights(username,
-                                publication_info,
-                                {"read": {username, username2, role1, },
-                                 "write": {username, username2, role1, },
-                                 },
-                                [username, role1, username2, ],
-                                [username, role1, username2, ],
-                                )
-
-        case_test_insert_rights(workspace_name,
-                                publication_info,
-                                {"read": {settings.RIGHTS_EVERYONE_ROLE, username, },
-                                 "write": {settings.RIGHTS_EVERYONE_ROLE, username, },
-                                 },
-                                [username, settings.RIGHTS_EVERYONE_ROLE, ],
-                                [username, settings.RIGHTS_EVERYONE_ROLE, ],
-                                )
-
-        case_test_insert_rights(workspace_name,
-                                publication_info,
-                                {"read": {settings.RIGHTS_EVERYONE_ROLE, },
-                                 "write": {settings.RIGHTS_EVERYONE_ROLE, },
-                                 },
-                                [settings.RIGHTS_EVERYONE_ROLE, ],
-                                [settings.RIGHTS_EVERYONE_ROLE, ],
-                                )
-
-        case_test_insert_rights(workspace_name,
-                                publication_info,
-                                {"read": {settings.RIGHTS_EVERYONE_ROLE, role1, },
-                                 "write": {settings.RIGHTS_EVERYONE_ROLE, role1, },
-                                 },
-                                [role1, settings.RIGHTS_EVERYONE_ROLE, ],
-                                [role1, settings.RIGHTS_EVERYONE_ROLE, ],
-                                )
-
-        users.delete_user(username)
-        users.delete_user(username2)
-        workspaces.delete_workspace(workspace_name)
+    @pytest.mark.parametrize("username, access_rights, read_to_test, write_to_test", [
+        pytest.param(
+            username,
+            {"read": {username, },
+             "write": {username, }, },
+            [username, ], [username, ],
+            id='personal_only_owner',
+        ),
+        pytest.param(
+            username,
+            {"read": {settings.RIGHTS_EVERYONE_ROLE, },
+             "write": {settings.RIGHTS_EVERYONE_ROLE, },
+             },
+            [username, settings.RIGHTS_EVERYONE_ROLE, ], [username, settings.RIGHTS_EVERYONE_ROLE, ],
+            id='personal_everyone',
+        ),
+        pytest.param(
+            username,
+            {"read": {settings.RIGHTS_EVERYONE_ROLE, username, },
+             "write": {settings.RIGHTS_EVERYONE_ROLE, username, },
+             },
+            [username, settings.RIGHTS_EVERYONE_ROLE, ], [username, settings.RIGHTS_EVERYONE_ROLE, ],
+            id='personal_everyone_owner',
+        ),
+        pytest.param(
+            username,
+            {"read": {username, username2, },
+             "write": {username, username2, },
+             },
+            [username, username2, ], [username, username2, ],
+            id='personal_owner_editor',
+        ),
+        pytest.param(
+            username,
+            {"read": {username, username2, role1, },
+             "write": {username, username2, role1, },
+             },
+            [username, role1, username2, ], [username, role1, username2, ],
+            id='personal_owner_editor_role',
+        ),
+        pytest.param(
+            workspace_name,
+            {"read": {settings.RIGHTS_EVERYONE_ROLE, username, },
+             "write": {settings.RIGHTS_EVERYONE_ROLE, username, },
+             },
+            [username, settings.RIGHTS_EVERYONE_ROLE, ], [username, settings.RIGHTS_EVERYONE_ROLE, ],
+            id='public_writer_everyone',
+        ),
+        pytest.param(
+            workspace_name,
+            {"read": {settings.RIGHTS_EVERYONE_ROLE, },
+             "write": {settings.RIGHTS_EVERYONE_ROLE, },
+             },
+            [settings.RIGHTS_EVERYONE_ROLE, ], [settings.RIGHTS_EVERYONE_ROLE, ],
+            id='public_everyone',
+        ),
+        pytest.param(
+            workspace_name,
+            {"read": {settings.RIGHTS_EVERYONE_ROLE, role1, },
+             "write": {settings.RIGHTS_EVERYONE_ROLE, role1, },
+             },
+            [role1, settings.RIGHTS_EVERYONE_ROLE, ], [role1, settings.RIGHTS_EVERYONE_ROLE, ],
+            id='public_everyone_role',
+        ),
+    ])
+    def test_rights(self, username, access_rights, read_to_test, write_to_test, ):
+        publication_info = self.publication_info.copy()
+        publication_info.update({"access_rights": access_rights})
+        if users.get_user_infos(username):
+            publication_info.update({"actor_name": username})
+        publication_info['image_mosaic'] = False
+        publications.insert_publication(username, publication_info)
+        assert_access_rights(username,
+                             self.publication_info["name"],
+                             self.publication_info["publ_type_name"],
+                             read_to_test,
+                             write_to_test,
+                             )
+        publications.delete_publication(username, publication_info["publ_type_name"], publication_info["name"])
 
 
 def test_update_rights():
