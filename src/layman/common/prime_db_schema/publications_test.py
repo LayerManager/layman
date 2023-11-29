@@ -433,127 +433,64 @@ class TestUpdateRights:
                              write_to_test,
                              )
 
-
-def test_update_rights():
-    def case_test_update_rights(username,
-                                publication_info_original,
-                                publication_update_info,
-                                read_to_test,
-                                write_to_test,
-                                ):
+    @pytest.mark.parametrize("username, pre_publication_update_info, publication_update_info", [
+        pytest.param(
+            username,
+            {},
+            {"access_rights": {"read": {username2, },
+                               "write": {username2, },
+                               },
+             'actor_name': username2},
+            id='personal_without_owner',
+        ),
+        pytest.param(
+            username,
+            {},
+            {"access_rights": {"read": {username, },
+                               },
+             'actor_name': username},
+            id='personal_remove_editor_reading',
+        ),
+        pytest.param(
+            username,
+            {"access_rights": {"read": {username, },
+                               "write": {username, },
+                               },
+             'actor_name': username},
+            {"access_rights": {"write": {username, username2, },
+                               },
+             'actor_name': username},
+            id='personal_add_only_writer',
+        ),
+        pytest.param(
+            username,
+            {"access_rights": {"read": {username, },
+                               "write": {username, },
+                               },
+             'actor_name': username},
+            {"access_rights": {"write": {settings.RIGHTS_EVERYONE_ROLE, },
+                               },
+             'actor_name': username},
+            id='personal_write_everyone',
+        ),
+    ])
+    def test_validation(self, username, pre_publication_update_info, publication_update_info):
+        publication_info_original = self.publication_insert_info
+        if pre_publication_update_info:
+            pre_publication_update_info["publ_type_name"] = publication_info_original["publ_type_name"]
+            pre_publication_update_info["name"] = publication_info_original["name"]
+            publications.update_publication(username,
+                                            pre_publication_update_info,
+                                            )
         if not publication_update_info.get("publ_type_name"):
             publication_update_info["publ_type_name"] = publication_info_original["publ_type_name"]
         if not publication_update_info.get("name"):
             publication_update_info["name"] = publication_info_original["name"]
-        publications.update_publication(username,
-                                        publication_update_info,
-                                        )
-        assert_access_rights(username,
-                             publication_info_original["name"],
-                             publication_info_original["publ_type_name"],
-                             read_to_test,
-                             write_to_test,
-                             )
-
-    workspace_name = 'test_update_rights_workspace'
-    username = 'test_update_rights_user'
-    username2 = 'test_update_rights_user2'
-
-    publication_name = 'test_update_rights_publication_name'
-    publication_type = MAP_TYPE
-    publication_insert_info = {"name": publication_name,
-                               "title": publication_name,
-                               "publ_type_name": publication_type,
-                               "actor_name": username,
-                               "uuid": uuid.uuid4(),
-                               "access_rights": {"read": {settings.RIGHTS_EVERYONE_ROLE, },
-                                                 "write": {settings.RIGHTS_EVERYONE_ROLE, },
-                                                 },
-                               "image_mosaic": False,
-                               }
-
-    with app.app_context():
-        workspaces.ensure_workspace(workspace_name)
-        id_workspace_user = workspaces.ensure_workspace(username)
-        userinfo = userinfo_baseline.copy()
-        userinfo['sub'] = '50'
-        users.ensure_user(id_workspace_user, userinfo)
-        id_workspace_user2 = workspaces.ensure_workspace(username2)
-        userinfo = userinfo_baseline.copy()
-        userinfo['sub'] = '60'
-        users.ensure_user(id_workspace_user2, userinfo)
-
-        publications.insert_publication(username, publication_insert_info)
-
         with pytest.raises(LaymanError) as exc_info:
-            case_test_update_rights(username,
-                                    publication_insert_info,
-                                    {"access_rights": {"read": {username2, },
-                                                       "write": {username2, },
-                                                       },
-                                     'actor_name': username2},
-                                    [username, username2, ],
-                                    [username, username2, ],
-                                    )
+            publications.update_publication(username,
+                                            publication_update_info,
+                                            )
         assert exc_info.value.code == 43
-
-        with pytest.raises(LaymanError) as exc_info:
-            case_test_update_rights(username,
-                                    publication_insert_info,
-                                    {"access_rights": {"read": {username, },
-                                                       },
-                                     'actor_name': username},
-                                    [username, username2, ],
-                                    [username, username2, ],
-                                    )
-        assert exc_info.value.code == 43
-
-        with pytest.raises(LaymanError) as exc_info:
-            case_test_update_rights(username,
-                                    publication_insert_info,
-                                    {"access_rights": {"read": {username, },
-                                                       },
-                                     'actor_name': username},
-                                    [username, username2, ],
-                                    [username, username2, ],
-                                    )
-        assert exc_info.value.code == 43
-
-        case_test_update_rights(username,
-                                publication_insert_info,
-                                {"access_rights": {"read": {username, },
-                                                   "write": {username, },
-                                                   },
-                                 'actor_name': username},
-                                [username, ],
-                                [username, ],
-                                )
-        with pytest.raises(LaymanError) as exc_info:
-            case_test_update_rights(username,
-                                    publication_insert_info,
-                                    {"access_rights": {"write": {username, username2, },
-                                                       },
-                                     'actor_name': username},
-                                    [username, username2, ],
-                                    [username, username2, username2, ],
-                                    )
-        assert exc_info.value.code == 43
-
-        with pytest.raises(LaymanError) as exc_info:
-            case_test_update_rights(username,
-                                    publication_insert_info,
-                                    {"access_rights": {"write": {settings.RIGHTS_EVERYONE_ROLE, },
-                                                       },
-                                     'actor_name': username},
-                                    [username, username2, ],
-                                    [settings.RIGHTS_EVERYONE_ROLE, ],
-                                    )
-        assert exc_info.value.code == 43
-
-        publications.delete_publication(username, publication_insert_info["publ_type_name"], publication_insert_info["name"])
-        users.delete_user(username)
-        users.delete_user(username2)
-        workspaces.delete_workspace(workspace_name)
 
 
 @pytest.mark.parametrize('roles_and_users, exp_users, exp_roles', [
