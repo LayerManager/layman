@@ -346,6 +346,8 @@ class TestUpdateRights:
     workspace_name = 'test_update_rights_workspace'
     username = 'test_update_rights_user'
     username2 = 'test_update_rights_user2'
+    role1 = 'TEST_UPDATE_RIGHTS_ROLE1'
+    role2 = 'TEST_UPDATE_RIGHTS_ROLE2'
 
     publication_name = 'test_update_rights_publication_name'
     publication_type = MAP_TYPE
@@ -354,8 +356,8 @@ class TestUpdateRights:
                                "publ_type_name": publication_type,
                                "actor_name": username,
                                "uuid": uuid.uuid4(),
-                               "access_rights": {"read": {settings.RIGHTS_EVERYONE_ROLE, },
-                                                 "write": {settings.RIGHTS_EVERYONE_ROLE, },
+                               "access_rights": {"read": {settings.RIGHTS_EVERYONE_ROLE, role1, },
+                                                 "write": {settings.RIGHTS_EVERYONE_ROLE, role1, },
                                                  },
                                "image_mosaic": False,
                                }
@@ -415,6 +417,14 @@ class TestUpdateRights:
              "actor_name": None},
             [username, settings.RIGHTS_EVERYONE_ROLE, ], [username, settings.RIGHTS_EVERYONE_ROLE, ],
             id='personal_everyone_as_anonym',
+        ),
+        pytest.param(
+            username,
+            {"access_rights": {"read": {username, role2, },
+                               "write": {username, role2, }},
+             "actor_name": username},
+            [username, role2, ], [username, role2, ],
+            id='personal_owner_role',
         ),
     ])
     def test_rights(self, username, publication_update_info, read_to_test, write_to_test, ):

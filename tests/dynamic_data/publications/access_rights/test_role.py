@@ -25,6 +25,7 @@ class TestPublication(base_test.TestSingleRestPublication):
 
     rest_parametrization = [
         PublicationTypes,
+        base_test_classes.RestMethod
     ]
 
     usernames_to_reserve = [

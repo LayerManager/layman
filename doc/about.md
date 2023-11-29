@@ -12,7 +12,7 @@ Layman supports two main models of geospatial data: layers and maps. **Layer** i
 There are multiple client applications for communication with Layman through its REST API: simple web test client shipped with Layman, QGIS desktop client, and HSLayers library. Published data are accessible through standardized OGC APIs: Web Map Service, Web Feature Service, and Catalogue Service.
 
 ### Security
-Layman`s security system uses two well-known concepts: authentication and authorization. Common configuration consists of authentication based on widely used OAuth2 protocol and authorization allows users to give read and write access rights to each user on publication level. 
+Layman`s security system uses two well-known concepts: authentication and authorization. Common configuration consists of authentication based on widely used OAuth2 protocol and authorization allows users to give read and write access rights to users and roles on publication level. 
 
 ### Scalability
 Large data files can be easily published thanks to chunk upload. Asynchronous processing ensures fast communication with REST API. Processing tasks can be distributed on multiple servers. Layman also stands on the shoulders of widely used programs like Flask, PostgreSQL, PostGIS, GDAL, GeoServer, QGIS Server, Celery, and Redis.

@@ -44,7 +44,7 @@ def delete_rights_for_publication(id_publication):
                           )
 
 
-def remove_rights(id_publication, users_list, right_type):
+def remove_rights(id_publication, users_list, roles_list, right_type):
     sql = f'''delete from {DB_SCHEMA}.rights
 where id_publication = %s
   and type = %s
@@ -57,5 +57,17 @@ where id_publication = %s
                               (id_publication,
                                right_type,
                                username,
+                               )
+                              )
+
+    sql = f'''delete from {DB_SCHEMA}.rights
+where id_publication = %s
+  and type = %s
+  and role_name = %s;'''
+    for role in roles_list:
+        db_util.run_statement(sql,
+                              (id_publication,
+                               right_type,
+                               role,
                                )
                               )

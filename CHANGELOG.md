@@ -13,7 +13,7 @@
 - [#165](https://github.com/LayerManager/layman/issues/165) Add column `role_name` to table `rights` in prime DB schema. Add constraint that exactly one of columns `role_name` and `id_user` is not null.
 #### Data migrations
 ### Changes
-- [#165](https://github.com/LayerManager/layman/issues/165) POST Workspace [Layers](doc/rest.md#post-workspace-layers)/[Maps](doc/rest.md#post-workspace-maps) saves [role names](doc/models.md#role) mentioned in `access_rights.read` and `access_rights.write` parameters into DB.
+- [#165](https://github.com/LayerManager/layman/issues/165) POST Workspace [Layers](doc/rest.md#post-workspace-layers)/[Maps](doc/rest.md#post-workspace-maps) and PATCH Workspace [Layer](doc/rest.md#patch-workspace-layer)/[Map](doc/rest.md#patch-workspace-map) saves [role names](doc/models.md#role) mentioned in `access_rights.read` and `access_rights.write` parameters into DB.
 - [#165](https://github.com/LayerManager/layman/issues/165) Many endpoints return previously associated [role names](doc/models.md#role) in `access_rights.read` and `access_rights.write` keys:
   - [GET](doc/rest.md#get-workspace-layer)/[PATCH](doc/rest.md#patch-workspace-layer) Workspace Layer
   - [GET](doc/rest.md#get-workspace-map)/[PATCH](doc/rest.md#patch-workspace-map) Workspace Map
