@@ -6,6 +6,7 @@ from test_tools import process_client
 from . import upgrade_v1_23
 
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
+ROLE_SERVICE_SCHEMA = settings.LAYMAN_INTERNAL_ROLE_SERVICE_SCHEMA
 
 
 @pytest.mark.usefixtures('ensure_layman', 'oauth2_provider_mock')
@@ -58,3 +59,17 @@ where id_publication in (
     assert len(rights_rows) == 1
     assert rights_rows[0][1] is not None, f"id_user is none!"
     assert rights_rows[0][2] is None, f"role_name is not none!"
+
+
+def test_create_role_service_schema():
+    drop_statement = f'''DROP SCHEMA IF EXISTS {ROLE_SERVICE_SCHEMA};'''
+    schema_existence_query = f'''SELECT schema_name FROM information_schema.schemata WHERE schema_name = '{ROLE_SERVICE_SCHEMA}';'''
+    with app.app_context():
+        db_util.run_statement(drop_statement)
+        result = len(db_util.run_query(schema_existence_query))
+        assert result == 0
+
+        upgrade_v1_23.create_role_service_schema()
+
+        result = len(db_util.run_query(schema_existence_query))
+        assert result == 1
