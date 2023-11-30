@@ -80,6 +80,8 @@ def test_create_role_service_schema():
     table_existence_query = f'''SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '{ROLE_SERVICE_SCHEMA}' and table_name = %s;'''
     layman_users_roles_query = f'''select COUNT(*) from {ROLE_SERVICE_SCHEMA}.layman_users_roles where name = %s'''
     layman_users_user_roles_query = f'''select COUNT(*) from {ROLE_SERVICE_SCHEMA}.layman_users_user_roles where username = %s and rolename = %s'''
+    admin_roles_query = f'''select COUNT(*) from {ROLE_SERVICE_SCHEMA}.admin_roles'''
+    admin_user_roles_query = f'''select COUNT(*) from {ROLE_SERVICE_SCHEMA}.admin_user_roles where username = %s and rolename = %s'''
 
     with app.app_context():
         ensure_whole_user(username, userinfo)
@@ -98,4 +100,10 @@ def test_create_role_service_schema():
         result = db_util.run_query(layman_users_roles_query, (rolename,))[0][0]
         assert result == 1
         result = db_util.run_query(layman_users_user_roles_query, (username, rolename,))[0][0]
+        assert result == 1
+        result = db_util.run_query(admin_roles_query)[0][0]
+        assert result == 3
+        result = db_util.run_query(admin_user_roles_query, ('layman_test', 'LAYMAN_TEST_ROLE',))[0][0]
+        assert result == 1
+        result = db_util.run_query(admin_user_roles_query, ('layman_test', 'ADMIN',))[0][0]
         assert result == 1
