@@ -50,3 +50,20 @@ def create_role_service_schema():
     CONSTRAINT bussiness_user_roles_username_rolename_key UNIQUE (username,rolename)
 );"""
     db_util.run_statement(create_role_table)
+
+    create_layman_users_roles_view = f"""create view {ROLE_SERVICE_SCHEMA}.layman_users_roles
+as
+select concat('USER_', UPPER(w.name)) as name
+from {DB_SCHEMA}.users u inner join
+     {DB_SCHEMA}.workspaces w on w.id = u.id_workspace
+;"""
+    db_util.run_statement(create_layman_users_roles_view)
+
+    create_layman_users_user_roles_view = f"""create view {ROLE_SERVICE_SCHEMA}.layman_users_user_roles
+as
+select w.name as username,
+       concat('USER_', UPPER(w.name)) as rolename
+from {DB_SCHEMA}.users u inner join
+     {DB_SCHEMA}.workspaces w on w.id = u.id_workspace
+;"""
+    db_util.run_statement(create_layman_users_user_roles_view)
