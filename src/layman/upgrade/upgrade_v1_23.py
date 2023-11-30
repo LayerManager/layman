@@ -30,5 +30,23 @@ ALTER TABLE {DB_SCHEMA}.rights ADD CONSTRAINT rights_unique_key unique (id_user,
 def create_role_service_schema():
     logger.info(f'    Create internal role service schema')
 
-    statement = f"""CREATE SCHEMA IF NOT EXISTS "{ROLE_SERVICE_SCHEMA}" AUTHORIZATION {settings.LAYMAN_PG_USER};"""
-    db_util.run_statement(statement)
+    create_schema = f"""CREATE SCHEMA IF NOT EXISTS "{ROLE_SERVICE_SCHEMA}" AUTHORIZATION {settings.LAYMAN_PG_USER};"""
+    db_util.run_statement(create_schema)
+
+    create_role_table = f"""create table {ROLE_SERVICE_SCHEMA}.bussiness_roles(
+    id integer GENERATED ALWAYS AS IDENTITY,
+    name varchar(64) not null,
+    parent varchar(64) references {ROLE_SERVICE_SCHEMA}.bussiness_roles (name),
+    CONSTRAINT bussiness_roles_pkey PRIMARY KEY (id),
+    CONSTRAINT bussiness_roles_name_key UNIQUE (name)
+);"""
+    db_util.run_statement(create_role_table)
+
+    create_role_table = f"""create table {ROLE_SERVICE_SCHEMA}.bussiness_user_roles(
+    id integer GENERATED ALWAYS AS IDENTITY,
+    username varchar(128) not null references {DB_SCHEMA}.workspaces (name),
+    rolename varchar(64) not null references {ROLE_SERVICE_SCHEMA}.bussiness_roles (name),
+    CONSTRAINT bussiness_user_roles_pkey PRIMARY KEY (id),
+    CONSTRAINT bussiness_user_roles_username_rolename_key UNIQUE (username,rolename)
+);"""
+    db_util.run_statement(create_role_table)
