@@ -524,16 +524,3 @@ class TestUpdateRights:
                                             publication_update_info,
                                             )
         assert exc_info.value.code == 43
-
-
-@pytest.mark.parametrize('roles_and_users, exp_users, exp_roles', [
-    pytest.param([], [], [], id='no-names'),
-    pytest.param(['user1', 'user2'], ['user1', 'user2'], [], id='only-users'),
-    pytest.param(['ROLE1', 'EVERYONE'], [], ['ROLE1', 'EVERYONE'], id='only-roles'),
-    pytest.param(['ROLE2', 'user1', 'EVERYONE', 'user2'], ['user1', 'user2'], ['ROLE2', 'EVERYONE'],
-                 id='more-users-and-roles'),
-])
-def test_split_user_and_role_names(roles_and_users, exp_users, exp_roles):
-    user_names, role_names = publications.split_user_and_role_names(roles_and_users)
-    assert user_names == exp_users
-    assert role_names == exp_roles
