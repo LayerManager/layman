@@ -2,6 +2,7 @@ import pytest
 
 from db import util as db_util
 from layman import app, settings
+from layman.common.prime_db_schema import ensure_whole_user
 from test_tools import process_client
 from . import upgrade_v1_23
 
@@ -62,10 +63,26 @@ where id_publication in (
 
 
 def test_create_role_service_schema():
+    username = 'test_create_role_service_schema_username'
+    rolename = f'USER_{username.upper()}'
+    userinfo = {"issuer_id": 'mock_test_users_test',
+                "sub": '10',
+                "claims": {"email": "test@oauth2.org",
+                           "name": "test ensure user",
+                           "preferred_username": 'test_preferred',
+                           "given_name": "test",
+                           "family_name": "user",
+                           "middle_name": "ensure",
+                           }
+                }
     drop_statement = f'''DROP SCHEMA IF EXISTS {ROLE_SERVICE_SCHEMA} CASCADE;'''
     schema_existence_query = f'''SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name = '{ROLE_SERVICE_SCHEMA}';'''
     table_existence_query = f'''SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '{ROLE_SERVICE_SCHEMA}' and table_name = %s;'''
+    layman_users_roles_query = f'''select COUNT(*) from {ROLE_SERVICE_SCHEMA}.layman_users_roles where name = %s'''
+    layman_users_user_roles_query = f'''select COUNT(*) from {ROLE_SERVICE_SCHEMA}.layman_users_user_roles where username = %s and rolename = %s'''
+
     with app.app_context():
+        ensure_whole_user(username, userinfo)
         db_util.run_statement(drop_statement)
         result = db_util.run_query(schema_existence_query)[0][0]
         assert result == 0
@@ -77,4 +94,8 @@ def test_create_role_service_schema():
         result = db_util.run_query(table_existence_query, ('bussiness_roles',))[0][0]
         assert result == 1
         result = db_util.run_query(table_existence_query, ('bussiness_user_roles',))[0][0]
+        assert result == 1
+        result = db_util.run_query(layman_users_roles_query, (rolename,))[0][0]
+        assert result == 1
+        result = db_util.run_query(layman_users_user_roles_query, (username, rolename,))[0][0]
         assert result == 1
