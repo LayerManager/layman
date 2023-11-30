@@ -2,6 +2,7 @@ import logging
 
 from db import util as db_util
 from layman import settings
+from layman.authz import role_service as role_service_util
 
 logger = logging.getLogger(__name__)
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
@@ -67,3 +68,5 @@ from {DB_SCHEMA}.users u inner join
      {DB_SCHEMA}.workspaces w on w.id = u.id_workspace
 ;"""
     db_util.run_statement(create_layman_users_user_roles_view)
+
+    role_service_util.ensure_admin_roles()
