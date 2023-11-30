@@ -155,7 +155,7 @@ LAYMAN_NORMALIZED_RASTER_DATA_DIR = os.path.join(GEOSERVER_DATADIR, LAYMAN_NORMA
 LAYMAN_PRIME_SCHEMA = os.environ['LAYMAN_PRIME_SCHEMA']
 assert re.match("[a-z_][a-z0-9_]*", LAYMAN_PRIME_SCHEMA), "Only lowercase characters, numbers and underscore " \
                                                           "should be used for " \
-                                                          "PG_PRIME_SCHEMA. "
+                                                          "LAYMAN_PRIME_SCHEMA. "
 
 # Name of schema, where Layman maintains internal GS JDBC Role Service.
 LAYMAN_INTERNAL_ROLE_SERVICE_SCHEMA = '_role_service'
