@@ -62,14 +62,19 @@ where id_publication in (
 
 
 def test_create_role_service_schema():
-    drop_statement = f'''DROP SCHEMA IF EXISTS {ROLE_SERVICE_SCHEMA};'''
-    schema_existence_query = f'''SELECT schema_name FROM information_schema.schemata WHERE schema_name = '{ROLE_SERVICE_SCHEMA}';'''
+    drop_statement = f'''DROP SCHEMA IF EXISTS {ROLE_SERVICE_SCHEMA} CASCADE;'''
+    schema_existence_query = f'''SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name = '{ROLE_SERVICE_SCHEMA}';'''
+    table_existence_query = f'''SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '{ROLE_SERVICE_SCHEMA}' and table_name = %s;'''
     with app.app_context():
         db_util.run_statement(drop_statement)
-        result = len(db_util.run_query(schema_existence_query))
+        result = db_util.run_query(schema_existence_query)[0][0]
         assert result == 0
 
         upgrade_v1_23.create_role_service_schema()
 
-        result = len(db_util.run_query(schema_existence_query))
+        result = db_util.run_query(schema_existence_query)[0][0]
+        assert result == 1
+        result = db_util.run_query(table_existence_query, ('bussiness_roles',))[0][0]
+        assert result == 1
+        result = db_util.run_query(table_existence_query, ('bussiness_user_roles',))[0][0]
         assert result == 1
