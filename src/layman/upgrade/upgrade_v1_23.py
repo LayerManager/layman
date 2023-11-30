@@ -5,6 +5,7 @@ from layman import settings
 
 logger = logging.getLogger(__name__)
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
+ROLE_SERVICE_SCHEMA = settings.LAYMAN_INTERNAL_ROLE_SERVICE_SCHEMA
 
 
 def adjust_db_for_roles():
@@ -23,4 +24,11 @@ ALTER TABLE {DB_SCHEMA}.rights DROP CONSTRAINT IF EXISTS rights_unique_key;
 ALTER TABLE {DB_SCHEMA}.rights ADD CONSTRAINT rights_unique_key unique (id_user, role_name, id_publication, type);
     '''
 
+    db_util.run_statement(statement)
+
+
+def create_role_service_schema():
+    logger.info(f'    Create internal role service schema')
+
+    statement = f"""CREATE SCHEMA IF NOT EXISTS "{ROLE_SERVICE_SCHEMA}" AUTHORIZATION {settings.LAYMAN_PG_USER};"""
     db_util.run_statement(statement)

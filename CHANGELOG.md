@@ -11,6 +11,7 @@
 ### Migrations and checks
 #### Schema migrations
 - [#165](https://github.com/LayerManager/layman/issues/165) Add column `role_name` to table `rights` in prime DB schema. Add constraint that exactly one of columns `role_name` and `id_user` is not null.
+- [#164](https://github.com/LayerManager/layman/issues/165) Create internal GeoServer [JDBC Role Service](https://docs.geoserver.org/2.21.x/en/user/security/usergrouprole/roleservices.html#jdbc-role-service) DB schema `_role_service`.
 #### Data migrations
 ### Changes
 - [#165](https://github.com/LayerManager/layman/issues/165) POST Workspace [Layers](doc/rest.md#post-workspace-layers)/[Maps](doc/rest.md#post-workspace-maps) and PATCH Workspace [Layer](doc/rest.md#patch-workspace-layer)/[Map](doc/rest.md#patch-workspace-map) saves [role names](doc/models.md#role) mentioned in `access_rights.read` and `access_rights.write` parameters into DB.

@@ -157,6 +157,9 @@ assert re.match("[a-z_][a-z0-9_]*", LAYMAN_PRIME_SCHEMA), "Only lowercase charac
                                                           "should be used for " \
                                                           "PG_PRIME_SCHEMA. "
 
+# Name of schema, where Layman maintains internal GS JDBC Role Service.
+LAYMAN_INTERNAL_ROLE_SERVICE_SCHEMA = '_role_service'
+
 # List of schemas that are not allowed to be used as usernames.
 PG_NON_USER_SCHEMAS = [
     'public',
