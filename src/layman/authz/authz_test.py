@@ -5,7 +5,7 @@ import pytest
 from layman import app, settings, LaymanError
 from test_tools import process_client
 from test_tools.util import url_for
-from . import authorize_workspace_publications_decorator
+from . import authorize_workspace_publications_decorator, split_user_and_role_names
 
 
 @authorize_workspace_publications_decorator
@@ -165,3 +165,16 @@ class TestRestApiClass:
         self.assert_response(response, authz_status_code, authz_response)
         response = requests.get(rest_url, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
         self.assert_response(response, authz_status_code, authz_response)
+
+
+@pytest.mark.parametrize('roles_and_users, exp_users, exp_roles', [
+    pytest.param([], [], [], id='no-names'),
+    pytest.param(['user1', 'user2'], ['user1', 'user2'], [], id='only-users'),
+    pytest.param(['ROLE1', 'EVERYONE'], [], ['ROLE1', 'EVERYONE'], id='only-roles'),
+    pytest.param(['ROLE2', 'user1', 'EVERYONE', 'user2'], ['user1', 'user2'], ['ROLE2', 'EVERYONE'],
+                 id='more-users-and-roles'),
+])
+def test_split_user_and_role_names(roles_and_users, exp_users, exp_roles):
+    user_names, role_names = split_user_and_role_names(roles_and_users)
+    assert user_names == exp_users
+    assert role_names == exp_roles

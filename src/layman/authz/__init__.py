@@ -149,3 +149,9 @@ def complete_access_rights(access_rights_to_complete, full_access_rights):
         if right_type not in access_rights_to_complete:
             access_rights_to_complete[right_type] = full_access_rights[right_type]
     return access_rights_to_complete
+
+
+def split_user_and_role_names(user_and_role_names):
+    user_names = [name for name in user_and_role_names if any(letter.islower() for letter in name)]
+    role_names = [name for name in user_and_role_names if name not in user_names]
+    return user_names, role_names
