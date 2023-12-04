@@ -219,11 +219,11 @@ def test_get_user_and_role_names_for_db():
 def assert_access_rights(workspace_name,
                          publication_name,
                          publication_type,
-                         read_to_test,
-                         write_to_test):
+                         exp_read_rights,
+                         exp_write_rights):
     pubs = publications.get_publication_infos(workspace_name, publication_type)
-    assert pubs[(workspace_name, publication_type, publication_name)]["access_rights"]["read"] == read_to_test
-    assert pubs[(workspace_name, publication_type, publication_name)]["access_rights"]["write"] == write_to_test
+    assert pubs[(workspace_name, publication_type, publication_name)]["access_rights"]["read"] == exp_read_rights
+    assert pubs[(workspace_name, publication_type, publication_name)]["access_rights"]["write"] == exp_write_rights
 
 
 class TestInsertRights:
@@ -261,7 +261,7 @@ class TestInsertRights:
                 users.delete_user(self.username2)
                 workspaces.delete_workspace(self.workspace_name)
 
-    @pytest.mark.parametrize("username, access_rights, read_to_test, write_to_test", [
+    @pytest.mark.parametrize("username, access_rights, exp_read_rights, exp_write_rights", [
         pytest.param(
             username,
             {"read": {username, },
@@ -326,7 +326,7 @@ class TestInsertRights:
             id='public_everyone_role',
         ),
     ])
-    def test_rights(self, username, access_rights, read_to_test, write_to_test, ):
+    def test_rights(self, username, access_rights, exp_read_rights, exp_write_rights, ):
         publication_info = self.publication_info.copy()
         publication_info.update({"access_rights": access_rights})
         if users.get_user_infos(username):
@@ -336,8 +336,8 @@ class TestInsertRights:
         assert_access_rights(username,
                              self.publication_info["name"],
                              self.publication_info["publ_type_name"],
-                             read_to_test,
-                             write_to_test,
+                             exp_read_rights,
+                             exp_write_rights,
                              )
         publications.delete_publication(username, publication_info["publ_type_name"], publication_info["name"])
 
@@ -385,7 +385,7 @@ class TestUpdateRights:
                 users.delete_user(self.username2)
                 workspaces.delete_workspace(self.workspace_name)
 
-    @pytest.mark.parametrize("username, publication_update_info, read_to_test, write_to_test", [
+    @pytest.mark.parametrize("username, publication_update_info, exp_read_rights, exp_write_rights", [
         pytest.param(
             username,
             {"access_rights": {"read": {settings.RIGHTS_EVERYONE_ROLE, },
@@ -427,7 +427,7 @@ class TestUpdateRights:
             id='personal_owner_role',
         ),
     ])
-    def test_rights(self, username, publication_update_info, read_to_test, write_to_test, ):
+    def test_rights(self, username, publication_update_info, exp_read_rights, exp_write_rights, ):
         publication_info_original = self.publication_insert_info
         if not publication_update_info.get("publ_type_name"):
             publication_update_info["publ_type_name"] = publication_info_original["publ_type_name"]
@@ -439,8 +439,8 @@ class TestUpdateRights:
         assert_access_rights(username,
                              publication_info_original["name"],
                              publication_info_original["publ_type_name"],
-                             read_to_test,
-                             write_to_test,
+                             exp_read_rights,
+                             exp_write_rights,
                              )
 
     @pytest.mark.parametrize("username, pre_publication_update_info, publication_update_info", [
