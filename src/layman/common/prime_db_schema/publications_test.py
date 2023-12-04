@@ -442,6 +442,13 @@ class TestUpdateRights:
             [username, role2], [username],
             id='different_read_and_write',
         ),
+        pytest.param(
+            username,
+            {"access_rights": {"write": {settings.RIGHTS_EVERYONE_ROLE, username}},
+             "actor_name": None},
+            [username, role1, settings.RIGHTS_EVERYONE_ROLE], [username, settings.RIGHTS_EVERYONE_ROLE],
+            id='change_write_only',
+        ),
     ])
     def test_rights(self, username, publication_update_info, exp_read_rights, exp_write_rights, ):
         publication_info_original = self.publication_insert_info
