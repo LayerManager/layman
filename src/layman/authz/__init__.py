@@ -5,6 +5,7 @@ from flask import after_this_request, request
 from layman import LaymanError, settings, authn, util as layman_util, common
 from layman.common.prime_db_schema import workspaces, users
 from layman.common.rest import parse_request_path
+from . import role_service
 
 
 def authorize(workspace, publication_type, publication_name, request_method, actor_name):
@@ -72,8 +73,11 @@ def authorize_after_multi_get_request(actor_name, response):
 
 
 def is_user_in_access_rule(username, access_rule_names):
-    return settings.RIGHTS_EVERYONE_ROLE in access_rule_names \
-        or (username and username in access_rule_names)
+    usernames, rolenames = split_user_and_role_names(access_rule_names)
+    userroles = role_service.get_user_roles(username)
+    return settings.RIGHTS_EVERYONE_ROLE in rolenames \
+        or (username and username in usernames) \
+        or (set(rolenames).intersection(userroles))
 
 
 def can_user_publish_in_public_workspace(username):
