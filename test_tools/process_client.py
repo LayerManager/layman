@@ -513,8 +513,13 @@ get_maps = partial(get_publications, MAP_TYPE)
 get_layers = partial(get_publications, LAYER_TYPE)
 
 
-def get_workspace_publication(publication_type, workspace, name, headers=None, ):
+def get_workspace_publication(publication_type, workspace, name, headers=None, *, actor_name=None):
     headers = headers or {}
+    if actor_name:
+        assert TOKEN_HEADER not in headers
+    if actor_name and actor_name != settings.ANONYM_USER:
+        headers.update(get_authz_headers(actor_name))
+
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
 
     with app.app_context():
