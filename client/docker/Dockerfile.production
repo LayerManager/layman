@@ -3,7 +3,7 @@ FROM node:18-alpine
 RUN mkdir /code
 WORKDIR /code
 
-RUN apk update && apk add wget
+RUN apk update && apk add wget patch
 
 ARG LAYMAN_CLIENT_VERSION
 # https://stackoverflow.com/a/42144033
@@ -14,6 +14,10 @@ RUN wget "https://github.com/LayerManager/layman-test-client/archive/$LAYMAN_CLI
     rm client.tar.gz
 
 RUN npm ci
+
+COPY docker/passport-oauth2-patch.diff /code/
+RUN patch node_modules/passport-oauth2/lib/strategy.js < passport-oauth2-patch.diff
+RUN rm passport-oauth2-patch.diff
 
 ARG LTC_BASEPATH
 RUN test -n "LTC_BASEPATH"

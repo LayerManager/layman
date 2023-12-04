@@ -6,6 +6,7 @@
 #### Schema migrations
 #### Data migrations
 ### Changes
+- Improve logging in Layman Test Client related to Passport.js.
 
 
 ## v1.22.2
