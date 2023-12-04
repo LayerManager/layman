@@ -15,7 +15,9 @@ class PublicationTypes(base_test_classes.PublicationByDefinitionBase):
 
 
 USERNAME = 'test_access_rights_role_user1'
-USERS_AND_ROLES = {USERNAME, 'ROLE1', 'EVERYONE'}
+USER_ROLE1_ROLE3_EVERYONE = {USERNAME, 'ROLE1', 'ROLE3', 'EVERYONE'}
+USER_ROLE1 = {USERNAME, 'ROLE1'}
+USER_ROLE1_ROLE2 = {USERNAME, 'ROLE1', 'ROLE2'}
 
 
 @pytest.mark.usefixtures('oauth2_provider_mock')
@@ -38,14 +40,29 @@ class TestPublication(base_test.TestSingleRestPublication):
                                                                                        None),
                                          rest_args={
                                              'access_rights': {
-                                                 'read': ','.join(USERS_AND_ROLES),
+                                                 'read': ','.join(USER_ROLE1_ROLE2),
+                                                 'write': ','.join(USER_ROLE1),
+                                             },
+                                             'actor_name': USERNAME,
+                                         },
+                                         post_before_test_args={
+                                             'access_rights': {
+                                                 'read': ','.join(USER_ROLE1_ROLE3_EVERYONE),
                                              }
                                          },
                                          type=EnumTestTypes.MANDATORY,
                                          )]
 
     def test_publication(self, publication, rest_method, rest_args):
+        if rest_method.enum_item == base_test_classes.RestMethod.PATCH:
+            info = process_client.get_workspace_publication(publication.type, publication.workspace, publication.name)
+            assert set(info['access_rights']['read']) == USER_ROLE1_ROLE3_EVERYONE
+            assert set(info['access_rights']['write']) == {'EVERYONE'}
+
         rest_method.fn(publication, args=rest_args)
         assert_util.is_publication_valid_and_complete(publication)
-        info = process_client.get_workspace_publication(publication.type, publication.workspace, publication.name)
-        assert set(info['access_rights']['read']) == USERS_AND_ROLES
+
+        info = process_client.get_workspace_publication(publication.type, publication.workspace, publication.name,
+                                                        actor_name=USERNAME)
+        assert set(info['access_rights']['read']) == USER_ROLE1_ROLE2
+        assert set(info['access_rights']['write']) == USER_ROLE1
