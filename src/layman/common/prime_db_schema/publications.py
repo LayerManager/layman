@@ -374,8 +374,12 @@ def owner_can_still_write(owner,
         raise LaymanError(43, f'Owner of the personal workspace have to keep write right.')
 
 
+def is_user(user_or_role_name):
+    return any(letter.islower() for letter in user_or_role_name)
+
+
 def split_user_and_role_names(user_and_role_names):
-    user_names = [name for name in user_and_role_names if any(letter.islower() for letter in name)]
+    user_names = [name for name in user_and_role_names if is_user(name)]
     role_names = [name for name in user_and_role_names if name not in user_names]
     return user_names, role_names
 
