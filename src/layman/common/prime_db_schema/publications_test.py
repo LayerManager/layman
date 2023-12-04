@@ -325,6 +325,14 @@ class TestInsertRights:
             [role1, settings.RIGHTS_EVERYONE_ROLE, ], [role1, settings.RIGHTS_EVERYONE_ROLE, ],
             id='public_everyone_role',
         ),
+        pytest.param(
+            username,
+            {"read": {username, username2, role1},
+             "write": {username, role1},
+             },
+            [username, role1, username2], [username, role1],
+            id='different_read_and_write',
+        ),
     ])
     def test_rights(self, username, access_rights, exp_read_rights, exp_write_rights, ):
         publication_info = self.publication_info.copy()
@@ -425,6 +433,14 @@ class TestUpdateRights:
              "actor_name": username},
             [username, role2, ], [username, role2, ],
             id='personal_owner_role',
+        ),
+        pytest.param(
+            username,
+            {"access_rights": {"read": {username, role2},
+                               "write": {username}},
+             "actor_name": username},
+            [username, role2], [username],
+            id='different_read_and_write',
         ),
     ])
     def test_rights(self, username, publication_update_info, exp_read_rights, exp_write_rights, ):
