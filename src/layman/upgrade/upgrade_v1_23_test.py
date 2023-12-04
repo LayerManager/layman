@@ -2,6 +2,7 @@ import pytest
 
 from db import util as db_util
 from layman import app, settings
+from layman.authz import role_service as role_service_util
 from layman.common.prime_db_schema import ensure_whole_user
 from test_tools import process_client
 from . import upgrade_v1_23
@@ -82,6 +83,16 @@ def test_create_role_service_schema():
     layman_users_user_roles_query = f'''select COUNT(*) from {ROLE_SERVICE_SCHEMA}.layman_users_user_roles where username = %s and rolename = %s'''
     admin_roles_query = f'''select COUNT(*) from {ROLE_SERVICE_SCHEMA}.admin_roles'''
     admin_user_roles_query = f'''select COUNT(*) from {ROLE_SERVICE_SCHEMA}.admin_user_roles where username = %s and rolename = %s'''
+    roles_query = f'''select
+    (select count(*) from {ROLE_SERVICE_SCHEMA}.bussiness_roles) bussiness_roles,
+    (select count(*) from {ROLE_SERVICE_SCHEMA}.layman_users_roles) layman_users_roles,
+    (select count(*) from {ROLE_SERVICE_SCHEMA}.admin_roles) admin_roles,
+    (select count(*) from {ROLE_SERVICE_SCHEMA}.roles) roles'''
+    user_roles_query = f'''select
+    (select count(*) from {ROLE_SERVICE_SCHEMA}.bussiness_user_roles) bussiness_user_roles,
+    (select count(*) from {ROLE_SERVICE_SCHEMA}.layman_users_user_roles) layman_users_user_roles,
+    (select count(*) from {ROLE_SERVICE_SCHEMA}.admin_user_roles) admin_user_roles,
+    (select count(*) from {ROLE_SERVICE_SCHEMA}.user_roles) user_roles'''
 
     with app.app_context():
         ensure_whole_user(username, userinfo)
@@ -107,3 +118,13 @@ def test_create_role_service_schema():
         assert result == 1
         result = db_util.run_query(admin_user_roles_query, ('layman_test', 'ADMIN',))[0][0]
         assert result == 1
+        result = db_util.run_query(roles_query)[0]
+        assert result[0] + result[1] + result[2] == result[3]
+        result = db_util.run_query(user_roles_query)[0]
+        assert result[0] + result[1] + result[2] == result[3]
+
+        role_service_util.ensure_admin_roles()
+        result = db_util.run_query(roles_query)[0]
+        assert result[0] + result[1] + result[2] == result[3]
+        result = db_util.run_query(user_roles_query)[0]
+        assert result[0] + result[1] + result[2] == result[3]

@@ -70,3 +70,35 @@ from {DB_SCHEMA}.users u inner join
     db_util.run_statement(create_layman_users_user_roles_view)
 
     role_service_util.ensure_admin_roles()
+
+    create_roles_view = f"""create view {ROLE_SERVICE_SCHEMA}.roles
+as
+select name,
+       parent
+from {ROLE_SERVICE_SCHEMA}.bussiness_roles
+UNION ALL
+select name,
+       null
+from {ROLE_SERVICE_SCHEMA}.layman_users_roles
+UNION ALL
+select name,
+       null
+from {ROLE_SERVICE_SCHEMA}.admin_roles
+;"""
+    db_util.run_statement(create_roles_view)
+
+    create_user_roles_view = f"""create view {ROLE_SERVICE_SCHEMA}.user_roles
+as
+select username,
+       rolename
+from {ROLE_SERVICE_SCHEMA}.bussiness_user_roles
+UNION ALL
+select username,
+       rolename
+from {ROLE_SERVICE_SCHEMA}.layman_users_user_roles
+UNION ALL
+select username,
+       rolename
+from {ROLE_SERVICE_SCHEMA}.admin_user_roles
+;"""
+    db_util.run_statement(create_user_roles_view)
