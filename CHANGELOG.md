@@ -8,6 +8,7 @@
   LAYMAN_CLIENT_VERSION=v1.17.1
   ```
   It was already required in v1.22.2.
+- Set new environment variable [LAYMAN_ROLE_SERVICE_URI](doc/env-settings.md#LAYMAN_ROLE_SERVICE_URI)
 ### Migrations and checks
 #### Schema migrations
 - [#165](https://github.com/LayerManager/layman/issues/165) Add column `role_name` to table `rights` in prime DB schema. Add constraint that exactly one of columns `role_name` and `id_user` is not null.

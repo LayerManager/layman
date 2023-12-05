@@ -1,6 +1,6 @@
 import os
 import re
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin, urlparse, parse_qs
 from enum import Enum
 import redis
 
@@ -157,9 +157,6 @@ assert re.match("[a-z_][a-z0-9_]*", LAYMAN_PRIME_SCHEMA), "Only lowercase charac
                                                           "should be used for " \
                                                           "LAYMAN_PRIME_SCHEMA. "
 
-# Name of schema, where Layman maintains internal GS JDBC Role Service.
-LAYMAN_INTERNAL_ROLE_SERVICE_SCHEMA = '_role_service'
-
 # List of schemas that are not allowed to be used as usernames.
 PG_NON_USER_SCHEMAS = [
     'public',
@@ -225,6 +222,11 @@ GRANT_PUBLISH_IN_PUBLIC_WORKSPACE = {
 }
 if RIGHTS_EVERYONE_ROLE not in GRANT_PUBLISH_IN_PUBLIC_WORKSPACE:
     assert not GRANT_CREATE_PUBLIC_WORKSPACE.difference(GRANT_PUBLISH_IN_PUBLIC_WORKSPACE)
+
+# Name of schema, where Layman maintains internal GS JDBC Role Service.
+LAYMAN_INTERNAL_ROLE_SERVICE_SCHEMA = '_role_service'
+LAYMAN_ROLE_SERVICE_URI = os.environ['LAYMAN_ROLE_SERVICE_URI']
+LAYMAN_ROLE_SERVICE_SCHEMA = parse_qs(urlparse(LAYMAN_ROLE_SERVICE_URI).query)['schema'][0]
 
 # UPLOAD_MAX_INACTIVITY_TIME = 10 # 10 seconds
 UPLOAD_MAX_INACTIVITY_TIME = 5 * 60  # 5 minutes
