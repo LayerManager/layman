@@ -119,6 +119,12 @@ See [`secret` at express-session documentation](https://www.npmjs.com/package/ex
 ### LTC_SESSION_MAX_AGE
 See [`cookie.maxAge` at express-session documentation](https://www.npmjs.com/package/express-session#cookiemaxage).
 
+
+### NODE_OPTIONS
+See [NODE_OPTIONS](https://nodejs.org/docs/latest-v18.x/api/cli.html#node_optionsoptions).
+
+To enable not-so-secure SSL communication (UnsafeLegacyRenegotiation), set `NODE_OPTIONS="--openssl-config=/code/unsafe_openssl.cnf"`.
+
 ## Connection to Redis
 
 ### LAYMAN_REDIS_URL
