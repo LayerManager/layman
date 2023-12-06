@@ -154,6 +154,8 @@ class TestAccessRights:
     READER = 'test_access_rights_application_reader'
     OTHER_USER = 'test_access_rights_application_other_user'
     ROLE = 'TEST_ACCESS_RIGHTS_APPLICATION_ROLE'
+    OTHER_ROLE = 'TEST_ACCESS_RIGHTS_APPLICATION_OTHER_ROLE'
+    NON_EXISTING_ROLE = 'TEST_ACCESS_RIGHTS_NON_EXISTING_ROLE'
 
     LAYER_NO_ACCESS = Publication(OWNER, process_client.LAYER_TYPE, 'test_no_access_layer')
     LAYER_USER_ACCESS = Publication(OWNER, process_client.LAYER_TYPE, 'test_user_access_layer')
@@ -173,7 +175,7 @@ class TestAccessRights:
         'write': OWNER,
     }
     ACCESS_RIGHTS_ROLE_ACCESS = {
-        'read': f'{OWNER}, {ROLE}',
+        'read': f'{OWNER}, {ROLE}, {NON_EXISTING_ROLE}',
         'write': OWNER,
     }
     ACCESS_RIGHTS_EVERYONE_ACCESS = {
@@ -212,10 +214,14 @@ class TestAccessRights:
         process_client.ensure_reserved_username(self.OWNER, process_client.get_authz_headers(self.OWNER))
         process_client.ensure_reserved_username(self.READER, process_client.get_authz_headers(self.READER))
         process_client.ensure_reserved_username(self.OTHER_USER, process_client.get_authz_headers(self.OTHER_USER))
+        role_service_util.ensure_user_role(self.READER, self.ROLE)
+        role_service_util.ensure_user_role(self.OTHER_USER, self.OTHER_ROLE)
+        role_service_util.ensure_user_role(self.READER, self.NON_EXISTING_ROLE)
         for publication, access_rights in self.PUBLICATIONS_DEFS:
             process_client.publish_workspace_publication(publication.type, publication.workspace, publication.name,
                                                          actor_name=self.OWNER, access_rights=access_rights, )
-        role_service_util.ensure_user_role(self.READER, self.ROLE)
+        role_service_util.delete_user_role(self.READER, self.NON_EXISTING_ROLE)
+        role_service_util.delete_role(self.NON_EXISTING_ROLE)
         yield
         if request.node.session.testsfailed == 0 and not request.config.option.nocleanup:
             for publication, access_rights in self.PUBLICATIONS_DEFS:
@@ -223,6 +229,8 @@ class TestAccessRights:
                                                             actor_name=self.OWNER, )
             role_service_util.delete_user_role(self.READER, self.ROLE)
             role_service_util.delete_role(self.ROLE)
+            role_service_util.delete_user_role(self.OTHER_USER, self.OTHER_ROLE)
+            role_service_util.delete_role(self.OTHER_ROLE)
 
     def test_single_positive(self, rest_method, rest_args, ):
         rest_method(**rest_args)
