@@ -2,11 +2,19 @@
 
 ## v1.22.3
 ### Upgrade requirements
+- Change environment variable [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION):
+  ```
+  LAYMAN_CLIENT_VERSION=v1.17.2
+  ```
 ### Migrations and checks
 #### Schema migrations
 #### Data migrations
 ### Changes
 - Improve logging in Layman Test Client related to Passport.js.
+- [968](https://github.com/LayerManager/layman/issues/968) Enable to use not-so-secure SSL communication (UnsafeLegacyRenegotiation) in Layman Test Client. It can be activated by environment variable [NODE_OPTIONS](doc/env-settings.md#NODE_OPTIONS):
+  ```
+  NODE_OPTIONS="--openssl-config=/code/unsafe_openssl.cnf"
+  ```
 
 
 ## v1.22.2
