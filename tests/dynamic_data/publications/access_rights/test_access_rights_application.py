@@ -114,10 +114,9 @@ def generate_negative_test_cases(publications_user_can_read, publication_all):
     return tc_list
 
 
-def generate_multiendpoint_test_cases(publications_user_can_read, workspace, role_user):
+def generate_multiendpoint_test_cases(publications_user_can_read, workspace, ):
     tc_list = []
     for user, publications in publications_user_can_read.items():
-        marks = [pytest.mark.xfail(reason="Not yet implemented.")] if user == role_user else []
         for method, type_filter, workspace_filter in [
             (process_client.get_publications, None, None),
             (process_client.get_publications, process_client.LAYER_TYPE, None),
@@ -140,7 +139,6 @@ def generate_multiendpoint_test_cases(publications_user_can_read, workspace, rol
                                                },
                                                params={'exp_publications': available_publications},
                                                type=EnumTestTypes.MANDATORY,
-                                               marks=marks
                                                )
 
             tc_list.append(test_case)
@@ -206,7 +204,7 @@ class TestAccessRights:
     test_cases = {
         'test_single_positive': generate_positive_test_cases(PUBLICATIONS_USER_CAN_READ),
         'test_single_negative': generate_negative_test_cases(PUBLICATIONS_USER_CAN_READ, PUBLICATIONS),
-        'test_multiendpoint': generate_multiendpoint_test_cases(PUBLICATIONS_USER_CAN_READ, OWNER, READER),
+        'test_multiendpoint': generate_multiendpoint_test_cases(PUBLICATIONS_USER_CAN_READ, OWNER),
     }
 
     @pytest.fixture(scope='class', autouse=True)

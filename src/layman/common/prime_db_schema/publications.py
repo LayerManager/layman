@@ -30,6 +30,7 @@ def get_publication_infos(workspace_name=None, pub_type=None, style_type=None, )
 
 def get_publication_infos_with_metainfo(workspace_name=None, pub_type=None, style_type=None,
                                         reader=None, writer=None,
+                                        reader_roles=None, writer_roles=None,
                                         limit=None, offset=None,
                                         full_text_filter=None,
                                         bbox_filter=None,
@@ -64,7 +65,12 @@ def get_publication_infos_with_metainfo(workspace_name=None, pub_type=None, styl
                                        {DB_SCHEMA}.workspaces w2 on w2.id = u2.id_workspace
                                   where r.id_publication = p.id
                                     and r.type = 'read'
-                                    and w2.name = %s))""", (reader, reader,)),
+                                    and w2.name = %s)
+                        or EXISTS(select 1
+                                  from {DB_SCHEMA}.rights r
+                                  where r.id_publication = p.id
+                                    and r.type = 'read'
+                                    and r.role_name = ANY(%s)))""", (reader, reader, reader_roles,)),
         (writer and not is_user_with_name(writer), 'p.everyone_can_write = TRUE', tuple()),
         (is_user_with_name(writer), f"""(p.everyone_can_write = TRUE
                         or (u.id is not null and w.name = %s)
@@ -74,7 +80,12 @@ def get_publication_infos_with_metainfo(workspace_name=None, pub_type=None, styl
                                        {DB_SCHEMA}.workspaces w2 on w2.id = u2.id_workspace
                                   where r.id_publication = p.id
                                     and r.type = 'write'
-                                    and w2.name = %s))""", (writer, writer,)),
+                                    and w2.name = %s)
+                        or EXISTS(select 1
+                                  from {DB_SCHEMA}.rights r
+                                  where r.id_publication = p.id
+                                    and r.type = 'write'
+                                    and r.role_name = ANY(%s)))""", (writer, writer, writer_roles, )),
         (full_text_filter, '(_prime_schema.my_unaccent(p.title) @@ to_tsquery(unaccent(%s))'
                            'or lower(unaccent(p.title)) like lower(unaccent(%s)))', (full_text_tsquery, full_text_like,)),
         (bbox_filter, bbox_filter_where_part, (filtering_bbox_srid, ) + bbox_filter if bbox_filter else None, ),
