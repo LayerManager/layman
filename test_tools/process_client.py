@@ -505,7 +505,12 @@ def get_publications_response(publication_type, *, workspace=None, headers=None,
     return response
 
 
-def get_publications(publication_type, *, workspace=None, headers=None, query_params=None):
+def get_publications(publication_type, *, workspace=None, headers=None, query_params=None, actor_name=None):
+    headers = headers or {}
+    if actor_name:
+        assert TOKEN_HEADER not in headers
+    if actor_name and actor_name != settings.ANONYM_USER:
+        headers.update(get_authz_headers(actor_name))
     return get_publications_response(publication_type, workspace=workspace, headers=headers, query_params=query_params).json()
 
 
@@ -535,7 +540,12 @@ get_workspace_map = partial(get_workspace_publication, MAP_TYPE)
 get_workspace_layer = partial(get_workspace_publication, LAYER_TYPE)
 
 
-def get_workspace_layer_style(workspace, layer, headers=None):
+def get_workspace_layer_style(workspace, layer, headers=None, *, actor_name=None, ):
+    headers = headers or {}
+    if actor_name:
+        assert TOKEN_HEADER not in headers
+    if actor_name and actor_name != settings.ANONYM_USER:
+        headers.update(get_authz_headers(actor_name))
     with app.app_context():
         r_url = url_for('rest_workspace_layer_style.get',
                         workspace=workspace,
@@ -554,8 +564,13 @@ def finish_delete(workspace, url, headers, skip_404=False, ):
     return response.json()
 
 
-def delete_workspace_publication(publication_type, workspace, name, *, headers=None, skip_404=False, ):
+def delete_workspace_publication(publication_type, workspace, name, *, headers=None, skip_404=False, actor_name=None, ):
     headers = headers or {}
+    if actor_name:
+        assert TOKEN_HEADER not in headers
+    if actor_name and actor_name != settings.ANONYM_USER:
+        headers.update(get_authz_headers(actor_name))
+
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
 
     with app.app_context():
