@@ -1,0 +1,12 @@
+@@ -174,7 +174,10 @@
+ 
+       self._oauth2.getOAuthAccessToken(code, params,
+         function(err, accessToken, refreshToken, params) {
+-          if (err) { return self.error(self._createOAuthError('Failed to obtain access token', err)); }
++          if (err) {
++            console.warn("Failed to obtain access token: ", err);
++            return self.error(self._createOAuthError('Failed to obtain access token', err));
++          }
+           if (!accessToken) { return self.error(new Error('Failed to obtain access token')); }
+ 
+           self._loadUserProfile(accessToken, function(err, profile) {
