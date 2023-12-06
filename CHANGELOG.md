@@ -5,9 +5,9 @@
 ### Upgrade requirements
 - Change environment variable [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION):
   ```
-  LAYMAN_CLIENT_VERSION=v1.17.1
+  LAYMAN_CLIENT_VERSION=v1.17.2
   ```
-  It was already required in v1.22.2.
+  It was already required in v1.22.3.
 - Set new environment variable [LAYMAN_ROLE_SERVICE_URI](doc/env-settings.md#LAYMAN_ROLE_SERVICE_URI)
 ### Migrations and checks
 #### Schema migrations
@@ -23,14 +23,23 @@
   - [GET](doc/rest.md#get-workspace-map)/[PATCH](doc/rest.md#patch-workspace-map) Workspace Map
   - GET Workspace [Layers](doc/rest.md#get-workspace-layers)/[Maps](doc/rest.md#get-workspace-maps)
   - GET [Layers](doc/rest.md#get-layers)/[Maps](doc/rest.md#get-maps)/[Publications](doc/rest.md#get-publications)
-- All changes from [v1.22.1](#v1221) and [v1.22.2](#v1222).
+- All changes from [v1.22.1](#v1221), [v1.22.2](#v1222) and [v1.22.3](#v1223).
 - [#960](https://github.com/LayerManager/layman/issues/960) Handle WMS requests with HTTP error more efficiently in timgen.
 - [#962](https://github.com/LayerManager/layman/issues/962) Make values of `layman_metadata.publication_status` and `status` key(s) more consistent in responses of PATCH Workspace [Layer](doc/rest.md#patch-workspace-layer)/[Map](doc/rest.md#patch-workspace-map) and GET Workspace [Layer](doc/rest.md#get-workspace-layer)/[Map](doc/rest.md#get-workspace-map).
 
 ## v1.22.3
  2023-12-06
+### Upgrade requirements
+- Change environment variable [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION):
+  ```
+  LAYMAN_CLIENT_VERSION=v1.17.2
+  ```
 ### Changes
 - Improve logging in Layman Test Client related to Passport.js.
+- [968](https://github.com/LayerManager/layman/issues/968) Enable to use not-so-secure SSL communication (UnsafeLegacyRenegotiation) in Layman Test Client. It can be activated by environment variable [NODE_OPTIONS](doc/env-settings.md#NODE_OPTIONS):
+  ```
+  NODE_OPTIONS="--openssl-config=/code/unsafe_openssl.cnf"
+  ```
 
 ## v1.22.2
  2023-11-10
