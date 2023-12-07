@@ -469,7 +469,7 @@ def get_publication_infos_with_metainfo(workspace=None, publ_type=None, context=
     reader = (context.get('actor_name') or settings.ANONYM_USER) if context.get('access_type') == 'read' else None
     writer = (context.get('actor_name') or settings.ANONYM_USER) if context.get('access_type') == 'write' else None
     reader_roles = list(get_user_roles(username=reader)) if reader and reader != settings.ANONYM_USER else None
-    writer_roles = list(get_user_roles(username=writer)) if reader and reader != settings.ANONYM_USER else None
+    writer_roles = list(get_user_roles(username=writer)) if writer and writer != settings.ANONYM_USER else None
 
     infos = publications.get_publication_infos_with_metainfo(workspace, publ_type, style_type,
                                                              reader=reader, writer=writer,

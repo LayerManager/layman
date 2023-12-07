@@ -23,6 +23,7 @@
   - GET Workspace Map [File](doc/rest.md#get-workspace-map-file)/[Thumbnail](doc/rest.md#get-workspace-map-thumbnail)/[Metadata Comparison](doc/rest.md#get-workspace-map-metadata-comparison)
   - GET Workspace [Layers](doc/rest.md#get-workspace-layers)/[Maps](doc/rest.md#get-workspace-maps)
   - GET [Layers](doc/rest.md#get-layers)/[Maps](doc/rest.md#get-maps)/[Publications](doc/rest.md#get-publications)
+  - DELETE Workspace [Layers](doc/rest.md#delete-workspace-layers)/[Maps](doc/rest.md#delete-workspace-maps)
 - [#165](https://github.com/LayerManager/layman/issues/165) Many endpoints return previously associated [role names](doc/models.md#role) in `access_rights.read` and `access_rights.write` keys:
   - [GET](doc/rest.md#get-workspace-layer)/[PATCH](doc/rest.md#patch-workspace-layer) Workspace Layer
   - [GET](doc/rest.md#get-workspace-map)/[PATCH](doc/rest.md#patch-workspace-map) Workspace Map
