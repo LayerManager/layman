@@ -1,6 +1,6 @@
 import pytest
 from layman.http import LaymanError
-from test_tools import process, process_client
+from test_tools import process, process_client, role_service as role_service_util
 
 
 class TestPublicWorkspaceClass:
@@ -8,31 +8,35 @@ class TestPublicWorkspaceClass:
     username = 'test_public_workspace_variable_user'
     workspace_name = 'test_public_workspace_variable_workspace'
     user_authz_headers = process_client.get_authz_headers(username)
+    ROLE = 'TEST_PUBLIC_WORKSPACE_VARIABLE_ROLE'
 
     @pytest.fixture(scope="class")
     def setup_test_public_workspace_variable(self):
         username = self.username
-        user_authz_headers = self.user_authz_headers
         env_vars = dict(process.AUTHN_SETTINGS)
 
         process.ensure_layman_function(env_vars)
-        process_client.reserve_username(username, headers=user_authz_headers)
+        process_client.ensure_reserved_username(username)
+        role_service_util.ensure_user_role(username, self.ROLE)
         yield
+        role_service_util.delete_user_role(username, self.ROLE)
+        role_service_util.delete_role(self.ROLE)
 
     @staticmethod
     @pytest.mark.usefixtures('oauth2_provider_mock', 'setup_test_public_workspace_variable')
     @pytest.mark.parametrize("publish_method, delete_method, workspace_suffix", [
-        (process_client.publish_workspace_layer, process_client.delete_workspace_layer, '_layer',),
-        (process_client.publish_workspace_map, process_client.delete_workspace_map, '_map',),
+        pytest.param(process_client.publish_workspace_layer, process_client.delete_workspace_layer, '_layer', id='layer'),
+        pytest.param(process_client.publish_workspace_map, process_client.delete_workspace_map, '_map', id='map'),
     ])
     @pytest.mark.parametrize(
         "create_public_workspace, publish_in_public_workspace, workspace_prefix, publication_name, authz_headers,"
         "user_can_create, anonymous_can_publish, anonymous_can_create,",
         [
-            ('EVERYONE', 'EVERYONE', workspace_name + 'ee', publication_name, user_authz_headers, True, True, True,),
-            (username, username, workspace_name + 'uu', publication_name, user_authz_headers, True, False, False,),
-            ('', '', workspace_name + 'nn', publication_name, user_authz_headers, False, False, False,),
-            (username, 'EVERYONE', workspace_name + 'ue', publication_name, user_authz_headers, True, True, False,),
+            pytest.param('EVERYONE', 'EVERYONE', workspace_name + 'ee', publication_name, user_authz_headers, True, True, True, id='create_everyone_publish_everyone'),
+            pytest.param(username, username, workspace_name + 'uu', publication_name, user_authz_headers, True, False, False, id='create_user_publish_user'),
+            pytest.param(ROLE, ROLE, workspace_name + 'rr', publication_name, user_authz_headers, True, False, False, id='create_role_publish_role'),
+            pytest.param('', '', workspace_name + 'nn', publication_name, user_authz_headers, False, False, False, id='create_none_publish_none'),
+            pytest.param(username, 'EVERYONE', workspace_name + 'ue', publication_name, user_authz_headers, True, True, False, id='create_user_publish_everyone'),
         ],
     )
     def test_public_workspace_variable(create_public_workspace,
