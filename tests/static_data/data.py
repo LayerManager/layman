@@ -62,7 +62,7 @@ def ensure_all_users():
         workspaces_in_db = workspaces.get_workspace_names()
     for user in data.USERS:
         if user not in workspaces_in_db:
-            process_client.ensure_reserved_username(user, headers=data.HEADERS[user])
+            process_client.ensure_reserved_username(user)
 
 
 def ensure_publication(workspace, publ_type, publication):

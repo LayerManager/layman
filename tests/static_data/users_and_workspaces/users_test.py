@@ -9,7 +9,7 @@ from ... import static_data as data
 @pytest.mark.parametrize('username', data.USERS)
 @pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman')
 def test_geoserver(username):
-    process_client.ensure_reserved_username(username, headers=data.HEADERS[username])
+    process_client.ensure_reserved_username(username)
 
     auth = settings.LAYMAN_GS_AUTH
     gs_usernames = gs_util.get_usernames(auth)

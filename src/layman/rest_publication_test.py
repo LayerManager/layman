@@ -61,7 +61,7 @@ class TestSoapClass:
 
     @pytest.fixture(scope='class')
     def reserve_username(self):
-        process_client.ensure_reserved_username(self.username, headers=self.authz_headers)
+        process_client.ensure_reserved_username(self.username)
         yield
 
     @pytest.fixture()

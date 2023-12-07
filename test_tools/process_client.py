@@ -659,7 +659,7 @@ def get_current_user(headers=None):
 
 
 def ensure_reserved_username(username, headers=None):
-    headers = headers or {}
+    headers = get_authz_headers(username) if headers is None else headers
     current_user = get_current_user(headers=headers)
     if 'username' not in current_user:
         reserve_username(username, headers=headers)
