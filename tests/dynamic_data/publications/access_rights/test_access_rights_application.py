@@ -9,17 +9,19 @@ from tests.dynamic_data import base_test
 
 ENDPOINTS_TO_TEST = {
     process_client.LAYER_TYPE: [
-        process_client.get_workspace_publication,
-        process_client.get_workspace_publication_metadata_comparison,
-        process_client.get_workspace_layer_style,
-        process_client.get_workspace_publication_thumbnail,
+        (process_client.get_workspace_publication, {}),
+        (process_client.get_workspace_publication_metadata_comparison, {}),
+        (process_client.get_workspace_layer_style, {}),
+        (process_client.get_workspace_publication_thumbnail, {}),
         # process_client.get_workspace_layer_chunk,
+        (process_client.patch_workspace_publication, {'title': 'New title'}),
+        (process_client.patch_workspace_publication, {'file_paths': ['sample/layman.layer/small_layer.geojson']}),
     ],
     process_client.MAP_TYPE: [
-        process_client.get_workspace_publication,
-        process_client.get_workspace_map_file,
-        process_client.get_workspace_publication_metadata_comparison,
-        process_client.get_workspace_publication_thumbnail,
+        (process_client.get_workspace_publication, {}),
+        (process_client.get_workspace_map_file, {}),
+        (process_client.get_workspace_publication_metadata_comparison, {}),
+        (process_client.get_workspace_publication_thumbnail, {}),
     ],
 }
 
@@ -69,15 +71,15 @@ def generate_positive_test_cases(publications_user_can_read):
                 'actor_name': user,
                 'publication_type': publication.type,
             }
-            for method in ENDPOINTS_TO_TEST[publication.type]:
-                pytest_id = f'{method.__name__}__{user.split("_")[-1]}__{publication.name[5:]}'
+            for method, args in ENDPOINTS_TO_TEST[publication.type]:
+                pytest_id = f'{method.__name__}__{user.split("_")[-1]}__{publication.name[5:]}{("__" + next(iter(args.keys()))) if args else ""}'
                 method_args = inspect.getfullargspec(method).args + inspect.getfullargspec(method).kwonlyargs
 
                 test_case = base_test.TestCaseType(pytest_id=pytest_id,
                                                    rest_method=method,
-                                                   rest_args={
+                                                   rest_args= {**args, **{
                                                        key: value for key, value in all_args.items() if key in method_args
-                                                   },
+                                                   }},
                                                    type=EnumTestTypes.MANDATORY,
                                                    )
 
@@ -98,15 +100,15 @@ def generate_negative_test_cases(publications_user_can_read, publication_all):
                 'actor_name': user,
                 'publication_type': publication.type,
             }
-            for method in ENDPOINTS_TO_TEST[publication.type]:
-                pytest_id = f'{method.__name__}__{user.split("_")[-1]}__{publication.name[5:]}'
+            for method, args in ENDPOINTS_TO_TEST[publication.type]:
+                pytest_id = f'{method.__name__}__{user.split("_")[-1]}__{publication.name[5:]}{("__" + next(iter(args.keys()))) if args else ""}'
                 method_args = inspect.getfullargspec(method).args + inspect.getfullargspec(method).kwonlyargs
 
                 test_case = base_test.TestCaseType(pytest_id=pytest_id,
                                                    rest_method=method,
-                                                   rest_args={
+                                                   rest_args= {**args, **{
                                                        key: value for key, value in all_args.items() if key in method_args
-                                                   },
+                                                   }},
                                                    type=EnumTestTypes.MANDATORY,
                                                    )
 
@@ -170,15 +172,15 @@ class TestAccessRights:
     }
     ACCESS_RIGHTS_USER_ACCESS = {
         'read': f'{OWNER}, {READER}',
-        'write': OWNER,
+        'write': f'{OWNER}, {READER}',
     }
     ACCESS_RIGHTS_ROLE_ACCESS = {
         'read': f'{OWNER}, {ROLE}, {NON_EXISTING_ROLE}',
-        'write': OWNER,
+        'write': f'{OWNER}, {ROLE}, {NON_EXISTING_ROLE}',
     }
     ACCESS_RIGHTS_EVERYONE_ACCESS = {
         'read': settings.RIGHTS_EVERYONE_ROLE,
-        'write': OWNER,
+        'write': settings.RIGHTS_EVERYONE_ROLE,
     }
 
     PUBLICATIONS_DEFS = [
@@ -194,7 +196,7 @@ class TestAccessRights:
 
     PUBLICATIONS = [publication for publication, _ in PUBLICATIONS_DEFS]
 
-    PUBLICATIONS_USER_CAN_READ = {
+    PUBLICATIONS_BY_USER = {
         OWNER: [publication for publication, _ in PUBLICATIONS_DEFS],
         READER: [LAYER_USER_ACCESS, LAYER_ROLE_ACCESS, LAYER_EVERYONE_ACCESS, MAP_USER_ACCESS, MAP_ROLE_ACCESS, MAP_EVERYONE_ACCESS, ],
         OTHER_USER: [LAYER_EVERYONE_ACCESS, MAP_EVERYONE_ACCESS, ],
@@ -202,9 +204,9 @@ class TestAccessRights:
     }
 
     test_cases = {
-        'test_single_positive': generate_positive_test_cases(PUBLICATIONS_USER_CAN_READ),
-        'test_single_negative': generate_negative_test_cases(PUBLICATIONS_USER_CAN_READ, PUBLICATIONS),
-        'test_multiendpoint': generate_multiendpoint_test_cases(PUBLICATIONS_USER_CAN_READ, OWNER),
+        'test_single_positive': generate_positive_test_cases(PUBLICATIONS_BY_USER),
+        'test_single_negative': generate_negative_test_cases(PUBLICATIONS_BY_USER, PUBLICATIONS),
+        'test_multiendpoint': generate_multiendpoint_test_cases(PUBLICATIONS_BY_USER, OWNER),
     }
 
     @pytest.fixture(scope='class', autouse=True)
