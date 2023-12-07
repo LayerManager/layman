@@ -17,7 +17,7 @@ jsonpath-ng = "*"
 
 [packages]
 celery = {extras = ["redis"],version = "<5.3.0"}
-flask = ">=2.3.2"
+flask = "*"
 unidecode = "*"
 psycopg2-binary = "*"
 requests = "*"
