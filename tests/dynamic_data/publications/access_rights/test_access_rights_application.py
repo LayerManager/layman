@@ -22,6 +22,8 @@ ENDPOINTS_TO_TEST = {
         (process_client.get_workspace_map_file, {}),
         (process_client.get_workspace_publication_metadata_comparison, {}),
         (process_client.get_workspace_publication_thumbnail, {}),
+        (process_client.patch_workspace_publication, {'title': 'New title'}),
+        (process_client.patch_workspace_publication, {'file_paths': ['sample/layman.map/small_map.json']}),
     ],
 }
 
