@@ -18,7 +18,9 @@
 - [#165](https://github.com/LayerManager/layman/issues/165) POST Workspace [Layers](doc/rest.md#post-workspace-layers)/[Maps](doc/rest.md#post-workspace-maps) and PATCH Workspace [Layer](doc/rest.md#patch-workspace-layer)/[Map](doc/rest.md#patch-workspace-map) saves [role names](doc/models.md#role) mentioned in `access_rights.read` and `access_rights.write` parameters into DB.
 - [#165](https://github.com/LayerManager/layman/issues/165) Many endpoints respect role access rights:
   - [GET](doc/rest.md#get-workspace-layer)/[PATCH](doc/rest.md#patch-workspace-layer)/[DELETE](doc/rest.md#delete-workspace-layer) Workspace Layer
+  - GET Workspace Layer [Thumbnail](doc/rest.md#get-workspace-layer-thumbnail)/[Style](doc/rest.md#get-workspace-layer-style)/[Metadata Comparison](doc/rest.md#get-workspace-layer-metadata-comparison)/[Chunk](doc/rest.md#get-workspace-layer-chunk)
   - [GET](doc/rest.md#get-workspace-map)/[PATCH](doc/rest.md#patch-workspace-map)/[DELETE](doc/rest.md#delete-workspace-map) Workspace Map
+  - GET Workspace Map [File](doc/rest.md#get-workspace-map-file)/[Thumbnail](doc/rest.md#get-workspace-map-thumbnail)/[Metadata Comparison](doc/rest.md#get-workspace-map-metadata-comparison)
   - GET Workspace [Layers](doc/rest.md#get-workspace-layers)/[Maps](doc/rest.md#get-workspace-maps)
   - GET [Layers](doc/rest.md#get-layers)/[Maps](doc/rest.md#get-maps)/[Publications](doc/rest.md#get-publications)
 - [#165](https://github.com/LayerManager/layman/issues/165) Many endpoints return previously associated [role names](doc/models.md#role) in `access_rights.read` and `access_rights.write` keys:
