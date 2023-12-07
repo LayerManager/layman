@@ -589,8 +589,12 @@ delete_workspace_map = partial(delete_workspace_publication, MAP_TYPE)
 delete_workspace_layer = partial(delete_workspace_publication, LAYER_TYPE)
 
 
-def delete_workspace_publications(publication_type, workspace, headers=None, ):
+def delete_workspace_publications(publication_type, workspace, headers=None, *, actor_name=None, ):
     headers = headers or {}
+    if actor_name:
+        assert TOKEN_HEADER not in headers
+    if actor_name and actor_name != settings.ANONYM_USER:
+        headers.update(get_authz_headers(actor_name))
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
 
     with app.app_context():
