@@ -32,6 +32,23 @@
 - All changes from [v1.22.1](#v1221), [v1.22.2](#v1222) and [v1.22.3](#v1223).
 - [#960](https://github.com/LayerManager/layman/issues/960) Handle WMS requests with HTTP error more efficiently in timgen.
 - [#962](https://github.com/LayerManager/layman/issues/962) Make values of `layman_metadata.publication_status` and `status` key(s) more consistent in responses of PATCH Workspace [Layer](doc/rest.md#patch-workspace-layer)/[Map](doc/rest.md#patch-workspace-map) and GET Workspace [Layer](doc/rest.md#get-workspace-layer)/[Map](doc/rest.md#get-workspace-map).
+- Upgrade Python dependencies
+  - werkzeug 2.3.7 -> 3.0.7 (suggested by dependabot)
+  - urllib3 1.26.16 -> 1.26.18 (suggested by dependabot)
+  - pillow 10.0.0 -> 10.1.0 (suggested by dependabot)
+  - cacheout 0.14.1 -> 0.15.0
+  - flask 2.3.3 -> 3.0.0
+  - jsonschema 4.19.0 -> 4.20.0
+  - owslib 0.29.2 -> 0.29.3
+  - importlib-metadata 6.8.0 -> 7.0.0
+  - psycopg2-binary 2.9.7 -> 2.9.9
+  - redis 5.0.0 -> 5.0.1
+  - unidecode 1.3.6 -> 1.3.7
+  - platformdirs 3.10.0 -> 4.1.0
+  - pycodestyle 2.11.0 -> 2.11.1
+  - pytest 7.4.2 -> 7.4.3
+  - pytest-rerunfailures 12.0 -> 13.0
+  - pytest-timeout 2.1.0 -> 2.2.0
 
 ## v1.22.3
  2023-12-06
