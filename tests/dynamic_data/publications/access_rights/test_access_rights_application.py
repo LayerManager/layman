@@ -27,6 +27,10 @@ ENDPOINTS_TO_TEST = {
     ],
 }
 
+ENDPOINTS_TO_TEST_NEGATIVE_ONLY = [
+    (process_client.delete_workspace_publication, {}),
+]
+
 
 def pytest_generate_tests(metafunc):
     # https://docs.pytest.org/en/6.2.x/parametrize.html#pytest-generate-tests
@@ -99,7 +103,8 @@ def generate_negative_test_cases(publications_user_can_read, publication_all):
         for publication in publication_all:
             if publication in available_publications:
                 continue
-            add_publication_test_cases_to_list(tc_list, publication, user, ENDPOINTS_TO_TEST)
+            endpoints_to_test = {publ_type: endpoints + ENDPOINTS_TO_TEST_NEGATIVE_ONLY for publ_type, endpoints in ENDPOINTS_TO_TEST.items()}
+            add_publication_test_cases_to_list(tc_list, publication, user, endpoints_to_test)
     return tc_list
 
 
@@ -171,20 +176,21 @@ class TestAccessRights:
     }
 
     PUBLICATIONS_DEFS = [
-        (LAYER_NO_ACCESS, ACCESS_RIGHT_NO_ACCESS),
-        (LAYER_USER_ACCESS, ACCESS_RIGHTS_USER_ACCESS),
-        (LAYER_ROLE_ACCESS, ACCESS_RIGHTS_ROLE_ACCESS),
-        (LAYER_EVERYONE_ACCESS, ACCESS_RIGHTS_EVERYONE_ACCESS),
-        (MAP_NO_ACCESS, ACCESS_RIGHT_NO_ACCESS),
-        (MAP_USER_ACCESS, ACCESS_RIGHTS_USER_ACCESS),
-        (MAP_ROLE_ACCESS, ACCESS_RIGHTS_ROLE_ACCESS),
-        (MAP_EVERYONE_ACCESS, ACCESS_RIGHTS_EVERYONE_ACCESS),
+        # Publication, posted access rights, deleter
+        (LAYER_NO_ACCESS, ACCESS_RIGHT_NO_ACCESS, OWNER),
+        (LAYER_USER_ACCESS, ACCESS_RIGHTS_USER_ACCESS, READER),
+        (LAYER_ROLE_ACCESS, ACCESS_RIGHTS_ROLE_ACCESS, READER),
+        (LAYER_EVERYONE_ACCESS, ACCESS_RIGHTS_EVERYONE_ACCESS, OTHER_USER),
+        (MAP_NO_ACCESS, ACCESS_RIGHT_NO_ACCESS, OWNER),
+        (MAP_USER_ACCESS, ACCESS_RIGHTS_USER_ACCESS, READER),
+        (MAP_ROLE_ACCESS, ACCESS_RIGHTS_ROLE_ACCESS, READER),
+        (MAP_EVERYONE_ACCESS, ACCESS_RIGHTS_EVERYONE_ACCESS, OTHER_USER),
     ]
 
-    PUBLICATIONS = [publication for publication, _ in PUBLICATIONS_DEFS]
+    PUBLICATIONS = [publication for publication, _, _ in PUBLICATIONS_DEFS]
 
     PUBLICATIONS_BY_USER = {
-        OWNER: [publication for publication, _ in PUBLICATIONS_DEFS],
+        OWNER: [publication for publication, _, _ in PUBLICATIONS_DEFS],
         READER: [LAYER_USER_ACCESS, LAYER_ROLE_ACCESS, LAYER_EVERYONE_ACCESS, MAP_USER_ACCESS, MAP_ROLE_ACCESS, MAP_EVERYONE_ACCESS, ],
         OTHER_USER: [LAYER_EVERYONE_ACCESS, MAP_EVERYONE_ACCESS, ],
         settings.ANONYM_USER: [LAYER_EVERYONE_ACCESS, MAP_EVERYONE_ACCESS, ],
@@ -204,16 +210,16 @@ class TestAccessRights:
         role_service_util.ensure_user_role(self.READER, self.ROLE)
         role_service_util.ensure_user_role(self.OTHER_USER, self.OTHER_ROLE)
         role_service_util.ensure_user_role(self.READER, self.NON_EXISTING_ROLE)
-        for publication, access_rights in self.PUBLICATIONS_DEFS:
+        for publication, access_rights, _ in self.PUBLICATIONS_DEFS:
             process_client.publish_workspace_publication(publication.type, publication.workspace, publication.name,
                                                          actor_name=self.OWNER, access_rights=access_rights, )
         role_service_util.delete_user_role(self.READER, self.NON_EXISTING_ROLE)
         role_service_util.delete_role(self.NON_EXISTING_ROLE)
         yield
         if request.node.session.testsfailed == 0 and not request.config.option.nocleanup:
-            for publication, access_rights in self.PUBLICATIONS_DEFS:
+            for publication, _, deleter in self.PUBLICATIONS_DEFS:
                 process_client.delete_workspace_publication(publication.type, publication.workspace, publication.name,
-                                                            actor_name=self.OWNER, )
+                                                            actor_name=deleter, )
             role_service_util.delete_user_role(self.READER, self.ROLE)
             role_service_util.delete_role(self.ROLE)
             role_service_util.delete_user_role(self.OTHER_USER, self.OTHER_ROLE)
