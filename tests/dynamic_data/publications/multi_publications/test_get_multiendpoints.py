@@ -1020,8 +1020,7 @@ class TestGet:
     @pytest.fixture(scope='class', autouse=True)
     def class_fixture(self):
         for username in self.usernames_to_reserve:
-            headers = process_client.get_authz_headers(username)
-            process_client.ensure_reserved_username(username, headers=headers)
+            process_client.ensure_reserved_username(username)
 
         TestGet.before_class()
         yield

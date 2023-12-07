@@ -7,13 +7,11 @@ from test_tools import process_client
 class TestDeletePublicationsClass:
     owner = 'test_delete_publications_owner'
     deleter = 'test_delete_publications_deleter'
-    authn_headers_owner = process_client.get_authz_headers(owner)
-    authn_headers_deleter = process_client.get_authz_headers(deleter)
 
     @pytest.fixture(scope="class")
     def provide_data(self):
-        process_client.ensure_reserved_username(self.owner, self.authn_headers_owner)
-        process_client.ensure_reserved_username(self.deleter, self.authn_headers_deleter)
+        process_client.ensure_reserved_username(self.owner)
+        process_client.ensure_reserved_username(self.deleter)
         yield
 
     @pytest.mark.parametrize('publ_type', process_client.PUBLICATION_TYPES)

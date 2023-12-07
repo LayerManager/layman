@@ -204,9 +204,9 @@ class TestAccessRights:
 
     @pytest.fixture(scope='class', autouse=True)
     def class_fixture(self, request):
-        process_client.ensure_reserved_username(self.OWNER, process_client.get_authz_headers(self.OWNER))
-        process_client.ensure_reserved_username(self.READER, process_client.get_authz_headers(self.READER))
-        process_client.ensure_reserved_username(self.OTHER_USER, process_client.get_authz_headers(self.OTHER_USER))
+        process_client.ensure_reserved_username(self.OWNER)
+        process_client.ensure_reserved_username(self.READER)
+        process_client.ensure_reserved_username(self.OTHER_USER)
         role_service_util.ensure_user_role(self.READER, self.ROLE)
         role_service_util.ensure_user_role(self.OTHER_USER, self.OTHER_ROLE)
         role_service_util.ensure_user_role(self.READER, self.NON_EXISTING_ROLE)
