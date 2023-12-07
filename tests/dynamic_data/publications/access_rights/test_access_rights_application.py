@@ -60,30 +60,34 @@ def pytest_generate_tests(metafunc):
     )
 
 
+def add_publication_test_cases_to_list(tc_list, publication, user, endpoints_to_test):
+    all_args = {
+        'workspace': publication.workspace,
+        'name': publication.name,
+        'layer': publication.name,
+        'actor_name': user,
+        'publication_type': publication.type,
+    }
+    for method, args in endpoints_to_test[publication.type]:
+        pytest_id = f'{method.__name__}__{user.split("_")[-1]}__{publication.name[5:]}{("__" + next(iter(args.keys()))) if args else ""}'
+        method_args = inspect.getfullargspec(method).args + inspect.getfullargspec(method).kwonlyargs
+
+        test_case = base_test.TestCaseType(pytest_id=pytest_id,
+                                           rest_method=method,
+                                           rest_args={**args, **{
+                                               key: value for key, value in all_args.items() if key in method_args
+                                           }},
+                                           type=EnumTestTypes.MANDATORY,
+                                           )
+
+        tc_list.append(test_case)
+
+
 def generate_positive_test_cases(publications_user_can_read):
     tc_list = []
     for user, publications in publications_user_can_read.items():
         for publication in publications:
-            all_args = {
-                'workspace': publication.workspace,
-                'name': publication.name,
-                'layer': publication.name,
-                'actor_name': user,
-                'publication_type': publication.type,
-            }
-            for method, args in ENDPOINTS_TO_TEST[publication.type]:
-                pytest_id = f'{method.__name__}__{user.split("_")[-1]}__{publication.name[5:]}{("__" + next(iter(args.keys()))) if args else ""}'
-                method_args = inspect.getfullargspec(method).args + inspect.getfullargspec(method).kwonlyargs
-
-                test_case = base_test.TestCaseType(pytest_id=pytest_id,
-                                                   rest_method=method,
-                                                   rest_args= {**args, **{
-                                                       key: value for key, value in all_args.items() if key in method_args
-                                                   }},
-                                                   type=EnumTestTypes.MANDATORY,
-                                                   )
-
-                tc_list.append(test_case)
+            add_publication_test_cases_to_list(tc_list, publication, user, ENDPOINTS_TO_TEST)
     return tc_list
 
 
@@ -93,26 +97,7 @@ def generate_negative_test_cases(publications_user_can_read, publication_all):
         for publication in publication_all:
             if publication in available_publications:
                 continue
-            all_args = {
-                'workspace': publication.workspace,
-                'name': publication.name,
-                'layer': publication.name,
-                'actor_name': user,
-                'publication_type': publication.type,
-            }
-            for method, args in ENDPOINTS_TO_TEST[publication.type]:
-                pytest_id = f'{method.__name__}__{user.split("_")[-1]}__{publication.name[5:]}{("__" + next(iter(args.keys()))) if args else ""}'
-                method_args = inspect.getfullargspec(method).args + inspect.getfullargspec(method).kwonlyargs
-
-                test_case = base_test.TestCaseType(pytest_id=pytest_id,
-                                                   rest_method=method,
-                                                   rest_args= {**args, **{
-                                                       key: value for key, value in all_args.items() if key in method_args
-                                                   }},
-                                                   type=EnumTestTypes.MANDATORY,
-                                                   )
-
-                tc_list.append(test_case)
+            add_publication_test_cases_to_list(tc_list, publication, user, ENDPOINTS_TO_TEST)
     return tc_list
 
 
