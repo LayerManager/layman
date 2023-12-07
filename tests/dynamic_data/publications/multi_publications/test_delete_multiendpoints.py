@@ -1,18 +1,23 @@
 import pytest
 
-from test_tools import process_client
+from test_tools import process_client, role_service as role_service_util
 
 
 @pytest.mark.timeout(60)
 class TestDeletePublicationsClass:
     owner = 'test_delete_publications_owner'
     deleter = 'test_delete_publications_deleter'
+    ROLE = 'TEST_DELETE_PUBLICATIONS_ROLE'
 
     @pytest.fixture(scope="class")
-    def provide_data(self):
+    def provide_data(self, request):
         process_client.ensure_reserved_username(self.owner)
         process_client.ensure_reserved_username(self.deleter)
+        role_service_util.ensure_user_role(self.deleter, self.ROLE)
         yield
+        if request.node.session.testsfailed == 0 and not request.config.option.nocleanup:
+            role_service_util.delete_user_role(self.deleter, self.ROLE)
+            role_service_util.delete_role(self.ROLE)
 
     def check_delete(self,
                      actor_name,
@@ -29,10 +34,11 @@ class TestDeletePublicationsClass:
         publication_set = {publication['name'] for publication in get_json}
         assert remaining_publications == publication_set
 
-
     @pytest.mark.parametrize('publ_type', process_client.PUBLICATION_TYPES)
     @pytest.mark.parametrize('available_write_rights', [
-        ('EVERYONE', ),
+        pytest.param('EVERYONE', id='access_by_everyone'),
+        pytest.param(f'{owner},{deleter}', id='access_by_user'),
+        pytest.param(f'{owner},{ROLE}', id='access_by_role'),
     ])
     @pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman', 'provide_data')
     def test_delete_publications_by_user(self,
