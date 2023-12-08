@@ -33,8 +33,8 @@ jobs:
         with:
           python-version: 3.8
 
-      # see https://github.com/BSFishy/pip-action
-      - uses: BSFishy/pip-action@v1
+      # see https://github.com/marketplace/actions/pip-installer-v2
+      - uses: insightsengineering/pip-action@v2
         with:
           packages: |
             flake8
@@ -56,8 +56,8 @@ jobs:
         with:
           python-version: 3.8
 
-      # see https://github.com/BSFishy/pip-action
-      - uses: BSFishy/pip-action@v1
+      # see https://github.com/marketplace/actions/pip-installer-v2
+      - uses: insightsengineering/pip-action@v2
         with:
           packages: |
             flake8
@@ -75,8 +75,8 @@ jobs:
         with:
           python-version: 3.8
 
-      # see https://github.com/BSFishy/pip-action
-      - uses: BSFishy/pip-action@v1
+      # see https://github.com/marketplace/actions/pip-installer-v2
+      - uses: insightsengineering/pip-action@v2
         with:
           packages: |
             pycodestyle
@@ -93,8 +93,8 @@ jobs:
         with:
           python-version: 3.8
 
-      # see https://github.com/BSFishy/pip-action
-      - uses: BSFishy/pip-action@v1
+      # see https://github.com/marketplace/actions/pip-installer-v2
+      - uses: insightsengineering/pip-action@v2
         with:
           packages: |
             pylint==2.15.9
@@ -114,8 +114,8 @@ jobs:
         with:
           python-version: 3.8
 
-      # see https://github.com/BSFishy/pip-action
-      - uses: BSFishy/pip-action@v1
+      # see https://github.com/marketplace/actions/pip-installer-v2
+      - uses: insightsengineering/pip-action@v2
         with:
           packages: |
             pylint==2.15.9
@@ -135,8 +135,8 @@ jobs:
         with:
           python-version: 3.8
 
-      # see https://github.com/BSFishy/pip-action
-      - uses: BSFishy/pip-action@v1
+      # see https://github.com/marketplace/actions/pip-installer-v2
+      - uses: insightsengineering/pip-action@v2
         with:
           packages: |
             autopep8
