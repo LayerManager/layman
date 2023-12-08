@@ -13,7 +13,7 @@ jobs:
   OptionalDynamicIntegrationTests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: View versions
         run: |
@@ -64,14 +64,14 @@ jobs:
 
       - name: Upload logs
         if: failure()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: test_logs
           path: logs
 
       - name: Upload artifacts
         if: failure()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: test_artifacts
           path: |
