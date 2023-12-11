@@ -128,3 +128,7 @@ def test_create_role_service_schema():
         assert result[0] + result[1] + result[2] == result[3]
         result = db_util.run_query(user_roles_query)[0]
         assert result[0] + result[1] + result[2] == result[3]
+        result = db_util.run_query(table_existence_query, ('role_props',))[0][0]
+        assert result == 1
+        result = db_util.run_query(table_existence_query, ('group_roles',))[0][0]
+        assert result == 1
