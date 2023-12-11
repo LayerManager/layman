@@ -102,3 +102,10 @@ select username,
 from {ROLE_SERVICE_SCHEMA}.admin_user_roles
 ;"""
     db_util.run_statement(create_user_roles_view)
+
+    create_other_tables = f"""
+    create table {ROLE_SERVICE_SCHEMA}.role_props(rolename varchar(64) not null,propname varchar(64) not null, propvalue varchar(2048),primary key (rolename,propname));
+    create table {ROLE_SERVICE_SCHEMA}.group_roles(groupname varchar(128) not null, rolename varchar(64) not null,  primary key(groupname,rolename));
+    create index group_roles_idx on {ROLE_SERVICE_SCHEMA}.group_roles(rolename,groupname);
+    """
+    db_util.run_statement(create_other_tables)
