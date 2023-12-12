@@ -3,11 +3,13 @@ import logging
 from psycopg2 import sql
 
 import pytest
+
+import requests_util.url_util
 from db import util as db_util, TableUri
 from layman import app, util as layman_util, settings, celery
 from layman.common import bbox as bbox_util
 from layman.common.prime_db_schema import publications
-from layman.layer import LAYER_TYPE, util as layer_util
+from layman.layer import LAYER_TYPE
 from layman.layer.filesystem import gdal, input_file
 from layman.map import MAP_TYPE, util as map_util
 from layman.map.filesystem import input_file as map_input_file
@@ -223,7 +225,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                                'wfs': {'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{workspace}/wfs'},
                                                '_table_uri': table_uri,
                                                'db': {
-                                                   'external_uri': layer_util.redact_uri(table_uri.db_uri_str),
+                                                   'external_uri': requests_util.url_util.redact_uri(table_uri.db_uri_str),
                                                    'schema': table_uri.schema,
                                                    'table': table_uri.table,
                                                    'geo_column': table_uri.geo_column,
