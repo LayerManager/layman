@@ -35,6 +35,7 @@
 - [#962](https://github.com/LayerManager/layman/issues/962) Make values of `layman_metadata.publication_status` and `status` key(s) more consistent in responses of PATCH Workspace [Layer](doc/rest.md#patch-workspace-layer)/[Map](doc/rest.md#patch-workspace-map) and GET Workspace [Layer](doc/rest.md#get-workspace-layer)/[Map](doc/rest.md#get-workspace-map).
 - Timgen handles better some edge cases:
   - If map's [internal layer](doc/models.md#internal-map-layer) points to non-existent workspace, Timgen is faster and does not fail.
+  - If map's file was not obtained from Layman, Timgen fails quickly.
 - Upgrade Python dependencies
   - werkzeug 2.3.7 -> 3.0.7 (suggested by dependabot)
   - urllib3 1.26.16 -> 1.26.18 (suggested by dependabot)

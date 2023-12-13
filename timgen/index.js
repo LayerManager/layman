@@ -40,7 +40,11 @@ const main = async () => {
             }
             return response.json();
           }
-      );
+  ).catch(e => {
+    const msg = `Error when fetching map: ${e.message}`
+    log(msg)
+    window['canvas_data_url_error'] = msg;
+  });
   const ol_map = json_to_map({
     map_json,
     gs_url,
