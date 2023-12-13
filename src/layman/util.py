@@ -701,3 +701,12 @@ def get_complete_publication_info(workspace, publication_type, publication_name,
             f"publication_status={publication_status}, is_updating_after={is_updating_after}")
 
     return complete_info
+
+
+def get_publication_writer(workspace, publication_type, publication_name):
+    from layman.common.prime_db_schema.publications import is_user
+    info = get_publication_info(workspace, publication_type, publication_name, context={'keys': ['access_rights']})
+    return next(
+        user_or_role for user_or_role in info['access_rights']['write']
+        if user_or_role == settings.RIGHTS_EVERYONE_ROLE or is_user(user_or_role)
+    )
