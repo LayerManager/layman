@@ -1,6 +1,5 @@
 import inspect
 from layman import util as layman_util, settings, app
-from layman.common.prime_db_schema.publications import is_user
 from test_tools import process_client
 from .. import Action, Publication
 
@@ -10,11 +9,7 @@ KEY_REPLACE = '__replace__'
 
 def get_publication_writer(publication):
     with app.app_context():
-        info = layman_util.get_publication_info(publication.workspace, publication.type, publication.name, context={'keys': ['access_rights']})
-    writer = next(
-        user_or_role for user_or_role in info['access_rights']['write']
-        if user_or_role == settings.RIGHTS_EVERYONE_ROLE or is_user(user_or_role)
-    )
+        writer = layman_util.get_publication_writer(publication.workspace, publication.type, publication.name)
     return writer
 
 
