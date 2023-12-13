@@ -33,6 +33,8 @@
 - All changes from [v1.22.1](#v1221), [v1.22.2](#v1222) and [v1.22.3](#v1223).
 - [#960](https://github.com/LayerManager/layman/issues/960) Handle WMS requests with HTTP error more efficiently in timgen.
 - [#962](https://github.com/LayerManager/layman/issues/962) Make values of `layman_metadata.publication_status` and `status` key(s) more consistent in responses of PATCH Workspace [Layer](doc/rest.md#patch-workspace-layer)/[Map](doc/rest.md#patch-workspace-map) and GET Workspace [Layer](doc/rest.md#get-workspace-layer)/[Map](doc/rest.md#get-workspace-map).
+- Timgen handles better some edge cases:
+  - If map's [internal layer](doc/models.md#internal-map-layer) points to non-existent workspace, Timgen is faster and does not fail.
 - Upgrade Python dependencies
   - werkzeug 2.3.7 -> 3.0.7 (suggested by dependabot)
   - urllib3 1.26.16 -> 1.26.18 (suggested by dependabot)
