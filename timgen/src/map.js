@@ -106,7 +106,9 @@ const proxify_layer_loader = (layer, tiled, gs_public_url, gs_url, headers) => {
       } else {
         const text = blob_or_text;
         log(`load_fn.fetch_retry, loaded ERROR, XML:\n${text}\n`)
-        if(is_internal_geoserver_url(image_url, gs_public_url, gs_url) && text.indexOf('Could not find layer') >= 0) {
+        if(is_internal_geoserver_url(image_url, gs_public_url, gs_url) &&
+            (text.indexOf('Could not find layer') >= 0 || text.indexOf('HTTP Status 404 – Not Found') >= 0)
+        ) {
           // request to internal GS => setting empty image
           tile_or_img.getImage().src = EMPTY_IMAGE_DATA_URL;
         } else {
