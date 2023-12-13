@@ -66,6 +66,7 @@ def oauth2_provider_mock():
                 'test_access_rights_application_owner': None,
                 'test_access_rights_application_reader': None,
                 'test_access_rights_application_other_user': None,
+                'test_patch_after_feature_change_role_user': None,
             },
         },
         'host': '0.0.0.0',
