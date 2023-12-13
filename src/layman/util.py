@@ -706,7 +706,7 @@ def get_complete_publication_info(workspace, publication_type, publication_name,
 def get_publication_writer(workspace, publication_type, publication_name):
     from layman.common.prime_db_schema.publications import is_user
     info = get_publication_info(workspace, publication_type, publication_name, context={'keys': ['access_rights']})
-    return next(
+    return next((
         user_or_role for user_or_role in info['access_rights']['write']
-        if user_or_role == settings.RIGHTS_EVERYONE_ROLE or is_user(user_or_role)
-    )
+        if is_user(user_or_role)
+    ), settings.ANONYM_USER)

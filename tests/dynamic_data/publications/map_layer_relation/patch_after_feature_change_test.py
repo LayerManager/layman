@@ -47,7 +47,6 @@ class TestPublication(base_test.TestSingleRestPublication):
                                              },
                                          },
                                          type=EnumTestTypes.MANDATORY,
-                                         marks=[pytest.mark.xfail(reason="Not fixed yet")]
                                          )]
 
     def before_class(self):

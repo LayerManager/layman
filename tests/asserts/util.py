@@ -15,7 +15,7 @@ def get_publication_writer(publication):
 
 def get_publication_header(publication):
     writer = get_publication_writer(publication)
-    headers = None if writer == settings.RIGHTS_EVERYONE_ROLE else process_client.get_authz_headers(writer)
+    headers = None if writer == settings.ANONYM_USER else process_client.get_authz_headers(writer)
     return headers
 
 
@@ -26,9 +26,7 @@ def get_publication_exists(publication):
 
 
 def get_publication_actor(publication):
-    writer = get_publication_writer(publication)
-    actor = settings.ANONYM_USER if writer == settings.RIGHTS_EVERYONE_ROLE else writer
-    return actor
+    return get_publication_writer(publication)
 
 
 def get_directory_name_from_publ_type(publ_type):
