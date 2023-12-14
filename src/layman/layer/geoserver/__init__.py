@@ -16,19 +16,11 @@ FLASK_RULES_KEY = f"{__name__}:RULES"
 
 def ensure_whole_user(username, auth=settings.LAYMAN_GS_AUTH):
     gs_util.ensure_user(username, None, auth)
-    role = gs_util.username_to_rolename(username)
-    gs_util.ensure_role(role, auth)
-    gs_util.ensure_user_role(username, role, auth)
-    gs_util.ensure_user_role(username, settings.LAYMAN_GS_ROLE, auth)
     ensure_workspace(username, auth)
 
 
 def delete_whole_user(username, auth=settings.LAYMAN_GS_AUTH):
-    role = gs_util.username_to_rolename(username)
     delete_workspace(username, auth)
-    gs_util.delete_user_role(username, role, auth)
-    gs_util.delete_user_role(username, settings.LAYMAN_GS_ROLE, auth)
-    gs_util.delete_role(role, auth)
     gs_util.delete_user(username, auth)
 
 

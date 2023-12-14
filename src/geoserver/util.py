@@ -78,38 +78,6 @@ def get_roles(auth):
     return response.json()['roles']
 
 
-def ensure_role(role, auth):
-    roles = get_roles(auth)
-    role_exists = role in roles
-    if not role_exists:
-        logger.info(f"Role {role} does not exist yet, creating.")
-        response = requests.post(
-            urljoin(GS_REST_ROLES, 'role/' + role),
-            headers=headers_json,
-            auth=auth,
-            timeout=GS_REST_TIMEOUT,
-        )
-        response.raise_for_status()
-    else:
-        logger.info(f"Role {role} already exists")
-    role_created = not role_exists
-    return role_created
-
-
-def delete_role(role, auth):
-    response = requests.delete(
-        urljoin(GS_REST_ROLES, 'role/' + role),
-        headers=headers_json,
-        auth=auth,
-        timeout=GS_REST_TIMEOUT,
-    )
-    role_not_exists = response.status_code == 404
-    if not role_not_exists:
-        response.raise_for_status()
-    role_deleted = not role_not_exists
-    return role_deleted
-
-
 def get_usernames(auth):
     r_url = GS_REST_USERS
     response = requests.get(r_url,
@@ -900,40 +868,6 @@ def get_user_roles(user, auth):
                             )
     response.raise_for_status()
     return response.json()['roles']
-
-
-def ensure_user_role(user, role, auth):
-    roles = get_user_roles(user, auth)
-    association_exists = role in roles
-    if not association_exists:
-        logger.info(f"Role {role} not associated with user {user} yet, associating.")
-        r_url = urljoin(GS_REST_ROLES, f'role/{role}/user/{user}/')
-        response = requests.post(
-            r_url,
-            headers=headers_json,
-            auth=auth,
-            timeout=GS_REST_TIMEOUT,
-        )
-        response.raise_for_status()
-    else:
-        logger.info(f"Role {role} already associated with user {user}")
-    association_created = not association_exists
-    return association_created
-
-
-def delete_user_role(user, role, auth):
-    r_url = urljoin(GS_REST_ROLES, f'role/{role}/user/{user}/')
-    response = requests.delete(
-        r_url,
-        headers=headers_json,
-        auth=auth,
-        timeout=GS_REST_TIMEOUT,
-    )
-    association_not_exists = response.status_code == 404
-    if not association_not_exists:
-        response.raise_for_status()
-    association_deleted = not association_not_exists
-    return association_deleted
 
 
 def get_service_url(service):

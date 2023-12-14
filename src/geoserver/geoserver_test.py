@@ -24,29 +24,6 @@ def gs_user():
     assert gs_util.delete_user(TEST_USER, GS_AUTH)
 
 
-@pytest.fixture()
-def gs_role():
-    roles = gs_util.get_roles(GS_AUTH)
-    assert TEST_ROLE not in roles
-    assert gs_util.ensure_role(TEST_ROLE, GS_AUTH)
-    yield TEST_ROLE
-    assert gs_util.delete_role(TEST_ROLE, GS_AUTH)
-
-
-def test_role_management():
-    init_roles = gs_util.get_roles(GS_AUTH)
-    new_role = TEST_ROLE
-    assert new_role not in init_roles
-    assert gs_util.ensure_role(new_role, GS_AUTH)
-    roles = gs_util.get_roles(GS_AUTH)
-    assert new_role in roles
-    assert len(init_roles) + 1 == len(roles)
-    assert gs_util.delete_role(new_role, GS_AUTH)
-    roles = gs_util.get_roles(GS_AUTH)
-    assert new_role not in roles
-    assert len(init_roles) == len(roles)
-
-
 def test_user_management():
     init_usernames = gs_util.get_usernames(GS_AUTH)
     new_user = TEST_USER
@@ -60,21 +37,6 @@ def test_user_management():
     usernames = gs_util.get_usernames(GS_AUTH)
     assert new_user not in usernames
     assert len(init_usernames) == len(usernames)
-
-
-def test_user_role_management(gs_user, gs_role):
-    user = gs_user[0]
-    init_user_roles = gs_util.get_user_roles(user, GS_AUTH)
-    role = gs_role
-    assert role not in init_user_roles
-    assert gs_util.ensure_user_role(user, role, GS_AUTH)
-    user_roles = gs_util.get_user_roles(user, GS_AUTH)
-    assert role in user_roles
-    assert len(init_user_roles) + 1 == len(user_roles)
-    assert gs_util.delete_user_role(user, role, GS_AUTH)
-    user_roles = gs_util.get_user_roles(user, GS_AUTH)
-    assert role not in user_roles
-    assert len(init_user_roles) == len(user_roles)
 
 
 @pytest.mark.parametrize('service', gs_util.SERVICE_TYPES)

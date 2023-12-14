@@ -86,10 +86,7 @@ with settings.LAYMAN_REDIS.pipeline() as pipe:
                     logger.info(f'Adjusting GeoServer roles')
 
                     if settings.GEOSERVER_ADMIN_AUTH:
-                        gs_util.ensure_role(settings.LAYMAN_GS_ROLE, settings.GEOSERVER_ADMIN_AUTH)
                         gs_util.ensure_user(settings.LAYMAN_GS_USER, settings.LAYMAN_GS_PASSWORD, settings.GEOSERVER_ADMIN_AUTH)
-                        gs_util.ensure_user_role(settings.LAYMAN_GS_USER, 'ADMIN', settings.GEOSERVER_ADMIN_AUTH)
-                        gs_util.ensure_user_role(settings.LAYMAN_GS_USER, settings.LAYMAN_GS_ROLE, settings.GEOSERVER_ADMIN_AUTH)
 
                     gs_util.ensure_proxy_base_url(settings.LAYMAN_GS_PROXY_BASE_URL_WITH_PLACEHOLDERS, settings.LAYMAN_GS_AUTH)
 
