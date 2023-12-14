@@ -44,6 +44,7 @@ class TestOnlyValidUserNames:
         pytest.param({username, workspace_name}, id='username-and-workspace-name'),
         pytest.param({workspace_name, username}, id='workspace-name-and-username'),
         pytest.param({'skaljgdalskfglshfgd'}, id='non-existent-username'),
+        pytest.param({'mIxEd'}, id='mixed-case'),
     ])
     def test_raises(cls, names):
         with app.app_context():
