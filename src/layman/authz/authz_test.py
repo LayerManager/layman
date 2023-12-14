@@ -64,6 +64,7 @@ def test_authorize_publications_decorator_accepts_path(request_path):
     pytest.param(['ROLE1', 'EVERYONE'], [], ['ROLE1', 'EVERYONE'], id='only-roles'),
     pytest.param(['ROLE2', 'user1', 'EVERYONE', 'user2'], ['user1', 'user2'], ['ROLE2', 'EVERYONE'],
                  id='more-users-and-roles'),
+    pytest.param(['mIxEd'], ['mIxEd'], [], id='mixed-case'),
 ])
 def test_split_user_and_role_names(roles_and_users, exp_users, exp_roles):
     user_names, role_names = split_user_and_role_names(roles_and_users)
