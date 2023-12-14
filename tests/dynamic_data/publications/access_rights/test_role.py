@@ -1,6 +1,6 @@
 import pytest
 
-from test_tools import process_client
+from test_tools import process_client, role_service
 from tests import EnumTestTypes, Publication
 from tests.asserts.final.publication import util as assert_util
 from tests.dynamic_data import base_test, base_test_classes
@@ -18,6 +18,7 @@ USERNAME = 'test_access_rights_role_user1'
 USER_ROLE1_ROLE3_EVERYONE = {USERNAME, 'ROLE1', 'ROLE3', 'EVERYONE'}
 USER_ROLE1 = {USERNAME, 'ROLE1'}
 USER_ROLE1_ROLE2 = {USERNAME, 'ROLE1', 'ROLE2'}
+ROLES = ['ROLE1', 'ROLE2', 'ROLE3']
 
 
 @pytest.mark.usefixtures('oauth2_provider_mock')
@@ -33,6 +34,15 @@ class TestPublication(base_test.TestSingleRestPublication):
     usernames_to_reserve = [
         USERNAME,
     ]
+
+    def before_class(self):
+        for role in ROLES:
+            role_service.ensure_role(role)
+
+    def after_class(self, request):
+        if request.session.testsfailed == 0 and not request.config.option.nocleanup:
+            for role in ROLES:
+                role_service.delete_role(role)
 
     test_cases = [base_test.TestCaseType(key='role_test',
                                          publication=lambda publ_def, cls: Publication(cls.workspace,

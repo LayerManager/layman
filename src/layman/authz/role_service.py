@@ -14,3 +14,11 @@ where username = %s
 """
     roles = db_util.run_query(query, (username, 'ADMIN', 'GROUP_ADMIN', settings.LAYMAN_GS_ROLE, ROLE_NAME_PATTERN), uri_str=settings.LAYMAN_ROLE_SERVICE_URI)
     return {role[0] for role in roles}
+
+
+def get_existent_roles(roles_to_check):
+    query = f"""
+select name from {settings.LAYMAN_ROLE_SERVICE_SCHEMA}.roles where name = ANY(%s)
+    """
+    rows = db_util.run_query(query, (list(roles_to_check),), uri_str=settings.LAYMAN_ROLE_SERVICE_URI)
+    return {row[0] for row in rows}

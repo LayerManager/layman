@@ -1,7 +1,7 @@
 import os
 import pytest
 
-from test_tools import process_client
+from test_tools import process_client, role_service
 from tests import EnumTestTypes, Publication
 from tests.asserts.final.publication import util as assert_util, internal as assert_internal
 from tests.dynamic_data import base_test, base_test_classes
@@ -50,6 +50,7 @@ class TestPublication(base_test.TestSingleRestPublication):
                                          )]
 
     def before_class(self):
+        role_service.ensure_role(ROLE)
         self.post_publication(MAP, args={
             'file_paths': [os.path.join(DIRECTORY, 'patch_after_feature_change_map.json')],
             'access_rights': {
@@ -58,6 +59,10 @@ class TestPublication(base_test.TestSingleRestPublication):
             },
             'actor_name': USER,
         }, scope='class')
+
+    def after_class(self, request):
+        if request.session.testsfailed == 0 and not request.config.option.nocleanup:
+            role_service.delete_role(ROLE)
 
     def test_publication(self, layer, rest_method, rest_args):
         # some initial asserts

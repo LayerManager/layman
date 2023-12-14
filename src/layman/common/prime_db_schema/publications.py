@@ -6,7 +6,7 @@ import crs as crs_def
 from db import util as db_util, TableUri
 from layman import settings, LaymanError
 from layman.authn import is_user_with_name
-from layman.authz import split_user_and_role_names
+from layman.authz import split_user_and_role_names, role_service
 from layman.common import get_publications_consts as consts, bbox as bbox_util
 from . import workspaces, users, rights
 
@@ -358,7 +358,12 @@ def only_valid_user_names(users_list):
 
 # pylint: disable=unused-argument
 def only_valid_role_names(roles_list):
-    pass
+    roles_list = set(roles_list) - {settings.RIGHTS_EVERYONE_ROLE}
+    if not roles_list:
+        return
+    non_existent_roles = roles_list - role_service.get_existent_roles(roles_list)
+    if non_existent_roles:
+        raise LaymanError(43, f'Non-existent roles found: {non_existent_roles}')
 
 
 def at_least_one_can_write(user_names, role_names):
