@@ -78,9 +78,12 @@ def main():
     ensure_jdbc_role_service_internal_schema()
     role_service.setup_jdbc_role_service(settings.GEOSERVER_DATADIR,
                                          settings.LAYMAN_ROLE_SERVICE_URI,
-                                         'layman_role_service',
+                                         settings.LAYMAN_GS_ROLE_SERVICE,
                                          settings.LAYMAN_ROLE_SERVICE_SCHEMA,
                                          )
+    role_service.set_primary_role_service(settings.GEOSERVER_DATADIR,
+                                          settings.LAYMAN_GS_ROLE_SERVICE,
+                                          )
     epsg_properties.setup_epsg(settings.GEOSERVER_DATADIR,
                                set(settings.LAYMAN_OUTPUT_SRS_LIST))
 

@@ -105,8 +105,15 @@ GEOSERVER_ADMIN_AUTH = None if GEOSERVER_ADMIN_PASSWORD is None else (GEOSERVER_
                                                                       GEOSERVER_ADMIN_PASSWORD)
 GEOSERVER_DATADIR = '/geoserver/data_dir'
 GEOSERVER_INITIAL_DATADIR = '/geoserver/initial_data_dir'
-LAYMAN_GS_ROLE_SERVICE = os.getenv('LAYMAN_GS_ROLE_SERVICE', '') or 'default'
+
+LAYMAN_GS_ROLE_SERVICE = 'layman_role_service'
+# Name of schema, where Layman maintains internal GS JDBC Role Service.
+LAYMAN_INTERNAL_ROLE_SERVICE_SCHEMA = '_role_service'
+LAYMAN_ROLE_SERVICE_URI = os.environ['LAYMAN_ROLE_SERVICE_URI']
+LAYMAN_ROLE_SERVICE_SCHEMA = parse_qs(urlparse(LAYMAN_ROLE_SERVICE_URI).query)['schema'][0]
+
 LAYMAN_GS_USER_GROUP_SERVICE = os.getenv('LAYMAN_GS_USER_GROUP_SERVICE', '') or 'default'
+
 
 LAYMAN_GS_USER = os.environ['LAYMAN_GS_USER']
 LAYMAN_GS_PASSWORD = os.environ['LAYMAN_GS_PASSWORD']
@@ -223,11 +230,6 @@ GRANT_PUBLISH_IN_PUBLIC_WORKSPACE = {
 }
 if RIGHTS_EVERYONE_ROLE not in GRANT_PUBLISH_IN_PUBLIC_WORKSPACE:
     assert not GRANT_CREATE_PUBLIC_WORKSPACE.difference(GRANT_PUBLISH_IN_PUBLIC_WORKSPACE)
-
-# Name of schema, where Layman maintains internal GS JDBC Role Service.
-LAYMAN_INTERNAL_ROLE_SERVICE_SCHEMA = '_role_service'
-LAYMAN_ROLE_SERVICE_URI = os.environ['LAYMAN_ROLE_SERVICE_URI']
-LAYMAN_ROLE_SERVICE_SCHEMA = parse_qs(urlparse(LAYMAN_ROLE_SERVICE_URI).query)['schema'][0]
 
 # UPLOAD_MAX_INACTIVITY_TIME = 10 # 10 seconds
 UPLOAD_MAX_INACTIVITY_TIME = 5 * 60  # 5 minutes

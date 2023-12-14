@@ -6,6 +6,7 @@ from urllib.parse import urlparse
 from xml.sax.saxutils import escape
 
 from requests_util import url_util
+from . import authn
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
@@ -50,3 +51,11 @@ def setup_jdbc_role_service(data_dir, service_url, role_service_name, db_schema)
         file.write(rolesdml_content.format(
             schema=escape(db_schema),
         ))
+
+
+def set_primary_role_service(data_dir, role_service_name):
+    security_xml = authn.get_security(data_dir)
+    element = security_xml.find('roleServiceName')
+    element.text = role_service_name
+    security_path = os.path.join(data_dir, 'security/config.xml')
+    security_xml.write(security_path)
