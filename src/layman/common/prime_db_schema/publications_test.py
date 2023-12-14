@@ -90,6 +90,8 @@ class TestOnlyValidRoleNames:
         pytest.param({non_existent_role}, id='non-existent-role'),
         pytest.param({role1, non_existent_role}, id='non-existent-role-of-two-roles'),
         pytest.param({f'USER_{user}'}, id='internal-user-role'),
+        pytest.param({f'INVALID__ROLE'}, id='invalid-role-two-underscores'),
+        pytest.param({f'0INVALID_ROLE'}, id='invalid-role-starts-with-number'),
     ])
     def test_raises(self, roles):
         with pytest.raises(LaymanError) as exc_info:
