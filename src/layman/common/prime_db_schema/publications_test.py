@@ -33,31 +33,23 @@ class TestOnlyValidUserNames:
     @pytest.fixture(scope="class", autouse=True)
     def provide_data(self, request):
         ensure_user(self.username, '10')
+        workspaces.ensure_workspace(self.workspace_name)
         yield
         if request.node.session.testsfailed == 0:
+            workspaces.delete_workspace(self.workspace_name)
             users.delete_user(self.username)
 
     @classmethod
-    def test_raises(cls):
-        workspace_name = cls.workspace_name
-        username = cls.username
-
+    @pytest.mark.parametrize("names", [
+        pytest.param({username, workspace_name}, id='username-and-workspace-name'),
+        pytest.param({workspace_name, username}, id='workspace-name-and-username'),
+        pytest.param({'skaljgdalskfglshfgd'}, id='non-existent-username'),
+    ])
+    def test_raises(cls, names):
         with app.app_context():
-            workspaces.ensure_workspace(workspace_name)
-
             with pytest.raises(LaymanError) as exc_info:
-                publications.only_valid_user_names({username, workspace_name})
+                publications.only_valid_user_names(names)
             assert exc_info.value.code == 43
-
-            with pytest.raises(LaymanError) as exc_info:
-                publications.only_valid_user_names({workspace_name, username})
-            assert exc_info.value.code == 43
-
-            with pytest.raises(LaymanError) as exc_info:
-                publications.only_valid_user_names({'skaljgdalskfglshfgd', })
-            assert exc_info.value.code == 43
-
-            workspaces.delete_workspace(workspace_name)
 
 
 class TestOnlyValidRoleNames:
