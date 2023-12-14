@@ -6,6 +6,7 @@ import crs as crs_def
 from db import util as db_util, TableUri
 from layman import settings, LaymanError
 from layman.authn import is_user_with_name
+from layman.authz import split_user_and_role_names
 from layman.common import get_publications_consts as consts, bbox as bbox_util
 from . import workspaces, users, rights
 
@@ -380,16 +381,6 @@ def owner_can_still_write(owner,
                           ):
     if owner and ROLE_EVERYONE not in can_write and owner not in can_write:
         raise LaymanError(43, f'Owner of the personal workspace have to keep write right.')
-
-
-def is_user(user_or_role_name):
-    return any(letter.islower() for letter in user_or_role_name)
-
-
-def split_user_and_role_names(user_and_role_names):
-    user_names = [name for name in user_and_role_names if is_user(name)]
-    role_names = [name for name in user_and_role_names if name not in user_names]
-    return user_names, role_names
 
 
 def check_rights_axioms(can_read,
