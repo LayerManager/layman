@@ -63,6 +63,7 @@ class TestOnlyValidUserNames:
 class TestOnlyValidRoleNames:
     role1 = 'TEST_ONLY_VALID_ROLE_NAMES_ROLE1'
     role2 = 'TEST_ONLY_VALID_ROLE_NAMES_ROLE2'
+    user = 'TEST_ONLY_VALID_ROLE_NAMES_USER'
     non_existent_role = 'TEST_ONLY_VALID_ROLE_NAMES_NON_EXISTENT_ROLE'
 
     @pytest.fixture(scope="class", autouse=True)
@@ -70,8 +71,10 @@ class TestOnlyValidRoleNames:
         roles = [self.role1, self.role2]
         for role in roles:
             ensure_role(role)
+        ensure_user(self.user, '11')
         yield
         if request.node.session.testsfailed == 0:
+            users.delete_user(self.user)
             for role in roles:
                 delete_role(role)
 
@@ -86,6 +89,7 @@ class TestOnlyValidRoleNames:
     @pytest.mark.parametrize("roles", [
         pytest.param({non_existent_role}, id='non-existent-role'),
         pytest.param({role1, non_existent_role}, id='non-existent-role-of-two-roles'),
+        pytest.param({f'USER_{user}'}, id='internal-user-role'),
     ])
     def test_raises(self, roles):
         with pytest.raises(LaymanError) as exc_info:

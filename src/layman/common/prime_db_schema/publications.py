@@ -361,6 +361,9 @@ def only_valid_role_names(roles_list):
     roles_list = set(roles_list) - {settings.RIGHTS_EVERYONE_ROLE}
     if not roles_list:
         return
+    internal_user_roles = [r for r in roles_list if r.startswith('USER_')]
+    if internal_user_roles:
+        raise LaymanError(43, f'Internal user roles found: {internal_user_roles}')
     non_existent_roles = roles_list - role_service.get_existent_roles(roles_list)
     if non_existent_roles:
         raise LaymanError(43, f'Non-existent roles found: {non_existent_roles}')
