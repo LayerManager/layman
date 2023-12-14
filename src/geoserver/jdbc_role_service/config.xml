@@ -6,9 +6,9 @@
   <propertyFileNameDML>rolesdml.xml</propertyFileNameDML>
   <jndi>false</jndi>
   <driverClassName>org.postgresql.Driver</driverClassName>
-  <connectURL>jdbc:postgresql://postgres:5432/gis</connectURL>
-  <userName>docker</userName>
-  <password>crypt1:E/7ccSbjdBTkK3i/PfgCvA==</password>
+  <connectURL>{connection_string}</connectURL>
+  <userName>{username}</userName>
+  <password>{password}</password>
   <creatingTables>false</creatingTables>
   <adminRoleName>ADMIN</adminRoleName>
   <groupAdminRoleName>GROUP_ADMIN</groupAdminRoleName>

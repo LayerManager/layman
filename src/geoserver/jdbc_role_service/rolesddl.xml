@@ -4,30 +4,30 @@
   <comment>DDL statements for role database</comment>
   <entry key="check.table">role_props</entry>
   <entry key="roles.create">
-	create table roles(name varchar(64) not null,parent varchar(64),  primary key(name))
+        create table {schema}.roles(name varchar(64) not null,parent varchar(64),  primary key(name))
   </entry>
   <entry key="roleprops.create">
-	create table role_props(rolename varchar(64) not null,propname varchar(64) not null, propvalue varchar(2048),primary key (rolename,propname))
+        create table {schema}.role_props(rolename varchar(64) not null,propname varchar(64) not null, propvalue varchar(2048),primary key (rolename,propname))
   </entry>
 
   <entry key="userroles.create">
-	create table user_roles(username varchar(128) not null, rolename varchar(64) not null,  primary key(username,rolename))
+        create table {schema}.user_roles(username varchar(128) not null, rolename varchar(64) not null,  primary key(username,rolename))
   </entry>
   <entry key="userroles.indexcreate">
-	create index user_roles_idx on user_roles(rolename,username)
+        create index {schema}.user_roles_idx on user_roles(rolename,username)
   </entry>
   <entry key="grouproles.create">
-	create table group_roles(groupname varchar(128) not null, rolename varchar(64) not null,  primary key(groupname,rolename))
+        create table {schema}.group_roles(groupname varchar(128) not null, rolename varchar(64) not null,  primary key(groupname,rolename))
   </entry>
   <entry key="grouproles.indexcreate">
-	create index group_roles_idx on group_roles(rolename,groupname)
+        create index group_roles_idx on {schema}.group_roles(rolename,groupname)
   </entry>
 
 
 
-  <entry key="roles.drop">drop table roles</entry>
-  <entry key="roleprops.drop">drop table role_props</entry>
-  <entry key="userroles.drop">drop table user_roles</entry>
-  <entry key="grouproles.drop">drop table group_roles</entry>
+  <entry key="roles.drop">drop table {schema}.roles</entry>
+  <entry key="roleprops.drop">drop table {schema}.role_props</entry>
+  <entry key="userroles.drop">drop table {schema}.user_roles</entry>
+  <entry key="grouproles.drop">drop table {schema}.group_roles</entry>
 
 </properties>

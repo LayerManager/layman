@@ -4,8 +4,7 @@ import time
 
 from db import util as db_util
 import geoserver
-from geoserver import epsg_properties
-from geoserver import authn
+from geoserver import authn, epsg_properties, role_service
 import layman_settings as settings
 
 
@@ -77,6 +76,11 @@ def main():
                       settings.LAYMAN_GS_AUTHN_FILTER_NAME_OLD,
                       )
     ensure_jdbc_role_service_internal_schema()
+    role_service.setup_jdbc_role_service(settings.GEOSERVER_DATADIR,
+                                         settings.LAYMAN_ROLE_SERVICE_URI,
+                                         'layman_role_service',
+                                         settings.LAYMAN_ROLE_SERVICE_SCHEMA,
+                                         )
     epsg_properties.setup_epsg(settings.GEOSERVER_DATADIR,
                                set(settings.LAYMAN_OUTPUT_SRS_LIST))
 
