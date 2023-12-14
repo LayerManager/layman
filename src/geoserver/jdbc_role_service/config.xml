@@ -1,0 +1,15 @@
+<jdbcroleservice>
+  <id>-52d98abd:18c3f4945bb:-7ffa</id>
+  <name>layman_role_service</name>
+  <className>org.geoserver.security.jdbc.JDBCRoleService</className>
+  <propertyFileNameDDL>rolesddl.xml</propertyFileNameDDL>
+  <propertyFileNameDML>rolesdml.xml</propertyFileNameDML>
+  <jndi>false</jndi>
+  <driverClassName>org.postgresql.Driver</driverClassName>
+  <connectURL>jdbc:postgresql://postgres:5432/gis</connectURL>
+  <userName>docker</userName>
+  <password>crypt1:E/7ccSbjdBTkK3i/PfgCvA==</password>
+  <creatingTables>false</creatingTables>
+  <adminRoleName>ADMIN</adminRoleName>
+  <groupAdminRoleName>GROUP_ADMIN</groupAdminRoleName>
+</jdbcroleservice>
