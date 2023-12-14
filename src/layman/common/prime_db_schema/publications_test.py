@@ -18,34 +18,45 @@ userinfo_baseline = {"issuer_id": 'mock_test_publications_test',
                      }
 
 
-def test_only_valid_names():
+def ensure_user(username, sub):
+    id_workspace_user = workspaces.ensure_workspace(username)
+    userinfo = userinfo_baseline.copy()
+    userinfo['sub'] = sub
+    users.ensure_user(id_workspace_user, userinfo)
+
+
+class TestOnlyValidUserNames:
     workspace_name = 'test_only_valid_names_workspace'
     username = 'test_only_valid_names_user'
 
-    with app.app_context():
-        workspaces.ensure_workspace(workspace_name)
-        id_workspace_user = workspaces.ensure_workspace(username)
-        userinfo = userinfo_baseline.copy()
-        userinfo['sub'] = '10'
-        users.ensure_user(id_workspace_user, userinfo)
+    @pytest.fixture(scope="class", autouse=True)
+    def provide_data(self, request):
+        ensure_user(self.username, '10')
+        yield
+        if request.node.session.testsfailed == 0:
+            users.delete_user(self.username)
 
-        publications.only_valid_user_names(set())
-        publications.only_valid_user_names({username, })
+    @classmethod
+    def test_raises(cls):
+        workspace_name = cls.workspace_name
+        username = cls.username
 
-        with pytest.raises(LaymanError) as exc_info:
-            publications.only_valid_user_names({username, workspace_name})
-        assert exc_info.value.code == 43
+        with app.app_context():
+            workspaces.ensure_workspace(workspace_name)
 
-        with pytest.raises(LaymanError) as exc_info:
-            publications.only_valid_user_names({workspace_name, username})
-        assert exc_info.value.code == 43
+            with pytest.raises(LaymanError) as exc_info:
+                publications.only_valid_user_names({username, workspace_name})
+            assert exc_info.value.code == 43
 
-        with pytest.raises(LaymanError) as exc_info:
-            publications.only_valid_user_names({'skaljgdalskfglshfgd', })
-        assert exc_info.value.code == 43
+            with pytest.raises(LaymanError) as exc_info:
+                publications.only_valid_user_names({workspace_name, username})
+            assert exc_info.value.code == 43
 
-        users.delete_user(username)
-        workspaces.delete_workspace(workspace_name)
+            with pytest.raises(LaymanError) as exc_info:
+                publications.only_valid_user_names({'skaljgdalskfglshfgd', })
+            assert exc_info.value.code == 43
+
+            workspaces.delete_workspace(workspace_name)
 
 
 def test_at_least_one_can_write():
@@ -179,10 +190,7 @@ def test_get_user_and_role_names_for_db():
 
     with app.app_context():
         workspaces.ensure_workspace(workspace_name)
-        id_workspace_user = workspaces.ensure_workspace(username)
-        userinfo = userinfo_baseline.copy()
-        userinfo['sub'] = '20'
-        users.ensure_user(id_workspace_user, userinfo)
+        ensure_user(username, '20')
 
         user_names, role_names = publications.get_user_and_role_names_for_db({username, }, workspace_name)
         assert user_names == {username}
@@ -246,14 +254,8 @@ class TestInsertRights:
     def provide_data(self, request):
         with app.app_context():
             workspaces.ensure_workspace(self.workspace_name)
-            id_workspace_user = workspaces.ensure_workspace(self.username)
-            userinfo = userinfo_baseline.copy()
-            userinfo['sub'] = '30'
-            users.ensure_user(id_workspace_user, userinfo)
-            id_workspace_user2 = workspaces.ensure_workspace(self.username2)
-            userinfo = userinfo_baseline.copy()
-            userinfo['sub'] = '40'
-            users.ensure_user(id_workspace_user2, userinfo)
+            ensure_user(self.username, '30')
+            ensure_user(self.username2, '40')
         yield
         if request.node.session.testsfailed == 0:
             with app.app_context():
@@ -374,15 +376,8 @@ class TestUpdateRights:
     def provide_data(self, request):
         with app.app_context():
             workspaces.ensure_workspace(self.workspace_name)
-            id_workspace_user = workspaces.ensure_workspace(self.username)
-            userinfo = userinfo_baseline.copy()
-            userinfo['sub'] = '50'
-            users.ensure_user(id_workspace_user, userinfo)
-            id_workspace_user2 = workspaces.ensure_workspace(self.username2)
-            userinfo = userinfo_baseline.copy()
-            userinfo['sub'] = '60'
-            users.ensure_user(id_workspace_user2, userinfo)
-
+            ensure_user(self.username, '50')
+            ensure_user(self.username2, '60')
             publications.insert_publication(self.username, self.publication_insert_info)
         yield
         if request.node.session.testsfailed == 0:
