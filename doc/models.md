@@ -81,7 +81,7 @@
 ## Role
 - Role is any group of users. One user can be assigned to multiple roles.
 - Each role is identified by name that is unique among all roles.
-- The name is upper-case (in contrast with [username](#username)).
+- The name is upper-case (in contrast with [username](#username)), maximum length is 64 characters.
 - Roles can be used for assigning access rights.
 
 ## Workspace

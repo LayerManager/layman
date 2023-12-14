@@ -63,12 +63,13 @@ class TestOnlyValidUserNames:
 class TestOnlyValidRoleNames:
     role1 = 'TEST_ONLY_VALID_ROLE_NAMES_ROLE1'
     role2 = 'TEST_ONLY_VALID_ROLE_NAMES_ROLE2'
+    role64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ_ABCDEFGHIJKLMNOPQRSTUVWXYZ_ABCDEFGHIJ'
     user = 'TEST_ONLY_VALID_ROLE_NAMES_USER'
     non_existent_role = 'TEST_ONLY_VALID_ROLE_NAMES_NON_EXISTENT_ROLE'
 
     @pytest.fixture(scope="class", autouse=True)
     def provide_data(self, request):
-        roles = [self.role1, self.role2]
+        roles = [self.role1, self.role2, self.role64]
         for role in roles:
             ensure_role(role)
         ensure_user(self.user, '11')
@@ -82,6 +83,7 @@ class TestOnlyValidRoleNames:
         pytest.param({role1}, id='one-existing-role'),
         pytest.param({role1, role2}, id='two-existing-roles'),
         pytest.param({'EVERYONE'}, id='everyone-role'),
+        pytest.param({role64}, id='64-characters'),
     ])
     def test_ok(self, roles):
         publications.only_valid_role_names(roles)
@@ -99,6 +101,7 @@ class TestOnlyValidRoleNames:
         pytest.param({f'ADMIN'}, id='ADMIN'),
         pytest.param({f'ADMIN_GROUP'}, id='ADMIN_GROUP'),
         pytest.param({settings.LAYMAN_GS_ROLE}, id='value-of-LAYMAN_GS_ROLE'),
+        pytest.param({'ABCDEFGHIJKLMNOPQRSTUVWXYZ_ABCDEFGHIJKLMNOPQRSTUVWXYZ_ABCDEFGHIJK'}, id='65-characters'),
     ])
     def test_raises(self, roles):
         with pytest.raises(LaymanError) as exc_info:
