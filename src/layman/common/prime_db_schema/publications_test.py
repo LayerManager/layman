@@ -3,6 +3,7 @@ import pytest
 
 from layman import settings, app as app, LaymanError
 from layman.map import MAP_TYPE
+from test_tools.role_service import ensure_role, delete_role
 from . import publications, workspaces, users
 
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
@@ -57,6 +58,39 @@ class TestOnlyValidUserNames:
             assert exc_info.value.code == 43
 
             workspaces.delete_workspace(workspace_name)
+
+
+class TestOnlyValidRoleNames:
+    role1 = 'TEST_ONLY_VALID_ROLE_NAMES_ROLE1'
+    role2 = 'TEST_ONLY_VALID_ROLE_NAMES_ROLE2'
+    non_existent_role = 'TEST_ONLY_VALID_ROLE_NAMES_NON_EXISTENT_ROLE'
+
+    @pytest.fixture(scope="class", autouse=True)
+    def provide_data(self, request):
+        roles = [self.role1, self.role2]
+        for role in roles:
+            ensure_role(role)
+        yield
+        if request.node.session.testsfailed == 0:
+            for role in roles:
+                delete_role(role)
+
+    @pytest.mark.parametrize("roles", [
+        pytest.param({role1}, id='one-existing-role'),
+        pytest.param({role1, role2}, id='two-existing-roles'),
+        pytest.param({'EVERYONE'}, id='everyone-role'),
+    ])
+    def test_ok(self, roles):
+        publications.only_valid_role_names(roles)
+
+    @pytest.mark.parametrize("roles", [
+        pytest.param({non_existent_role}, id='non-existent-role'),
+        pytest.param({role1, non_existent_role}, id='non-existent-role-of-two-roles'),
+    ])
+    def test_raises(self, roles):
+        with pytest.raises(LaymanError) as exc_info:
+            publications.only_valid_role_names(roles)
+        assert exc_info.value.code == 43
 
 
 def test_at_least_one_can_write():
@@ -256,9 +290,11 @@ class TestInsertRights:
             workspaces.ensure_workspace(self.workspace_name)
             ensure_user(self.username, '30')
             ensure_user(self.username2, '40')
+            ensure_role(self.role1)
         yield
         if request.node.session.testsfailed == 0:
             with app.app_context():
+                delete_role(self.role1)
                 users.delete_user(self.username)
                 users.delete_user(self.username2)
                 workspaces.delete_workspace(self.workspace_name)
@@ -378,12 +414,16 @@ class TestUpdateRights:
             workspaces.ensure_workspace(self.workspace_name)
             ensure_user(self.username, '50')
             ensure_user(self.username2, '60')
+            ensure_role(self.role1)
+            ensure_role(self.role2)
             publications.insert_publication(self.username, self.publication_insert_info)
         yield
         if request.node.session.testsfailed == 0:
             with app.app_context():
                 publications.delete_publication(self.username, self.publication_insert_info["publ_type_name"],
                                                 self.publication_insert_info["name"])
+                delete_role(self.role1)
+                delete_role(self.role2)
                 users.delete_user(self.username)
                 users.delete_user(self.username2)
                 workspaces.delete_workspace(self.workspace_name)
