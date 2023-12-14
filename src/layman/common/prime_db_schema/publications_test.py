@@ -92,6 +92,13 @@ class TestOnlyValidRoleNames:
         pytest.param({f'USER_{user}'}, id='internal-user-role'),
         pytest.param({f'INVALID__ROLE'}, id='invalid-role-two-underscores'),
         pytest.param({f'0INVALID_ROLE'}, id='invalid-role-starts-with-number'),
+        pytest.param({f'ROLE_ADMINISTRATOR'}, id='ROLE_ADMINISTRATOR'),
+        pytest.param({f'ROLE_GROUP_ADMIN'}, id='ROLE_GROUP_ADMIN'),
+        pytest.param({f'ROLE_AUTHENTICATED'}, id='ROLE_AUTHENTICATED'),
+        pytest.param({f'ROLE_ANONYMOUS'}, id='ROLE_ANONYMOUS'),
+        pytest.param({f'ADMIN'}, id='ADMIN'),
+        pytest.param({f'ADMIN_GROUP'}, id='ADMIN_GROUP'),
+        pytest.param({settings.LAYMAN_GS_ROLE}, id='value-of-LAYMAN_GS_ROLE'),
     ])
     def test_raises(self, roles):
         with pytest.raises(LaymanError) as exc_info:

@@ -1,9 +1,11 @@
+import re
 from dataclasses import dataclass
 import logging
 import psycopg2.extras
 
 import crs as crs_def
 from db import util as db_util, TableUri
+from geoserver.util import RESERVED_ROLE_NAMES
 from layman import settings, LaymanError
 from layman.authn import is_user_with_name
 from layman.authz import split_user_and_role_names, role_service
@@ -370,6 +372,11 @@ def only_valid_role_names(roles_list):
     internal_user_roles = [r for r in roles_list if r.startswith('USER_')]
     if internal_user_roles:
         raise LaymanError(43, f'Internal user roles found: {internal_user_roles}')
+
+    reserved_admin_roles = RESERVED_ROLE_NAMES + ['ADMIN', 'ADMIN_GROUP', settings.LAYMAN_GS_ROLE]
+    admin_roles = [r for r in roles_list if r in reserved_admin_roles]
+    if admin_roles:
+        raise LaymanError(43, f'Admin roles found: {admin_roles}')
 
     non_existent_roles = roles_list - role_service.get_existent_roles(roles_list)
     if non_existent_roles:
