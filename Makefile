@@ -3,24 +3,28 @@
 start-demo:
 	mkdir -p layman_data deps/qgis/data
 	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client timgen
+	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d postgresql
 	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps -u root layman bash -c "cd src && python3 -B setup_geoserver.py"
-	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate postgresql qgis geoserver redis layman celery_worker flower timgen layman_client nginx
+	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate qgis geoserver redis layman celery_worker flower timgen layman_client nginx
 
 start-demo-full:
 	mkdir -p layman_data deps/qgis/data
 	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client timgen
+	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d postgresql
 	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps -u root layman bash -c "cd src && python3 -B setup_geoserver.py"
-	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate postgresql qgis geoserver redis layman celery_worker flower timgen layman_client micka nginx
+	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate qgis geoserver redis layman celery_worker flower timgen layman_client micka nginx
 
 start-demo-only:
 	mkdir -p layman_data deps/qgis/data
 	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client timgen
+	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d postgresql
 	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps -u root layman bash -c "cd src && python3 -B setup_geoserver.py"
 	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate --no-deps layman celery_worker flower timgen layman_client nginx
 
 start-demo-full-with-optional-deps:
 	mkdir -p layman_data deps/qgis/data
 	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client timgen
+	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d postgresql
 	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps -u root layman bash -c "cd src && python3 -B setup_geoserver.py"
 	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate
 
@@ -33,15 +37,17 @@ build-demo:
 upgrade-demo:
 	mkdir -p layman_data deps/qgis/data
 	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client timgen
+	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d postgresql
 	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps -u root layman bash -c "cd src && python3 -B setup_geoserver.py"
-	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate --no-deps postgresql qgis geoserver redis timgen layman_client nginx
+	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate --no-deps qgis geoserver redis timgen layman_client nginx
 	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps layman bash -c "cd src && python3 layman_flush_redis.py && python3 wait_for_deps.py && python3 standalone_upgrade.py"
 
 upgrade-demo-full:
 	mkdir -p layman_data deps/qgis/data
 	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client timgen
+	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d postgresql
 	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps -u root layman bash -c "cd src && python3 -B setup_geoserver.py"
-	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate --no-deps postgresql qgis geoserver redis timgen layman_client micka nginx
+	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate --no-deps qgis geoserver redis timgen layman_client micka nginx
 	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps layman bash -c "cd src && python3 layman_flush_redis.py && python3 wait_for_deps.py && python3 standalone_upgrade.py"
 
 upgrade-after-timeout:
@@ -55,6 +61,7 @@ deps-stop:
 
 start-dev:
 	mkdir -p layman_data layman_data_test tmp deps/qgis/data
+	docker compose -f docker-compose.deps.yml -f docker-compose.dev.yml up -d postgresql
 	docker compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm --no-deps -u root layman_dev bash -c "cd src && python3 -B setup_geoserver.py"
 	docker compose -f docker-compose.deps.yml -f docker-compose.dev.yml up --force-recreate -d
 
@@ -64,6 +71,7 @@ stop-dev:
 start-dev-only:
 	mkdir -p layman_data layman_data_test tmp deps/qgis/data
 	docker compose -f docker-compose.deps.yml -f docker-compose.dev.yml rm -fsv layman_dev celery_worker_dev flower timgen layman_client
+	docker compose -f docker-compose.deps.yml -f docker-compose.dev.yml up -d postgresql
 	docker compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm --no-deps -u root layman_dev bash -c "cd src && python3 -B setup_geoserver.py"
 	docker compose -f docker-compose.deps.yml -f docker-compose.dev.yml up -d layman_dev celery_worker_dev flower timgen layman_client
 
@@ -93,8 +101,9 @@ restart-celery-dev:
 
 upgrade-dev:
 	mkdir -p layman_data layman_data_test tmp deps/qgis/data
+	docker compose -f docker-compose.deps.yml -f docker-compose.dev.yml up -d postgresql
 	docker compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm --no-deps -u root layman_dev bash -c "cd src && python3 -B setup_geoserver.py"
-	docker compose -f docker-compose.deps.yml -f docker-compose.dev.yml up -d timgen layman_client postgresql qgis nginx-qgis geoserver redis micka
+	docker compose -f docker-compose.deps.yml -f docker-compose.dev.yml up -d timgen layman_client qgis nginx-qgis geoserver redis micka
 	docker compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm --no-deps layman_dev bash -c "cd src && python3 layman_flush_redis.py && python3 wait_for_deps.py && python3 standalone_upgrade.py"
 
 prepare-dirs:
@@ -194,7 +203,8 @@ test:
 		docker compose -f docker-compose.deps.yml -f docker-compose.test.yml build layman_client_test ; \
 	fi;
 	docker compose -f docker-compose.deps.yml -f docker-compose.test.yml rm -f layman_test
-	docker compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --no-deps layman_test bash -c "bash ensure-test-data.sh"
+	docker compose -f docker-compose.deps.yml -f docker-compose.test.yml up -d postgresql
+	docker compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --no-deps layman_test bash -c "bash ensure-test-data.sh && python3 src/assert_db.py"
 	docker compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --no-deps -u root layman_test bash -c "cd src && python3 -B setup_geoserver.py"
 	docker compose -f docker-compose.deps.yml -f docker-compose.test.yml up --force-recreate --no-deps -d celery_worker_test
 	docker compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --name layman_test_run_1 layman_test
@@ -214,7 +224,8 @@ test-separated:
 		docker compose -f docker-compose.deps.yml -f docker-compose.test.yml build layman_client_test ; \
 	fi;
 	docker compose -f docker-compose.deps.yml -f docker-compose.test.yml rm -f layman_test
-	docker compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --no-deps layman_test bash -c "bash ensure-test-data.sh"
+	docker compose -f docker-compose.deps.yml -f docker-compose.test.yml up -d postgresql
+	docker compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --no-deps layman_test bash -c "bash ensure-test-data.sh && python3 src/assert_db.py"
 	docker compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --no-deps -u root layman_test bash -c "cd src && python3 -B setup_geoserver.py"
 	docker compose -f docker-compose.deps.yml -f docker-compose.test.yml up --force-recreate --no-deps -d celery_worker_test
 	docker compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --name layman_test_run_1 -e "TEST_TYPE=$(test_type)" layman_test bash -c "bash test_separated.sh $(max_fail)"
@@ -234,7 +245,8 @@ test-static:
 		docker compose -f docker-compose.deps.yml -f docker-compose.test.yml build layman_client_test ; \
 	fi;
 	docker compose -f docker-compose.deps.yml -f docker-compose.test.yml rm -f layman_test
-	docker compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --no-deps layman_test bash -c "bash ensure-test-data.sh"
+	docker compose -f docker-compose.deps.yml -f docker-compose.test.yml up -d postgresql
+	docker compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --no-deps layman_test bash -c "bash ensure-test-data.sh && python3 src/assert_db.py"
 	docker compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --no-deps -u root layman_test bash -c "cd src && python3 -B setup_geoserver.py"
 	docker compose -f docker-compose.deps.yml -f docker-compose.test.yml up --force-recreate --no-deps -d celery_worker_test
 	docker compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --name layman_test_run_1 layman_test bash -c "bash test_static.sh"
@@ -283,6 +295,7 @@ geoserver-exec:
 	docker compose -f docker-compose.deps.yml exec geoserver bash
 
 geoserver-ensure-authn:
+	docker compose -f docker-compose.deps.yml -f docker-compose.dev.yml up -d postgresql
 	docker compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm --no-deps -u root layman_dev bash -c "cd src && python3 -B setup_geoserver.py"
 
 get-current-user:

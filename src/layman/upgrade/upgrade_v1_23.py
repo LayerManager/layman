@@ -31,7 +31,10 @@ ALTER TABLE {DB_SCHEMA}.rights ADD CONSTRAINT rights_unique_key unique (id_user,
 def create_role_service_schema():
     logger.info(f'    Create internal role service schema')
 
-    create_schema = f"""CREATE SCHEMA IF NOT EXISTS "{ROLE_SERVICE_SCHEMA}" AUTHORIZATION {settings.LAYMAN_PG_USER};"""
+    drop_temporary_views = f"""drop schema if exists "{ROLE_SERVICE_SCHEMA}" CASCADE;"""
+    db_util.run_statement(drop_temporary_views)
+
+    create_schema = f"""CREATE SCHEMA "{ROLE_SERVICE_SCHEMA}" AUTHORIZATION {settings.LAYMAN_PG_USER};"""
     db_util.run_statement(create_schema)
 
     create_role_table = f"""create table {ROLE_SERVICE_SCHEMA}.bussiness_roles(
