@@ -129,7 +129,8 @@ with settings.LAYMAN_REDIS.pipeline() as pipe:
                         set_after_restart()
 
                     logger.info(f'Recreate Role Service admin role views')
-                    from .authz.role_service import ensure_admin_roles
+                    from .authz.internal_role_service import ensure_admin_roles
+
                     ensure_admin_roles()
 
                 pipe.multi()
