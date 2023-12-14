@@ -1,7 +1,7 @@
 from db import util as db_util
 from layman import settings
 
-ROLE_NAME_PATTERN = r'^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*$'
+ROLE_NAME_PATTERN = r'^(?!.{65,})[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*$'
 
 
 def get_user_roles(username):
