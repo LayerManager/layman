@@ -120,24 +120,6 @@ DROP USER IF EXISTS {READ_ONLY_USER}
             )
             response.raise_for_status()
 
-            for role in roles:
-                response = requests.delete(
-                    urljoin(geoserver.GS_REST_ROLES, f'role/{role}/user/{user}/'),
-                    headers=headers_json,
-                    auth=auth,
-                    timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
-                )
-                response.raise_for_status()
-
-            response = requests.delete(
-                urljoin(geoserver.GS_REST_ROLES, 'role/' + f"USER_{user.upper()}"),
-                headers=headers_json,
-                auth=auth,
-                timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
-            )
-            if response.status_code != 404:
-                response.raise_for_status()
-
             response = requests.delete(
                 urljoin(geoserver.GS_REST_USER, user),
                 headers=headers_json,

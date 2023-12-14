@@ -165,6 +165,7 @@ PG_NON_USER_SCHEMAS = [
     'pg_toast',
     'information_schema',
     LAYMAN_PRIME_SCHEMA,
+    LAYMAN_INTERNAL_ROLE_SERVICE_SCHEMA,
 ]
 
 PG_POSTGIS_SCHEMA = 'public'
