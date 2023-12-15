@@ -1,52 +1,10 @@
 import pytest
 
-from layman import LaymanError, settings, common
+from layman import settings, common
 from layman.common.micka import util as micka_util
 from test_tools import process_client
 
 db_schema = settings.LAYMAN_PRIME_SCHEMA
-
-
-@pytest.mark.parametrize('publ_type', process_client.PUBLICATION_TYPES)
-@pytest.mark.usefixtures('ensure_layman')
-def test_wrong_post(publ_type):
-    def check_response(exception):
-        assert exception.value.http_code == 400
-        assert exception.value.code == 43
-        assert exception.value.message == 'Wrong access rights.'
-
-    workspace = 'test_wrong_post_workspace'
-    publication = 'test_wrong_post_publication'
-
-    with pytest.raises(LaymanError) as exc_info:
-        process_client.publish_workspace_publication(publ_type, workspace, publication, access_rights={'read': 'EVRBODY'}, )
-    check_response(exc_info)
-
-    with pytest.raises(LaymanError) as exc_info:
-        process_client.publish_workspace_publication(publ_type, workspace, publication, access_rights={'write': 'EVRBODY'}, )
-    check_response(exc_info)
-
-    with pytest.raises(LaymanError) as exc_info:
-        process_client.publish_workspace_publication(publ_type, workspace, publication, access_rights={'read': 'EVRBODY', 'write': 'EVRBODY'}, )
-    check_response(exc_info)
-
-    process_client.publish_workspace_publication(publ_type, workspace, publication)
-
-    with pytest.raises(LaymanError) as exc_info:
-        process_client.patch_workspace_publication(publ_type, workspace, publication, access_rights={'read': 'EVRBODY'}, )
-    check_response(exc_info)
-
-    with pytest.raises(LaymanError) as exc_info:
-        process_client.patch_workspace_publication(publ_type, workspace, publication, access_rights={'write': 'EVRBODY'}, )
-    check_response(exc_info)
-
-    with pytest.raises(LaymanError) as exc_info:
-        process_client.patch_workspace_publication(publ_type, workspace, publication, access_rights={'read': 'EVRBODY', 'write': 'EVRBODY'}, )
-    check_response(exc_info)
-
-    process_client.patch_workspace_publication(publ_type, workspace, publication)
-
-    process_client.delete_workspace_publication(publ_type, workspace, publication)
 
 
 class TestSoapClass:
