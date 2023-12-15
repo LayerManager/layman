@@ -2,7 +2,6 @@ import logging
 
 from db import util as db_util
 from layman import settings
-from layman.authz import internal_role_service
 
 logger = logging.getLogger(__name__)
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
@@ -72,7 +71,30 @@ from {DB_SCHEMA}.users u inner join
 ;"""
     db_util.run_statement(create_layman_users_user_roles_view)
 
-    internal_role_service.ensure_admin_roles()
+    create_admin_roles_view = f"""CREATE OR REPLACE view {ROLE_SERVICE_SCHEMA}.admin_roles
+    as
+    select 'ADMIN' as name
+    UNION ALL
+    select 'GROUP_ADMIN'
+    UNION ALL
+    select %s
+    ;"""
+    db_util.run_statement(create_admin_roles_view, (settings.LAYMAN_GS_ROLE, ))
+
+    create_admin_user_roles_view = f"""CREATE OR REPLACE view {ROLE_SERVICE_SCHEMA}.admin_user_roles
+    as
+    select %s as username, %s as rolename
+    UNION ALL
+    select %s, 'ADMIN'
+    UNION ALL
+    select %s, 'ADMIN'
+    union all
+    select w.name as username,
+           %s as rolename
+    from {settings.LAYMAN_PRIME_SCHEMA}.users u inner join
+         {settings.LAYMAN_PRIME_SCHEMA}.workspaces w on w.id = u.id_workspace
+    ;"""
+    db_util.run_statement(create_admin_user_roles_view, (settings.LAYMAN_GS_USER, settings.LAYMAN_GS_ROLE, settings.LAYMAN_GS_USER, settings.GEOSERVER_ADMIN_USER, settings.LAYMAN_GS_ROLE, ))
 
     create_roles_view = f"""create view {ROLE_SERVICE_SCHEMA}.roles
 as

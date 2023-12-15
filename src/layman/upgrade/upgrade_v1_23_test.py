@@ -2,7 +2,6 @@ import pytest
 
 from db import util as db_util
 from layman import app, settings
-from layman.authz import internal_role_service
 from layman.common.prime_db_schema import ensure_whole_user
 from test_tools import process_client
 from . import upgrade_v1_23
@@ -118,12 +117,6 @@ def test_create_role_service_schema():
         assert result == 1
         result = db_util.run_query(admin_user_roles_query, ('layman_test', 'ADMIN',))[0][0]
         assert result == 1
-        result = db_util.run_query(roles_query)[0]
-        assert result[0] + result[1] + result[2] == result[3]
-        result = db_util.run_query(user_roles_query)[0]
-        assert result[0] + result[1] + result[2] == result[3]
-
-        internal_role_service.ensure_admin_roles()
         result = db_util.run_query(roles_query)[0]
         assert result[0] + result[1] + result[2] == result[3]
         result = db_util.run_query(user_roles_query)[0]
