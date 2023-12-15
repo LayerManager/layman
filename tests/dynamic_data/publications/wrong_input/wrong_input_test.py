@@ -1391,6 +1391,62 @@ TESTCASES = {
         Key.RUN_ONLY_CASES: frozenset([RestMethod.PATCH, WithChunksDomain.FALSE, CompressDomain.FALSE]),
         Key.SPECIFIC_CASES: {},
     },
+    'layer_wrong_access_rights_wrong_role': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.WORKSPACE: OWNER,
+        Key.POST_BEFORE_TEST_ARGS: {
+            'access_rights': {
+                'read': OWNER,
+                'write': OWNER,
+            },
+            'actor_name': OWNER,
+        },
+        Key.REST_ARGS: {
+            'access_rights': {
+                'read': f'{OWNER},EVERYONE,ROLE__WITH_TWO_UNDERSCORES',
+                'write': f'{OWNER},EVERYONE,ROLE__WITH_TWO_UNDERSCORES',
+            },
+            'actor_name': OWNER,
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 43,
+            'message': 'Wrong access rights.',
+        },
+        Key.MANDATORY_CASES: frozenset([RestMethod.POST, WithChunksDomain.FALSE, CompressDomain.FALSE]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod, WithChunksDomain.FALSE, CompressDomain.FALSE]),
+        Key.SPECIFIC_CASES: {},
+    },
+    'map_wrong_access_rights_wrong_role': {
+        Key.PUBLICATION_TYPE: process_client.MAP_TYPE,
+        Key.WORKSPACE: OWNER,
+        Key.POST_BEFORE_TEST_ARGS: {
+            'access_rights': {
+                'read': OWNER,
+                'write': OWNER,
+            },
+            'actor_name': OWNER,
+        },
+        Key.REST_ARGS: {
+            'access_rights': {
+                'read': f'{OWNER},EVERYONE,ROLE__WITH_TWO_UNDERSCORES',
+                'write': f'{OWNER},EVERYONE,ROLE__WITH_TWO_UNDERSCORES',
+            },
+            'actor_name': OWNER,
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 400,
+            'sync': True,
+            'code': 43,
+            'message': 'Wrong access rights.',
+        },
+        Key.MANDATORY_CASES: frozenset([RestMethod.POST, WithChunksDomain.FALSE, CompressDomain.FALSE]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod, WithChunksDomain.FALSE, CompressDomain.FALSE]),
+        Key.SPECIFIC_CASES: {},
+    },
 }
 
 
