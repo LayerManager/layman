@@ -125,11 +125,6 @@ with settings.LAYMAN_REDIS.pipeline() as pipe:
                         from .layer.prime_db_schema.wfs_wms_status import set_after_restart
                         set_after_restart()
 
-                    logger.info(f'Recreate Role Service admin role views')
-                    from .authz.internal_role_service import ensure_admin_roles
-
-                    ensure_admin_roles()
-
                 pipe.multi()
                 pipe.set(LAYMAN_DEPS_ADJUSTED_KEY, 'done')
                 pipe.execute()
