@@ -43,8 +43,8 @@ def ensure_jdbc_role_service_internal_schema():
     wait_for_db(db_conn)
 
     logger.info(f"  Checking internal role service DB schema")
-    schema_query = f'''SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name = '{internal_service_schema}';'''
-    schema_exists = db_util.run_query(schema_query, uri_str=uri_str)[0][0]
+    schema_query = f'''SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name = %s;'''
+    schema_exists = db_util.run_query(schema_query, (internal_service_schema, ), uri_str=uri_str)[0][0]
     if schema_exists == 0:
         logger.info(f"    Setting up internal role service DB schema")
         statement = f"""
@@ -61,6 +61,36 @@ def ensure_jdbc_role_service_internal_schema():
         create view {internal_service_schema}.group_roles as select null::varchar as groupname, null::varchar as rolename;
     """
         db_util.run_statement(statement, data=(settings.LAYMAN_GS_ROLE, settings.LAYMAN_GS_USER, settings.LAYMAN_GS_USER, settings.LAYMAN_GS_ROLE, settings.GEOSERVER_ADMIN_USER, ), uri_str=uri_str)
+    else:
+        prime_schema_exists = db_util.run_query(schema_query, (settings.LAYMAN_PRIME_SCHEMA, ), uri_str=uri_str)[0][0]
+        if prime_schema_exists:
+            logger.info(f'  Recreate Role Service admin role views')
+            create_admin_roles_view = f"""CREATE OR REPLACE view {internal_service_schema}.admin_roles
+            as
+            select 'ADMIN' as name
+            UNION ALL
+            select 'GROUP_ADMIN'
+            UNION ALL
+            select %s
+            ;"""
+            db_util.run_statement(create_admin_roles_view, (settings.LAYMAN_GS_ROLE,), uri_str=uri_str)
+
+            create_admin_user_roles_view = f"""CREATE OR REPLACE view {internal_service_schema}.admin_user_roles
+            as
+            select %s as username, %s as rolename
+            UNION ALL
+            select %s, 'ADMIN'
+            UNION ALL
+            select %s, 'ADMIN'
+            union all
+            select w.name as username,
+                   %s as rolename
+            from {settings.LAYMAN_PRIME_SCHEMA}.users u inner join
+                 {settings.LAYMAN_PRIME_SCHEMA}.workspaces w on w.id = u.id_workspace
+            ;"""
+            db_util.run_statement(create_admin_user_roles_view, (
+                settings.LAYMAN_GS_USER, settings.LAYMAN_GS_ROLE, settings.LAYMAN_GS_USER, settings.GEOSERVER_ADMIN_USER,
+                settings.LAYMAN_GS_ROLE,), uri_str=uri_str)
 
 
 def main():
