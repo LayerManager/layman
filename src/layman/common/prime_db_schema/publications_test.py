@@ -203,28 +203,34 @@ def test_i_can_still_write():
     assert exc_info.value.code == 43
 
 
-def test_owner_can_still_write():
-    workspace_name = 'test_owner_can_still_write_workspace'
+class TestOwnerCanStillWrite:
     username = 'test_owner_can_still_write_user'
+    username2 = 'test_owner_can_still_write_user2'
+    role1 = 'ROLE1'
 
-    publications.owner_can_still_write(None, set())
-    publications.owner_can_still_write(None, {settings.RIGHTS_EVERYONE_ROLE, })
-    publications.owner_can_still_write(None, {username, })
-    publications.owner_can_still_write(username, {settings.RIGHTS_EVERYONE_ROLE, })
-    publications.owner_can_still_write(username, {username, })
-    publications.owner_can_still_write(username, {username, workspace_name, })
+    @classmethod
+    @pytest.mark.parametrize("owner, can_write", [
+        pytest.param(None, set(), id='no-owner-empty-rights'),
+        pytest.param(None, {settings.RIGHTS_EVERYONE_ROLE}, id='no-owner-rights-everyone'),
+        pytest.param(None, {username}, id='no-owner-rights-user'),
+        pytest.param(username, {settings.RIGHTS_EVERYONE_ROLE}, id='owner-rights-everyone'),
+        pytest.param(username, {username}, id='owner-rights-owner'),
+        pytest.param(username, {username, username2}, id='owner-rights-owner-and-other-user'),
+        pytest.param(username, {username, role1}, id='owner-rights-owner-and-role'),
+    ])
+    def test_ok(cls, owner, can_write):
+        publications.owner_can_still_write(owner, can_write)
 
-    with pytest.raises(LaymanError) as exc_info:
-        publications.owner_can_still_write(username, set())
-    assert exc_info.value.code == 43
-
-    with pytest.raises(LaymanError) as exc_info:
-        publications.owner_can_still_write(username, {workspace_name, })
-    assert exc_info.value.code == 43
-
-    with pytest.raises(LaymanError) as exc_info:
-        publications.owner_can_still_write(username, {'ROLE1'})
-    assert exc_info.value.code == 43
+    @classmethod
+    @pytest.mark.parametrize("owner, can_write", [
+        pytest.param(username, set(), id='owner-empty-rights'),
+        pytest.param(username, {username2}, id='owner-rights-other-user'),
+        pytest.param(username, {role1}, id='owner-rights-role'),
+    ])
+    def test_raises(cls, owner, can_write):
+        with pytest.raises(LaymanError) as exc_info:
+            publications.owner_can_still_write(owner, can_write)
+        assert exc_info.value.code == 43
 
 
 def test_get_user_and_role_names_for_db():
