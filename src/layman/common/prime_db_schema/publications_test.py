@@ -172,35 +172,34 @@ def test_who_can_write_can_read():
     assert exc_info.value.code == 43
 
 
-def test_i_can_still_write():
-    workspace_name = 'test_i_can_still_write_workspace'
-    username = 'test_who_can_write_can_read_user'
+class TestICanStillWrite:
+    username = 'test_i_can_still_write_user'
+    username2 = 'test_i_can_still_write_user2'
+    role1 = 'ROLE1'
 
-    publications.i_can_still_write(None, {settings.RIGHTS_EVERYONE_ROLE, })
-    publications.i_can_still_write(None, {username, settings.RIGHTS_EVERYONE_ROLE, })
-    publications.i_can_still_write(username, {settings.RIGHTS_EVERYONE_ROLE, })
-    publications.i_can_still_write(username, {workspace_name, settings.RIGHTS_EVERYONE_ROLE, })
-    publications.i_can_still_write(username, {workspace_name, username, })
+    @classmethod
+    @pytest.mark.parametrize("actor_name, can_write", [
+        pytest.param(None, {settings.RIGHTS_EVERYONE_ROLE}, id='noname-rights-everyone'),
+        pytest.param(None, {username, settings.RIGHTS_EVERYONE_ROLE}, id='noname-rights-everyone-and-user'),
+        pytest.param(username, {settings.RIGHTS_EVERYONE_ROLE}, id='user-rights-everyone'),
+        pytest.param(username, {username2, settings.RIGHTS_EVERYONE_ROLE}, id='user-rights-other-user-and-everyone'),
+        pytest.param(username, {username, username2}, id='user-rights-user-and-other-user'),
+    ])
+    def test_ok(cls, actor_name, can_write):
+        publications.i_can_still_write(actor_name, can_write)
 
-    with pytest.raises(LaymanError) as exc_info:
-        publications.i_can_still_write(None, set())
-    assert exc_info.value.code == 43
-
-    with pytest.raises(LaymanError) as exc_info:
-        publications.i_can_still_write(None, {workspace_name, })
-    assert exc_info.value.code == 43
-
-    with pytest.raises(LaymanError) as exc_info:
-        publications.i_can_still_write(username, set())
-    assert exc_info.value.code == 43
-
-    with pytest.raises(LaymanError) as exc_info:
-        publications.i_can_still_write(username, {workspace_name, })
-    assert exc_info.value.code == 43
-
-    with pytest.raises(LaymanError) as exc_info:
-        publications.i_can_still_write(username, {'ROLE1'})
-    assert exc_info.value.code == 43
+    @classmethod
+    @pytest.mark.parametrize("actor_name, can_write", [
+        pytest.param(None, set(), id='noname-empty-rights'),
+        pytest.param(None, {username2}, id='noname-rights-other-user'),
+        pytest.param(username, set(), id='user-empty-rights'),
+        pytest.param(username, {username2}, id='user-rights-other-user'),
+        pytest.param(username, {role1}, id='user-rights-role'),
+    ])
+    def test_raises(cls, actor_name, can_write):
+        with pytest.raises(LaymanError) as exc_info:
+            publications.i_can_still_write(actor_name, can_write)
+        assert exc_info.value.code == 43
 
 
 class TestOwnerCanStillWrite:
