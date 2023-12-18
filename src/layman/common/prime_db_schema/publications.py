@@ -394,7 +394,12 @@ def who_can_write_can_read(can_read, can_write):
 
 
 def i_can_still_write(actor_name, can_write):
-    if ROLE_EVERYONE not in can_write and actor_name not in can_write:
+    if ROLE_EVERYONE not in can_write and (
+            (not actor_name) or (
+                actor_name not in can_write
+                and not any(role in can_write for role in role_service.get_user_roles(actor_name))
+            )
+    ):
         raise LaymanError(43, f'After the operation, the actor has to have write right.')
 
 
