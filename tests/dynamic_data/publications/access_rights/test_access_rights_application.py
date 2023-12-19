@@ -5,6 +5,7 @@ import pytest
 from layman import settings, LaymanError
 from test_tools import process_client, role_service as role_service_util
 from tests import Publication, EnumTestTypes
+from tests.asserts.final.publication import geoserver_proxy
 from tests.dynamic_data import base_test
 
 ENDPOINTS_TO_TEST = {
@@ -29,6 +30,11 @@ ENDPOINTS_TO_TEST = {
 
 ENDPOINTS_TO_TEST_NEGATIVE_ONLY = [
     (process_client.delete_workspace_publication, {}),
+]
+
+GEOSERVER_METHODS_TO_TEST = [
+    (geoserver_proxy.is_complete_in_workspace_wms_1_3_0, {}),
+    (geoserver_proxy.workspace_wfs_2_0_0_capabilities_available_if_vector, {}),
 ]
 
 
@@ -73,8 +79,9 @@ def add_publication_test_cases_to_list(tc_list, publication, user, endpoints_to_
         'layer': publication.name,
         'actor_name': user,
         'publication_type': publication.type,
+        'publ_type': publication.type,
     }
-    for method, args in endpoints_to_test[publication.type]:
+    for method, args in endpoints_to_test:
         pytest_id = f'{method.__name__}__{user.split("_")[-1]}__{publication.name[5:]}{("__" + next(iter(args.keys()))) if args else ""}'
         method_args = inspect.getfullargspec(method).args + inspect.getfullargspec(method).kwonlyargs
 
@@ -93,7 +100,7 @@ def generate_positive_test_cases(publications_user_can_read):
     tc_list = []
     for user, publications in publications_user_can_read.items():
         for publication in publications:
-            add_publication_test_cases_to_list(tc_list, publication, user, ENDPOINTS_TO_TEST)
+            add_publication_test_cases_to_list(tc_list, publication, user, ENDPOINTS_TO_TEST[publication.type])
     return tc_list
 
 
@@ -104,7 +111,7 @@ def generate_negative_test_cases(publications_user_can_read, publication_all):
             if publication in available_publications:
                 continue
             endpoints_to_test = {publ_type: endpoints + ENDPOINTS_TO_TEST_NEGATIVE_ONLY for publ_type, endpoints in ENDPOINTS_TO_TEST.items()}
-            add_publication_test_cases_to_list(tc_list, publication, user, endpoints_to_test)
+            add_publication_test_cases_to_list(tc_list, publication, user, endpoints_to_test[publication.type])
     return tc_list
 
 
@@ -136,6 +143,24 @@ def generate_multiendpoint_test_cases(publications_user_can_read, workspace, ):
                                                )
 
             tc_list.append(test_case)
+    return tc_list
+
+
+def generate_positive_geoserver_test_cases(publications_user_can_read):
+    tc_list = []
+    for user, publications in publications_user_can_read.items():
+        for publication in publications:
+            if publication.type == process_client.LAYER_TYPE:
+                add_publication_test_cases_to_list(tc_list, publication, user, GEOSERVER_METHODS_TO_TEST)
+    return tc_list
+
+
+def generate_geoserver_negative_test_cases(publications_user_can_read, publication_all):
+    tc_list = []
+    for user, available_publications in publications_user_can_read.items():
+        for publication in publication_all:
+            if publication not in available_publications and publication.type == process_client.LAYER_TYPE:
+                add_publication_test_cases_to_list(tc_list, publication, user, GEOSERVER_METHODS_TO_TEST)
     return tc_list
 
 
@@ -197,9 +222,10 @@ class TestAccessRights:
     }
 
     test_cases = {
-        'test_single_positive': generate_positive_test_cases(PUBLICATIONS_BY_USER),
+        'test_single_positive': generate_positive_test_cases(PUBLICATIONS_BY_USER) + generate_positive_geoserver_test_cases(PUBLICATIONS_BY_USER),
         'test_single_negative': generate_negative_test_cases(PUBLICATIONS_BY_USER, PUBLICATIONS),
         'test_multiendpoint': generate_multiendpoint_test_cases(PUBLICATIONS_BY_USER, OWNER),
+        'test_geoserver_negative': generate_geoserver_negative_test_cases(PUBLICATIONS_BY_USER, PUBLICATIONS),
     }
 
     @pytest.fixture(scope='class', autouse=True)
@@ -238,3 +264,8 @@ class TestAccessRights:
         result = rest_method(**rest_args)
         result_publications = [(publ['workspace'], f"layman.{publ['publication_type']}", publ['name']) for publ in result]
         assert result_publications == params['exp_publications']
+
+    def test_geoserver_negative(self, rest_method, rest_args, ):
+        with pytest.raises(AssertionError) as exc_info:
+            rest_method(**rest_args)
+        assert exc_info.value.args[0].startswith('Layer not found in Capabilities.')
