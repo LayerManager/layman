@@ -91,10 +91,10 @@ def set_security_rules(workspace, layer, access_rights, auth, geoserver_workspac
     read_roles = access_rights.get('read') if access_rights and access_rights.get('read') else layer_info['access_rights']['read']
     write_roles = access_rights.get('write') if access_rights and access_rights.get('write') else layer_info['access_rights']['write']
 
-    security_read_roles = gs_common.layman_users_to_geoserver_roles(read_roles)
+    security_read_roles = gs_common.layman_users_and_roles_to_geoserver_roles(read_roles)
     gs_util.ensure_layer_security_roles(geoserver_workspace, layer, security_read_roles, 'r', auth)
 
-    security_write_roles = gs_common.layman_users_to_geoserver_roles(write_roles)
+    security_write_roles = gs_common.layman_users_and_roles_to_geoserver_roles(write_roles)
     gs_util.ensure_layer_security_roles(geoserver_workspace, layer, security_write_roles, 'w', auth)
 
 
