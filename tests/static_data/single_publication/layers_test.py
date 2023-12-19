@@ -9,7 +9,7 @@ import pytest
 import crs as crs_def
 from geoserver import GS_REST_WORKSPACES, GS_REST, GS_AUTH, util as gs_util
 from layman import settings, app, util as layman_util
-from layman.common import bbox as bbox_util, geoserver as gs_common
+from layman.common import bbox as bbox_util
 from layman.common.micka import util as micka_common_util
 from layman.layer import util as layer_util, db as layer_db, get_layer_info_keys
 from layman.layer.geoserver.wms import DEFAULT_WMS_QGIS_STORE_PREFIX, VERSION
@@ -252,30 +252,6 @@ def test_fill_project_template(workspace, publ_type, publication):
     with pytest.raises(requests.exceptions.HTTPError) as excinfo:
         WebMapService(wms_url, version=wms_version)
     assert excinfo.value.response.status_code == 500
-
-
-@pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_LAYERS)
-@pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman')
-def test_gs_data_security(workspace, publ_type, publication):
-    ensure_publication(workspace, publ_type, publication)
-
-    auth = settings.LAYMAN_GS_AUTH
-    is_personal_workspace = workspace in data.USERS
-    owner_and_everyone_roles = gs_common.layman_users_and_roles_to_geoserver_roles({workspace, settings.RIGHTS_EVERYONE_ROLE})
-    owner_role_set = gs_common.layman_users_and_roles_to_geoserver_roles({workspace})
-    with app.app_context():
-        info = layman_util.get_publication_info(workspace, publ_type, publication, context={'keys': ['access_rights', 'wms']})
-    expected_roles = info['access_rights']
-    gs_workspace = info['_wms']['workspace']
-    geodata_type = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('geodata_type')
-    workspaces = [workspace, gs_workspace] if geodata_type != settings.GEODATA_TYPE_RASTER else [gs_workspace]
-    for right_type in ['read', 'write']:
-        for wspace in workspaces:
-            gs_expected_roles = gs_common.layman_users_and_roles_to_geoserver_roles(expected_roles[right_type])
-            gs_roles = gs_util.get_security_roles(f'{wspace}.{publication}.{right_type[0]}', auth)
-            assert gs_expected_roles == gs_roles\
-                or (is_personal_workspace
-                    and gs_expected_roles == owner_and_everyone_roles == gs_roles.union(owner_role_set)), f'gs_expected_roles={gs_expected_roles}, gs_roles={gs_roles}, wspace={wspace}, is_personal_workspace={is_personal_workspace}'
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', [(wspace, ptype, pub)

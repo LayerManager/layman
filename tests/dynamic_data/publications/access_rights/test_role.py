@@ -1,17 +1,14 @@
 import pytest
 
+from geoserver import util as gs_util
+from layman import app, settings, util as layman_util
+from layman.common import geoserver as gs_common
 from test_tools import process_client, role_service
 from tests import EnumTestTypes, Publication
 from tests.asserts.final.publication import util as assert_util
 from tests.dynamic_data import base_test, base_test_classes
-from tests.dynamic_data.publications import common_publications
 
 pytest_generate_tests = base_test.pytest_generate_tests
-
-
-class PublicationTypes(base_test_classes.PublicationByDefinitionBase):
-    LAYER = (common_publications.LAYER_VECTOR_SLD, 'layer')
-    MAP = (common_publications.MAP_EMPTY, 'map')
 
 
 USERNAME = 'test_access_rights_role_user1'
@@ -27,13 +24,15 @@ class TestPublication(base_test.TestSingleRestPublication):
     publication_type = None
 
     rest_parametrization = [
-        PublicationTypes,
+        base_test.PublicationByUsedServers,
         base_test_classes.RestMethod
     ]
 
     usernames_to_reserve = [
         USERNAME,
     ]
+
+    external_tables_to_create = base_test_classes.EXTERNAL_TABLE_FOR_LAYERS_BY_USED_SERVERS
 
     def before_class(self):
         for role in ROLES:
@@ -74,5 +73,20 @@ class TestPublication(base_test.TestSingleRestPublication):
 
         info = process_client.get_workspace_publication(publication.type, publication.workspace, publication.name,
                                                         actor_name=USERNAME)
-        assert set(info['access_rights']['read']) == USER_ROLE1_ROLE2
-        assert set(info['access_rights']['write']) == USER_ROLE1
+        for right, exp_rights in [('read', USER_ROLE1_ROLE2),
+                                  ('write', USER_ROLE1),
+                                  ]:
+            assert set(info['access_rights'][right]) == exp_rights
+
+            if publication.type == process_client.LAYER_TYPE:
+                with app.app_context():
+                    internal_info = layman_util.get_publication_info(publication.workspace, publication.type, publication.name, {'keys': ['geodata_type', 'wms']})
+
+                geodata_type = internal_info['geodata_type']
+                gs_workspace = internal_info['_wms']['workspace']
+                workspaces = [publication.workspace, gs_workspace] if geodata_type != settings.GEODATA_TYPE_RASTER else [gs_workspace]
+                for wspace in workspaces:
+                    gs_expected_roles = gs_common.layman_users_and_roles_to_geoserver_roles(exp_rights)
+                    rule = f'{wspace}.{publication.name}.{right[0]}'
+                    gs_roles = gs_util.get_security_roles(rule, settings.LAYMAN_GS_AUTH)
+                    assert gs_expected_roles == gs_roles, f'gs_expected_roles={gs_expected_roles}, gs_roles={gs_roles}, wspace={wspace}, rule={rule}'
