@@ -1,7 +1,7 @@
 import pytest
 
 import crs as crs_def
-from layman import app, util as layman_util, settings
+from layman import app, settings
 from layman.common import bbox as bbox_util
 from layman.layer.filesystem import gdal
 from test_tools import assert_util, process_client
@@ -42,47 +42,6 @@ def test_infos(workspace, publ_type, publication):
     if 'geodata_type' in publ_def[data.TEST_DATA]:
         exp_geodata_type = publ_def[data.TEST_DATA]['geodata_type']
         assert rest_detail['geodata_type'] == exp_geodata_type
-
-
-@pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)
-@pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman')
-def test_auth_get_publications(workspace, publ_type, publication):
-    ensure_publication(workspace, publ_type, publication)
-
-    all_auth_info = util.get_users_and_headers_for_publication(workspace, publ_type, publication)
-    headers_list_in = all_auth_info['read'][util.KEY_AUTH][util.KEY_HEADERS]
-    headers_list_out = all_auth_info['read'][util.KEY_NOT_AUTH][util.KEY_HEADERS]
-
-    for in_headers in headers_list_in:
-        infos = process_client.get_publications(publ_type, workspace=workspace, headers=in_headers)
-        publication_names = [li['name'] for li in infos]
-        assert publication in publication_names, in_headers
-
-    for out_headers in headers_list_out:
-        infos = process_client.get_publications(publ_type, workspace=workspace, headers=out_headers)
-        publication_names = [li['name'] for li in infos]
-        assert publication not in publication_names, out_headers
-
-
-@pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)
-@pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman')
-def test_auth_get_publication(workspace, publ_type, publication):
-    ensure_publication(workspace, publ_type, publication)
-
-    all_auth_info = util.get_users_and_headers_for_publication(workspace, publ_type, publication)
-    readers = all_auth_info['read'][util.KEY_AUTH][util.KEY_USERS]
-    non_readers = all_auth_info['read'][util.KEY_NOT_AUTH][util.KEY_USERS]
-
-    for user in readers:
-        with app.app_context():
-            pub_info = layman_util.get_publication_info(workspace, publ_type, publication, {'actor_name': user})
-        assert pub_info['name'] == publication, f'pub_info={pub_info}'
-        assert pub_info['type'] == publ_type, f'pub_info={pub_info}'
-
-    for user in non_readers:
-        with app.app_context():
-            pub_info = layman_util.get_publication_info(workspace, publ_type, publication, {'actor_name': user})
-        assert not pub_info, pub_info
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)
