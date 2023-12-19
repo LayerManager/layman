@@ -58,11 +58,11 @@ def patch_layer(workspace, layername, original_data_source, title, description, 
     clear_cache(workspace)
 
     if access_rights and access_rights.get('read'):
-        security_read_roles = gs_common.layman_users_to_geoserver_roles(access_rights['read'])
+        security_read_roles = gs_common.layman_users_and_roles_to_geoserver_roles(access_rights['read'])
         gs_util.ensure_layer_security_roles(geoserver_workspace, layername, security_read_roles, 'r', settings.LAYMAN_GS_AUTH)
 
     if access_rights and access_rights.get('write'):
-        security_write_roles = gs_common.layman_users_to_geoserver_roles(access_rights['write'])
+        security_write_roles = gs_common.layman_users_and_roles_to_geoserver_roles(access_rights['write'])
         gs_util.ensure_layer_security_roles(geoserver_workspace, layername, security_write_roles, 'w', settings.LAYMAN_GS_AUTH)
 
 

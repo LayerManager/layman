@@ -261,8 +261,8 @@ def test_gs_data_security(workspace, publ_type, publication):
 
     auth = settings.LAYMAN_GS_AUTH
     is_personal_workspace = workspace in data.USERS
-    owner_and_everyone_roles = gs_common.layman_users_to_geoserver_roles({workspace, settings.RIGHTS_EVERYONE_ROLE})
-    owner_role_set = gs_common.layman_users_to_geoserver_roles({workspace})
+    owner_and_everyone_roles = gs_common.layman_users_and_roles_to_geoserver_roles({workspace, settings.RIGHTS_EVERYONE_ROLE})
+    owner_role_set = gs_common.layman_users_and_roles_to_geoserver_roles({workspace})
     with app.app_context():
         info = layman_util.get_publication_info(workspace, publ_type, publication, context={'keys': ['access_rights', 'wms']})
     expected_roles = info['access_rights']
@@ -271,7 +271,7 @@ def test_gs_data_security(workspace, publ_type, publication):
     workspaces = [workspace, gs_workspace] if geodata_type != settings.GEODATA_TYPE_RASTER else [gs_workspace]
     for right_type in ['read', 'write']:
         for wspace in workspaces:
-            gs_expected_roles = gs_common.layman_users_to_geoserver_roles(expected_roles[right_type])
+            gs_expected_roles = gs_common.layman_users_and_roles_to_geoserver_roles(expected_roles[right_type])
             gs_roles = gs_util.get_security_roles(f'{wspace}.{publication}.{right_type[0]}', auth)
             assert gs_expected_roles == gs_roles\
                 or (is_personal_workspace
