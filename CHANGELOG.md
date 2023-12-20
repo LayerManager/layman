@@ -5,7 +5,7 @@
 ### Upgrade requirements
 - Change environment variable [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION):
   ```
-  LAYMAN_CLIENT_VERSION=v1.17.2
+  LAYMAN_CLIENT_VERSION=d1b504525db23129c3998bbc18383aa1dba76efa
   ```
   It was already required in v1.22.3.
 - Set new environment variable [LAYMAN_ROLE_SERVICE_URI](doc/env-settings.md#LAYMAN_ROLE_SERVICE_URI)
@@ -32,6 +32,7 @@
   - [GET](doc/rest.md#get-workspace-map)/[PATCH](doc/rest.md#patch-workspace-map) Workspace Map
   - GET Workspace [Layers](doc/rest.md#get-workspace-layers)/[Maps](doc/rest.md#get-workspace-maps)
   - GET [Layers](doc/rest.md#get-layers)/[Maps](doc/rest.md#get-maps)/[Publications](doc/rest.md#get-publications)
+- [#165](https://github.com/LayerManager/layman/issues/165) New REST endpoint [GET Roles](doc/rest.md#get-roles) with list of all roles registered in [JDBC Role Service](https://docs.geoserver.org/2.21.x/en/user/security/usergrouprole/roleservices.html#jdbc-role-service), that can be used in access rights. This new endpoint was added to Test Client into tab "Others".
 - All changes from [v1.22.1](#v1221), [v1.22.2](#v1222) and [v1.22.3](#v1223).
 - [#960](https://github.com/LayerManager/layman/issues/960) Handle WMS requests with HTTP error more efficiently in timgen.
 - [#962](https://github.com/LayerManager/layman/issues/962) Make values of `layman_metadata.publication_status` and `status` key(s) more consistent in responses of PATCH Workspace [Layer](doc/rest.md#patch-workspace-layer)/[Map](doc/rest.md#patch-workspace-map) and GET Workspace [Layer](doc/rest.md#get-workspace-layer)/[Map](doc/rest.md#get-workspace-map).

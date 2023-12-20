@@ -47,10 +47,12 @@ for bp in get_blueprints():
 from .user.rest_current_user import bp as current_user_bp
 from .geoserver_proxy import bp as geoserver_proxy_bp
 from .user.rest_users import bp as users_bp
+from .user.rest_roles import bp as roles_bp
 
 app.register_blueprint(current_user_bp, url_prefix='/rest/current-user')
 app.register_blueprint(geoserver_proxy_bp, url_prefix='/geoserver')
 app.register_blueprint(users_bp, url_prefix=f'/rest/{settings.REST_USERS_PREFIX}')
+app.register_blueprint(roles_bp, url_prefix=f'/rest/{settings.REST_ROLES_PREFIX}')
 
 logger.info(f"IN_CELERY_WORKER_PROCESS={IN_CELERY_WORKER_PROCESS}")
 logger.info(f"IN_PYTEST_PROCESS={IN_PYTEST_PROCESS}")
