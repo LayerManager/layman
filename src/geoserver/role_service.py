@@ -4,7 +4,9 @@ import shutil
 import sys
 from urllib.parse import urlparse
 from xml.sax.saxutils import escape
+import psycopg2
 
+from db import util as db_util
 from requests_util import url_util
 from . import authn
 
@@ -59,3 +61,19 @@ def set_primary_role_service(data_dir, role_service_name):
     element.text = role_service_name
     security_path = os.path.join(data_dir, 'security/config.xml')
     security_xml.write(security_path)
+
+
+def check_jdbc_role_service(role_service_db_uri, role_service_schema):
+
+    try:
+        db_util.get_connection_pool(db_uri_str=role_service_db_uri, encapsulate_exception=False)
+    except psycopg2.OperationalError as exc:
+        secret_conn_dict = url_util.redact_uri(role_service_db_uri)
+        raise Exception(f"Failed to connect to role service database {secret_conn_dict}") from exc
+
+    try:
+        db_util.run_query(f"select name, parent from {role_service_schema}.roles limit 0",
+                          uri_str=role_service_db_uri, encapsulate_exception=False)
+    except BaseException as exc:
+        secret_conn_dict = url_util.redact_uri(role_service_db_uri)
+        raise Exception(f"Error querying role service database {secret_conn_dict}") from exc

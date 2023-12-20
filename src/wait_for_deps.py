@@ -5,7 +5,7 @@ from urllib.parse import urljoin
 
 import geoserver
 import layman_settings as settings
-
+from geoserver.role_service import check_jdbc_role_service
 
 ATTEMPT_INTERVAL = 2
 MAX_ATTEMPTS = 60
@@ -46,6 +46,11 @@ def main():
         except psycopg2.OperationalError as exc:
             handle_exception(exc, attempt, wait_for_msg)
             attempt += 1
+    print()
+
+    # Check PostgreSQL role service and stops immediately in case of any error
+    print(f"Checking PostgreSQL role service")
+    check_jdbc_role_service(settings.LAYMAN_ROLE_SERVICE_URI, settings.LAYMAN_ROLE_SERVICE_SCHEMA)
     print()
 
     # QGIS Server
