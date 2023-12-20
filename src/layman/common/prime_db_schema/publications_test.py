@@ -121,55 +121,45 @@ def test_at_least_one_can_write():
     assert exc_info.value.code == 43
 
 
-def test_who_can_write_can_read():
-    workspace_name = 'test_who_can_write_can_read_workspace'
+class TestWhoCanWriteCanRead:
     username = 'test_who_can_write_can_read_user'
+    username2 = 'test_who_can_write_can_read_user2'
+    role1 = 'test_who_can_write_can_read_role1'
+    role2 = 'test_who_can_write_can_read_role2'
 
-    publications.who_can_write_can_read(set(), set())
-    publications.who_can_write_can_read({username, }, {username, })
-    publications.who_can_write_can_read({username, workspace_name}, {username, })
-    publications.who_can_write_can_read({username, settings.RIGHTS_EVERYONE_ROLE}, {username, })
-    publications.who_can_write_can_read({username, settings.RIGHTS_EVERYONE_ROLE}, {username, settings.RIGHTS_EVERYONE_ROLE, })
-    publications.who_can_write_can_read({settings.RIGHTS_EVERYONE_ROLE, }, {settings.RIGHTS_EVERYONE_ROLE, })
-    publications.who_can_write_can_read({settings.RIGHTS_EVERYONE_ROLE, }, {settings.RIGHTS_EVERYONE_ROLE, username, })
-    publications.who_can_write_can_read({settings.RIGHTS_EVERYONE_ROLE, }, {settings.RIGHTS_EVERYONE_ROLE, workspace_name, })
-    publications.who_can_write_can_read({settings.RIGHTS_EVERYONE_ROLE, username, }, {settings.RIGHTS_EVERYONE_ROLE, })
-    publications.who_can_write_can_read({settings.RIGHTS_EVERYONE_ROLE, username, }, set())
-    publications.who_can_write_can_read({workspace_name, }, {workspace_name, })
-    publications.who_can_write_can_read({'ROLE1'}, {'ROLE1'})
-    publications.who_can_write_can_read({settings.RIGHTS_EVERYONE_ROLE}, {'ROLE1'})
+    @pytest.mark.parametrize("can_read, can_write", [
+        pytest.param(set(), set(), id='read-empty-write-empty'),
+        pytest.param({username}, {username}, id='read-user-write-user'),
+        pytest.param({username, username2}, {username}, id='read-two-users-write-user'),
+        pytest.param({username, settings.RIGHTS_EVERYONE_ROLE}, {username}, id='read-user-everyone-write-user'),
+        pytest.param({username, settings.RIGHTS_EVERYONE_ROLE}, {username, settings.RIGHTS_EVERYONE_ROLE},
+                     id='read-user-everyone-write-user-everyone'),
+        pytest.param({settings.RIGHTS_EVERYONE_ROLE}, {settings.RIGHTS_EVERYONE_ROLE},
+                     id='read-everyone-write-everyone'),
+        pytest.param({settings.RIGHTS_EVERYONE_ROLE}, {settings.RIGHTS_EVERYONE_ROLE, username},
+                     id='read-everyone-write-user-everyone'),
+        pytest.param({settings.RIGHTS_EVERYONE_ROLE, username}, {settings.RIGHTS_EVERYONE_ROLE},
+                     id='read-user-everyone-write-everyone'),
+        pytest.param({settings.RIGHTS_EVERYONE_ROLE, username}, set(), id='read-user-everyone-write-empty'),
+        pytest.param({role1}, {role1}, id='read-role-write-role'),
+        pytest.param({settings.RIGHTS_EVERYONE_ROLE}, {role1}, id='read-everyone-write-role'),
+    ])
+    def test_ok(self, can_read, can_write):
+        publications.who_can_write_can_read(can_read, can_write)
 
-    with pytest.raises(LaymanError) as exc_info:
-        publications.who_can_write_can_read(set(), {workspace_name, })
-    assert exc_info.value.code == 43
-
-    with pytest.raises(LaymanError) as exc_info:
-        publications.who_can_write_can_read(set(), {username, })
-    assert exc_info.value.code == 43
-
-    with pytest.raises(LaymanError) as exc_info:
-        publications.who_can_write_can_read(set(), {settings.RIGHTS_EVERYONE_ROLE, })
-    assert exc_info.value.code == 43
-
-    with pytest.raises(LaymanError) as exc_info:
-        publications.who_can_write_can_read({username}, {settings.RIGHTS_EVERYONE_ROLE, })
-    assert exc_info.value.code == 43
-
-    with pytest.raises(LaymanError) as exc_info:
-        publications.who_can_write_can_read({username}, {workspace_name, })
-    assert exc_info.value.code == 43
-
-    with pytest.raises(LaymanError) as exc_info:
-        publications.who_can_write_can_read({username}, {'ROLE1'})
-    assert exc_info.value.code == 43
-
-    with pytest.raises(LaymanError) as exc_info:
-        publications.who_can_write_can_read({'ROLE2'}, {'ROLE1'})
-    assert exc_info.value.code == 43
-
-    with pytest.raises(LaymanError) as exc_info:
-        publications.who_can_write_can_read({'ROLE2'}, {settings.RIGHTS_EVERYONE_ROLE})
-    assert exc_info.value.code == 43
+    @pytest.mark.parametrize("can_read, can_write", [
+        pytest.param(set(), {username}, id='read-empty-write-user'),
+        pytest.param(set(), {settings.RIGHTS_EVERYONE_ROLE}, id='read-empty-write-everyone'),
+        pytest.param({username}, {settings.RIGHTS_EVERYONE_ROLE}, id='read-user-write-everyone'),
+        pytest.param({username}, {username2}, id='read-user-write-user2'),
+        pytest.param({username}, {role1}, id='read-user-write-role'),
+        pytest.param({role1}, {role2}, id='read-role1-write-role2'),
+        pytest.param({role1}, {settings.RIGHTS_EVERYONE_ROLE}, id='read-role1-write-everyone'),
+    ])
+    def test_raises(self, can_read, can_write):
+        with pytest.raises(LaymanError) as exc_info:
+            publications.who_can_write_can_read(can_read, can_write)
+        assert exc_info.value.code == 43
 
 
 class TestICanStillWrite:
