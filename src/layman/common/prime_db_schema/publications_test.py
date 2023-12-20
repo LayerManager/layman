@@ -127,6 +127,19 @@ class TestWhoCanWriteCanRead:
     role1 = 'test_who_can_write_can_read_role1'
     role2 = 'test_who_can_write_can_read_role2'
 
+    @pytest.fixture(scope="class", autouse=True)
+    def provide_data(self, request):
+        with app.app_context():
+            ensure_user(self.username, '13')
+            ensure_role(self.role1)
+            ensure_user_role(self.username, self.role1)
+        yield
+        if request.node.session.testsfailed == 0:
+            with app.app_context():
+                delete_user_role(self.username, self.role1)
+                delete_role(self.role1)
+                users.delete_user(self.username)
+
     @pytest.mark.parametrize("can_read, can_write", [
         pytest.param(set(), set(), id='read-empty-write-empty'),
         pytest.param({username}, {username}, id='read-user-write-user'),
@@ -153,6 +166,7 @@ class TestWhoCanWriteCanRead:
         pytest.param({username}, {settings.RIGHTS_EVERYONE_ROLE}, id='read-user-write-everyone'),
         pytest.param({username}, {username2}, id='read-user-write-user2'),
         pytest.param({username}, {role1}, id='read-user-write-role'),
+        pytest.param({role1}, {username}, id='read-role-write-user'),
         pytest.param({role1}, {role2}, id='read-role1-write-role2'),
         pytest.param({role1}, {settings.RIGHTS_EVERYONE_ROLE}, id='read-role1-write-everyone'),
     ])
