@@ -6,7 +6,7 @@ import redis
 
 import db
 import geoserver
-from layman_settings_util import read_clients_dict_from_env
+from layman_settings_util import read_clients_dict_from_env, validate_layman_role_service_uri
 import micka
 
 
@@ -110,6 +110,7 @@ LAYMAN_GS_ROLE_SERVICE = 'layman_role_service'
 # Name of schema, where Layman maintains internal GS JDBC Role Service.
 LAYMAN_INTERNAL_ROLE_SERVICE_SCHEMA = '_role_service'
 LAYMAN_ROLE_SERVICE_URI = os.environ['LAYMAN_ROLE_SERVICE_URI']
+validate_layman_role_service_uri(LAYMAN_ROLE_SERVICE_URI, 'LAYMAN_ROLE_SERVICE_URI')
 LAYMAN_ROLE_SERVICE_SCHEMA = parse_qs(urlparse(LAYMAN_ROLE_SERVICE_URI).query)['schema'][0]
 
 LAYMAN_GS_USER_GROUP_SERVICE = os.getenv('LAYMAN_GS_USER_GROUP_SERVICE', '') or 'default'

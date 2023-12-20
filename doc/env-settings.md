@@ -100,7 +100,7 @@ List of [users](models.md#user) and [roles](models.md#role) giving them permissi
 List of [users](models.md#user) and [roles](models.md#role) giving them permission to publish new [publication](models.md#publication) in already created [public workspace](models.md#public-workspace).
 
 ### LAYMAN_ROLE_SERVICE_URI
-URL of Role Service with schema in format `postgresql://<username>:<password>@<host>:<port>/<dbname>?schema=<schema_name>`. If you want to use internal Role Service, set it to `postgresql://<LAYMAN_PG_USER>:<LAYMAN_PG_PASSWORD>@<LAYMAN_PG_HOST>:<LAYMAN_PG_PORT>/<LAYMAN_PG_DBNAME>?schema=_role_service` (replace variable names with their values).
+URL of Role Service with schema in format `postgresql://<username>:<password>@<host>:<port>/<dbname>?schema=<schema_name>`. If you want to use internal Role Service, set it to `postgresql://<LAYMAN_PG_USER>:<LAYMAN_PG_PASSWORD>@<LAYMAN_PG_HOST>:<LAYMAN_PG_PORT>/<LAYMAN_PG_DBNAME>?schema=_role_service` (replace variable names with their values). URL scheme must be `postgresql`. URL host must be mentioned explicitly, as well as DB schema in `schema` URL query parameter.
 
 ## Layman Test Client Settings
 
