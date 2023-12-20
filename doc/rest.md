@@ -19,6 +19,7 @@
 |Workspace Map Metadata Comparison|`/rest/workspaces/<workspace_name>/layers/<layername>/metadata-comparison`|[GET](#get-workspace-map-metadata-comparison) | x | x | x |
 |Users|`/rest/users`|[GET](#get-users)| x | x | x |
 |Current [User](models.md#user)|`/rest/current-user`|[GET](#get-current-user)| x | [PATCH](#patch-current-user) | [DELETE](#delete-current-user) |
+|Roles|`/rest/roles`|[GET](#get-roles)| x | x | x |
 |Version|`/rest/about/version`|[GET](#get-version)| x | x | x |
 
 #### REST path parameters
@@ -849,6 +850,21 @@ No action parameters.
 Content-Type: `application/json`
 
 HTTP status code 200 if credentials were deleted.
+
+## Roles
+### URL
+`/rest/roles`
+
+### GET Roles
+Get list of roles.
+
+#### Request.
+No action parameters.
+
+#### Response
+Content-Type: `application/json`
+
+JSON array of role names, where each role name is a `string`.
 
 ## Version
 ### URL
