@@ -1,5 +1,6 @@
 import logging
 
+from geoserver import util as gs_util
 from db import util as db_util
 from layman import settings
 
@@ -134,3 +135,5 @@ from {ROLE_SERVICE_SCHEMA}.admin_user_roles
     create index group_roles_idx on {ROLE_SERVICE_SCHEMA}.group_roles(rolename,groupname);
     """
     db_util.run_statement(create_other_tables)
+
+    gs_util.reload(settings.LAYMAN_GS_AUTH)
