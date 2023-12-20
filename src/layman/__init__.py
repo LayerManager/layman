@@ -83,11 +83,12 @@ with settings.LAYMAN_REDIS.pipeline() as pipe:
                 pipe.execute()
 
                 with app.app_context():
-                    logger.info(f'Adjusting GeoServer roles')
 
                     if settings.GEOSERVER_ADMIN_AUTH:
+                        logger.info(f'Ensuring Layman user on GeoServer')
                         gs_util.ensure_user(settings.LAYMAN_GS_USER, settings.LAYMAN_GS_PASSWORD, settings.GEOSERVER_ADMIN_AUTH)
 
+                    logger.info(f'Adjusting GeoServer proxy base URL')
                     gs_util.ensure_proxy_base_url(settings.LAYMAN_GS_PROXY_BASE_URL_WITH_PLACEHOLDERS, settings.LAYMAN_GS_AUTH)
 
                     if not IN_UPGRADE_PROCESS:
