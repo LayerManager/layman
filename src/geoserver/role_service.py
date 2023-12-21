@@ -20,7 +20,7 @@ DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
 def setup_jdbc_role_service(data_dir, service_url, role_service_name, db_schema):
     logger.info(f"Ensuring GeoServer DB role service '{role_service_name}' "
-                f"for URL: {service_url}.")
+                f"for URL: {url_util.redact_uri(service_url)}.")
 
     role_service_path = os.path.join(data_dir, ROLE_SERVICE_PATH)
     layman_role_service_path = os.path.join(role_service_path, role_service_name)
