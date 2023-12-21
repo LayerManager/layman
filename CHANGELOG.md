@@ -566,8 +566,8 @@ make timgen-build
 - [#380](https://github.com/LayerManager/layman/issues/380) Enable to upload geojson with "id" attribute with non-unique values.
 - [#383](https://github.com/LayerManager/layman/issues/383) Add new Makefile target `upgrade-after-timeout` to finish upgrade in case of GeoServer call timeout.
 - Fix [GET Workspace Layer](doc/rest.md#get-workspace-layer) documentation; `style` item was incorrectly used instead of `sld`.
-- [#347](https://github.com/LayerManager/layman/issues/347) Upgrade PostgreSQL 10 to 13.3 and PostGIS 2.4 to 3.1. Use docker image from [layermanager/postgis@hub.docker.com](https://hub.docker.com/repository/docker/layermanager/postgis@github.com), source is located at [layermanager/docker-postgis@github.com](https://github.com/LayerManager/docker-postgis).
-- [#367](https://github.com/LayerManager/layman/issues/367) Upgrade gdal from 2.4 to 3.3. Use docker image from [osgeo/gdal@hub.docker.com](https://hub.docker.com/r/osgeo/gdal), source is located at [osgeo/gdal@github.com](https://github.com/OSGeo/gdal/tree/master/docker).
+- [#347](https://github.com/LayerManager/layman/issues/347) Upgrade PostgreSQL 10 to 13.3 and PostGIS 2.4 to 3.1. Use docker image from [layermanager/postgis@hub.docker.com](https://hub.docker.com/repository/docker/layermanager/postgis), source is located at [layermanager/docker-postgis@github.com](https://github.com/LayerManager/docker-postgis).
+- [#367](https://github.com/LayerManager/layman/issues/367) Upgrade gdal from 2.4 to 3.3. Use docker image from [osgeo/gdal@hub.docker.com](https://hub.docker.com/repository/docker/osgeo/gdal), source is located at [osgeo/gdal@github.com](https://github.com/OSGeo/gdal/tree/master/docker).
 - [#367](https://github.com/LayerManager/layman/issues/367) Upgrade also
   - python from 3.6 to 3.8
   - flask from 1.1 to 2.0
