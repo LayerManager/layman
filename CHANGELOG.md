@@ -5,7 +5,7 @@
 ### Upgrade requirements
 - Change environment variable [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION):
   ```
-  LAYMAN_CLIENT_VERSION=d1b504525db23129c3998bbc18383aa1dba76efa
+  LAYMAN_CLIENT_VERSION=73a6d0b5d2138e62077d305d07b4992d020168c8
   ```
   It was already required in v1.22.3.
 - Set new environment variable [LAYMAN_ROLE_SERVICE_URI](doc/env-settings.md#LAYMAN_ROLE_SERVICE_URI)
