@@ -74,6 +74,12 @@ def check_jdbc_role_service(role_service_db_uri, role_service_schema):
     try:
         db_util.run_query(f"select name, parent from {role_service_schema}.roles limit 0",
                           uri_str=role_service_db_uri, encapsulate_exception=False)
+        db_util.run_query(f"select username, rolename from {role_service_schema}.user_roles limit 0",
+                          uri_str=role_service_db_uri, encapsulate_exception=False)
+        db_util.run_query(f"select rolename, propname, propvalue from {role_service_schema}.role_props limit 0",
+                          uri_str=role_service_db_uri, encapsulate_exception=False)
+        db_util.run_query(f"select groupname, rolename from {role_service_schema}.group_roles limit 0",
+                          uri_str=role_service_db_uri, encapsulate_exception=False)
     except BaseException as exc:
         secret_conn_dict = url_util.redact_uri(role_service_db_uri)
         raise Exception(f"Error querying role service database {secret_conn_dict}") from exc
