@@ -128,6 +128,10 @@ with settings.LAYMAN_REDIS.pipeline() as pipe:
                         from .layer.prime_db_schema.wfs_wms_status import set_after_restart
                         set_after_restart()
 
+                        logger.info(f'Validate Role service data')
+                        from .authz.role_service import validate_role_service
+                        validate_role_service()
+
                 pipe.multi()
                 pipe.set(LAYMAN_DEPS_ADJUSTED_KEY, 'done')
                 pipe.execute()
