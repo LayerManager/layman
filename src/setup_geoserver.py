@@ -49,16 +49,16 @@ def ensure_jdbc_role_service_internal_schema():
         logger.info(f"    Setting up internal role service DB schema")
         statement = f"""
         CREATE SCHEMA "{internal_service_schema}" AUTHORIZATION {settings.LAYMAN_PG_USER};
-        create view {internal_service_schema}.roles as select 'ADMIN' as name, null as parent
+        create view {internal_service_schema}.roles as select 'ADMIN'::varchar(64) as name, null::varchar(64) as parent
         union all select 'GROUP_ADMIN', null
         union all select %s, null
         ;
-        create view {internal_service_schema}.role_props as select null::varchar as rolename, null::varchar as propname, null::varchar as propvalue;
-        create view {internal_service_schema}.user_roles as select %s as username, 'ADMIN' as rolename
+        create view {internal_service_schema}.role_props as select null::varchar(64) as rolename, null::varchar(64) as propname, null::varchar(2048) as propvalue;
+        create view {internal_service_schema}.user_roles as select %s::varchar(64) as username, 'ADMIN'::varchar(64) as rolename
         union all select %s, %s
         union all select %s, 'ADMIN'
         ;
-        create view {internal_service_schema}.group_roles as select null::varchar as groupname, null::varchar as rolename;
+        create view {internal_service_schema}.group_roles as select null::varchar(128) as groupname, null::varchar(64) as rolename;
     """
         db_util.run_statement(statement, data=(settings.LAYMAN_GS_ROLE, settings.LAYMAN_GS_USER, settings.LAYMAN_GS_USER, settings.LAYMAN_GS_ROLE, settings.GEOSERVER_ADMIN_USER, ), uri_str=uri_str)
     else:
