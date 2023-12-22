@@ -99,8 +99,8 @@ from {DB_SCHEMA}.users u inner join
 
     create_roles_view = f"""create view {ROLE_SERVICE_SCHEMA}.roles
 as
-select name,
-       parent
+select name::varchar(64),
+       parent::varchar(64)
 from {ROLE_SERVICE_SCHEMA}.bussiness_roles
 UNION ALL
 select name,
@@ -115,8 +115,8 @@ from {ROLE_SERVICE_SCHEMA}.admin_roles
 
     create_user_roles_view = f"""create view {ROLE_SERVICE_SCHEMA}.user_roles
 as
-select username,
-       rolename
+select username::varchar(64),
+       rolename::varchar(64)
 from {ROLE_SERVICE_SCHEMA}.bussiness_user_roles
 UNION ALL
 select username,
