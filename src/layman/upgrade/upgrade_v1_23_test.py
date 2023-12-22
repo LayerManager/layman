@@ -93,11 +93,29 @@ def test_create_role_service_schema():
     (select count(*) from {ROLE_SERVICE_SCHEMA}.admin_user_roles) admin_user_roles,
     (select count(*) from {ROLE_SERVICE_SCHEMA}.user_roles) user_roles'''
 
+    # prepare simple schema in the same way as in setup_geoserver.py
+    prepare_simple_schema_statement = f"""
+CREATE SCHEMA "{ROLE_SERVICE_SCHEMA}" AUTHORIZATION {settings.LAYMAN_PG_USER};
+create view {ROLE_SERVICE_SCHEMA}.roles as select 'ADMIN'::varchar(64) as name, null::varchar(64) as parent
+union all select 'GROUP_ADMIN', null
+union all select %s, null
+;
+create view {ROLE_SERVICE_SCHEMA}.role_props as select null::varchar(64) as rolename, null::varchar(64) as propname, null::varchar(2048) as propvalue;
+create view {ROLE_SERVICE_SCHEMA}.user_roles as select %s::varchar(64) as username, 'ADMIN'::varchar(64) as rolename
+union all select %s, %s
+union all select %s, 'ADMIN'
+;
+create view {ROLE_SERVICE_SCHEMA}.group_roles as select null::varchar(128) as groupname, null::varchar(64) as rolename;
+    """
+
     with app.app_context():
         ensure_whole_user(username, userinfo)
         db_util.run_statement(drop_statement)
         result = db_util.run_query(schema_existence_query)[0][0]
         assert result == 0
+        db_util.run_statement(prepare_simple_schema_statement, data=(
+            settings.LAYMAN_GS_ROLE, settings.LAYMAN_GS_USER, settings.LAYMAN_GS_USER, settings.LAYMAN_GS_ROLE,
+            settings.GEOSERVER_ADMIN_USER))
 
         upgrade_v1_23.create_role_service_schema()
 
