@@ -29,13 +29,7 @@ ALTER TABLE {DB_SCHEMA}.rights ADD CONSTRAINT rights_unique_key unique (id_user,
 
 
 def create_role_service_schema():
-    logger.info(f'    Create internal role service schema')
-
-    drop_temporary_views = f"""drop schema if exists "{ROLE_SERVICE_SCHEMA}" CASCADE;"""
-    db_util.run_statement(drop_temporary_views)
-
-    create_schema = f"""CREATE SCHEMA "{ROLE_SERVICE_SCHEMA}" AUTHORIZATION {settings.LAYMAN_PG_USER};"""
-    db_util.run_statement(create_schema)
+    logger.info(f'    Complete internal role service schema')
 
     create_role_table = f"""create table {ROLE_SERVICE_SCHEMA}.bussiness_roles(
     id integer GENERATED ALWAYS AS IDENTITY,
@@ -72,7 +66,7 @@ from {DB_SCHEMA}.users u inner join
 ;"""
     db_util.run_statement(create_layman_users_user_roles_view)
 
-    create_admin_roles_view = f"""CREATE OR REPLACE view {ROLE_SERVICE_SCHEMA}.admin_roles
+    create_admin_roles_view = f"""CREATE view {ROLE_SERVICE_SCHEMA}.admin_roles
     as
     select 'ADMIN' as name
     UNION ALL
@@ -82,7 +76,7 @@ from {DB_SCHEMA}.users u inner join
     ;"""
     db_util.run_statement(create_admin_roles_view, (settings.LAYMAN_GS_ROLE, ))
 
-    create_admin_user_roles_view = f"""CREATE OR REPLACE view {ROLE_SERVICE_SCHEMA}.admin_user_roles
+    create_admin_user_roles_view = f"""CREATE view {ROLE_SERVICE_SCHEMA}.admin_user_roles
     as
     select %s as username, %s as rolename
     UNION ALL
@@ -97,7 +91,7 @@ from {DB_SCHEMA}.users u inner join
     ;"""
     db_util.run_statement(create_admin_user_roles_view, (settings.LAYMAN_GS_USER, settings.LAYMAN_GS_ROLE, settings.LAYMAN_GS_USER, settings.GEOSERVER_ADMIN_USER, settings.LAYMAN_GS_ROLE, ))
 
-    create_roles_view = f"""create view {ROLE_SERVICE_SCHEMA}.roles
+    create_roles_view = f"""create or replace view {ROLE_SERVICE_SCHEMA}.roles
 as
 select name::varchar(64),
        parent::varchar(64)
@@ -113,7 +107,7 @@ from {ROLE_SERVICE_SCHEMA}.admin_roles
 ;"""
     db_util.run_statement(create_roles_view)
 
-    create_user_roles_view = f"""create view {ROLE_SERVICE_SCHEMA}.user_roles
+    create_user_roles_view = f"""create or replace view {ROLE_SERVICE_SCHEMA}.user_roles
 as
 select username::varchar(64),
        rolename::varchar(64)
@@ -128,12 +122,5 @@ select username,
 from {ROLE_SERVICE_SCHEMA}.admin_user_roles
 ;"""
     db_util.run_statement(create_user_roles_view)
-
-    create_other_tables = f"""
-    create table {ROLE_SERVICE_SCHEMA}.role_props(rolename varchar(64) not null,propname varchar(64) not null, propvalue varchar(2048),primary key (rolename,propname));
-    create table {ROLE_SERVICE_SCHEMA}.group_roles(groupname varchar(128) not null, rolename varchar(64) not null,  primary key(groupname,rolename));
-    create index group_roles_idx on {ROLE_SERVICE_SCHEMA}.group_roles(rolename,groupname);
-    """
-    db_util.run_statement(create_other_tables)
 
     gs_util.reload(settings.LAYMAN_GS_AUTH)
