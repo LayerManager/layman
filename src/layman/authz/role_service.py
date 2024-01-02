@@ -62,14 +62,15 @@ def validate_role_table():
     if roles:
         raise Exception(f"Roles not matching pattern '{ROLE_NAME_PATTERN}' in JDBC Role service: {[role[0] for role in roles]}")
 
+    not_expected_roles = [settings.RIGHTS_EVERYONE_ROLE, ] + gs_util.RESERVED_ROLE_NAMES
     query = f"""
     select name
     from {settings.LAYMAN_ROLE_SERVICE_SCHEMA}.roles
     where name = any(%s)
     """
-    roles = db_util.run_query(query, ([settings.RIGHTS_EVERYONE_ROLE, ] + gs_util.RESERVED_ROLE_NAMES,), uri_str=settings.LAYMAN_ROLE_SERVICE_URI)
+    roles = db_util.run_query(query, (not_expected_roles,), uri_str=settings.LAYMAN_ROLE_SERVICE_URI)
     if roles:
-        raise Exception(f"Role '{settings.RIGHTS_EVERYONE_ROLE}' should not be in JDBC Role service.")
+        raise Exception(f"Roles {not_expected_roles} should not be in JDBC Role service.")
 
     query = f"""
     select name
