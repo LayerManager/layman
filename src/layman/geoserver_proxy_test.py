@@ -9,13 +9,6 @@ from test_tools.process_client import get_authz_headers
 from . import geoserver_proxy
 
 
-def setup_user_layer(username, layername, authn_headers):
-    process_client.reserve_username(username, headers=authn_headers)
-    process_client.publish_workspace_layer(username, layername, file_paths=[
-        'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',
-    ], headers=authn_headers)
-
-
 @pytest.mark.usefixtures('ensure_layman', 'oauth2_provider_mock')
 def test_missing_attribute_authz():
     username = 'testmissingattr_authz'
