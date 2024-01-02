@@ -168,32 +168,27 @@ def generate_geoserver_negative_test_cases(publications_user_can_read, publicati
 @pytest.mark.usefixtures('ensure_layman_module', 'oauth2_provider_mock')
 class TestAccessRights:
     OWNER = 'test_access_rights_application_owner'
-    READER = 'test_access_rights_application_reader'
+    READER_BY_USERNAME = 'test_access_rights_application_reader_by_username'
+    READER_BY_ROLE = 'test_access_rights_application_reader_by_role'
     OTHER_USER = 'test_access_rights_application_other_user'
     ROLE = 'TEST_ACCESS_RIGHTS_APPLICATION_ROLE'
     OTHER_ROLE = 'TEST_ACCESS_RIGHTS_APPLICATION_OTHER_ROLE'
     NON_EXISTING_ROLE = 'TEST_ACCESS_RIGHTS_NON_EXISTING_ROLE'
 
     LAYER_NO_ACCESS = Publication(OWNER, process_client.LAYER_TYPE, 'test_no_access_layer')
-    LAYER_USER_ACCESS = Publication(OWNER, process_client.LAYER_TYPE, 'test_user_access_layer')
-    LAYER_ROLE_ACCESS = Publication(OWNER, process_client.LAYER_TYPE, 'test_role_access_layer')
+    LAYER_ACCESS_RIGHTS = Publication(OWNER, process_client.LAYER_TYPE, 'test_access_rights_layer')
     LAYER_EVERYONE_ACCESS = Publication(OWNER, process_client.LAYER_TYPE, 'test_everyone_access_layer')
     MAP_NO_ACCESS = Publication(OWNER, process_client.MAP_TYPE, 'test_no_access_map')
-    MAP_USER_ACCESS = Publication(OWNER, process_client.MAP_TYPE, 'test_user_access_map')
-    MAP_ROLE_ACCESS = Publication(OWNER, process_client.MAP_TYPE, 'test_role_access_map')
+    MAP_ACCESS_RIGHTS = Publication(OWNER, process_client.MAP_TYPE, 'test_access_rights_map')
     MAP_EVERYONE_ACCESS = Publication(OWNER, process_client.MAP_TYPE, 'test_everyone_access_map')
 
     ACCESS_RIGHT_NO_ACCESS = {
         'read': OWNER,
         'write': OWNER,
     }
-    ACCESS_RIGHTS_USER_ACCESS = {
-        'read': f'{OWNER}, {READER}',
-        'write': f'{OWNER}, {READER}',
-    }
-    ACCESS_RIGHTS_ROLE_ACCESS = {
-        'read': f'{OWNER}, {ROLE}, {NON_EXISTING_ROLE}',
-        'write': f'{OWNER}, {ROLE}, {NON_EXISTING_ROLE}',
+    ACCESS_RIGHTS_ACCESS = {
+        'read': f'{OWNER}, {READER_BY_USERNAME}, {ROLE}, {NON_EXISTING_ROLE}',
+        'write': f'{OWNER}, {READER_BY_USERNAME}, {ROLE}, {NON_EXISTING_ROLE}',
     }
     ACCESS_RIGHTS_EVERYONE_ACCESS = {
         'read': settings.RIGHTS_EVERYONE_ROLE,
@@ -203,12 +198,10 @@ class TestAccessRights:
     PUBLICATIONS_DEFS = [
         # Publication, posted access rights, deleter
         (LAYER_NO_ACCESS, ACCESS_RIGHT_NO_ACCESS, OWNER),
-        (LAYER_USER_ACCESS, ACCESS_RIGHTS_USER_ACCESS, READER),
-        (LAYER_ROLE_ACCESS, ACCESS_RIGHTS_ROLE_ACCESS, READER),
+        (LAYER_ACCESS_RIGHTS, ACCESS_RIGHTS_ACCESS, READER_BY_USERNAME),
         (LAYER_EVERYONE_ACCESS, ACCESS_RIGHTS_EVERYONE_ACCESS, OTHER_USER),
         (MAP_NO_ACCESS, ACCESS_RIGHT_NO_ACCESS, OWNER),
-        (MAP_USER_ACCESS, ACCESS_RIGHTS_USER_ACCESS, READER),
-        (MAP_ROLE_ACCESS, ACCESS_RIGHTS_ROLE_ACCESS, READER),
+        (MAP_ACCESS_RIGHTS, ACCESS_RIGHTS_ACCESS, READER_BY_USERNAME),
         (MAP_EVERYONE_ACCESS, ACCESS_RIGHTS_EVERYONE_ACCESS, OTHER_USER),
     ]
 
@@ -216,7 +209,8 @@ class TestAccessRights:
 
     PUBLICATIONS_BY_USER = {
         OWNER: [publication for publication, _, _ in PUBLICATIONS_DEFS],
-        READER: [LAYER_USER_ACCESS, LAYER_ROLE_ACCESS, LAYER_EVERYONE_ACCESS, MAP_USER_ACCESS, MAP_ROLE_ACCESS, MAP_EVERYONE_ACCESS, ],
+        READER_BY_USERNAME: [LAYER_ACCESS_RIGHTS, LAYER_EVERYONE_ACCESS, MAP_ACCESS_RIGHTS, MAP_EVERYONE_ACCESS, ],
+        READER_BY_ROLE: [LAYER_ACCESS_RIGHTS, LAYER_EVERYONE_ACCESS, MAP_ACCESS_RIGHTS, MAP_EVERYONE_ACCESS, ],
         OTHER_USER: [LAYER_EVERYONE_ACCESS, MAP_EVERYONE_ACCESS, ],
         settings.ANONYM_USER: [LAYER_EVERYONE_ACCESS, MAP_EVERYONE_ACCESS, ],
     }
@@ -231,22 +225,23 @@ class TestAccessRights:
     @pytest.fixture(scope='class', autouse=True)
     def class_fixture(self, request):
         process_client.ensure_reserved_username(self.OWNER)
-        process_client.ensure_reserved_username(self.READER)
+        process_client.ensure_reserved_username(self.READER_BY_USERNAME)
+        process_client.ensure_reserved_username(self.READER_BY_ROLE)
         process_client.ensure_reserved_username(self.OTHER_USER)
-        role_service_util.ensure_user_role(self.READER, self.ROLE)
+        role_service_util.ensure_user_role(self.READER_BY_ROLE, self.ROLE)
         role_service_util.ensure_user_role(self.OTHER_USER, self.OTHER_ROLE)
-        role_service_util.ensure_user_role(self.READER, self.NON_EXISTING_ROLE)
+        role_service_util.ensure_user_role(self.READER_BY_ROLE, self.NON_EXISTING_ROLE)
         for publication, access_rights, _ in self.PUBLICATIONS_DEFS:
             process_client.publish_workspace_publication(publication.type, publication.workspace, publication.name,
                                                          actor_name=self.OWNER, access_rights=access_rights, )
-        role_service_util.delete_user_role(self.READER, self.NON_EXISTING_ROLE)
+        role_service_util.delete_user_role(self.READER_BY_ROLE, self.NON_EXISTING_ROLE)
         role_service_util.delete_role(self.NON_EXISTING_ROLE)
         yield
         if request.node.session.testsfailed == 0 and not request.config.option.nocleanup:
             for publication, _, deleter in self.PUBLICATIONS_DEFS:
                 process_client.delete_workspace_publication(publication.type, publication.workspace, publication.name,
                                                             actor_name=deleter, )
-            role_service_util.delete_user_role(self.READER, self.ROLE)
+            role_service_util.delete_user_role(self.READER_BY_ROLE, self.ROLE)
             role_service_util.delete_role(self.ROLE)
             role_service_util.delete_user_role(self.OTHER_USER, self.OTHER_ROLE)
             role_service_util.delete_role(self.OTHER_ROLE)
