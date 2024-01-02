@@ -2,10 +2,13 @@ import copy
 import inspect
 import pytest
 
-from layman import settings, LaymanError
+from geoserver.error import Error as GS_Error
+from layman import app, settings, LaymanError
+from layman.layer import db
 from test_tools import process_client, role_service as role_service_util
+from test_tools.data import wfs
 from tests import Publication, EnumTestTypes
-from tests.asserts.final.publication import geoserver_proxy
+from tests.asserts.final.publication import geoserver_proxy, util as assert_publ_util
 from tests.dynamic_data import base_test
 
 ENDPOINTS_TO_TEST = {
@@ -37,6 +40,12 @@ GEOSERVER_METHODS_TO_TEST = [
     (geoserver_proxy.workspace_wfs_2_0_0_capabilities_available_if_vector, {}),
 ]
 
+WFST_METHODS_TO_TEST = {
+    'insert_lines': {'xml_getter': wfs.get_wfs20_insert_lines},
+    'insert_points_new_attr': {'xml_getter': wfs.get_wfs20_insert_points_new_attr, 'attr_names': ['inexist_attr1', 'inexist_attr2']},
+    'update_points_new_attr': {'xml_getter': wfs.get_wfs20_update_points_new_attr, 'attr_names': ['inexist_attr3', 'inexist_attr4']},
+}
+
 
 def pytest_generate_tests(metafunc):
     # https://docs.pytest.org/en/6.2.x/parametrize.html#pytest-generate-tests
@@ -48,8 +57,6 @@ def pytest_generate_tests(metafunc):
 
     test_cases = cls.test_cases[test_fn.__name__]
     for test_case in test_cases:
-        assert not test_case.publication, f"Not yet implemented"
-        assert not test_case.publication_type, f"Not yet implemented"
         assert not test_case.key, f"Not yet implemented"
         assert not test_case.specific_params, f"Not yet implemented"
         assert not test_case.specific_types, f"Not yet implemented"
@@ -57,6 +64,8 @@ def pytest_generate_tests(metafunc):
         assert not test_case.post_before_test_args, f"Not yet implemented"
         assert test_case.type == EnumTestTypes.MANDATORY, f"Other types then MANDATORY are not implemented yet"
         arg_name_to_value = {
+            'publication': test_case.publication,
+            'publication_type': test_case.publication_type,
             'rest_method': test_case.rest_method,
             'rest_args': copy.deepcopy(test_case.rest_args),
             'params': copy.deepcopy(test_case.params),
@@ -164,6 +173,63 @@ def generate_geoserver_negative_test_cases(publications_user_can_read, publicati
     return tc_list
 
 
+def add_wfst_publication_test_cases_to_list(tc_list, publication, user, username_for_id, test_cases):
+    method = process_client.post_wfst_with_xml_getter
+    all_args = {
+        'workspace': publication.workspace,
+        'name': publication.name,
+        'layer': publication.name,
+        'actor_name': user,
+        'publication_type': publication.type,
+        'publ_type': publication.type,
+    }
+    for key, test_case in test_cases.items():
+        attribs = [attr + f'_{username_for_id.lower()}' for attr in test_case.get('attr_names', [])]
+        args = {
+            'xml_getter': test_case['xml_getter'],
+            'xml_getter_params': {'attr_names': attribs} if attribs else {},
+        }
+        params = {
+            'headers': process_client.get_authz_headers(user) if user != settings.ANONYM_USER else {}
+        }
+        if attribs:
+            params['new_attribs'] = attribs
+        pytest_id = f'{method.__name__}__{user.split("_")[-1]}__{publication.name[5:]}__{key}'
+        method_args = inspect.getfullargspec(method).args + inspect.getfullargspec(method).kwonlyargs
+
+        test_case = base_test.TestCaseType(pytest_id=pytest_id,
+                                           publication=publication,
+                                           publication_type=process_client.LAYER_TYPE,
+                                           rest_method=method,
+                                           rest_args={**args, **{
+                                               key: value for key, value in all_args.items() if key in method_args
+                                           }},
+                                           params=params,
+                                           type=EnumTestTypes.MANDATORY,
+                                           )
+
+        tc_list.append(test_case)
+
+
+def generate_wfst_negative_test_cases(publications_user_can_read, publication_all, test_cases):
+    tc_list = []
+    for user, available_publications in publications_user_can_read.items():
+        username_for_id = user.replace('--', "")
+        for publication in [publication for publication in publication_all if
+                            publication not in available_publications and publication.type == process_client.LAYER_TYPE]:
+            add_wfst_publication_test_cases_to_list(tc_list, publication, user, username_for_id, test_cases)
+    return tc_list
+
+
+def generate_positive_wfst_test_cases(publications_user_can_read, test_cases):
+    tc_list = []
+    for user, publications in publications_user_can_read.items():
+        username_for_id = user.replace('--', "")
+        for publication in [publication for publication in publications if publication.type == process_client.LAYER_TYPE]:
+            add_wfst_publication_test_cases_to_list(tc_list, publication, user, username_for_id, test_cases)
+    return tc_list
+
+
 @pytest.mark.timeout(60)
 @pytest.mark.usefixtures('ensure_layman_module', 'oauth2_provider_mock')
 class TestAccessRights:
@@ -220,6 +286,8 @@ class TestAccessRights:
         'test_single_negative': generate_negative_test_cases(PUBLICATIONS_BY_USER, PUBLICATIONS),
         'test_multiendpoint': generate_multiendpoint_test_cases(PUBLICATIONS_BY_USER, OWNER),
         'test_geoserver_negative': generate_geoserver_negative_test_cases(PUBLICATIONS_BY_USER, PUBLICATIONS),
+        'test_wfst_positive': generate_positive_wfst_test_cases(PUBLICATIONS_BY_USER, WFST_METHODS_TO_TEST),
+        'test_wfst_negative': generate_wfst_negative_test_cases(PUBLICATIONS_BY_USER, PUBLICATIONS, WFST_METHODS_TO_TEST),
     }
 
     @pytest.fixture(scope='class', autouse=True)
@@ -264,3 +332,27 @@ class TestAccessRights:
         with pytest.raises(AssertionError) as exc_info:
             rest_method(**rest_args)
         assert exc_info.value.args[0].startswith('Layer not found in Capabilities.')
+
+    def test_wfst_positive(self, publication, rest_method, rest_args, params):
+        attr_names = params.get('new_attributes', [])
+        with app.app_context():
+            old_db_attributes = db.get_internal_table_all_column_names(publication.workspace, publication.name)
+        for attr_name in attr_names:
+            assert attr_name not in old_db_attributes, \
+                f"old_db_attributes={old_db_attributes}, attr_name={attr_name}"
+        rest_method(**rest_args)
+        process_client.wait_for_publication_status(publication.workspace,
+                                                   publication.type,
+                                                   publication.name,
+                                                   headers=params['headers'])
+        assert_publ_util.is_publication_valid_and_complete(publication)
+        with app.app_context():
+            new_db_attributes = db.get_internal_table_all_column_names(publication.workspace, publication.name)
+        for attr_name in attr_names:
+            assert attr_name in new_db_attributes, \
+                f"new_db_attributes={new_db_attributes}, attr_name={attr_name}"
+
+    def test_wfst_negative(self, rest_method, rest_args, ):
+        with pytest.raises(GS_Error) as exc_info:
+            rest_method(**rest_args)
+        assert exc_info.value.data['status_code'] == 400

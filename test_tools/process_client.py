@@ -703,6 +703,19 @@ def post_wfst(xml, *, headers=None, url=None, workspace=None):
         raise gs_error.Error(code_or_message='WFS-T error', data={'status_code': response.status_code})
 
 
+def post_wfst_with_xml_getter(workspace, layer, *, xml_getter, actor_name=None, xml_getter_params=None):
+    xml_getter_params = xml_getter_params or {}
+    headers = {}
+    if actor_name:
+        assert TOKEN_HEADER not in headers
+
+    if actor_name and actor_name != settings.ANONYM_USER:
+        headers.update(get_authz_headers(actor_name))
+
+    xml = xml_getter(workspace, layer, **xml_getter_params)
+    post_wfst(xml, headers=headers, workspace=workspace)
+
+
 def check_publication_status(response):
     try:
         current_status = response.json().get('layman_metadata', {}).get('publication_status')
