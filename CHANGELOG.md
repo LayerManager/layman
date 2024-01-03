@@ -16,6 +16,7 @@
 - [#164](https://github.com/LayerManager/layman/issues/165) Create internal GeoServer [JDBC Role Service](https://docs.geoserver.org/2.21.x/en/user/security/usergrouprole/roleservices.html#jdbc-role-service) DB schema `_role_service`.
 #### Data migrations
 ### Changes
+- [#165](https://github.com/LayerManager/layman/issues/165) New REST endpoint [GET Roles](doc/rest.md#get-roles) with list of all roles registered in [JDBC Role Service](https://docs.geoserver.org/2.21.x/en/user/security/usergrouprole/roleservices.html#jdbc-role-service), that can be used in access rights. This new endpoint was added to Test Client into tab "Others".
 - [#165](https://github.com/LayerManager/layman/issues/165) POST Workspace [Layers](doc/rest.md#post-workspace-layers)/[Maps](doc/rest.md#post-workspace-maps) and PATCH Workspace [Layer](doc/rest.md#patch-workspace-layer)/[Map](doc/rest.md#patch-workspace-map) saves [role names](doc/models.md#role) mentioned in `access_rights.read` and `access_rights.write` parameters into DB.
 - [#165](https://github.com/LayerManager/layman/issues/165) Many endpoints respect role access rights:
   - [GET](doc/rest.md#get-workspace-layer)/[PATCH](doc/rest.md#patch-workspace-layer)/[DELETE](doc/rest.md#delete-workspace-layer) Workspace Layer
@@ -25,14 +26,13 @@
   - GET Workspace [Layers](doc/rest.md#get-workspace-layers)/[Maps](doc/rest.md#get-workspace-maps)
   - GET [Layers](doc/rest.md#get-layers)/[Maps](doc/rest.md#get-maps)/[Publications](doc/rest.md#get-publications)
   - DELETE Workspace [Layers](doc/rest.md#delete-workspace-layers)/[Maps](doc/rest.md#delete-workspace-maps)
-  - POST Workspace [Layers](doc/rest.md#post-workspace-layers)/[Maps](doc/rest.md#post-workspace-maps) respects roles in [GRANT_CREATE_PUBLIC_WORKSPACE](doc/env-settings.md#grant_create_public_workspace) and [GRANT_PUBLISH_IN_PUBLIC_WORKSPACE](doc/env-settings.md#grant_publish_in_public_workspace)
   - requests to [WMS](doc/endpoints.md#web-map-service) and [WFS](doc/endpoints.md#web-feature-service) endpoints
+- [#165](https://github.com/LayerManager/layman/issues/165) POST Workspace [Layers](doc/rest.md#post-workspace-layers)/[Maps](doc/rest.md#post-workspace-maps) respects roles in [GRANT_CREATE_PUBLIC_WORKSPACE](doc/env-settings.md#grant_create_public_workspace) and [GRANT_PUBLISH_IN_PUBLIC_WORKSPACE](doc/env-settings.md#grant_publish_in_public_workspace)
 - [#165](https://github.com/LayerManager/layman/issues/165) Many endpoints return previously associated [role names](doc/models.md#role) in `access_rights.read` and `access_rights.write` keys:
   - [GET](doc/rest.md#get-workspace-layer)/[PATCH](doc/rest.md#patch-workspace-layer) Workspace Layer
   - [GET](doc/rest.md#get-workspace-map)/[PATCH](doc/rest.md#patch-workspace-map) Workspace Map
   - GET Workspace [Layers](doc/rest.md#get-workspace-layers)/[Maps](doc/rest.md#get-workspace-maps)
   - GET [Layers](doc/rest.md#get-layers)/[Maps](doc/rest.md#get-maps)/[Publications](doc/rest.md#get-publications)
-- [#165](https://github.com/LayerManager/layman/issues/165) New REST endpoint [GET Roles](doc/rest.md#get-roles) with list of all roles registered in [JDBC Role Service](https://docs.geoserver.org/2.21.x/en/user/security/usergrouprole/roleservices.html#jdbc-role-service), that can be used in access rights. This new endpoint was added to Test Client into tab "Others".
 - All changes from [v1.22.1](#v1221), [v1.22.2](#v1222) and [v1.22.3](#v1223).
 - [#960](https://github.com/LayerManager/layman/issues/960) Handle WMS requests with HTTP error more efficiently in timgen.
 - [#962](https://github.com/LayerManager/layman/issues/962) Make values of `layman_metadata.publication_status` and `status` key(s) more consistent in responses of PATCH Workspace [Layer](doc/rest.md#patch-workspace-layer)/[Map](doc/rest.md#patch-workspace-map) and GET Workspace [Layer](doc/rest.md#get-workspace-layer)/[Map](doc/rest.md#get-workspace-map).
