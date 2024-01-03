@@ -7,7 +7,6 @@
   ```
   LAYMAN_CLIENT_VERSION=73a6d0b5d2138e62077d305d07b4992d020168c8
   ```
-  It was already required in v1.22.3.
 - Set new environment variable [LAYMAN_ROLE_SERVICE_URI](doc/env-settings.md#LAYMAN_ROLE_SERVICE_URI)
 - Stop using environment variable `LAYMAN_GS_ROLE_SERVICE`, it has no effect to Layman anymore. Role service called `layman_role_service` is used now.
 ### Migrations and checks
