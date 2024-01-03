@@ -7,17 +7,20 @@
   ```
   LAYMAN_CLIENT_VERSION=73a6d0b5d2138e62077d305d07b4992d020168c8
   ```
+- Stop using environment variable `LAYMAN_GS_ROLE_SERVICE`, it has no effect to Layman anymore. Layman now uses [role service](doc/security.md#role-service) identified by new environment variable [LAYMAN_ROLE_SERVICE_URI](doc/env-settings.md#LAYMAN_ROLE_SERVICE_URI). The service is called `layman_role_service` on GeoServer.
 - Set new environment variable [LAYMAN_ROLE_SERVICE_URI](doc/env-settings.md#LAYMAN_ROLE_SERVICE_URI)
-- Stop using environment variable `LAYMAN_GS_ROLE_SERVICE`, it has no effect to Layman anymore. Role service called `layman_role_service` is used now.
 ### Migrations and checks
 #### Schema migrations
 - [#165](https://github.com/LayerManager/layman/issues/165) Add column `role_name` to table `rights` in prime DB schema. Add constraint that exactly one of columns `role_name` and `id_user` is not null.
-- [#164](https://github.com/LayerManager/layman/issues/165) Create internal GeoServer [JDBC Role Service](https://docs.geoserver.org/2.21.x/en/user/security/usergrouprole/roleservices.html#jdbc-role-service) DB schema `_role_service`.
+- [#165](https://github.com/LayerManager/layman/issues/165) Create DB schema `_role_service` that can be used as [role service](doc/security.md#role-service).
 #### Data migrations
 ### Changes
-- [#165](https://github.com/LayerManager/layman/issues/165) New REST endpoint [GET Roles](doc/rest.md#get-roles) with list of all roles registered in [JDBC Role Service](https://docs.geoserver.org/2.21.x/en/user/security/usergrouprole/roleservices.html#jdbc-role-service), that can be used in access rights. This new endpoint was added to Test Client into tab "Others".
-- [#165](https://github.com/LayerManager/layman/issues/165) POST Workspace [Layers](doc/rest.md#post-workspace-layers)/[Maps](doc/rest.md#post-workspace-maps) and PATCH Workspace [Layer](doc/rest.md#patch-workspace-layer)/[Map](doc/rest.md#patch-workspace-map) saves [role names](doc/models.md#role) mentioned in `access_rights.read` and `access_rights.write` parameters into DB.
-- [#165](https://github.com/LayerManager/layman/issues/165) Many endpoints respect role access rights:
+- [#165](https://github.com/LayerManager/layman/issues/165) Prior to this version, Layman enabled to use [usernames](doc/models.md#username) and pseudo-role `EVERYONE` in access rights. From now on, Layman accepts also [role names](doc/models.md#role).
+- [#165](https://github.com/LayerManager/layman/issues/165) Roles (except of `EVERYONE`) are managed by [role service](doc/security.md#role-service).
+- [#165](https://github.com/LayerManager/layman/issues/165) New REST endpoint [GET Roles](doc/rest.md#get-roles) with list of all roles registered in [role service](doc/security.md#role-service), that can be used in access rights.
+  - This new endpoint was added to Test Client into tab "Others".
+- [#165](https://github.com/LayerManager/layman/issues/165) POST Workspace [Layers](doc/rest.md#post-workspace-layers)/[Maps](doc/rest.md#post-workspace-maps) and PATCH Workspace [Layer](doc/rest.md#patch-workspace-layer)/[Map](doc/rest.md#patch-workspace-map) saves [role names](doc/models.md#role) mentioned in `access_rights.read` and `access_rights.write` parameters into [prime DB schema](doc/data-storage.md#postgresql).
+- [#165](https://github.com/LayerManager/layman/issues/165) Many requests respect roles in access rights:
   - [GET](doc/rest.md#get-workspace-layer)/[PATCH](doc/rest.md#patch-workspace-layer)/[DELETE](doc/rest.md#delete-workspace-layer) Workspace Layer
   - GET Workspace Layer [Thumbnail](doc/rest.md#get-workspace-layer-thumbnail)/[Style](doc/rest.md#get-workspace-layer-style)/[Metadata Comparison](doc/rest.md#get-workspace-layer-metadata-comparison)/[Chunk](doc/rest.md#get-workspace-layer-chunk)
   - [GET](doc/rest.md#get-workspace-map)/[PATCH](doc/rest.md#patch-workspace-map)/[DELETE](doc/rest.md#delete-workspace-map) Workspace Map

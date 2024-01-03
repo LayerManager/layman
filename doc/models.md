@@ -69,6 +69,7 @@
 - User is any person who communicates with Layman REST API through any client.
 - User can be either authenticated, or unauthenticated (i.e. anonymous).
 - User is sometimes identified by [username](#username)
+- List of users with usernames can be obtained by [GET Users](rest.md#get-users).
 
 ## Username
 - Username is a string identifying one [user](#user), so it is unique among all users.
@@ -76,13 +77,17 @@
 - Each user is represented by max. one username.
 - Username is also used to identify user's [personal workspace](#personal-workspace) when communicating with [Layman REST API](rest.md).
 - Username can be reserved by [PATCH Current User](rest.md#patch-current-user).
+- Usernames can be used for assigning access rights.
 - Anonymous user has no username.
 
 ## Role
 - Role is any group of users. One user can be assigned to multiple roles.
 - Each role is identified by name that is unique among all roles.
 - The name is upper-case (in contrast with [username](#username)), maximum length is 64 characters.
-- Roles can be used for assigning access rights.
+- Role names can be used for assigning access rights.
+- Existing roles can be obtained by [GET Roles](rest.md#get-roles).
+  - There is always listed special pseudo-role `EVERYONE` that represents every user including anonymous (unauthenticated).
+- Roles (except of `EVERYONE`) are managed by [role service](security.md#role-service).
 
 ## Workspace
 - Workspace is folder for [publications](#publication).

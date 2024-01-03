@@ -98,10 +98,11 @@ Data is saved to LAYMAN_DATA_DIR directory, LAYMAN_QGIS_DATA_DIR directory, and 
 Filesystem is used as persistent data store, so data survives Layman restart.
  
 ### PostgreSQL
-Layman uses directly **one database** specified by [LAYMAN_PG_DBNAME](env-settings.md#LAYMAN_PG_DBNAME) to store data. There are two kinds of schemas in such database:
+Layman uses directly **one database** specified by [LAYMAN_PG_DBNAME](env-settings.md#LAYMAN_PG_DBNAME) to store data. There are three kinds of schemas in such database:
 - [LAYMAN_PRIME_SCHEMA](env-settings.md#LAYMAN_PRIME_SCHEMA) that holds information about
    - users, workspaces, and publications including access rights
    - data version including migration ID
+- [Internal Role Service Schema](security.md#internal-role-service-schema) with table and view structure that can be used as [role service](security.md#role-service)
 - Schemas holding vector layer data.
     - One **[workspace schema](https://www.postgresql.org/docs/13/ddl-schemas.html)** is created for every created [workspace](models.md#workspace). Name of workspace schema is always the same as workspace name.
     - One **[table](https://www.postgresql.org/docs/13/sql-createtable.html)** is created in workspace schema for each layer published with input vector files. Name of the table is in form `layer_<UUID>` with `-` replaced with `_`, e.g. `layer_96b918c6_d88c_42d8_b999_f3992b826958`. The table contains data from vector data files.
@@ -115,7 +116,7 @@ Data changes made directly in vector data DB tables (both internal and external)
 PostgreSQL is used as persistent data store, so data survives Layman restart.
 
 ### GeoServer
-**[User](https://docs.geoserver.org/2.21.x/en/user/security/webadmin/ugr.html)** and **[role](https://docs.geoserver.org/2.21.x/en/user/security/webadmin/ugr.html)** are created for every [user](models.md#user) who reserved [username](models.md#username). User name on GeoServer is the same as username on Layman. Role name is composed a `USER_<upper-cased username>`.
+**[User](https://docs.geoserver.org/2.21.x/en/user/security/webadmin/ugr.html)** is created for every [user](models.md#user) who reserved [username](models.md#username). Username on GeoServer is the same as username on Layman.
 
 Two **[workspaces](https://docs.geoserver.org/2.21.x/en/user/data/webadmin/workspaces.html)** are created, each with one **[PostgreSQL datastore](https://docs.geoserver.org/2.21.x/en/user/data/app-schema/data-stores.html#postgis)**, for every [workspace](models.md#workspace) (both personal and public). First workspace is meant for [WFS](endpoints.md#web-feature-service) and has the same name as the workspace on Layman. Second workspace is meant for [WMS](endpoints.md#web-map-service) and is suffixed with `_wms`. Name of the datastore is `postgresql` for both workspaces. Every workspace-related information (including PostgreSQL datastore) is saved inside workspace.
 
@@ -127,6 +128,6 @@ For each vector layer with QML style, **[Feature Type](https://docs.geoserver.or
 
 For each raster layer, **[Coverage Store](https://docs.geoserver.org/2.21.x/en/user/rest/api/coveragestores.html)**, **[Coverage](https://docs.geoserver.org/2.21.x/en/user/rest/api/coverages.html)**, and **[Style](https://docs.geoserver.org/2.21.x/en/user/styling/webadmin/index.html)** are created in WMS workspace. If layer is [timeseries](models.md#timeseries), Coverage Store is [ImageMosaic](https://docs.geoserver.org/2.21.x/en/user/data/raster/imagemosaic/index.html), otherwise it is [GeoTIFF](https://docs.geoserver.org/2.21.x/en/user/data/raster/geotiff.html). Names of Coverage and Style are the same as layername, name of Coverage Store is prefixed with `geotiff_` or `image_mosaic_` depending on its type. Coverage Store and Coverage points to appropriate normalized raster GeoTIFF file(s). Style contains visualization file.
 
-Two **[access rules](https://docs.geoserver.org/2.21.x/en/user/security/layer.html)** are created for each layer in each GeoServer workspace (WFS and WMS), one for [read access right](security.md#publication-access-rights), one for [write access right](security.md#publication-access-rights). Every username from Layman's access right is represented by user's role name (i.e. `USER_<upper-cased username>`). Role `EVERYONE` is represented as `ROLE_ANONYMOUS` on GeoServer.
+Two **[access rules](https://docs.geoserver.org/2.21.x/en/user/security/layer.html)** are created for each layer in each GeoServer workspace (WFS and WMS), one for [read access right](security.md#publication-access-rights), one for [write access right](security.md#publication-access-rights). Every username from Layman's access right is represented by user's role name (i.e. `USER_<upper-cased username>`). Role `EVERYONE` is represented as `ROLE_ANONYMOUS` and `ROLE_AUTHENTICATED` on GeoServer.
 
 GeoServer is used as persistent data store, so data survives Layman restart.
