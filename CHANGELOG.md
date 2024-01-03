@@ -14,6 +14,7 @@
 - [#165](https://github.com/LayerManager/layman/issues/165) Add column `role_name` to table `rights` in prime DB schema. Add constraint that exactly one of columns `role_name` and `id_user` is not null.
 - [#165](https://github.com/LayerManager/layman/issues/165) Create DB schema `_role_service` that can be used as [role service](doc/security.md#role-service).
 #### Data migrations
+- [#165](https://github.com/LayerManager/layman/issues/165) Delete technical roles and user-role relations in GeoServer `default` role service, which is now replaced by JDBC role service.
 ### Changes
 - [#165](https://github.com/LayerManager/layman/issues/165) Prior to this version, Layman enabled to use [usernames](doc/models.md#username) and pseudo-role `EVERYONE` in access rights. From now on, Layman accepts also [role names](doc/models.md#role).
 - [#165](https://github.com/LayerManager/layman/issues/165) Roles (except of `EVERYONE`) are managed by [role service](doc/security.md#role-service).

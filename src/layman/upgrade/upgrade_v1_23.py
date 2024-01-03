@@ -1,8 +1,11 @@
+from urllib.parse import urljoin
 import logging
+import requests
 
-from geoserver import util as gs_util
+from geoserver import util as gs_util, GS_REST, GS_REST_TIMEOUT
 from db import util as db_util
 from layman import settings
+from layman.common.prime_db_schema import users
 
 logger = logging.getLogger(__name__)
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
@@ -124,3 +127,44 @@ from {ROLE_SERVICE_SCHEMA}.admin_user_roles
     db_util.run_statement(create_user_roles_view)
 
     gs_util.reload(settings.LAYMAN_GS_AUTH)
+
+
+def delete_user_roles():
+    logger.info(f'    Delete user roles from GeoServer')
+
+    role_service = 'default'
+    gs_rest_roles_service = urljoin(GS_REST, f'security/roles/service/{role_service}/')
+
+    for user in users.get_usernames():
+        logger.info(f'      Delete user {user}')
+        for role in [f'USER_{user}', settings.LAYMAN_GS_ROLE]:
+            r_url = urljoin(gs_rest_roles_service, f'role/{role}/user/{user}/')
+            response = requests.delete(
+                r_url,
+                headers=gs_util.headers_json,
+                auth=settings.LAYMAN_GS_AUTH,
+                timeout=GS_REST_TIMEOUT,
+            )
+            association_not_exists = response.status_code == 404
+            if not association_not_exists:
+                response.raise_for_status()
+
+        response = requests.delete(
+            urljoin(gs_rest_roles_service, 'role/' + role),
+            headers=gs_util.headers_json,
+            auth=settings.LAYMAN_GS_AUTH,
+            timeout=GS_REST_TIMEOUT,
+        )
+        role_not_exists = response.status_code == 404
+        if not role_not_exists:
+            response.raise_for_status()
+
+    response = requests.delete(
+        urljoin(gs_rest_roles_service, 'role/' + settings.LAYMAN_GS_ROLE),
+        headers=gs_util.headers_json,
+        auth=settings.LAYMAN_GS_AUTH,
+        timeout=GS_REST_TIMEOUT,
+    )
+    role_not_exists = response.status_code == 404
+    if not role_not_exists:
+        response.raise_for_status()

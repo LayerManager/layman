@@ -71,6 +71,9 @@ MIGRATIONS = {
             upgrade_v1_22.remove_authn_txt_files,
             upgrade_v1_22.insert_map_layer_relations,
         ]),
+        ((1, 23, 0), [
+            upgrade_v1_23.delete_user_roles,
+        ]),
     ],
 }
 
