@@ -175,9 +175,11 @@ When providing **external dependencies**, check their production-related documen
 
 Within PostgreSQL, you need to provide one database for Layman and one database for Micka. For Layman, you also need to provide one user [LAYMAN_PG_USER](doc/env-settings.md#LAYMAN_PG_USER) who needs enough privileges to create new schemas in [LAYMAN_PG_DBNAME](doc/env-settings.md#LAYMAN_PG_DBNAME) database. The user also needs access to `public` schema where PostGIS must be installed.
 
+If you are using other DB schema than [internal role service schema](doc/security.md#internal-role-service-schema) as [role service](doc/security.md#role-service), you need to provide all [admin records](doc/security.md#admin-role-service-records).
+
 Within QGIS Server, you do not need to provide anything special.
 
-Within GeoServer, you need to provide either admin password [GEOSERVER_ADMIN_PASSWORD](doc/env-settings.md#GEOSERVER_ADMIN_PASSWORD), or one Layman user [LAYMAN_GS_USER](doc/env-settings.md#LAYMAN_GS_USER) and one layman role [LAYMAN_GS_ROLE](doc/env-settings.md#LAYMAN_GS_ROLE). If admin password is provided, Layman will create the Layman user and the Layman role automatically. URL path of the GeoServer must be `/geoserver/`.
+Within GeoServer, you need to provide either admin password [GEOSERVER_ADMIN_PASSWORD](doc/env-settings.md#GEOSERVER_ADMIN_PASSWORD), or one Layman user [LAYMAN_GS_USER](doc/env-settings.md#LAYMAN_GS_USER). If admin password is provided, Layman will create the Layman user automatically. URL path of the GeoServer must be `/geoserver/`.
 
 Within Redis, you need to provide two databases, one for Layman, second for Layman Test Client. Connection strings are defined by [LAYMAN_REDIS_URL](doc/env-settings.md#LAYMAN_REDIS_URL) and [LTC_REDIS_URL](doc/env-settings.md#LTC_REDIS_URL).
 

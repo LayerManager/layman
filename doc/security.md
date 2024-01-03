@@ -43,8 +43,7 @@ Access rights enable user to control access to publications. Access to each publ
    - grants deleting the publication by `DELETE` HTTP request to [multi-publication REST API endpoints](#access-to-multi-publication-endpoints)
    - grants WFS-T requests to the layer
 
-Both read and write access rights contain list of [user names](models.md#username) or [role names](models.md#role). Currently, Layman accepts following roles:
-- `EVERYONE`: every user including anonymous (unauthenticated)
+Both read and write access rights contain list of [usernames](models.md#username) or [role names](models.md#role).
 
 Users listed in access rights, either directly or indirectly through roles, are granted to perform described actions.
 
@@ -71,3 +70,45 @@ Access is treated by following rules:
 
 It's analogical for maps.
 
+### Role Service
+Despite of [usernames](models.md#username), [role names](models.md#role) are not controlled by Layman, but by **role service**.
+
+Role service can be any PostgreSQL DB schema containing table (or view, or materialized view) structure described in [GeoServer documentation](https://docs.geoserver.org/2.21.x/en/user/security/usergrouprole/roleservices.html#jdbc-role-service). Furthermore, Layman has special requirements to records in the tables. There are two types of records: [admin records](#admin-role-service-records) and [business records](#business-role-service-records). No other records are allowed.
+
+Role service is used by both Layman and GeoServer when [access rights](#publication-access-rights) are evaluated.
+
+Role service is identified by [LAYMAN_ROLE_SERVICE_URI](env-settings.md#LAYMAN_ROLE_SERVICE_URI). It can contain URI to any PostgreSQL schema that meets mentioned requirements, e.g. to [internal role service schema](#internal-role-service-schema).
+
+#### Admin role-service records
+
+Admin records are needed for Layman and GeoServer to handle authorization correctly.
+
+- Table `roles` must contain records
+
+| name                                                                | parent |
+|---------------------------------------------------------------------|--------|
+| `ADMIN`                                                             | null   |
+| `GROUP_ADMIN`                                                       | null   |
+| value of [LAYMAN_GS_ROLE](./env-settings.md#LAYMAN_GS_ROLE)         | null   |
+| `USER_<username>` of every user with [username](models.md#username) | null   |
+
+These records do not appear in [GET Roles](rest.md#get-roles). They are also not accepted in access rights.
+
+- Table `user_roles` must contain records
+
+| username                                                                                         | rolename |
+|--------------------------------------------------------------------------------------------------|----------|
+| `admin`                                                                                          | `ADMIN`  |
+| value of [LAYMAN_GS_USER](./env-settings.md#LAYMAN_GS_USER)                                      | `ADMIN`  |
+| value of [LAYMAN_GS_USER](./env-settings.md#LAYMAN_GS_USER)                                      | value of [LAYMAN_GS_ROLE](./env-settings.md#LAYMAN_GS_ROLE) |
+| every [username](models.md#username)| `USER_<username>` |
+| every [username](models.md#username)| value of [LAYMAN_GS_ROLE](./env-settings.md#LAYMAN_GS_ROLE) |
+
+#### Business role-service records
+
+Table `roles` may contain other records that appear in [GET Roles](rest.md#get-roles) and are accepted in access rights. Their `name` must match to regular expression `[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*` and `parent` must be null. Names `ROLE_ADMINISTRATOR`, `ROLE_GROUP_ADMIN`, `ROLE_AUTHENTICATED`, `ROLE_ANONYMOUS`, and `EVERYONE` are forbidden.
+
+Table `user_roles` may contain other records that connects [users](models.md#user) with [roles](#role-service).
+
+#### Internal Role Service Schema
+Layman provides PostgreSQL DB schema `_role_service` that can be used as the role service. The schema contain all necessary [admin records](#admin-role-service-records) and (by default) no [business records](#business-role-service-records). Business records can be added manually to tables `bussiness_roles` and `bussiness_user_roles`.

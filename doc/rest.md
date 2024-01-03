@@ -856,7 +856,7 @@ HTTP status code 200 if credentials were deleted.
 `/rest/roles`
 
 ### GET Roles
-Get list of roles.
+Get list of [roles](models.md#role) available in [role service](security.md#role-service) in table `roles` except of [admin records](security.md#admin-role-service-records). Pseudo-role `EVERYONE` appear in the list too.  
 
 #### Request.
 No action parameters.
