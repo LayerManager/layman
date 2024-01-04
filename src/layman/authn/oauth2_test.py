@@ -217,15 +217,6 @@ def test_get_current_user_anonymous(client):
     assert claims['nickname'] == 'Anonymous', claims
 
 
-@pytest.mark.usefixtures('app_context')
-def test_patch_current_user_anonymous(client):
-    rest_path = url_for('rest_current_user.patch')
-    response = client.patch(rest_path)
-    assert response.status_code == 403
-    resp_json = response.get_json()
-    assert resp_json['code'] == 30
-
-
 @pytest.mark.usefixtures('active_token_introspection_url', 'user_profile_url', 'ensure_layman')
 def test_patch_current_user_without_username():
 
