@@ -1447,6 +1447,23 @@ TESTCASES = {
         Key.RUN_ONLY_CASES: frozenset([RestMethod, WithChunksDomain.FALSE, CompressDomain.FALSE]),
         Key.SPECIFIC_CASES: {},
     },
+    'workspace_too_long': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.WORKSPACE: WORKSPACE.ljust(60, 'x'),
+        Key.REST_ARGS: {
+            'name': 'workspace_too_long_layer',
+        },
+        Key.EXCEPTION: LaymanError,
+        Key.FAILED_INFO_KEY: 'file',
+        Key.EXPECTED_EXCEPTION: {
+            'http_code': 403,
+            'sync': True,
+            'code': 56,
+        },
+        Key.MANDATORY_CASES: None,
+        Key.RUN_ONLY_CASES: frozenset([RestMethod.POST, WithChunksDomain.FALSE, CompressDomain.FALSE]),
+        Key.SPECIFIC_CASES: {},
+    },
 }
 
 

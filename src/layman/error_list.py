@@ -56,4 +56,5 @@ ERROR_LIST = {
     53: (500, 'Error when publishing on GeoServer. It happens for example for raster files with wrong explicit CRS.'),
     54: (400, 'Wrong header value'),
     55: (400, 'Publication is not complete'),  # raised by process_client only
+    56: (403, 'Username or workspace name is too long. Maximum is 59 characters.')
 }
