@@ -640,8 +640,13 @@ get_workspace_layer_metadata_comparison = partial(get_workspace_publication_meta
 get_workspace_map_metadata_comparison = partial(get_workspace_publication_metadata_comparison, MAP_TYPE)
 
 
-def reserve_username(username, headers=None):
+def reserve_username(username, headers=None, *, actor_name=None):
     headers = headers or {}
+    if actor_name:
+        assert TOKEN_HEADER not in headers
+
+    if actor_name and actor_name != settings.ANONYM_USER:
+        headers.update(get_authz_headers(actor_name))
     with app.app_context():
         r_url = url_for('rest_current_user.patch')
     data = {

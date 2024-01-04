@@ -1,4 +1,5 @@
 from layman.common.prime_db_schema import users as users_util, workspaces as workspaces_util
+from layman.http import LaymanError
 
 get_usernames = users_util.get_usernames
 get_workspaces = workspaces_util.get_workspace_names
@@ -26,4 +27,6 @@ def ensure_workspace(workspace):
 
 
 def check_workspace_name(workspace):
+    if len(workspace) > 59:
+        raise LaymanError(56)
     workspaces_util.check_workspace_name(workspace)
