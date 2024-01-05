@@ -168,3 +168,26 @@ def delete_user_roles():
     role_not_exists = response.status_code == 404
     if not role_not_exists:
         response.raise_for_status()
+
+
+def restrict_workspace_name_length():
+    logger.info(f'    Restrict workspace name length')
+
+    select_too_long = f"""
+select name
+from {settings.LAYMAN_PRIME_SCHEMA}.workspaces
+where length(name) > 59
+;"""
+    too_long_workspace_name = db_util.run_query(select_too_long)
+    if len(too_long_workspace_name) > 0:
+        raise NotImplementedError(f"Too long workspace names: {[name[0] for name in too_long_workspace_name]}")
+
+    # For direct ALTER TABLE raises "ERROR: cannot alter type of a column used by a view or rule"
+    # For details see https://web.archive.org/web/20111007112138/http://sniptools.com/databases/resize-a-column-in-a-postgresql-table-without-changing-data
+    alter_column = f"""
+UPDATE pg_attribute SET
+    atttypmod = 59+4
+WHERE attrelid = '{settings.LAYMAN_PRIME_SCHEMA}.workspaces'::regclass
+AND attname = 'name'
+;"""
+    db_util.run_statement(alter_column)
