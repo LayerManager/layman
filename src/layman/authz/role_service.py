@@ -5,8 +5,6 @@ from layman import settings
 
 logger = logging.getLogger(__name__)
 
-ROLE_NAME_PATTERN = r'^(?!.{65,})[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*$'
-
 
 def get_user_roles(username):
     query = f"""
@@ -16,7 +14,9 @@ where username = %s
   and LEFT(rolename, 5) != 'USER_'
   and rolename ~ %s
 """
-    roles = db_util.run_query(query, (username, 'ADMIN', 'GROUP_ADMIN', settings.LAYMAN_GS_ROLE, ROLE_NAME_PATTERN), uri_str=settings.LAYMAN_ROLE_SERVICE_URI)
+    roles = db_util.run_query(query,
+                              (username, 'ADMIN', 'GROUP_ADMIN', settings.LAYMAN_GS_ROLE, settings.ROLE_NAME_PATTERN),
+                              uri_str=settings.LAYMAN_ROLE_SERVICE_URI)
     return {role[0] for role in roles}
 
 
@@ -36,5 +36,5 @@ def get_all_roles():
       and LEFT(name, 5) != 'USER_'
       and name ~ %s
     """
-    roles = db_util.run_query(query, ('ADMIN', 'GROUP_ADMIN', settings.LAYMAN_GS_ROLE, ROLE_NAME_PATTERN), uri_str=settings.LAYMAN_ROLE_SERVICE_URI)
+    roles = db_util.run_query(query, ('ADMIN', 'GROUP_ADMIN', settings.LAYMAN_GS_ROLE, settings.ROLE_NAME_PATTERN), uri_str=settings.LAYMAN_ROLE_SERVICE_URI)
     return [role[0] for role in roles] + [settings.RIGHTS_EVERYONE_ROLE]
