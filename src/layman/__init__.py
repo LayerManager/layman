@@ -7,6 +7,7 @@ from flask.logging import create_logger
 from redis import WatchError
 
 import layman_settings as settings
+from layman_start_util import validate_role_service
 
 IN_CELERY_WORKER_PROCESS = sys.argv and sys.argv[0].endswith('/celery/__main__.py')
 IN_PYTEST_PROCESS = sys.argv and sys.argv[0].endswith('/pytest/__main__.py')
@@ -129,7 +130,6 @@ with settings.LAYMAN_REDIS.pipeline() as pipe:
                         set_after_restart()
 
                         logger.info(f'Validate Role service data')
-                        from .authz.role_service import validate_role_service
                         validate_role_service()
 
                 pipe.multi()
