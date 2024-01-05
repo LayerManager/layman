@@ -4,8 +4,9 @@ import time
 from urllib.parse import urljoin
 
 import geoserver
-import layman_settings as settings
 from geoserver.role_service import check_jdbc_role_service
+import layman_settings as settings
+from layman_start_util import validate_role_service
 
 ATTEMPT_INTERVAL = 2
 MAX_ATTEMPTS = 60
@@ -51,6 +52,7 @@ def main():
     # Check PostgreSQL role service and stops immediately in case of any error
     print(f"Checking PostgreSQL role service")
     check_jdbc_role_service(settings.LAYMAN_ROLE_SERVICE_URI, settings.LAYMAN_ROLE_SERVICE_SCHEMA)
+    validate_role_service(layman_usernames=[])
     print()
 
     # QGIS Server
