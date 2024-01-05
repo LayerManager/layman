@@ -364,9 +364,9 @@ def only_valid_role_names(roles_list):
     if not roles_list:
         return
 
-    not_matching_roles = [r for r in roles_list if not re.match(role_service.ROLE_NAME_PATTERN, r)]
+    not_matching_roles = [r for r in roles_list if not re.match(settings.ROLE_NAME_PATTERN, r)]
     if not_matching_roles:
-        raise LaymanError(43, f'Found roles not matching to regex {role_service.ROLE_NAME_PATTERN} '
+        raise LaymanError(43, f'Found roles not matching to regex {settings.ROLE_NAME_PATTERN} '
                               f': {not_matching_roles}')
 
     internal_user_roles = [r for r in roles_list if r.startswith('USER_')]

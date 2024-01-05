@@ -1,7 +1,6 @@
 import layman_settings as settings
 from db import util as db_util
 from geoserver import util as gs_util
-from layman.authz.role_service import ROLE_NAME_PATTERN
 
 
 def validate_role_table():
@@ -21,9 +20,9 @@ def validate_role_table():
     from {settings.LAYMAN_ROLE_SERVICE_SCHEMA}.roles
     where name !~ %s
     """
-    roles = db_util.run_query(query, (ROLE_NAME_PATTERN,), uri_str=settings.LAYMAN_ROLE_SERVICE_URI)
+    roles = db_util.run_query(query, (settings.ROLE_NAME_PATTERN,), uri_str=settings.LAYMAN_ROLE_SERVICE_URI)
     if roles:
-        raise Exception(f"Roles not matching pattern '{ROLE_NAME_PATTERN}' in JDBC Role service: {[role[0] for role in roles]}")
+        raise Exception(f"Roles not matching pattern '{settings.ROLE_NAME_PATTERN}' in JDBC Role service: {[role[0] for role in roles]}")
 
     not_expected_roles = [settings.RIGHTS_EVERYONE_ROLE, ] + gs_util.RESERVED_ROLE_NAMES
     query = f"""
