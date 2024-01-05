@@ -143,3 +143,27 @@ create view {ROLE_SERVICE_SCHEMA}.group_roles as select null::varchar(128) as gr
         assert result == 1
         result = db_util.run_query(table_existence_query, ('group_roles',))[0][0]
         assert result == 1
+
+
+def test_restrict_username_length():
+    too_long_workspace_name = 'test_restrict_username_length'.ljust(60, 'x')
+    alter_column = f"""
+    UPDATE pg_attribute SET
+        atttypmod = 1043
+    WHERE attrelid = '{settings.LAYMAN_PRIME_SCHEMA}.workspaces'::regclass
+    AND attname = 'name'
+    ;"""
+    db_util.run_statement(alter_column)
+
+    insert_statement = f"""INSERT INTO {settings.LAYMAN_PRIME_SCHEMA}.workspaces (name) values ('{too_long_workspace_name}')"""
+    db_util.run_statement(insert_statement)
+
+    with app.app_context():
+        with pytest.raises(NotImplementedError):
+            upgrade_v1_23.restrict_workspace_name_length()
+
+    delete_statement = f"""DELETE FROM {settings.LAYMAN_PRIME_SCHEMA}.workspaces WHERE name = '{too_long_workspace_name}'"""
+    db_util.run_statement(delete_statement)
+
+    with app.app_context():
+        upgrade_v1_23.restrict_workspace_name_length()

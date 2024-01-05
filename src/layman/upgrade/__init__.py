@@ -44,6 +44,7 @@ MIGRATIONS = {
         ((1, 23, 0), [
             upgrade_v1_23.adjust_db_for_roles,
             upgrade_v1_23.create_role_service_schema,
+            upgrade_v1_23.restrict_workspace_name_length,
         ]),
     ],
     consts.MIGRATION_TYPE_DATA: [

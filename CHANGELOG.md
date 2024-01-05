@@ -13,6 +13,7 @@
 #### Schema migrations
 - [#165](https://github.com/LayerManager/layman/issues/165) Add column `role_name` to table `rights` in prime DB schema. Add constraint that exactly one of columns `role_name` and `id_user` is not null.
 - [#165](https://github.com/LayerManager/layman/issues/165) Create DB schema `_role_service` that can be used as [role service](doc/security.md#role-service).
+- [#165](https://github.com/LayerManager/layman/issues/165) Column `name` in table `workspace` in prime DB schema length is changed to 59 characters.
 #### Data migrations
 - [#165](https://github.com/LayerManager/layman/issues/165) Delete technical roles and user-role relations in GeoServer `default` role service, which is now replaced by JDBC role service.
 ### Changes
@@ -36,7 +37,7 @@
   - [GET](doc/rest.md#get-workspace-map)/[PATCH](doc/rest.md#patch-workspace-map) Workspace Map
   - GET Workspace [Layers](doc/rest.md#get-workspace-layers)/[Maps](doc/rest.md#get-workspace-maps)
   - GET [Layers](doc/rest.md#get-layers)/[Maps](doc/rest.md#get-maps)/[Publications](doc/rest.md#get-publications)
-- [#165](https://github.com/LayerManager/layman/issues/165) Name of [users](doc/models.md#username) and [public workspaces](doc/models.md#public-workspace) are from now on restricted to 59 characters.
+- [#165](https://github.com/LayerManager/layman/issues/165) Name of [users](doc/models.md#username) and [public workspaces](doc/models.md#public-workspace) are from now on restricted to a maximum length of 59 characters.
 - All changes from [v1.22.1](#v1221), [v1.22.2](#v1222) and [v1.22.3](#v1223).
 - [#960](https://github.com/LayerManager/layman/issues/960) Handle WMS requests with HTTP error more efficiently in timgen.
 - [#962](https://github.com/LayerManager/layman/issues/962) Make values of `layman_metadata.publication_status` and `status` key(s) more consistent in responses of PATCH Workspace [Layer](doc/rest.md#patch-workspace-layer)/[Map](doc/rest.md#patch-workspace-map) and GET Workspace [Layer](doc/rest.md#get-workspace-layer)/[Map](doc/rest.md#get-workspace-map).
