@@ -130,7 +130,9 @@ with settings.LAYMAN_REDIS.pipeline() as pipe:
                         set_after_restart()
 
                         logger.info(f'Validate Role service data')
-                        validate_role_service()
+                        from .common.prime_db_schema.users import get_user_infos
+                        usernames = get_user_infos().keys()
+                        validate_role_service(layman_usernames=usernames)
 
                 pipe.multi()
                 pipe.set(LAYMAN_DEPS_ADJUSTED_KEY, 'done')
