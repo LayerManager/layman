@@ -73,7 +73,7 @@
 
 ## Username
 - Username is a string identifying one [user](#user), so it is unique among all users.
-- The string is lower-case (in contrast with [role name](#role)).
+- The string is lower-case (in contrast with [role name](#role)), maximum length is 59 characters.
 - Each user is represented by max. one username.
 - Username is also used to identify user's [personal workspace](#personal-workspace) when communicating with [Layman REST API](rest.md).
 - Username can be reserved by [PATCH Current User](rest.md#patch-current-user).
@@ -92,6 +92,7 @@
 ## Workspace
 - Workspace is folder for [publications](#publication).
 - Each workspace is identified by name that is unique among all workspaces.
+- The name is lower-case, maximum length is 59 characters.
 - Workspace name is sometimes used for structuring publication-related data. For example, it's part of REST API URL (`/rest/workspaces/<workspace_name>/...`), directory names (`<LAYMAN_DATA_DIR>/workspaces/<workspace_name>/...`), DB schemas, or OGC Web Services (`/geoserver/<workspace_name>/...`, `/geoserver/<workspace_name>_wms/...`).
 - Workspace's REST API consists of all [map and layer endpoints](rest.md) endpoints.
 - There are following types of workspaces:
