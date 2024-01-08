@@ -182,12 +182,8 @@ where length(name) > 59
     if len(too_long_workspace_name) > 0:
         raise NotImplementedError(f"Too long workspace names: {[name[0] for name in too_long_workspace_name]}")
 
-    # For direct ALTER TABLE raises "ERROR: cannot alter type of a column used by a view or rule"
-    # For details see https://web.archive.org/web/20111007112138/http://sniptools.com/databases/resize-a-column-in-a-postgresql-table-without-changing-data
     alter_column = f"""
-UPDATE pg_attribute SET
-    atttypmod = 59+4
-WHERE attrelid = '{settings.LAYMAN_PRIME_SCHEMA}.workspaces'::regclass
-AND attname = 'name'
+ALTER TABLE {settings.LAYMAN_PRIME_SCHEMA}.workspaces
+    ALTER COLUMN name TYPE VARCHAR(59) COLLATE pg_catalog."default"
 ;"""
     db_util.run_statement(alter_column)
