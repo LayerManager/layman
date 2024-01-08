@@ -62,6 +62,33 @@ where id_publication in (
     assert rights_rows[0][2] is None, f"role_name is not none!"
 
 
+def drop_role_schema():
+    drop_statement = f'''DROP SCHEMA IF EXISTS {ROLE_SERVICE_SCHEMA} CASCADE;'''
+    db_util.run_statement(drop_statement)
+
+
+def create_simple_role_schema():
+    # prepare simple schema in the same way as in setup_geoserver.py
+
+    prepare_simple_schema_statement = f"""
+CREATE SCHEMA "{ROLE_SERVICE_SCHEMA}" AUTHORIZATION {settings.LAYMAN_PG_USER};
+create view {ROLE_SERVICE_SCHEMA}.roles as select 'ADMIN'::varchar(64) as name, null::varchar(64) as parent
+union all select 'GROUP_ADMIN', null
+union all select %s, null
+;
+create view {ROLE_SERVICE_SCHEMA}.role_props as select null::varchar(64) as rolename, null::varchar(64) as propname, null::varchar(2048) as propvalue;
+create view {ROLE_SERVICE_SCHEMA}.user_roles as select %s::varchar(64) as username, 'ADMIN'::varchar(64) as rolename
+union all select %s, %s
+union all select %s, 'ADMIN'
+;
+create view {ROLE_SERVICE_SCHEMA}.group_roles as select null::varchar(128) as groupname, null::varchar(64) as rolename;
+        """
+
+    db_util.run_statement(prepare_simple_schema_statement, data=(
+        settings.LAYMAN_GS_ROLE, settings.LAYMAN_GS_USER, settings.LAYMAN_GS_USER, settings.LAYMAN_GS_ROLE,
+        settings.GEOSERVER_ADMIN_USER))
+
+
 def test_create_role_service_schema():
     username = 'test_create_role_service_schema_username'
     rolename = f'USER_{username.upper()}'
@@ -75,7 +102,6 @@ def test_create_role_service_schema():
                            "middle_name": "ensure",
                            }
                 }
-    drop_statement = f'''DROP SCHEMA IF EXISTS {ROLE_SERVICE_SCHEMA} CASCADE;'''
     schema_existence_query = f'''SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name = '{ROLE_SERVICE_SCHEMA}';'''
     table_existence_query = f'''SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '{ROLE_SERVICE_SCHEMA}' and table_name = %s;'''
     layman_users_roles_query = f'''select COUNT(*) from {ROLE_SERVICE_SCHEMA}.layman_users_roles where name = %s'''
@@ -93,30 +119,13 @@ def test_create_role_service_schema():
     (select count(*) from {ROLE_SERVICE_SCHEMA}.admin_user_roles) admin_user_roles,
     (select count(*) from {ROLE_SERVICE_SCHEMA}.user_roles) user_roles'''
 
-    # prepare simple schema in the same way as in setup_geoserver.py
-    prepare_simple_schema_statement = f"""
-CREATE SCHEMA "{ROLE_SERVICE_SCHEMA}" AUTHORIZATION {settings.LAYMAN_PG_USER};
-create view {ROLE_SERVICE_SCHEMA}.roles as select 'ADMIN'::varchar(64) as name, null::varchar(64) as parent
-union all select 'GROUP_ADMIN', null
-union all select %s, null
-;
-create view {ROLE_SERVICE_SCHEMA}.role_props as select null::varchar(64) as rolename, null::varchar(64) as propname, null::varchar(2048) as propvalue;
-create view {ROLE_SERVICE_SCHEMA}.user_roles as select %s::varchar(64) as username, 'ADMIN'::varchar(64) as rolename
-union all select %s, %s
-union all select %s, 'ADMIN'
-;
-create view {ROLE_SERVICE_SCHEMA}.group_roles as select null::varchar(128) as groupname, null::varchar(64) as rolename;
-    """
+    drop_role_schema()
 
     with app.app_context():
         ensure_whole_user(username, userinfo)
-        db_util.run_statement(drop_statement)
         result = db_util.run_query(schema_existence_query)[0][0]
         assert result == 0
-        db_util.run_statement(prepare_simple_schema_statement, data=(
-            settings.LAYMAN_GS_ROLE, settings.LAYMAN_GS_USER, settings.LAYMAN_GS_USER, settings.LAYMAN_GS_ROLE,
-            settings.GEOSERVER_ADMIN_USER))
-
+        create_simple_role_schema()
         upgrade_v1_23.create_role_service_schema()
 
         result = db_util.run_query(schema_existence_query)[0][0]
@@ -147,11 +156,11 @@ create view {ROLE_SERVICE_SCHEMA}.group_roles as select null::varchar(128) as gr
 
 def test_restrict_username_length():
     too_long_workspace_name = 'test_restrict_username_length'.ljust(60, 'x')
+    drop_role_schema()
+
     alter_column = f"""
-    UPDATE pg_attribute SET
-        atttypmod = 1043
-    WHERE attrelid = '{settings.LAYMAN_PRIME_SCHEMA}.workspaces'::regclass
-    AND attname = 'name'
+ALTER TABLE {settings.LAYMAN_PRIME_SCHEMA}.workspaces
+    ALTER COLUMN name TYPE VARCHAR(256) COLLATE pg_catalog."default"
     ;"""
     db_util.run_statement(alter_column)
 
@@ -167,3 +176,5 @@ def test_restrict_username_length():
 
     with app.app_context():
         upgrade_v1_23.restrict_workspace_name_length()
+        create_simple_role_schema()
+        upgrade_v1_23.create_role_service_schema()
