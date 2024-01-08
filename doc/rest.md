@@ -834,7 +834,7 @@ Query parameters:
   - `true`: If `username` sent in body parameter is already reserved by another user or `username` is an empty string, layman will definitely reserve some `username`, preferably similar to the value sent in `username` body parameter or to one of claims.
 
 Body parameters:
-- *username*: String. [Username](models.md#username) that should be reserved for current user. Username can be reserved only once and it cannot be changed. See URL parameter `adjust_username` for other details.
+- *username*: String. [Username](models.md#username) that should be reserved for current user (maximum length is 59 characters). Username can be reserved only once and cannot be changed. See URL parameter `adjust_username` for other details.
 
 #### Response
 Content-Type: `application/json`
