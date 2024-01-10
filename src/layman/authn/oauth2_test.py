@@ -150,7 +150,7 @@ def test_unexisting_introspection_url(client, headers):
         f'{TOKEN_HEADER}': 'Bearer abc',
     }
 ])
-@pytest.mark.usefixtures('app_context', 'inactive_token_introspection_url', 'ensure_layman')
+@pytest.mark.usefixtures('app_context', 'inactive_token_introspection_url', 'user_profile_url', 'ensure_layman')
 def test_token_inactive(client, headers):
     username = 'testuser1'
     url = url_for('rest_workspace_layers.get', workspace=username)
@@ -166,7 +166,7 @@ def test_token_inactive(client, headers):
         f'{TOKEN_HEADER}': 'Bearer abc',
     }
 ])
-@pytest.mark.usefixtures('app_context', 'active_token_introspection_url', 'ensure_layman')
+@pytest.mark.usefixtures('app_context', 'active_token_introspection_url', 'user_profile_url', 'ensure_layman')
 def test_token_active(client, headers):
     username = 'testuser1'
     url = url_for('rest_workspace_layers.get', workspace=username)

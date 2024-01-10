@@ -271,6 +271,9 @@ postgresql-psql:
 postgresql-psql-test:
 	docker compose -f docker-compose.deps.yml run -e PGPASSWORD=docker --entrypoint "psql -U docker -p 5432 -h postgresql layman_test" --rm postgresql
 
+postgresql-bash-exec:
+	docker compose -f docker-compose.deps.yml exec -e PGPASSWORD=docker postgresql "bash"
+
 redis-cli-db:
 	docker compose -f docker-compose.deps.yml exec redis redis-cli -h redis -p 6379 -n 0
 

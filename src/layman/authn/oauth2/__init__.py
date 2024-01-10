@@ -72,6 +72,15 @@ def authenticate():
                 # current_app.logger.info(f"r_json={r_json}")
                 if r_json['active'] is True and r_json.get('token_type', 'Bearer') == 'Bearer':
                     valid_resp = r_json
+                    if settings.OAUTH2_INTROSPECTION_USE_SUB_KEY_FROM_USER_PROFILE:
+                        assert USER_PROFILE_URL is not None, f"USER_PROFILE_URL is None"
+                        response = requests.get(USER_PROFILE_URL, headers={
+                            'Authorization': f'Bearer {access_token}',
+                        }, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
+                        response.raise_for_status()
+                        user_profile_json = response.json()
+                        # current_app.logger.info(f"user_profile_json={user_profile_json}")
+                        valid_resp[INTROSPECTION_SUB_KEY] = user_profile_json[INTROSPECTION_SUB_KEY]
                     break
             except ValueError:
                 continue
