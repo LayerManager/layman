@@ -24,6 +24,10 @@
     ```
       - `URI_of_Wagtail_db` is PostgreSQL connection URI to Wagtail database, e.g. `postgresql://user:password@host.docker.internal:5432/wagtail_db_name`
       - The script changes OAuth2 "sub" values in Layman prime DB schema from Wagtail usernames to Wagtail user IDs. See [940](https://github.com/LayerManager/layman/issues/940).
+    - In case of development settings, run following script instead:
+      ```bash
+      docker compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm --no-deps -u root -e LAYMAN_WAGTAIL_DB_URI=<URI_of_Wagtail_db> layman_dev bash -c "cd src && python3 -B v1_23_change_oauth2_sub_username_to_user_id.py"
+      ```
 ### Migrations and checks
 #### Schema migrations
 - [#165](https://github.com/LayerManager/layman/issues/165) Add column `role_name` to table `rights` in prime DB schema. Add constraint that exactly one of columns `role_name` and `id_user` is not null.

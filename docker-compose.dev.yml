@@ -24,6 +24,7 @@ services:
         - ./deps/geoserver/data:/geoserver/data_dir
         - ./deps/geoserver/sample/geoserver_data:/geoserver/initial_data_dir
         - ./deps/qgis/data:/qgis/data
+        - ./deps/wagtail/data:/wagtail/data
       depends_on:
         - timgen
         - redis

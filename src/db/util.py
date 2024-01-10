@@ -1,5 +1,7 @@
+import contextlib
 import logging
 import re
+import sqlite3
 from urllib import parse
 import psycopg2
 import psycopg2.pool
@@ -35,6 +37,35 @@ def get_connection_pool(db_uri_str=None, encapsulate_exception=True):
 
 
 def run_query(query, data=None, uri_str=None, encapsulate_exception=True, log_query=False):
+    if uri_str is None or uri_str.startswith('postgres:') or uri_str.startswith('postgresql:'):
+        method = _run_query_postgres
+    elif uri_str.startswith('sqlite:'):
+        method = _run_query_sqlite
+    else:
+        raise NotImplementedError(f"Unsupported database protocol: {uri_str}")
+
+    return method(query, data=data, uri_str=uri_str, encapsulate_exception=encapsulate_exception, log_query=log_query)
+
+
+def _run_query_sqlite(query, data=None, *, uri_str, encapsulate_exception=True, log_query=False):
+    assert data is None, f"data is not yet implemented"
+    db_uri_parsed = parse.urlparse(uri_str)
+    db_path = db_uri_parsed.path
+    try:
+        if log_query:
+            logger.info(f"query={query}")
+        with contextlib.closing(sqlite3.connect(db_path)) as conn:  # auto-closes
+            with conn:  # auto-commits
+                result = list(conn.execute(query))
+    except BaseException as exc:
+        if encapsulate_exception:
+            logger.error(f"_run_query_sqlite, query={query}, data={data}, exc={exc}")
+            raise Error(2) from exc
+        raise exc
+    return result
+
+
+def _run_query_postgres(query, data=None, uri_str=None, encapsulate_exception=True, log_query=False):
     pool = get_connection_pool(db_uri_str=uri_str, encapsulate_exception=encapsulate_exception, )
     conn = pool.getconn()
     conn.autocommit = True
@@ -47,7 +78,7 @@ def run_query(query, data=None, uri_str=None, encapsulate_exception=True, log_qu
         conn.commit()
     except BaseException as exc:
         if encapsulate_exception:
-            logger.error(f"run_query, query={query}, data={data}, exc={exc}")
+            logger.error(f"_run_query_postgres, query={query}, data={data}, exc={exc}")
             raise Error(2) from exc
         raise exc
     finally:
