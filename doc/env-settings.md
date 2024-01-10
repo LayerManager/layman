@@ -85,7 +85,10 @@ URL of LTC OAuth2 callback endpoint to be called after successful OAuth2 authori
 URL of OAuth2 Introspection endpoint.
 
 ### OAUTH2_INTROSPECTION_SUB_KEY
-Name of the key in OAuth2 introspection response whose value is OAuth2 subject (also known as "sub"). Value `username` is suitable for Wagtail. If not set or set to empty string, `sub` is used, that is suitable option for Liferay.
+Name of the key in OAuth2 introspection response whose value is OAuth2 subject (also known as "sub"). Value `userId` is suitable for Wagtail (together with setting [OAUTH2_INTROSPECTION_USE_SUB_KEY_FROM_USER_PROFILE](#OAUTH2_INTROSPECTION_USE_SUB_KEY_FROM_USER_PROFILE) to `true`). If not set or set to empty string, `sub` is used, that is suitable option for Liferay.
+
+### OAUTH2_INTROSPECTION_USE_SUB_KEY_FROM_USER_PROFILE
+Set to `true` if you want [OAUTH2_INTROSPECTION_SUB_KEY](#OAUTH2_INTROSPECTION_SUB_KEY) to be read from [OAUTH2_USER_PROFILE_URL](#OAUTH2_USER_PROFILE_URL) instead of [OAUTH2_INTROSPECTION_URL](#OAUTH2_INTROSPECTION_URL). Default value is `false`. Value `true` is suitable for Wagtail.
 
 ### OAUTH2_USER_PROFILE_URL
 URL of User Profile endpoint used to obtain user's ID, name, email, etc.

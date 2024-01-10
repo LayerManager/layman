@@ -9,6 +9,15 @@
   ```
 - Stop using environment variable `LAYMAN_GS_ROLE_SERVICE`, it has no effect to Layman anymore. Layman now uses [role service](doc/security.md#role-service) identified by new environment variable [LAYMAN_ROLE_SERVICE_URI](doc/env-settings.md#LAYMAN_ROLE_SERVICE_URI). The service is called `layman_role_service` on GeoServer.
 - Set new environment variable [LAYMAN_ROLE_SERVICE_URI](doc/env-settings.md#LAYMAN_ROLE_SERVICE_URI)
+- If you are using Wagtail as OAuth2 provider
+  - Set new environment variable [OAUTH2_INTROSPECTION_USE_SUB_KEY_FROM_USER_PROFILE](doc/env-settings.md#OAUTH2_INTROSPECTION_USE_SUB_KEY_FROM_USER_PROFILE):
+    ```
+    OAUTH2_INTROSPECTION_USE_SUB_KEY_FROM_USER_PROFILE=true
+    ```  
+  - Change environment variable [OAUTH2_INTROSPECTION_SUB_KEY](doc/env-settings.md#OAUTH2_INTROSPECTION_SUB_KEY):
+    ```
+    OAUTH2_INTROSPECTION_SUB_KEY=userId
+    ```
 ### Migrations and checks
 #### Schema migrations
 - [#165](https://github.com/LayerManager/layman/issues/165) Add column `role_name` to table `rights` in prime DB schema. Add constraint that exactly one of columns `role_name` and `id_user` is not null.
@@ -38,6 +47,7 @@
   - GET Workspace [Layers](doc/rest.md#get-workspace-layers)/[Maps](doc/rest.md#get-workspace-maps)
   - GET [Layers](doc/rest.md#get-layers)/[Maps](doc/rest.md#get-maps)/[Publications](doc/rest.md#get-publications)
 - [#165](https://github.com/LayerManager/layman/issues/165) Name of [users](doc/models.md#username) and [public workspaces](doc/models.md#public-workspace) are from now on restricted to a maximum length of 59 characters.
+- [940](https://github.com/LayerManager/layman/issues/940) Enable to use `userId` as OAuth2 "sub" instead of `username`. This is recommended option for Wagtail. See [OAUTH2_INTROSPECTION_SUB_KEY](doc/env-settings.md#OAUTH2_INTROSPECTION_SUB_KEY) for more details.
 - [941](https://github.com/LayerManager/layman/issues/941) Wagtail database is now persistent when restarting Layman or Wagtail.
 - All changes from [v1.22.1](#v1221), [v1.22.2](#v1222) and [v1.22.3](#v1223).
 - [#960](https://github.com/LayerManager/layman/issues/960) Handle WMS requests with HTTP error more efficiently in timgen.
