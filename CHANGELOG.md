@@ -9,6 +9,7 @@
   ```
 - Stop using environment variable `LAYMAN_GS_ROLE_SERVICE`, it has no effect to Layman anymore. Layman now uses [role service](doc/security.md#role-service) identified by new environment variable [LAYMAN_ROLE_SERVICE_URI](doc/env-settings.md#LAYMAN_ROLE_SERVICE_URI). The service is called `layman_role_service` on GeoServer.
 - Set new environment variable [LAYMAN_ROLE_SERVICE_URI](doc/env-settings.md#LAYMAN_ROLE_SERVICE_URI)
+- Stop using environment variable [`OAUTH2_INTROSPECTION_SUB_KEY`](https://github.com/LayerManager/layman/blob/v1.22.3/doc/env-settings.md#oauth2_introspection_sub_key), it has no effect to Layman anymore. 
 ### Migrations and checks
 #### Schema migrations
 - [#165](https://github.com/LayerManager/layman/issues/165) Add column `role_name` to table `rights` in prime DB schema. Add constraint that exactly one of columns `role_name` and `id_user` is not null.
@@ -38,6 +39,7 @@
   - GET Workspace [Layers](doc/rest.md#get-workspace-layers)/[Maps](doc/rest.md#get-workspace-maps)
   - GET [Layers](doc/rest.md#get-layers)/[Maps](doc/rest.md#get-maps)/[Publications](doc/rest.md#get-publications)
 - [#165](https://github.com/LayerManager/layman/issues/165) Name of [users](doc/models.md#username) and [public workspaces](doc/models.md#public-workspace) are from now on restricted to a maximum length of 59 characters.
+- [940](https://github.com/LayerManager/layman/issues/940) Use `userId` as OAuth2 "sub" instead of `username`. This is suitable for Wagtail.
 - [941](https://github.com/LayerManager/layman/issues/941) Wagtail database is now persistent when restarting Layman or Wagtail.
 - All changes from [v1.22.1](#v1221), [v1.22.2](#v1222) and [v1.22.3](#v1223).
 - [#960](https://github.com/LayerManager/layman/issues/960) Handle WMS requests with HTTP error more efficiently in timgen.
@@ -369,7 +371,7 @@ make client-build
 - Maximum length of layer and map name is 210 characters.
 - [#606](https://github.com/LayerManager/layman/issues/606) Fix filtering and ordering publications by bounding box in case of publication with whole world bounding box in database.
 - New environment variable [OAUTH2_LIFERAY_SCOPE](doc/env-settings.md#oauth2_scope). Introduced in v1.16.2.
-- New environment variable [OAUTH2_LIFERAY_INTROSPECTION_SUB_KEY](doc/env-settings.md#oauth2_introspection_sub_key). Introduced in v1.16.1.
+- New environment variable [OAUTH2_LIFERAY_INTROSPECTION_SUB_KEY](https://github.com/LayerManager/layman/blob/v1.22.3/doc/env-settings.md#oauth2_introspection_sub_key). Introduced in v1.16.1.
 - [#599](https://github.com/LayerManager/layman/issues/599) Layman supports uploading data files with upper or mixed case extensions. Introduced in v1.16.1.
 - [#541](https://github.com/LayerManager/layman/issues/541) Vector layers are stored in DB table with name in form `layer_<UUID>`, e.g. `layer_96b918c6_d88c_42d8_b999_f3992b826958`, previously the name of the table was the same as name of the layer.
 
@@ -403,7 +405,7 @@ make client-build
 ### Changes
 - Fix infinity loop when generating map thumbnail. One of consequences was that such infinity loops consumed all celery workers and it was not possible to complete POST/PATCH map or layer.
 - Fix empty map thumbnail. In some cases, map thumbnail was generated as if anonymous user asks for the map. Now the thumbnail is generated as if user with writing rights asks for the map.
-- New environment variable [OAUTH2_LIFERAY_INTROSPECTION_SUB_KEY](doc/env-settings.md#oauth2_introspection_sub_key).
+- New environment variable [OAUTH2_LIFERAY_INTROSPECTION_SUB_KEY](https://github.com/LayerManager/layman/blob/v1.22.3/doc/env-settings.md#oauth2_introspection_sub_key).
 - [#599](https://github.com/LayerManager/layman/issues/599) Layman supports uploading data files with upper or mixed case extensions.
 
 ## v1.16.0
