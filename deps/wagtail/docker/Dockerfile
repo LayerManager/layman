@@ -21,15 +21,13 @@ RUN pip install -r /app/requirements.txt
 # Copy the entire project code.
 COPY laymanportal /app/
 
-# Prepare the app.
-RUN python manage.py migrate
+# Prepare the app: migrations (not needed as db.sqlite3a was generated after migrations)
+# RUN python manage.py migrate
+
+# Prepare the app: collect static files
 RUN python manage.py collectstatic --noinput
 
 # Create a "coderedcms" user account to run the app.
 RUN useradd coderedcms
 RUN chown -R coderedcms /app/
 USER coderedcms
-
-# Finally, run the app on port 8000.
-EXPOSE 8000
-CMD exec waitress-serve --listen "*:8000" "laymanportal.wsgi:application"

@@ -22,7 +22,7 @@ start-demo-only:
 	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate --no-deps layman celery_worker flower timgen layman_client nginx
 
 start-demo-full-with-optional-deps:
-	mkdir -p layman_data deps/qgis/data
+	mkdir -p layman_data deps/qgis/data deps/wagtail/data
 	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client timgen
 	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d postgresql
 	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps -u root layman bash -c "cd src && python3 -B setup_geoserver.py"
@@ -60,7 +60,7 @@ deps-stop:
 	docker compose -f docker-compose.deps.yml stop
 
 start-dev:
-	mkdir -p layman_data layman_data_test tmp deps/qgis/data
+	mkdir -p layman_data layman_data_test tmp deps/qgis/data deps/wagtail/data
 	docker compose -f docker-compose.deps.yml -f docker-compose.dev.yml up -d postgresql
 	docker compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm --no-deps -u root layman_dev bash -c "cd src && python3 -B setup_geoserver.py"
 	docker compose -f docker-compose.deps.yml -f docker-compose.dev.yml up --force-recreate -d
@@ -107,7 +107,7 @@ upgrade-dev:
 	docker compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm --no-deps layman_dev bash -c "cd src && python3 layman_flush_redis.py && python3 wait_for_deps.py && python3 standalone_upgrade.py"
 
 prepare-dirs:
-	mkdir -p layman_data layman_data_test tmp deps/qgis/data
+	mkdir -p layman_data layman_data_test tmp deps/qgis/data deps/wagtail/data
 
 build-dev:
 	docker compose -f docker-compose.deps.yml -f docker-compose.dev.yml build --force-rm layman_dev
@@ -143,7 +143,7 @@ reset-data-directories:
 	docker compose -f docker-compose.deps.yml rm -fsv
 	docker volume rm layman_redis-data || true
 	sudo rm -rf layman_data layman_data_test deps/*/data
-	mkdir -p layman_data layman_data_test tmp deps/qgis/data
+	mkdir -p layman_data layman_data_test tmp deps/qgis/data deps/wagtail/data
 
 clear-python-cache-dev:
 	docker compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm --no-deps layman_dev bash /code/src/clear-python-cache.sh
@@ -313,10 +313,15 @@ wagtail-exec:
 	docker compose -f docker-compose.deps.yml exec wagtail bash
 
 wagtail-restart:
+	mkdir -p deps/wagtail/data
 	docker compose -f docker-compose.deps.yml up --force-recreate --no-deps -d wagtail
 
 wagtail-stop:
 	docker compose -f docker-compose.deps.yml stop wagtail
+
+wagtail-reset-datadir:
+	mkdir -p deps/wagtail/data
+	rm -rf deps/wagtail/data/*
 
 micka-restart:
 	docker compose -f docker-compose.deps.yml up --force-recreate --no-deps -d micka
