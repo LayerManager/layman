@@ -61,7 +61,7 @@ List of dotted paths to Python modules to be used for authentication. Paths are 
 Secret name of HTTP header used for authentication internally (e.g. when generating private map thumbnail). Only combination of lowercase characters and numbers must be used for the value. At demo configuration, the HTTP header is automatically removed by Nginx on every request to Layman REST API or to GeoServer WMS/WFS/OWS.
 
 ### OAUTH2_CLIENT_ID
-Client ID of Layman's Test Client registered at OAuth2 provider (e.g. Wagtail or Liferay).
+Client ID of Layman's Test Client registered at OAuth2 provider (e.g. Wagtail).
 
 ### OAUTH2_CLIENT&lt;n&gt;_ID
 Client ID of another Layman's client registered at OAuth2 provider. The **n** must be integer starting from `1`. In case of more clients other than LTC, list of **n**s must be uninterrupted series of integers.

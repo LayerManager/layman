@@ -47,6 +47,7 @@
   - GET [Layers](doc/rest.md#get-layers)/[Maps](doc/rest.md#get-maps)/[Publications](doc/rest.md#get-publications)
 - [#165](https://github.com/LayerManager/layman/issues/165) Name of [users](doc/models.md#username) and [public workspaces](doc/models.md#public-workspace) are from now on restricted to a maximum length of 59 characters.
 - [940](https://github.com/LayerManager/layman/issues/940) Use `userId` as OAuth2 "sub" instead of `username`. This is suitable for Wagtail.
+- [940](https://github.com/LayerManager/layman/issues/940) Stop supporting Liferay as OAuth2 provider.
 - [941](https://github.com/LayerManager/layman/issues/941) Wagtail database is now persistent when restarting Layman or Wagtail.
 - All changes from [v1.22.1](#v1221), [v1.22.2](#v1222) and [v1.22.3](#v1223).
 - [#960](https://github.com/LayerManager/layman/issues/960) Handle WMS requests with HTTP error more efficiently in timgen.
