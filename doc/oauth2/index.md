@@ -32,9 +32,8 @@ From [RFC6749](https://tools.ietf.org/html/rfc6749#section-1.1):
 Layman acts as *resource server*. On every request to REST API, Layman accepts OAuth2 [access token](https://tools.ietf.org/html/rfc6749#section-1.4) from a *client* and validates access token against *authorization server* to authenticate *resource owner* (i.e. end-user). The access token is validated token against *authorization server* by OAuth2 mechanism called [Token Introspection](https://oauth.net/2/token-introspection/) (RFC 7662). Furthermore, Layman is responsible for fetching user-related metadata from *authorization server* using provider-specific endpoint.
 
 ### Authorization Server
-There are currently two supported *authorization servers* (OAuth2 providers):
+There is currently one supported *authorization server* (OAuth2 provider):
 - [Django OAuth2 Toolkit](https://django-oauth-toolkit.readthedocs.io/en/latest/) as plugin of [Wagtail CRX](https://docs.coderedcorp.com/wagtail-crx/), this is preferred option
-- [Liferay Portal](https://help.liferay.com/hc/en-us/articles/360018176491-OAuth-2-0)
 
 Supporting [other OAuth2 providers](https://en.wikipedia.org/wiki/List_of_OAuth_providers) (e.g. Google or Facebook) should be quite straightforward in the future.
 
@@ -130,26 +129,3 @@ Check following environment variables of LTC:
 - OAUTH2_TOKEN_URL: URL of [Token Endpoint](https://tools.ietf.org/html/rfc6749#section-3.2). In case of Django OAuth Toolkit (Wagtail), it's something like `<http or https>://<wagtail domain and port>/o/token`
 - OAUTH2_CALLBACK_URL: URL of [Redirection Endpoint](https://tools.ietf.org/html/rfc6749#section-3.1.2), the value is `<http or https>://<LTC domain, port, and path prefix>/auth/oauth2-provider/callback`.
 - OAUTH2_USER_PROFILE_URL: URL of Layman's [GET Current User](../rest.md#get-current-user)
-
-### Liferay Settings
-Every *client* must be registered in Liferay as *application*, as described in [Liferay documentation](https://help.liferay.com/hc/en-us/articles/360018176491-OAuth-2-0#creating-an-application). For LTC, fill in following settings:
-- **Website URL** should point to application's home page, e.g. `http://localhost:3000/`.
-- **Callback URIs** must contain URL of OAuth2 [Redirection Endpoint](https://tools.ietf.org/html/rfc6749#section-3.1.2). In case of LTC, the value is the same as LTC setting OAUTH2_CALLBACK_URL.
-- **Client Profile**: Web Application
-- **Allowed Authorization Types**:
-    - Authorization Code
-    - Refresh Token
-- **Supported Features**:
-    - Token Introspection
-
-Furthermore, check "read your personal user data" (liferay-json-web-services.everything.read.userprofile) in **Scopes** tab. This scope will enable `/api/jsonws/user/get-current-user` endpoint to provide user-related metadata to Layman.
-
-By default, only Liferay users with Administrator role have enough privileges to use OAuth2 authorization. To enable other roles to use OAuth2 (e.g. User role), you need to
-- add **View** permission for **Authorize Screen URL** to desired roles
-  - **Authorize Screen URL** can be found in *Configuration > System Settings > OAuth 2 > Authorize Screen*
-  - to open permissions of default Authorize Screen URL `/?p_p_id=com_liferay_oauth2_provider_web_internal_portlet_OAuth2AuthorizePortlet&p_p_state=maximized`, visit [this URL](http://localhost:8080/?p_p_id=com_liferay_portlet_configuration_web_portlet_PortletConfigurationPortlet&p_p_state=pop_up&_com_liferay_portlet_configuration_web_portlet_PortletConfigurationPortlet_mvcPath=%2Fedit_permissions.jsp&_com_liferay_portlet_configuration_web_portlet_PortletConfigurationPortlet_portletConfiguration=true&_com_liferay_portlet_configuration_web_portlet_PortletConfigurationPortlet_portletResource=com_liferay_oauth2_provider_web_internal_portlet_OAuth2AuthorizePortlet&_com_liferay_portlet_configuration_web_portlet_PortletConfigurationPortlet_resourcePrimKey=com_liferay_oauth2_provider_web_internal_portlet_OAuth2AuthorizePortlet)
-    - see [Workaround #1](https://issues.liferay.com/browse/OAUTH2-202) for details
-- add **View** and **Create token** permissions for each registered OAuth2 application to desired roles
-  - to open permissions, visit *Configuration > OAuth 2 Administration*, click on three dots for desired application and select *Permissions*
-
-After registration, add **Client ID** and **Client Secret** pair to Layman's setting OAUTH2_CLIENTS.
