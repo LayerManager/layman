@@ -197,7 +197,7 @@
     OAUTH2_INTROSPECTION_SUB_KEY=username
     OAUTH2_USER_PROFILE_URL=http://wagtail:8000/profile
     ```
-  - unset environment variable `OAUTH2_SCOPE` (previously `OAUTH2_LIFERAY_SCOPE`)
+  - unset environment variable `OAUTH2_SCOPE` (previously [`OAUTH2_LIFERAY_SCOPE`](https://github.com/LayerManager/layman/blob/v1.20.1/doc/env-settings.md#oauth2_liferay_scope))
   - after [usual dev upgrade commands](README.md#upgrade) run also
     ```
     make wagtail-build
@@ -378,7 +378,7 @@ make client-build
 - [#541](https://github.com/LayerManager/layman/issues/541) Layer name and map name can start with numbers.
 - Maximum length of layer and map name is 210 characters.
 - [#606](https://github.com/LayerManager/layman/issues/606) Fix filtering and ordering publications by bounding box in case of publication with whole world bounding box in database.
-- New environment variable [OAUTH2_LIFERAY_SCOPE](doc/env-settings.md#oauth2_scope). Introduced in v1.16.2.
+- New environment variable [OAUTH2_LIFERAY_SCOPE](https://github.com/LayerManager/layman/blob/v1.20.1/doc/env-settings.md#oauth2_liferay_scope). Introduced in v1.16.2.
 - New environment variable [OAUTH2_LIFERAY_INTROSPECTION_SUB_KEY](https://github.com/LayerManager/layman/blob/v1.22.3/doc/env-settings.md#oauth2_introspection_sub_key). Introduced in v1.16.1.
 - [#599](https://github.com/LayerManager/layman/issues/599) Layman supports uploading data files with upper or mixed case extensions. Introduced in v1.16.1.
 - [#541](https://github.com/LayerManager/layman/issues/541) Vector layers are stored in DB table with name in form `layer_<UUID>`, e.g. `layer_96b918c6_d88c_42d8_b999_f3992b826958`, previously the name of the table was the same as name of the layer.
@@ -396,7 +396,7 @@ make client-build
   ```
   LAYMAN_CLIENT_VERSION=v1.11.0
   ```
-- If you are using Liferay as OAuth2 provider, set new environment variable [OAUTH2_LIFERAY_SCOPE](doc/env-settings.md#oauth2_scope):
+- If you are using Liferay as OAuth2 provider, set new environment variable [OAUTH2_LIFERAY_SCOPE](https://github.com/LayerManager/layman/blob/v1.20.1/doc/env-settings.md#oauth2_liferay_scope):
   ```
   OAUTH2_LIFERAY_SCOPE=liferay-json-web-services.everything.read.userprofile
   ```
@@ -406,7 +406,7 @@ make client-build
   make client-build
   ```
 ### Changes
-- New environment variable [OAUTH2_LIFERAY_SCOPE](doc/env-settings.md#oauth2_scope).
+- New environment variable [OAUTH2_LIFERAY_SCOPE](https://github.com/LayerManager/layman/blob/v1.20.1/doc/env-settings.md#oauth2_liferay_scope).
 
 ## v1.16.1
  2022-02-25
