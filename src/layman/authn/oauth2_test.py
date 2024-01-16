@@ -150,7 +150,7 @@ def test_unexisting_introspection_url(client, headers):
         f'{TOKEN_HEADER}': 'Bearer abc',
     }
 ])
-@pytest.mark.usefixtures('app_context', 'inactive_token_introspection_url', 'user_profile_url', 'ensure_layman')
+@pytest.mark.usefixtures('app_context', 'inactive_token_introspection_url', 'user_profile_url')
 def test_token_inactive(client, headers):
     username = 'testuser1'
     url = url_for('rest_workspace_layers.get', workspace=username)
@@ -166,7 +166,7 @@ def test_token_inactive(client, headers):
         f'{TOKEN_HEADER}': 'Bearer abc',
     }
 ])
-@pytest.mark.usefixtures('app_context', 'active_token_introspection_url', 'user_profile_url', 'ensure_layman')
+@pytest.mark.usefixtures('app_context', 'active_token_introspection_url', 'user_profile_url')
 def test_token_active(client, headers):
     username = 'testuser1'
     url = url_for('rest_workspace_layers.get', workspace=username)
@@ -176,7 +176,7 @@ def test_token_active(client, headers):
     assert resp_json['code'] == 40
 
 
-@pytest.mark.usefixtures('app_context', 'active_token_introspection_url', 'user_profile_url', 'ensure_layman')
+@pytest.mark.usefixtures('app_context', 'active_token_introspection_url', 'user_profile_url')
 def test_authn_get_current_user_without_username(client):
     rest_path = url_for('rest_current_user.get')
     response = client.get(rest_path, headers={
