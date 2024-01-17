@@ -12,8 +12,12 @@ from tests import Publication, EnumTestTypes, EnumTestKeys
 from tests.asserts.final.publication import geoserver_proxy, util as assert_publ_util
 from tests.dynamic_data import base_test
 
+OWNER = 'test_access_rights_application_owner'
 READER_BY_USERNAME = 'test_access_rights_application_reader_by_username'
 READER_BY_ROLE = 'test_access_rights_application_reader_by_role'
+
+LAYER_NO_ACCESS = Publication(OWNER, process_client.LAYER_TYPE, 'test_no_access_layer')
+LAYER_ACCESS_RIGHTS = Publication(OWNER, process_client.LAYER_TYPE, 'test_access_rights_layer')
 
 ENDPOINTS_TO_TEST = {
     process_client.LAYER_TYPE: [
@@ -99,6 +103,13 @@ def add_publication_test_cases_to_list(tc_list, publication, user, endpoints_to_
         'publ_type': publication.type,
     }
     for method, args in endpoints_to_test:
+        # pylint: disable=comparison-with-callable
+        test_type = EnumTestTypes.MANDATORY if user in {
+            READER_BY_USERNAME,
+            READER_BY_ROLE} and method in {process_client.get_workspace_publication,
+                                           geoserver_proxy.is_complete_in_workspace_wms_1_3_0} and publication in {LAYER_ACCESS_RIGHTS,
+                                                                                                                   LAYER_NO_ACCESS} else EnumTestTypes.OPTIONAL
+
         pytest_id = f'{method.__name__}__{user.split("_")[-1]}__{publication.name[5:]}{("__" + next(iter(args.keys()))) if args else ""}'
         method_args = inspect.getfullargspec(method).args + inspect.getfullargspec(method).kwonlyargs
 
@@ -107,7 +118,7 @@ def add_publication_test_cases_to_list(tc_list, publication, user, endpoints_to_
                                            rest_args={**args, **{
                                                key: value for key, value in all_args.items() if key in method_args
                                            }},
-                                           type=EnumTestTypes.MANDATORY,
+                                           type=test_type,
                                            )
 
         tc_list.append(test_case)
@@ -245,7 +256,7 @@ def generate_positive_wfst_test_cases(publications_user_can_read, test_cases):
 @pytest.mark.timeout(60)
 @pytest.mark.usefixtures('ensure_layman_module', 'oauth2_provider_mock')
 class TestAccessRights:
-    OWNER = 'test_access_rights_application_owner'
+    OWNER = OWNER
     READER_BY_USERNAME = READER_BY_USERNAME
     READER_BY_ROLE = READER_BY_ROLE
     OTHER_USER = 'test_access_rights_application_other_user'
@@ -253,8 +264,8 @@ class TestAccessRights:
     OTHER_ROLE = 'TEST_ACCESS_RIGHTS_APPLICATION_OTHER_ROLE'
     NON_EXISTING_ROLE = 'TEST_ACCESS_RIGHTS_NON_EXISTING_ROLE'
 
-    LAYER_NO_ACCESS = Publication(OWNER, process_client.LAYER_TYPE, 'test_no_access_layer')
-    LAYER_ACCESS_RIGHTS = Publication(OWNER, process_client.LAYER_TYPE, 'test_access_rights_layer')
+    LAYER_NO_ACCESS = LAYER_NO_ACCESS
+    LAYER_ACCESS_RIGHTS = LAYER_ACCESS_RIGHTS
     LAYER_EVERYONE_ACCESS = Publication(OWNER, process_client.LAYER_TYPE, 'test_everyone_access_layer')
     MAP_NO_ACCESS = Publication(OWNER, process_client.MAP_TYPE, 'test_no_access_map')
     MAP_ACCESS_RIGHTS = Publication(OWNER, process_client.MAP_TYPE, 'test_access_rights_map')
