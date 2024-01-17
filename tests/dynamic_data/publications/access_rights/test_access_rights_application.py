@@ -193,6 +193,9 @@ def add_wfst_publication_test_cases_to_list(tc_list, publication, user, username
         'publ_type': publication.type,
     }
     for key, test_case in test_cases.items():
+        test_type = EnumTestTypes.MANDATORY if user in {
+            READER_BY_USERNAME, READER_BY_ROLE} and key == 'insert_lines' and publication in (LAYER_ACCESS_RIGHTS, LAYER_NO_ACCESS) else EnumTestTypes.OPTIONAL
+
         attribs = [attr + f'_{username_for_id.lower()}' for attr in test_case.get('attr_names', [])]
         args = {
             'xml_getter': test_case['xml_getter'],
@@ -214,7 +217,7 @@ def add_wfst_publication_test_cases_to_list(tc_list, publication, user, username
                                                key: value for key, value in all_args.items() if key in method_args
                                            }},
                                            params=params,
-                                           type=EnumTestTypes.MANDATORY,
+                                           type=test_type,
                                            )
 
         tc_list.append(test_case)
