@@ -59,7 +59,8 @@ class TestPublication(base_test.TestSingleRestPublication):
                                                  'read': ','.join(USER_ROLE1_ROLE3_EVERYONE),
                                              }
                                          },
-                                         type=EnumTestTypes.MANDATORY,
+                                         type=EnumTestTypes.OPTIONAL,
+                                         specific_types={frozenset([base_test.PublicationByUsedServers.LAYER_VECTOR_SLD, base_test_classes.RestMethod.POST]): EnumTestTypes.MANDATORY},
                                          )]
 
     def test_publication(self, publication, rest_method, rest_args):
