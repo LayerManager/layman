@@ -1,4 +1,5 @@
 import copy
+import os
 import inspect
 import pytest
 
@@ -7,9 +8,12 @@ from layman import app, settings, LaymanError
 from layman.layer import db
 from test_tools import process_client, role_service as role_service_util
 from test_tools.data import wfs
-from tests import Publication, EnumTestTypes
+from tests import Publication, EnumTestTypes, EnumTestKeys
 from tests.asserts.final.publication import geoserver_proxy, util as assert_publ_util
 from tests.dynamic_data import base_test
+
+READER_BY_USERNAME = 'test_access_rights_application_reader_by_username'
+READER_BY_ROLE = 'test_access_rights_application_reader_by_role'
 
 ENDPOINTS_TO_TEST = {
     process_client.LAYER_TYPE: [
@@ -49,6 +53,8 @@ WFST_METHODS_TO_TEST = {
 
 def pytest_generate_tests(metafunc):
     # https://docs.pytest.org/en/6.2.x/parametrize.html#pytest-generate-tests
+    test_type_str = os.getenv(EnumTestKeys.TYPE.value) or EnumTestTypes.MANDATORY.value
+    test_type = EnumTestTypes(test_type_str)
     cls = metafunc.cls
     test_fn = metafunc.function
     arg_names = [a for a in inspect.getfullargspec(test_fn).args if a != 'self']
@@ -56,13 +62,15 @@ def pytest_generate_tests(metafunc):
     ids = []
 
     test_cases = cls.test_cases[test_fn.__name__]
-    for test_case in test_cases:
+    test_cases_for_type = [test_case for test_case in test_cases if
+                           test_type == EnumTestTypes.OPTIONAL or test_case.type == EnumTestTypes.MANDATORY]
+    for test_case in test_cases_for_type:
         assert not test_case.key, f"Not yet implemented"
         assert not test_case.specific_params, f"Not yet implemented"
         assert not test_case.specific_types, f"Not yet implemented"
         assert not test_case.parametrization, f"Not yet implemented"
         assert not test_case.post_before_test_args, f"Not yet implemented"
-        assert test_case.type == EnumTestTypes.MANDATORY, f"Other types then MANDATORY are not implemented yet"
+        assert test_case.type in {EnumTestTypes.MANDATORY, EnumTestTypes.OPTIONAL}
         arg_name_to_value = {
             'publication': test_case.publication,
             'publication_type': test_case.publication_type,
@@ -134,6 +142,7 @@ def generate_multiendpoint_test_cases(publications_user_can_read, workspace, ):
             (process_client.get_publications, process_client.LAYER_TYPE, workspace),
             (process_client.get_publications, process_client.MAP_TYPE, workspace),
         ]:
+            test_type = EnumTestTypes.MANDATORY if method == process_client.get_publications and type_filter is None and workspace_filter is None and user in {READER_BY_USERNAME, READER_BY_ROLE} else EnumTestTypes.OPTIONAL
             pytest_id = f'GET__{type_filter.split(".")[1] if type_filter else "publication"}s__{workspace_filter}__{user.split("_")[-1]}'
             available_publications = [(publication.workspace, publication.type, publication.name) for publication in publications
                                       if (not type_filter or publication.type == type_filter)
@@ -148,7 +157,7 @@ def generate_multiendpoint_test_cases(publications_user_can_read, workspace, ):
                                                    'actor_name': user,
                                                },
                                                params={'exp_publications': available_publications},
-                                               type=EnumTestTypes.MANDATORY,
+                                               type=test_type,
                                                )
 
             tc_list.append(test_case)
@@ -234,8 +243,8 @@ def generate_positive_wfst_test_cases(publications_user_can_read, test_cases):
 @pytest.mark.usefixtures('ensure_layman_module', 'oauth2_provider_mock')
 class TestAccessRights:
     OWNER = 'test_access_rights_application_owner'
-    READER_BY_USERNAME = 'test_access_rights_application_reader_by_username'
-    READER_BY_ROLE = 'test_access_rights_application_reader_by_role'
+    READER_BY_USERNAME = READER_BY_USERNAME
+    READER_BY_ROLE = READER_BY_ROLE
     OTHER_USER = 'test_access_rights_application_other_user'
     ROLE = 'TEST_ACCESS_RIGHTS_APPLICATION_ROLE'
     OTHER_ROLE = 'TEST_ACCESS_RIGHTS_APPLICATION_OTHER_ROLE'
