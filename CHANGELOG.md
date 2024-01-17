@@ -22,6 +22,7 @@
 - [#165](https://github.com/LayerManager/layman/issues/165) Add column `role_name` to table `rights` in prime DB schema. Add constraint that exactly one of columns `role_name` and `id_user` is not null.
 - [#165](https://github.com/LayerManager/layman/issues/165) Create DB schema `_role_service` that can be used as [role service](doc/security.md#role-service).
 - [#165](https://github.com/LayerManager/layman/issues/165) Column `name` in table `workspace` in prime DB schema length is changed to 59 characters.
+- Drop DB table `right_types`.
 #### Data migrations
 - [#165](https://github.com/LayerManager/layman/issues/165) Delete technical roles and user-role relations in GeoServer `default` role service, which is now replaced by JDBC role service.
 ### Changes

@@ -187,3 +187,16 @@ ALTER TABLE {settings.LAYMAN_PRIME_SCHEMA}.workspaces
     ALTER COLUMN name TYPE VARCHAR(59) COLLATE pg_catalog."default"
 ;"""
     db_util.run_statement(alter_column)
+
+
+def remove_right_types_table():
+    logger.info(f'    Remove right_types table')
+
+    remove_fk_statement = f"""alter table {settings.LAYMAN_PRIME_SCHEMA}.rights drop constraint rights_type_fkey;"""
+    db_util.run_statement(remove_fk_statement)
+
+    create_check_statement = f"""alter table {settings.LAYMAN_PRIME_SCHEMA}.rights add constraint rights_type check (type in ('read', 'write'));"""
+    db_util.run_statement(create_check_statement)
+
+    drop_table_statement = f"""drop table {settings.LAYMAN_PRIME_SCHEMA}.right_types"""
+    db_util.run_statement(drop_table_statement)
