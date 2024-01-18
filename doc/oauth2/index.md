@@ -57,7 +57,7 @@ Although LTC is currently the only OAuth2 client for Layman, there is an intenti
 
 Schema specific for LTC, distinguishing client side and server side of LTC:
 
-![auth-code.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/LayerManager/layman/master/doc/oauth2/auth-code.puml) 
+![auth-code.puml](auth-code.png) 
 
 ### Request Layman REST API
 After successful authorization, *client* is able to communicate with Layman REST API. To authenticate using OAuth2, every request to Layman REST API must contain HTTP header `Authorization`.
@@ -68,13 +68,13 @@ Because access token is known only on server side of LTC and not to client side,
  
 General schema of any request to Layman REST API:
 
-![rest.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/LayerManager/layman/master/doc/oauth2/rest.puml)
+![rest.puml](rest.png)
 
 
 ### Fetch User-Related Metadata
 Fetching user-related metadata happens automatically immediately after successful initial authorization by [GET Current User](../rest.md#get-current-user).
 
-![get-current-user.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/LayerManager/layman/master/doc/oauth2/get-current-user.puml)
+![get-current-user.puml](get-current-user.png)
 
 The fetch should happen regularly during end-user session to test if authentication (access token) is still valid. 
  
@@ -84,7 +84,7 @@ Immediately after the first [fetch of user-related metadata](#fetch-user-related
 
 Username is reserved by [PATCH Current User](../rest.md#patch-current-user). Username can be either generated automatically (this approach is used by LTC) or set manually; this is controlled by `adjust_username` parameter.
 
-![patch-current-user.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/LayerManager/layman/master/doc/oauth2/patch-current-user.puml) 
+![patch-current-user.puml](patch-current-user.png) 
 
 ### Refresh Access Token
 During end-user's session, *client* keeps both access tokens and refresh token. When access token expires or it's lifetime is close, *client* should use refresh token to generate new access token at [Token Endpoint](https://tools.ietf.org/html/rfc6749#section-3.2).
@@ -93,7 +93,7 @@ In case of LTC, refreshing happens automatically on any request to Layman REST A
 
 Schema specific for LTC:
 
-![refresh.puml](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/LayerManager/layman/master/doc/oauth2/refresh.puml) 
+![refresh.puml](refresh.png) 
 
 
 ## Settings

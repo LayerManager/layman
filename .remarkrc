@@ -9,8 +9,7 @@
       "skipLocalhost": true,
       "skipUrlPatterns": [
         "https://security.stackexchange.com",
-        "https://github.com/LayerManager/layman/issues/",
-        "http://www.plantuml.com/plantuml/proxy"
+        "https://github.com/LayerManager/layman/issues/"
       ]
     }
   }
