@@ -136,8 +136,9 @@ def delete_user_roles():
     gs_rest_roles_service = urljoin(GS_REST, f'security/roles/service/{role_service}/')
 
     for user in users.get_usernames():
-        logger.info(f'      Delete user {user}')
-        for role in [f'USER_{user}', settings.LAYMAN_GS_ROLE]:
+        user_role = f'USER_{user.upper()}'
+        logger.info(f'      Delete user {user} with role {user_role}')
+        for role in [user_role, settings.LAYMAN_GS_ROLE]:
             r_url = urljoin(gs_rest_roles_service, f'role/{role}/user/{user}/')
             response = requests.delete(
                 r_url,
@@ -150,7 +151,7 @@ def delete_user_roles():
                 response.raise_for_status()
 
         response = requests.delete(
-            urljoin(gs_rest_roles_service, 'role/' + role),
+            urljoin(gs_rest_roles_service, 'role/' + user_role),
             headers=gs_util.headers_json,
             auth=settings.LAYMAN_GS_AUTH,
             timeout=GS_REST_TIMEOUT,
