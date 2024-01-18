@@ -1,6 +1,8 @@
+import os
 import pytest
 
 from test_tools import process_client, role_service as role_service_util
+from tests import EnumTestTypes, EnumTestKeys
 
 
 @pytest.mark.timeout(60)
@@ -8,6 +10,9 @@ class TestDeletePublicationsClass:
     owner = 'test_delete_publications_owner'
     deleter = 'test_delete_publications_deleter'
     ROLE = 'TEST_DELETE_PUBLICATIONS_ROLE'
+
+    test_type_str = os.getenv(EnumTestKeys.TYPE.value) or EnumTestTypes.MANDATORY.value
+    test_type = EnumTestTypes(test_type_str)
 
     @pytest.fixture(scope="class")
     def provide_data(self, request):
@@ -34,12 +39,18 @@ class TestDeletePublicationsClass:
         publication_set = {publication['name'] for publication in get_json}
         assert remaining_publications == publication_set
 
-    @pytest.mark.parametrize('publ_type', process_client.PUBLICATION_TYPES)
-    @pytest.mark.parametrize('available_write_rights', [
-        pytest.param('EVERYONE', id='access_by_everyone'),
+    publ_types_for_test_type = [process_client.LAYER_TYPE]
+    available_write_rights_for_test_type = [
         pytest.param(f'{owner},{deleter}', id='access_by_user'),
         pytest.param(f'{owner},{ROLE}', id='access_by_role'),
-    ])
+    ]
+
+    if test_type == EnumTestTypes.OPTIONAL:
+        publ_types_for_test_type = process_client.PUBLICATION_TYPES
+        available_write_rights_for_test_type += [pytest.param('EVERYONE', id='access_by_everyone')]
+
+    @pytest.mark.parametrize('publ_type', publ_types_for_test_type)
+    @pytest.mark.parametrize('available_write_rights', available_write_rights_for_test_type)
     @pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman', 'provide_data')
     def test_delete_publications_by_user(self,
                                          publ_type,
