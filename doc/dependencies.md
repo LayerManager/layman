@@ -90,3 +90,4 @@
 | [jirikcz/micka](https://github.com/LayerManager/docker-micka) | GNU GPL v3 | docker-compose.yml | prod-external | bin | |
 | [samtux/micka](https://github.com/samtux/docker-micka) | GNU GPL v3 | jirikcz/micka | prod-external | src | |
 | [docker-library/redis](https://github.com/docker-library/redis) | BSD 3-Clause | docker-compose.yml | prod | bin | |
+| [plantuml/plantuml](https://hub.docker.com/r/plantuml/plantuml) | GNU GPL v3 | Makefile | dev | bin | render PlantUML images |

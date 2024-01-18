@@ -73,6 +73,7 @@
   - pytest 7.4.2 -> 7.4.3
   - pytest-rerunfailures 12.0 -> 13.0
   - pytest-timeout 2.1.0 -> 2.2.0
+- Add development dependency `plantuml/plantuml` for rendering PlantUML diagrams.
 
 ## v1.22.3
  2023-12-06

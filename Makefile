@@ -424,3 +424,6 @@ pull-dev-images:
 	docker tag layermanager/layman:client-latest layman_client_test
 	docker pull layermanager/layman:timgen-latest
 	docker tag layermanager/layman:timgen-latest timgen
+
+render-puml-images:
+	docker run --rm -it -u $(UID_GID) -v $$(pwd):/src plantuml/plantuml -v /src/**/*.puml
