@@ -8,7 +8,7 @@ Publishing geospatial data online through [REST API](doc/rest.md).
   - [**map**](doc/models.md#map): collection of layers
 - Accepts **vector** layer data in [GeoJSON](https://en.wikipedia.org/wiki/GeoJSON), [ShapeFile](https://en.wikipedia.org/wiki/Shapefile), or [PostGIS table](https://postgis.net/) identified by [PostgreSQL connection URI](https://www.postgresql.org/docs/15/libpq-connect.html#id-1.7.3.8.3.6)
 - Accepts **raster** layer data in [GeoTIFF](https://gdal.org/drivers/raster/gtiff.html), [JPEG2000](https://gdal.org/drivers/raster/jp2openjpeg.html), [PNG](https://gdal.org/drivers/raster/png.html), and [JPEG](https://gdal.org/drivers/raster/jpeg.html) formats
-- Accepts layer **style** in [Styled Layer Descriptor](https://www.opengeospatial.org/standards/sld), [Symbology Encoding](https://www.opengeospatial.org/standards/se), and [QGIS Style File Format](https://docs.qgis.org/3.16/en/docs/user_manual/appendices/qgis_file_formats.html#qml-the-qgis-style-file-format) (for vector data only) formats
+- Accepts layer **style** in [Styled Layer Descriptor](https://ogc.org/standard/sld), [Symbology Encoding](https://ogc.org/standard/se), and [QGIS Style File Format](https://docs.qgis.org/3.16/en/docs/user_manual/appendices/qgis_file_formats.html#qml-the-qgis-style-file-format) (for vector data only) formats
 - Accepts **map** definition in [HSLayers Map Composition](https://github.com/hslayers/map-compositions) format
 - Even large files can be easily uploaded from browser thanks to asynchronous chunk upload
 - [OAuth2 authentication](doc/security.md#authentication)

@@ -1,6 +1,6 @@
 # Metadata
 
-Layman is able to publish partial metadata records to [OGC Catalogue Service](https://www.opengeospatial.org/standards/cat) [Micka](http://micka.bnhelp.cz/). Records are partial because Layman does not know all metadata properties. Below are listed
+Layman is able to publish partial metadata records to [OGC Catalogue Service](https://ogc.org/standard/cat) [Micka](http://micka.bnhelp.cz/). Records are partial because Layman does not know all metadata properties. Below are listed
 - [metadata properties that are known to Layman](#metadata-properties-known-to-layman) 
 - [metadata properties unknown to Layman](#metadata-properties-unknown-to-layman), that Layman is aware of. 
 
