@@ -196,10 +196,10 @@ Filesystem directory where data published on QGIS are stored, including styles.
 HTTP Basic Authentication credentials for communication with [CSW](#CSW_URL) encoded as `user:password`.
 
 ### CSW_URL
-Internal URL of [OGC Catalogue Service v2.0.2](https://www.opengeospatial.org/standards/cat) endpoint. Tested with [Micka](http://micka.bnhelp.cz/).
+Internal URL of [OGC Catalogue Service v2.0.2](https://ogc.org/standard/cat) endpoint. Tested with [Micka](http://micka.bnhelp.cz/).
 
 ### CSW_PROXY_URL
-Public URL of [OGC Catalogue Service v2.0.2](https://www.opengeospatial.org/standards/cat) endpoint. Tested with [Micka](http://micka.bnhelp.cz/).
+Public URL of [OGC Catalogue Service v2.0.2](https://ogc.org/standard/cat) endpoint. Tested with [Micka](http://micka.bnhelp.cz/).
 
 ### MICKA_ACCEPTED_VERSION
 Version of Micka that Layman will accept on startup encoded as `version:revision`, e.g. `2020.014:2020-04-15.01`. Also, on one of '>=' or '==' prefixes can be used with obvious meaning, `e.g. >=2020.014:2020-04-15.01`. For prefix '>=', version and revision are compared independently as strings. If the variable is not set, a version defined in [`src/layman_settings.py`](../src/layman_settings.py) will be accepted. If none prefix is used, value is compared as with '=='.
