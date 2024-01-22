@@ -15,7 +15,7 @@ pytest_generate_tests = base_test.pytest_generate_tests
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
-WORKSPACE = 'layer_map_relation_workspace'
+WORKSPACE = 'layer_map_relation_ws'
 PRIVATE_WORKSPACE = 'layer_map_relation_user'
 
 LAYER_HRANICE = Publication(WORKSPACE, process_client.LAYER_TYPE, 'hranice')
