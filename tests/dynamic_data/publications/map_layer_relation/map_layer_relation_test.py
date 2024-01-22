@@ -120,6 +120,7 @@ TEST_CASES = {
 }
 
 
+@pytest.mark.timeout(60)
 @pytest.mark.usefixtures('oauth2_provider_mock')
 class TestPublication(base_test.TestSingleRestPublication):
     workspace = WORKSPACE
