@@ -47,7 +47,7 @@
       "title": "Hranice",
       "className": "HSLayers.Layer.WMS",
       "singleTile": true,
-      "url": "http://localhost:8000/some-client-proxy/geoserver/layer_map_relation_workspace_wms/ows",
+      "url": "http://localhost:8000/some-client-proxy/geoserver/layer_map_relation_ws_wms/ows",
       "params": {
         "LAYERS": "hranice",
         "FORMAT": "image\/png"
@@ -60,7 +60,7 @@
       "title": "Mista",
       "className": "HSLayers.Layer.WMS",
       "singleTile": true,
-      "url": "http://localhost:8000/geoserver/layer_map_relation_workspace_wms/ows",
+      "url": "http://localhost:8000/geoserver/layer_map_relation_ws_wms/ows",
       "params": {
         "LAYERS": "mista",
         "FORMAT": "image\/png"
@@ -79,7 +79,7 @@
       "opacity": 1,
       "protocol": {
         "format": "hs.format.WFS",
-        "url": "http://localhost:8000/geoserver/layer_map_relation_workspace/wfs"
+        "url": "http://localhost:8000/geoserver/layer_map_relation_ws/wfs"
       },
       "ratio": 1.5,
       "singleTile": true,
