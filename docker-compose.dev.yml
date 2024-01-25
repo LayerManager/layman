@@ -80,6 +80,8 @@ services:
       image: timgen:latest
       user: ${UID_GID}
       command: node server.js
+      environment:
+        - NODE_OPTIONS="--openssl-config=/code/unsafe_openssl.cnf"
 #      ports:
 #        - 8080:8080
 

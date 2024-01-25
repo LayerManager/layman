@@ -73,6 +73,11 @@
   - pytest 7.4.2 -> 7.4.3
   - pytest-rerunfailures 12.0 -> 13.0
   - pytest-timeout 2.1.0 -> 2.2.0
+- Upgrade Timgen from v16 to v18. Use not-so-secure SSL communication (UnsafeLegacyRenegotiation) in Timgen.
+- Upgrade Timgen Node.js dependencies
+  - follow-redirects 1.15.2 -> 1.15.2 (suggested by dependabot)
+  - postcss 8.4.21 -> 8.4.33 (suggested by dependabot)
+  - vite 3.2.7 -> 3.2.8 (suggested by dependabot)
 - Add development dependency `plantuml/plantuml` for rendering PlantUML diagrams.
 
 ## v1.22.3
