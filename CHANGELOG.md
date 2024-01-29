@@ -5,7 +5,7 @@
 ### Upgrade requirements
 - Change environment variable [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION):
   ```
-  LAYMAN_CLIENT_VERSION=73a6d0b5d2138e62077d305d07b4992d020168c8
+  LAYMAN_CLIENT_VERSION=v1.18.0
   ```
 - Stop using environment variable `LAYMAN_GS_ROLE_SERVICE`, it has no effect to Layman anymore. Layman now uses [role service](doc/security.md#role-service) identified by new environment variable [LAYMAN_ROLE_SERVICE_URI](doc/env-settings.md#LAYMAN_ROLE_SERVICE_URI). The service is called `layman_role_service` on GeoServer.
 - Set new environment variable [LAYMAN_ROLE_SERVICE_URI](doc/env-settings.md#LAYMAN_ROLE_SERVICE_URI)
