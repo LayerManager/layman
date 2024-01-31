@@ -19,7 +19,7 @@
 - Set new environment variable [LAYMAN_ROLE_SERVICE_URI](doc/env-settings.md#LAYMAN_ROLE_SERVICE_URI)
 - Stop using environment variable [`OAUTH2_INTROSPECTION_SUB_KEY`](https://github.com/LayerManager/layman/blob/v1.22.3/doc/env-settings.md#oauth2_introspection_sub_key), it has no effect to Layman anymore. 
 - If you are using Wagtail as OAuth2 provider
-  - After running `make upgrade-demo` or `make-upgrade-demo-full`, run also script `v1_23_change_oauth2_sub_username_to_user_id.py`:
+  - After running `make upgrade-demo` or `make upgrade-demo-full`, run also script `v1_23_change_oauth2_sub_username_to_user_id.py`:
     ```bash
     docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps -u root -e LAYMAN_WAGTAIL_DB_URI=<URI_of_Wagtail_db> layman bash -c "cd src && python3 -B v1_23_change_oauth2_sub_username_to_user_id.py"
     ```
@@ -29,7 +29,7 @@
 #### Schema migrations
 - [#165](https://github.com/LayerManager/layman/issues/165) Add column `role_name` to table `rights` in prime DB schema. Add constraint that exactly one of columns `role_name` and `id_user` is not null.
 - [#165](https://github.com/LayerManager/layman/issues/165) Create DB schema `_role_service` that can be used as [role service](doc/security.md#role-service).
-- [#165](https://github.com/LayerManager/layman/issues/165) Column `name` in table `workspace` in prime DB schema length is changed to 59 characters.
+- [#165](https://github.com/LayerManager/layman/issues/165) Column `name` in table `workspaces` in prime DB schema length is changed to 59 characters.
 - Drop DB table `right_types`.
 #### Data migrations
 - [#165](https://github.com/LayerManager/layman/issues/165) Delete technical roles and user-role relations in GeoServer `default` role service, which is now replaced by JDBC role service.
