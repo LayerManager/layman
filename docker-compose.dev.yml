@@ -37,7 +37,7 @@ services:
       image: layman_dev:latest
       user: ${UID_GID}
       # use watchdog
-      command: bash -c "cd src && python3 wait_for_deps.py && watchmedo auto-restart -d . -p '*.py' --recursive -- python3 -m celery -A layman.celery_app worker -Q $${LAYMAN_CELERY_QUEUE} --loglevel=info"
+      command: bash -c "cd src && python3 wait_for_layman.py && watchmedo auto-restart -d . -p '*.py' --recursive -- python3 -m celery -A layman.celery_app worker -Q $${LAYMAN_CELERY_QUEUE} --loglevel=info"
 #      command: bash -c "cd src && python3 -m celery -A layman.celery_app worker --loglevel=info"
       env_file: .env
       environment:
