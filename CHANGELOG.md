@@ -7,6 +7,7 @@
 #### Schema migrations
 #### Data migrations
 ### Changes
+- [#1016](https://github.com/LayerManager/layman/issues/1016) Flower container used to wait for all dependencies and also check [role service](doc/security.md#role-service), from now on it waits only for Layman API to be ready.
 
 ## v1.23.0
  2024-01-30
