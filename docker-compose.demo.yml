@@ -35,7 +35,7 @@ services:
    celery_worker:
       image: layman:latest
       user: ${UID_GID}
-      command: bash -c "cd src && python3 wait_for_deps.py && python3 -m celery -A layman.celery_app worker -Q $${LAYMAN_CELERY_QUEUE} --loglevel=info"
+      command: bash -c "cd src && python3 wait_for_layman.py && python3 -m celery -A layman.celery_app worker -Q $${LAYMAN_CELERY_QUEUE} --loglevel=info"
       env_file: .env
       environment:
         - C_FORCE_ROOT=true
