@@ -57,7 +57,7 @@ services:
       container_name: flower
       image: layman_dev:latest
       user: ${UID_GID}
-      command: bash -c "cd src && python3 wait_for_deps.py && celery -A layman.celery_app flower --port=5555"
+      command: bash -c "cd src && python3 wait_for_layman.py && celery -A layman.celery_app flower --port=5555"
       env_file: .env
       environment:
         - LAYMAN_SKIP_REDIS_LOADING=true
