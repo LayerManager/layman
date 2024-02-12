@@ -37,4 +37,5 @@ def get_all_roles():
       and name ~ %s
     """
     roles = db_util.run_query(query, ('ADMIN', 'GROUP_ADMIN', settings.LAYMAN_GS_ROLE, settings.ROLE_NAME_PATTERN), uri_str=settings.LAYMAN_ROLE_SERVICE_URI)
-    return [role[0] for role in roles] + [settings.RIGHTS_EVERYONE_ROLE]
+    result = sorted([role[0] for role in roles] + [settings.RIGHTS_EVERYONE_ROLE])
+    return result
