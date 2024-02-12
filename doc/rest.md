@@ -864,7 +864,7 @@ No action parameters.
 #### Response
 Content-Type: `application/json`
 
-JSON array of role names, where each role name is a `string`.
+JSON array of role names in alphabetical order, where each role name is a `string`.
 
 ## Version
 ### URL

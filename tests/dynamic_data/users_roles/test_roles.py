@@ -25,6 +25,6 @@ def test_get_roles():
         role_service.ensure_role(rolename)
     response = requests.get(url, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
     assert response.status_code == 200, response.json()
-    assert response.json() == [rolename, settings.RIGHTS_EVERYONE_ROLE]
+    assert response.json() == [settings.RIGHTS_EVERYONE_ROLE, rolename]
 
     role_service.delete_role(rolename)
