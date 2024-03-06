@@ -1,11 +1,7 @@
 # Changelog
 
 ## v1.23.1
- {release-date}
-### Upgrade requirements
-### Migrations and checks
-#### Schema migrations
-#### Data migrations
+ 2024-03-06
 ### Changes
 - [#1016](https://github.com/LayerManager/layman/issues/1016) Flower and Celery worker containers used to wait for all dependencies and also check [role service](doc/security.md#role-service), from now on it waits only for Layman API to be ready.
 - [#165](https://github.com/LayerManager/layman/issues/165) Roles in REST endpoint [GET Roles](doc/rest.md#get-roles) result are in alphabetical order.
