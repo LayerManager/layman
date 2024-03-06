@@ -61,6 +61,7 @@ services:
       environment:
         - LAYMAN_SKIP_REDIS_LOADING=true
       extra_hosts:
+         - "host.docker.internal:host-gateway"
          - ${EXTRA_HOST1}
          - ${EXTRA_HOST2}
       volumes:
