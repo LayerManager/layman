@@ -56,6 +56,10 @@ services:
         dockerfile: docker/Dockerfile
       ports:
         - 8083:8000
+      command: /app/start_wagtail.sh
+      volumes:
+        - ./deps/wagtail/data:/app/data/
+        - ./deps/wagtail/sample:/app/initial_data/
 
    micka:
       container_name: micka
