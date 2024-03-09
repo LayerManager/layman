@@ -22,6 +22,7 @@
 #### Data migrations
 ### Changes
 - [#1021](https://github.com/LayerManager/layman/issues/1021) Fix WFS-T error by manually changing GeoServer configuration as described in upgrade requirements.
+- [#1022](https://github.com/LayerManager/layman/issues/1022) Fix login in demo configuration with authentication. 
 
 ## v1.23.1
  2024-03-06
