@@ -7,9 +7,10 @@
 #### Schema migrations
 #### Data migrations
 ### Changes
+- All changes from [v1.23.1](#v1231) and [v1.23.2](#v1232).
 
 ## v1.23.2
- {release-date}
+ 2024-03-10
 ### Upgrade requirements
 - [#1021](https://github.com/LayerManager/layman/issues/1021) After [upgrade](README.md#upgrade) and start of Layman, it's needed to change GeoServer configuration by following steps:
     1. Log in to GeoServer Admin
@@ -17,9 +18,6 @@
     3. Find part "**Authentication Filters**" and click on "**laymanHttpHeader**"
     4. In part "**Role source**" choose "**Role service**" in left dropdown and "**layman_role_service**" in right dropdown.
     5. Click on **Save** button.
-### Migrations and checks
-#### Schema migrations
-#### Data migrations
 ### Changes
 - [#1021](https://github.com/LayerManager/layman/issues/1021) Fix WFS-T error by manually changing GeoServer configuration as described in upgrade requirements.
 - [#1022](https://github.com/LayerManager/layman/issues/1022) Fix login in demo configuration with authentication. 
