@@ -7,8 +7,8 @@ Publishing geospatial data online through [REST API](doc/rest.md).
   - [**layer**](doc/models.md#layer): visual representation of single vector or raster dataset, including raster [timeseries](doc/models.md#timeseries)
   - [**map**](doc/models.md#map): collection of layers
 - Accepts **vector** layer data in [GeoJSON](https://en.wikipedia.org/wiki/GeoJSON), [ShapeFile](https://en.wikipedia.org/wiki/Shapefile), or [PostGIS table](https://postgis.net/) identified by [PostgreSQL connection URI](https://www.postgresql.org/docs/15/libpq-connect.html#id-1.7.3.8.3.6)
-- Accepts **raster** layer data in [GeoTIFF](https://gdal.org/drivers/raster/gtiff.html), [JPEG2000](https://gdal.org/drivers/raster/jp2openjpeg.html), [PNG](https://gdal.org/drivers/raster/png.html), and [JPEG](https://gdal.org/drivers/raster/jpeg.html) formats
-- Accepts layer **style** in [Styled Layer Descriptor](https://ogc.org/standard/sld), [Symbology Encoding](https://ogc.org/standard/se), and [QGIS Style File Format](https://docs.qgis.org/3.16/en/docs/user_manual/appendices/qgis_file_formats.html#qml-the-qgis-style-file-format) (for vector data only) formats
+- Accepts **raster** layer data in [GeoTIFF](https://gdal.org/en/stable/drivers/raster/gtiff.html), [JPEG2000](https://gdal.org/en/stable/drivers/raster/jp2openjpeg.html), [PNG](https://gdal.org/en/stable/drivers/raster/png.html), and [JPEG](https://gdal.org/en/stable/drivers/raster/jpeg.html) formats
+- Accepts layer **style** in [Styled Layer Descriptor](https://www.ogc.org/publications/standard/sld/), [Symbology Encoding](https://www.ogc.org/publications/standard/se/), and [QGIS Style File Format](https://docs.qgis.org/3.16/en/docs/user_manual/appendices/qgis_file_formats.html#qml-the-qgis-style-file-format) (for vector data only) formats
 - Accepts **map** definition in [HSLayers Map Composition](https://github.com/hslayers/map-compositions) format
 - Even large files can be easily uploaded from browser thanks to asynchronous chunk upload
 - [OAuth2 authentication](doc/security.md#authentication)
@@ -35,7 +35,7 @@ Publishing geospatial data online through [REST API](doc/rest.md).
 
     You can check your kernel version with `uname -r`.
 - Docker Engine v20.10.13+ including Docker Compose v2+
-  - installation instructions for [centos 7](https://docs.docker.com/install/linux/docker-ce/centos/), including docker-compose-plugin installation
+  - installation instructions for [centos 7](https://docs.docker.com/engine/install/centos/), including docker-compose-plugin installation
 
 **Optionally**
 - linux or any tool to run tasks defined in Makefile using `make` command
@@ -106,7 +106,7 @@ Then you can log in with automatically provided Wagtail user `layman` and passwo
 Layman's source code provides settings suitable for development, testing and demo purposes. Furthermore, there exists [`Makefile`](Makefile) with predefined commands for each purpose including starting all necessary services (both in background and foreground) and stoping it.
 
 Layman's configuration is split into three levels:
-- `docker-compose.*.yml` files used as [docker-compose configuration files](https://docs.docker.com/compose/compose-file/) with most general settings of docker containers including volume mappings, port mappings, container names and startup commands
+- `docker-compose.*.yml` files used as [docker-compose configuration files](https://docs.docker.com/reference/compose-file/) with most general settings of docker containers including volume mappings, port mappings, container names and startup commands
 - `.env*` files with environment settings of both build stage and runtime of docker containers
 - `src/layman_settings.py` Python module with settings of Layman's Python modules for runtime
 
@@ -170,7 +170,7 @@ When providing **external dependencies**, check their production-related documen
 - [PostgreSQL 13.3](https://www.postgresql.org/docs/13/admin.html) & [PostGIS 3.1](http://postgis.net/docs/manual-3.1/performance_tips.html)
 - [QGIS Server 3.16.1](https://docs.qgis.org/3.10/en/docs/user_manual/working_with_ogc/server/index.html)
 - [GeoServer 2.21.2](https://geoserver.org/release/2.21.2/)
-- [Redis 4.0](https://redis.io/topics/admin)
+- [Redis 4.0](https://redis.io/docs/latest/operate/oss_and_stack/management/admin/)
 - [Micka v2020.014](https://github.com/hsrs-cz/Micka/releases/tag/v2020.014), see also [configuration](deps/micka/sample/confs/config.local.neon) of [dockerized Micka](https://github.com/LayerManager/docker-micka).
 
 Within PostgreSQL, you need to provide one database for Layman and one database for Micka. For Layman, you also need to provide one user [LAYMAN_PG_USER](doc/env-settings.md#LAYMAN_PG_USER) who needs enough privileges to create new schemas in [LAYMAN_PG_DBNAME](doc/env-settings.md#LAYMAN_PG_DBNAME) database. The user also needs access to `public` schema where PostGIS must be installed.
@@ -190,8 +190,8 @@ After providing external dependencies there is time to provide **internal depend
 **System-level** dependencies includes
 - python 3.8+
 - [python3-lxml](https://lxml.de/installation.html)
-- [ogr2ogr](https://gdal.org/programs/ogr2ogr.html) utility of [gdal](https://gdal.org/) 3.3+
-- [chromium-browser](https://chromium.org/) 90+ and corresponding version of [chromedriver](https://chromedriver.chromium.org/)
+- [ogr2ogr](https://gdal.org/en/stable/programs/ogr2ogr.html) utility of [gdal](https://gdal.org/) 3.3+
+- [chromium-browser](https://www.chromium.org/) 90+ and corresponding version of [chromedriver](https://developer.chrome.com/docs/chromedriver/)
 - [pipenv](https://pypi.org/project/pipenv/)
 - [node.js](https://nodejs.org/) 18 & npm 8 for running Layman Test Client
 - [node.js](https://nodejs.org/) 16 & npm 8 for running Timgen

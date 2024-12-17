@@ -6,7 +6,7 @@ Layman is able to authenticate against [OAuth 2.0](https://oauth.net/2/) provide
 ## Roles
 
 ### OAuth2 Terminology
-From [RFC6749](https://tools.ietf.org/html/rfc6749#section-1.1):
+From [RFC6749](https://datatracker.ietf.org/doc/html/rfc6749#section-1.1):
 - *resource owner*:
       An entity capable of granting access to a protected resource.
       When the resource owner is a person, it is referred to as an
@@ -29,7 +29,7 @@ From [RFC6749](https://tools.ietf.org/html/rfc6749#section-1.1):
 
 
 ### Layman
-Layman acts as *resource server*. On every request to REST API, Layman accepts OAuth2 [access token](https://tools.ietf.org/html/rfc6749#section-1.4) from a *client* and validates access token against *authorization server* to authenticate *resource owner* (i.e. end-user). The access token is validated token against *authorization server* by OAuth2 mechanism called [Token Introspection](https://oauth.net/2/token-introspection/) (RFC 7662). Furthermore, Layman is responsible for fetching user-related metadata from *authorization server* using provider-specific endpoint.
+Layman acts as *resource server*. On every request to REST API, Layman accepts OAuth2 [access token](https://datatracker.ietf.org/doc/html/rfc6749#section-1.4) from a *client* and validates access token against *authorization server* to authenticate *resource owner* (i.e. end-user). The access token is validated token against *authorization server* by OAuth2 mechanism called [Token Introspection](https://oauth.net/2/token-introspection/) (RFC 7662). Furthermore, Layman is responsible for fetching user-related metadata from *authorization server* using provider-specific endpoint.
 
 ### Authorization Server
 There is currently one supported *authorization server* (OAuth2 provider):
@@ -39,7 +39,7 @@ Supporting [other OAuth2 providers](https://en.wikipedia.org/wiki/List_of_OAuth_
 
 ### Layman Test Client
 [Layman Test Client](https://github.com/LayerManager/layman-test-client) (LTC) acts as *client*. It is responsible for
-- asking appropriate [authorization grant](https://tools.ietf.org/html/rfc6749#section-1.3) from *resource server* to get valid access token
+- asking appropriate [authorization grant](https://datatracker.ietf.org/doc/html/rfc6749#section-1.3) from *resource server* to get valid access token
 - safely storing access token and [refresh token](https://oauth.net/2/grant-types/refresh-token/) during end-user's session
 - fetching user-related metadata from Layman's [GET Current User](../rest.md#get-current-user)
 - reserving username for the end-user on Layman's side using [PATCH Current User](../rest.md#patch-current-user) if end-user does not have any username yet
@@ -62,7 +62,7 @@ Schema specific for LTC, distinguishing client side and server side of LTC:
 ### Request Layman REST API
 After successful authorization, *client* is able to communicate with Layman REST API. To authenticate using OAuth2, every request to Layman REST API must contain HTTP header `Authorization`.
 
-**Authorization** header contains access token according to [RFC6750 Bearer Token Usage](https://tools.ietf.org/html/rfc6750#section-2.1). Structure of its value is `"Bearer <access token>"`.
+**Authorization** header contains access token according to [RFC6750 Bearer Token Usage](https://datatracker.ietf.org/doc/html/rfc6750#section-2.1). Structure of its value is `"Bearer <access token>"`.
 
 Because access token is known only on server side of LTC and not to client side, every request from client side to Layman REST API goes through **proxy** on LTC server side. The proxy adds `Authorization` header to the request and forward it to the Layman. To authenticate end-user, Layman then validates access token on *authorization server* using [Token Introspection](https://oauth.net/2/token-introspection/) mechanism.
  
@@ -87,7 +87,7 @@ Username is reserved by [PATCH Current User](../rest.md#patch-current-user). Use
 ![patch-current-user.puml](patch-current-user.png) 
 
 ### Refresh Access Token
-During end-user's session, *client* keeps both access tokens and refresh token. When access token expires or it's lifetime is close, *client* should use refresh token to generate new access token at [Token Endpoint](https://tools.ietf.org/html/rfc6749#section-3.2).
+During end-user's session, *client* keeps both access tokens and refresh token. When access token expires or it's lifetime is close, *client* should use refresh token to generate new access token at [Token Endpoint](https://datatracker.ietf.org/doc/html/rfc6749#section-3.2).
 
 In case of LTC, refreshing happens automatically on any request to Layman REST API if access token expired, or it's lifetime is closer than 10 seconds.
 
@@ -112,7 +112,7 @@ Sample values for OAuth2 authentication can be found in [`layman_settings.py`](.
 
 ### Django OAuth Toolkit Settings
 Every *client* must be registered in Django OAuth Toolkit (Wagtail) as *application*, as described in [documentation](https://django-oauth-toolkit.readthedocs.io/en/latest/getting_started.html#oauth2-authorization-grants). For LTC, fill in following settings:
-- **Redirect URIs** must contain URL of OAuth2 [Redirection Endpoint](https://tools.ietf.org/html/rfc6749#section-3.1.2). In case of LTC, the value is the same as LTC setting OAUTH2_CALLBACK_URL.
+- **Redirect URIs** must contain URL of OAuth2 [Redirection Endpoint](https://datatracker.ietf.org/doc/html/rfc6749#section-3.1.2). In case of LTC, the value is the same as LTC setting OAUTH2_CALLBACK_URL.
 - **Client Type**: Confidential
 - **Authorization Grant Type**: Authorization Code
 - **Name**: layman-test-client
@@ -125,7 +125,7 @@ Furthermore, you need to provide endpoint `/profile` with user-related metadata.
 Check following environment variables of LTC:
 - OAUTH2_CLIENT_ID: **Client ID** from authorization server
 - OAUTH2_CLIENT_SECRET: **Client Secret** from authorization server
-- OAUTH2_AUTH_URL: URL of [Authorization Endpoint](https://tools.ietf.org/html/rfc6749#section-3.1), usually the same as the first URL from Layman's OAUTH2_AUTH_URLS
-- OAUTH2_TOKEN_URL: URL of [Token Endpoint](https://tools.ietf.org/html/rfc6749#section-3.2). In case of Django OAuth Toolkit (Wagtail), it's something like `<http or https>://<wagtail domain and port>/o/token`
-- OAUTH2_CALLBACK_URL: URL of [Redirection Endpoint](https://tools.ietf.org/html/rfc6749#section-3.1.2), the value is `<http or https>://<LTC domain, port, and path prefix>/auth/oauth2-provider/callback`.
+- OAUTH2_AUTH_URL: URL of [Authorization Endpoint](https://datatracker.ietf.org/doc/html/rfc6749#section-3.1), usually the same as the first URL from Layman's OAUTH2_AUTH_URLS
+- OAUTH2_TOKEN_URL: URL of [Token Endpoint](https://datatracker.ietf.org/doc/html/rfc6749#section-3.2). In case of Django OAuth Toolkit (Wagtail), it's something like `<http or https>://<wagtail domain and port>/o/token`
+- OAUTH2_CALLBACK_URL: URL of [Redirection Endpoint](https://datatracker.ietf.org/doc/html/rfc6749#section-3.1.2), the value is `<http or https>://<LTC domain, port, and path prefix>/auth/oauth2-provider/callback`.
 - OAUTH2_USER_PROFILE_URL: URL of Layman's [GET Current User](../rest.md#get-current-user)

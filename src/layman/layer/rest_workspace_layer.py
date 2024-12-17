@@ -132,7 +132,7 @@ def patch(workspace, layername):
     # Overview resampling
     overview_resampling = request.form.get('overview_resampling', '')
     if overview_resampling and overview_resampling not in settings.OVERVIEW_RESAMPLING_METHOD_LIST:
-        raise LaymanError(2, {'expected': 'Resampling method for gdaladdo utility, https://gdal.org/programs/gdaladdo.html',
+        raise LaymanError(2, {'expected': 'Resampling method for gdaladdo utility, https://gdal.org/en/stable/programs/gdaladdo.html',
                               'parameter': 'overview_resampling',
                               'detail': {'found': 'no_overview_resampling',
                                          'supported_values': settings.OVERVIEW_RESAMPLING_METHOD_LIST}, })

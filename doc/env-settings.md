@@ -109,7 +109,7 @@ Internal URL of REST API [Current User](rest.md#current-user) endpoint.
 Internal URL (only protocol & host & port, without path) of Layman's REST API.
 
 ### LTC_REDIS_URL
-URL of [Redis logical database](https://redis.io/commands/select) including database number where Layman Test Client stores user sessions including authentication credentials.
+URL of [Redis logical database](https://redis.io/docs/latest/commands/select/) including database number where Layman Test Client stores user sessions including authentication credentials.
 
 ### LTC_SESSION_SECRET
 See [`secret` at express-session documentation](https://www.npmjs.com/package/express-session#secret).
@@ -126,7 +126,7 @@ To enable not-so-secure SSL communication (UnsafeLegacyRenegotiation), set `NODE
 ## Connection to Redis
 
 ### LAYMAN_REDIS_URL
-URL of [Redis logical database](https://redis.io/commands/select) including database number. Layman stores internal data about publications and users in this database. By default, Layman flushes the whole logical database on every startup! See also [LAYMAN_SKIP_REDIS_LOADING](#LAYMAN_SKIP_REDIS_LOADING).
+URL of [Redis logical database](https://redis.io/docs/latest/commands/select/) including database number. Layman stores internal data about publications and users in this database. By default, Layman flushes the whole logical database on every startup! See also [LAYMAN_SKIP_REDIS_LOADING](#LAYMAN_SKIP_REDIS_LOADING).
 
 ## Connection to PostgreSQL
 
@@ -197,10 +197,10 @@ Filesystem directory where data published on QGIS are stored, including styles.
 HTTP Basic Authentication credentials for communication with [CSW](#CSW_URL) encoded as `user:password`.
 
 ### CSW_URL
-Internal URL of [OGC Catalogue Service v2.0.2](https://ogc.org/standard/cat) endpoint. Tested with [Micka](http://micka.bnhelp.cz/).
+Internal URL of [OGC Catalogue Service v2.0.2](https://www.ogc.org/publications/standard/cat/) endpoint. Tested with [Micka](https://www.bnhelp.cz/produkty/metadata/).
 
 ### CSW_PROXY_URL
-Public URL of [OGC Catalogue Service v2.0.2](https://ogc.org/standard/cat) endpoint. Tested with [Micka](http://micka.bnhelp.cz/).
+Public URL of [OGC Catalogue Service v2.0.2](https://www.ogc.org/publications/standard/cat/) endpoint. Tested with [Micka](https://www.bnhelp.cz/produkty/metadata/).
 
 ### MICKA_ACCEPTED_VERSION
 Version of Micka that Layman will accept on startup encoded as `version:revision`, e.g. `2020.014:2020-04-15.01`. Also, on one of '>=' or '==' prefixes can be used with obvious meaning, `e.g. >=2020.014:2020-04-15.01`. For prefix '>=', version and revision are compared independently as strings. If the variable is not set, a version defined in [`src/layman_settings.py`](../src/layman_settings.py) will be accepted. If none prefix is used, value is compared as with '=='.
@@ -211,13 +211,13 @@ String with public domain and optionally port, e.g. `<domain>` or `<domain>:<por
 ## Flask settings
 
 ### FLASK_APP
-See [Flask documentation](https://flask.palletsprojects.com/en/2.3.x/cli/?highlight=flask_app#environment-variables-from-dotenv).
+See [Flask documentation](https://flask.palletsprojects.com/en/stable/cli/?highlight=flask_app#environment-variables-from-dotenv).
 
 ### FLASK_DEBUG
-See [Flask documentation](https://flask.palletsprojects.com/en/2.3.x/config/?highlight=flask_debug#DEBUG).
+See [Flask documentation](https://flask.palletsprojects.com/en/stable/config/?highlight=flask_debug#DEBUG).
 
 ### FLASK_SECRET_KEY
-See [Flask documentation](https://flask.palletsprojects.com/en/2.3.x/config/?highlight=secret_key#SECRET_KEY).
+See [Flask documentation](https://flask.palletsprojects.com/en/stable/config/?highlight=secret_key#SECRET_KEY).
 
 ## Docker settings
 

@@ -8,9 +8,9 @@
 ## Layer
 - Layer is [publication](#publication) created from combination of vector or raster data (GeoJSON, ShapeFile, PostGIS table, GeoTIFF, JPEG2000, PNG or JPEG) and visualization (SLD, SE, or QML style). Raster layer can hold also [timeseries](#timeseries) data.
 - Published layer can be accessed by standardized OGC interfaces
-  - [Web Map Service (WMS)](https://ogc.org/standard/wms)
-  - [Web Feature Service (WFS)](https://ogc.org/standard/wfs)
-  - [Catalogue Service](https://ogc.org/standard/cat)
+  - [Web Map Service (WMS)](https://www.ogc.org/publications/standard/wms/)
+  - [Web Feature Service (WFS)](https://www.ogc.org/publications/standard/wfs/)
+  - [Catalogue Service](https://www.ogc.org/publications/standard/cat/)
 - Thumbnail image available
 - Layer-related data is named and structured 
   - either by [workspace](#workspace) name and layername

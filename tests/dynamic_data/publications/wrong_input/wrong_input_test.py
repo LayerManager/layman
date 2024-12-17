@@ -540,7 +540,7 @@ TESTCASES = {
             'http_code': 400,
             'sync': True,
             'code': 2,
-            'data': {'expected': 'Resampling method for gdaladdo utility, https://gdal.org/programs/gdaladdo.html',
+            'data': {'expected': 'Resampling method for gdaladdo utility, https://gdal.org/en/stable/programs/gdaladdo.html',
                      'parameter': 'overview_resampling',
                      'detail': {'found': 'no_overview_resampling',
                                 'supported_values': settings.OVERVIEW_RESAMPLING_METHOD_LIST}, },
