@@ -13,7 +13,9 @@
       },
       "skipUrlPatterns": [
         "https://security.stackexchange.com",
-        "https://github.com/LayerManager/layman/issues/"
+        "https://github.com/LayerManager/layman/issues/",
+        "https://github.com/LayerManager/layman/blob/",
+        "https://docs.geoserver.org/2.21.x/en/api/"
       ]
     }
   }
