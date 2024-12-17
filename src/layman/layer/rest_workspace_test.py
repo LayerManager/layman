@@ -657,9 +657,9 @@ def test_patch_layer_title(client):
         chain_info = util.get_layer_chain(workspace, layername)
         assert chain_info is not None and celery_util.is_chain_ready(chain_info)
 
-        resp_json = response.get_json()
-        assert resp_json['title'] == new_title
-        assert resp_json['description'] == new_description
+        get_json = client.get(rest_path).get_json()
+        assert get_json['title'] == new_title
+        assert get_json['description'] == new_description
 
     with app.app_context():
         expected_md_values = {
@@ -716,8 +716,8 @@ def test_patch_layer_style(client):
         flask_client.wait_till_layer_ready(workspace, layername)
         # last_task['last'].get()
 
-        resp_json = response.get_json()
-        assert resp_json['title'] == "countries in blue"
+        get_json = client.get(rest_path).get_json()
+        assert get_json['title'] == "countries in blue"
 
         wms_url = geoserver_wms.get_wms_url(workspace)
         wms = wms_proxy(wms_url)
@@ -772,10 +772,10 @@ def test_patch_layer_data(client):
 
         chain_info = util.get_layer_chain(workspace, layername)
         assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
-        resp_json = response.get_json()
+        get_json = client.get(rest_path).get_json()
         keys_to_check = ['db', 'wms', 'wfs', 'thumbnail', 'metadata']
         for key_to_check in keys_to_check:
-            assert 'status' in resp_json[key_to_check]
+            assert 'status' in get_json[key_to_check]
         flask_client.wait_till_layer_ready(workspace, layername)
         # last_task['last'].get()
 
