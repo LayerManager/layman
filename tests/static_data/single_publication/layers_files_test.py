@@ -29,7 +29,7 @@ def test_raster_files(workspace, publ_type, publication):
     # check number of overviews
     raster_size = max(gdal.get_raster_size(norm_file_path))
     overview_counts = gdal.get_overview_counts(norm_file_path)
-    # https://gdal.org/programs/gdaladdo.html#cmdoption-gdaladdo-minsize
+    # https://gdal.org/en/stable/programs/gdaladdo.html#cmdoption-gdaladdo-minsize
     exp_overview_count = max(math.ceil(math.log(raster_size / 256, 2)), 0)
     assert overview_counts == [exp_overview_count] * len(overview_counts)
     exp_def_overview_count = publ_test_data.get('normalized_overviews')

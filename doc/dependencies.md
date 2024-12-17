@@ -35,12 +35,12 @@
 | --- | --- | --- | --- | --- | --- |
 | [flask](http://flask.pocoo.org/) | BSD License | Pipfile | prod | bin | to build REST API |
 | [celery](https://github.com/celery/celery) | BSD 3-Clause | Pipfile | prod | bin | asynchronous task runner |
-| [redis-py](https://github.com/andymccurdy/redis-py) | MIT | Pipfile | prod | bin | |
+| [redis-py](https://github.com/redis/redis-py) | MIT | Pipfile | prod | bin | |
 | [unidecode](https://github.com/avian2/unidecode) | GNU GPL v2 | Pipfile | prod | bin | |
 | [psycopg2-binary](https://github.com/psycopg/psycopg2) | GNU LGPL | Pipfile | prod | bin | |
 | [requests](https://requests.readthedocs.io/) | Apache License 2.0 | Pipfile | prod | bin | |
 | [owslib](https://github.com/geopython/OWSLib) | BSD 3-Clause | Pipfile | prod | bin | |
-| [jsonschema](https://github.com/Julian/jsonschema) | MIT | Pipfile | prod | bin | |
+| [jsonschema](https://github.com/python-jsonschema/jsonschema) | MIT | Pipfile | prod | bin | |
 | [flower](https://github.com/mher/flower) | BSD 3-Clause | Pipfile | prod | bin | to monitor celery tasks |
 | [selenium](https://www.chromium.org/) | Apache License 2.0 | Dockerfile | prod | bin | for client-side map rendering and integration testing |
 | [cacheout](https://github.com/dgilland/cacheout) | MIT | Pipfile | prod | bin | |
@@ -51,7 +51,7 @@
 | [pytest](https://pytest.org/) | MIT License | Pipfile | test | bin | |
 | [flake8](https://flake8.pycqa.org/) | MIT | Pipfile | test | bin | code style checker |
 | [pycodestyle](https://pycodestyle.pycqa.org/) | MIT | Pipfile | test | bin | code style checker |
-| [pylint](https://github.com/PyCQA/pylint) | GNU GPL v2 | Pipfile | test | bin | code style checker |
+| [pylint](https://github.com/pylint-dev/pylint) | GNU GPL v2 | Pipfile | test | bin | code style checker |
 | [autopep8](https://github.com/hhatto/autopep8) | MIT | Pipfile | test | bin | to automatically fix code style |
 | [pytest-rerunfailures](https://github.com/pytest-dev/pytest-rerunfailures) | MPL | Pipfile | test | bin | to automatically rerun flaky tests |
 | [pytest-timeout](https://pypi.org/project/pytest-timeout/) | MIT | Pipfile | test | bin | to automatically stop tests after given timeout |
@@ -89,5 +89,5 @@
 | [layermanager/docker-postgis](https://github.com/layermanager/docker-postgis) | MIT | docker-compose.yml | dev | bin | |
 | [jirikcz/micka](https://github.com/LayerManager/docker-micka) | GNU GPL v3 | docker-compose.yml | prod-external | bin | |
 | [samtux/micka](https://github.com/samtux/docker-micka) | GNU GPL v3 | jirikcz/micka | prod-external | src | |
-| [docker-library/redis](https://github.com/docker-library/redis) | BSD 3-Clause | docker-compose.yml | prod | bin | |
+| [docker-library/redis](https://github.com/redis/docker-library-redis) | BSD 3-Clause | docker-compose.yml | prod | bin | |
 | [plantuml/plantuml](https://hub.docker.com/r/plantuml/plantuml) | GNU GPL v3 | Makefile | dev | bin | render PlantUML images |

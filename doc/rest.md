@@ -156,7 +156,7 @@ Body parameters:
       - 3 bands: Red, Green, Blue
       - 4 bands: Red, Green, Blue, Alpha
    - if published file has empty bounding box (i.e. no features), its bounding box on WMS/WFS endpoint is set to the whole World
-   - attribute names are [laundered](https://gdal.org/drivers/vector/pg.html#layer-creation-options) to be safely stored in DB
+   - attribute names are [laundered](https://gdal.org/en/stable/drivers/vector/pg.html#layer-creation-options) to be safely stored in DB
    - if QML style is used in this request, it must list all attributes contained in given data file
 - *external_table_uri*, string
    - exactly one of `file` or `external_table_uri` must be set
@@ -199,7 +199,7 @@ Body parameters:
      - QML style for raster data file is not supported
      - It's possible to encode also external images in QML styles and use them in the style. To do so, each image needs to be encoded in Base64 encoding inside QML file. You can achieve it by selecting "Embed File" option in QGIS Layer Symbology window, see e.g. QGIS issues [2815](https://github.com/qgis/QGIS-Documentation/issues/2815) or [4563](https://github.com/qgis/QGIS-Documentation/pull/4563).
    - uploading of additional style files, e.g. point-symbol images or fonts is not supported
-   - attribute names are [laundered](https://gdal.org/drivers/vector/pg.html#layer-creation-options) to be in line with DB attribute names
+   - attribute names are [laundered](https://gdal.org/en/stable/drivers/vector/pg.html#layer-creation-options) to be in line with DB attribute names
 - *access_rights.read*, string
    - comma-separated names of [users](./models.md#user) and [roles](./models.md#role) who will get [read access](./security.md#publication-access-rights) to this publication
    - default value is current authenticated user, or EVERYONE if published by anonymous
@@ -211,7 +211,7 @@ Body parameters:
    - alias for *style* parameter
 - *overview_resampling*, string
    - supported only for raster layers
-   - method used by [`gdaladdo`](https://gdal.org/programs/gdaladdo.html#cmdoption-gdaladdo-r) for overview resampling when normalizing raster layer
+   - method used by [`gdaladdo`](https://gdal.org/en/stable/programs/gdaladdo.html#cmdoption-gdaladdo-r) for overview resampling when normalizing raster layer
    - by default Layman will guess overview resampling method from input file metadata
    - supported values are: `nearest`, `average`, `rms`, `bilinear`, `gauss`, `cubic`, `cubicspline`, `lanczos`, `average_magphase` and `mode`
 - *time_regex*, string, e.g. `[0-9]{8}T[0-9]{6}Z`
@@ -404,7 +404,7 @@ Body parameters:
    - SLD or QML style file (recognized by the root element of XML: `StyledLayerDescriptor` or `qgis`)
      - QML style for raster data file is not supported
      - It's possible to encode also external images in QML styles and use them in the style. See [POST Workspace Layers](#post-workspace-layers) body parameter *style* for details.
-   - attribute names are [laundered](https://gdal.org/drivers/vector/pg.html#layer-creation-options) to be in line with DB attribute names
+   - attribute names are [laundered](https://gdal.org/en/stable/drivers/vector/pg.html#layer-creation-options) to be in line with DB attribute names
    - If provided, current layer thumbnail will be temporarily deleted and created again using the new style.
 - *access_rights.read*, string
    - comma-separated names of [users](./models.md#user) and [roles](./models.md#role) who will get [read access](./security.md#publication-access-rights) to this publication
@@ -415,7 +415,7 @@ Body parameters:
    - alias for *style* parameter
 - *overview_resampling*, string
    - supported only for raster layers
-   - method used by [`gdaladdo`](https://gdal.org/programs/gdaladdo.html#cmdoption-gdaladdo-r) for overview resampling when normalizing raster layer
+   - method used by [`gdaladdo`](https://gdal.org/en/stable/programs/gdaladdo.html#cmdoption-gdaladdo-r) for overview resampling when normalizing raster layer
    - by default Layman will guess overview resampling method from input file metadata
    - supported values are: `nearest`, `average`, `rms`, `bilinear`, `gauss`, `cubic`, `cubicspline`, `lanczos`, `average_magphase` and `mode`
    - can be used only together with `file` parameter, otherwise error is raised

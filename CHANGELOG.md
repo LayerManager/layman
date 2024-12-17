@@ -210,7 +210,7 @@
 - If you are using environment variable [`OAUTH2_CALLBACK_URL`](doc/env-settings.md#oauth2_callback_url), change only its URL path from `/client/authn/oauth2-liferay/callback` to `/client/authn/oauth2-provider/callback`. Keep protocol, domain, and port unchanged.
 - Stop using environment variable `LAYMAN_AUTHN_OAUTH2_PROVIDERS`, it has no effect to Layman anymore. There is exactly one OAuth2 provider Python module now, no need to set it.
 - Stop using environment variable `FLASK_ENV`, it has no effect to Layman anymore.
-  - If you used environment variable `FLASK_ENV` with value `development`, add new environment variable [`FLASK_DEBUG`](https://flask.palletsprojects.com/en/2.3.x/config/?highlight=flask_debug#DEBUG):
+  - If you used environment variable `FLASK_ENV` with value `development`, add new environment variable [`FLASK_DEBUG`](https://flask.palletsprojects.com/en/stable/config/?highlight=flask_debug#DEBUG):
     ```
     FLASK_DEBUG=1
     ```
@@ -579,10 +579,10 @@ make timgen-build
 ### Changes
 - [#167](https://github.com/LayerManager/layman/issues/167) Allow publishing also raster geospatial data using [POST Workspace Layers](doc/rest.md#post-workspace-layers) and [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer).
   - Following formats are supported:
-     - [GeoTIFF](https://gdal.org/drivers/raster/gtiff.html) 
-     - [JPEG2000](https://gdal.org/drivers/raster/jp2openjpeg.html)
-     - [PNG](https://gdal.org/drivers/raster/png.html)
-     - [JPEG](https://gdal.org/drivers/raster/jpeg.html)
+     - [GeoTIFF](https://gdal.org/en/stable/drivers/raster/gtiff.html) 
+     - [JPEG2000](https://gdal.org/en/stable/drivers/raster/jp2openjpeg.html)
+     - [PNG](https://gdal.org/en/stable/drivers/raster/png.html)
+     - [JPEG](https://gdal.org/en/stable/drivers/raster/jpeg.html)
   - Following input combinations of bands and color interpretations are supported:
     - 1 band: Gray
     - 1 band: Palette
@@ -742,7 +742,7 @@ make timgen-build
     - Parameter *style* accepts also QGIS layer style (QML). Layman Test Client enables to select also `*.qml` files.
     - Endpoint [GET Workspace Layer](doc/rest.md#get-workspace-layer) returns in `style` attribute also `type`, either `"sld"` or `"qml"`.
     - Endpoint [GET Workspace Layer Style](doc/rest.md#get-workspace-layer-style) returns SLD style or QML style.
-    - Treat attribute names in QML (also known as '[launder](https://gdal.org/drivers/vector/pg.html#layer-creation-options)').
+    - Treat attribute names in QML (also known as '[launder](https://gdal.org/en/stable/drivers/vector/pg.html#layer-creation-options)').
     - New docker container with QGIS server called `qgis` in demo configuration.
     - New directory [LAYMAN_QGIS_DATA_DIR](doc/env-settings.md#LAYMAN_QGIS_DATA_DIR) is used to store [layer QGS files](doc/data-storage.md#filesystem).
     - [WMS](doc/endpoints.md#web-map-service) is moved to dedicated [GeoServer workspace](doc/data-storage.md#geoserver) whose name is composed from Layman's [workspace](doc/models.md#workspace) name and suffix `_wms`. [WFS](doc/endpoints.md#web-feature-service) remains in GeoServer workspace whose name is equal to Layman's workspace name.
