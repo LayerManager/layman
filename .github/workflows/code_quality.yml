@@ -22,6 +22,7 @@ jobs:
         with:
           node-version: '18'
       - run: npm install --global remark-cli remark-validate-links remark-lint-no-dead-urls
+      - run: remark --version
       - run: make remark
 
   Flake_8_syntax_errors:
