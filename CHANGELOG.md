@@ -11,6 +11,7 @@
 #### Schema migrations
 #### Data migrations
 ### Changes
+- [#1009](https://github.com/LayerManager/layman/issues/1009) [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) returns same response as [POST Workspace Layers](doc/rest.md#post-workspace-layers) with only `name`, `uuid`, `url` and optional `files_to_upload` keys.
 - [#1028](https://github.com/LayerManager/layman/issues/1028) Upgrade Node.js of Laymen Test Client from v18 to v22 and dependencies:
   - eslint-config-next 13 -> 14
   - next 13 -> 14

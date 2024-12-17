@@ -10,7 +10,7 @@ from layman.util import check_workspace_name_decorator
 from layman import settings, authn, util as layman_util
 from layman.authn import authenticate
 from layman.authz import authorize_workspace_publications_decorator
-from . import util, LAYER_REST_PATH_NAME, LAYER_TYPE
+from . import util, LAYER_REST_PATH_NAME, LAYER_TYPE, get_layer_patch_keys
 from .filesystem import input_file, input_style, input_chunk, util as fs_util
 
 bp = Blueprint('rest_workspace_layer', __name__)
@@ -262,8 +262,11 @@ def patch(workspace, layername):
     )
 
     app.logger.info('PATCH Layer changes done')
-    info = util.get_complete_layer_info(workspace, layername, x_forwarded_items=x_forwarded_items)
+    patch_keys = get_layer_patch_keys()
+    info = util.get_layer_info(workspace, layername, context={'keys': patch_keys, 'x_forwarded_items': x_forwarded_items})
+    info['url'] = layman_util.get_workspace_publication_url(info['type'], workspace, layername, x_forwarded_items=x_forwarded_items)
     info.update(layer_result)
+    info = {key: value for key, value in info.items() if key in patch_keys}
 
     return jsonify(info), 200
 

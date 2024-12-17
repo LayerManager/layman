@@ -29,6 +29,10 @@ def get_layer_info_keys(*, geodata_type, original_data_source):
     return result
 
 
+def get_layer_patch_keys():
+    return get_layer_type_def()['patch_keys']
+
+
 LAYER_REST_PATH_NAME = "layers"
 
 
@@ -131,6 +135,7 @@ PUBLICATION_TYPES = {
             },
         },
         'multi_info_keys_to_remove': [],
+        'patch_keys': ['name', 'uuid', 'url', 'files_to_upload'],
     }
 }
 

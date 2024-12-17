@@ -296,6 +296,12 @@ def patch_workspace_publication(publication_type,
                                   )
     raise_layman_error(response)
 
+    assert response.json()['name'] == name or not name, f'name={name}, response.name={response.json()[0]["name"]}'
+    expected_resp_keys = ['name', 'uuid', 'url']
+    if with_chunks:
+        expected_resp_keys.append('files_to_upload')
+    assert all(key in response.json() for key in expected_resp_keys), f'name={name}, response.name={response.json()[0]["name"]}'
+
     if with_chunks and not do_not_upload_chunks:
         upload_file_chunks(publication_type,
                            workspace,

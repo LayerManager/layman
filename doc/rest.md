@@ -429,8 +429,7 @@ Body parameters:
 #### Response
 Content-Type: `application/json`
 
-JSON object, same as in case of [GET Workspace Layer](#get-workspace-layer), possibly extended with one extra property:
-- *files_to_upload*: List of objects. It's present only if **file** parameter contained file names. See [POST Workspace Layers](#post-workspace-layers) response to find out more.
+JSON object, same as in case of [POST Workspace Layers](#post-workspace-layers).
 
 ### DELETE Workspace Layer
 Delete existing layer and all associated sources except external DB table published using `external_table_uri`. So it deletes e.g. data file, vector internal DB table or normalized raster file. The currently running [asynchronous tasks](async-tasks.md) of affected layer are aborted.
