@@ -8,8 +8,8 @@
     "lint-no-dead-urls": {
       "skipLocalhost": true,
       "deadOrAliveOptions": {
-        "timeout": 20000,
-        "maxRetries": 2
+        "timeout": 30000,
+        "maxRetries": 3
       },
       "skipUrlPatterns": [
         "https://security.stackexchange.com",
