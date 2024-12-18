@@ -3,10 +3,18 @@
 ## v2.0.0
  {release-date}
 ### Upgrade requirements
+- Change environment variable [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION):
+  ```
+  LAYMAN_CLIENT_VERSION=00c3ceac509354cd2d53fce30041e63e35efaa69
+  ```
 ### Migrations and checks
 #### Schema migrations
 #### Data migrations
 ### Changes
+- [#1028](https://github.com/LayerManager/layman/issues/1028) Upgrade Node.js of Laymen Test Client from v18 to v22 and dependencies:
+  - eslint-config-next 13 -> 14
+  - next 13 -> 14
+  - semantic-ui-react 2 -> 3.0.0-beta.2
 - All changes from [v1.23.1](#v1231) and [v1.23.2](#v1232).
 
 ## v1.23.2
