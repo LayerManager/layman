@@ -116,12 +116,13 @@ def publish_layer(workspace, layer, *, file_path, style_type, style_file, ):
                                          layer,
                                          access_rights=access_rights,
                                          title=layer,
+                                         description=None,
                                          uuid=uuid_str,
                                          actor_name=None,
                                          geodata_type=settings.GEODATA_TYPE_VECTOR,
                                          style_type=style_type_def,
                                          image_mosaic=False,
-                                         external_table_uri=None
+                                         external_table_uri=None,
                                          )
         uuid_common.assign_publication_uuid(LAYER_TYPE, workspace, layer, uuid_str=uuid_str)
 

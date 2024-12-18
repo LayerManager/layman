@@ -2,7 +2,7 @@ import logging
 
 from db import util as db_util
 from layman.upgrade import upgrade_v1_8, upgrade_v1_9, upgrade_v1_10, upgrade_v1_12, upgrade_v1_16, upgrade_v1_17, upgrade_v1_18, \
-    upgrade_v1_20, upgrade_v1_21, upgrade_v1_22, upgrade_v1_23
+    upgrade_v1_20, upgrade_v1_21, upgrade_v1_22, upgrade_v1_23, upgrade_v2_0
 from layman import settings
 from . import consts
 
@@ -46,6 +46,9 @@ MIGRATIONS = {
             upgrade_v1_23.restrict_workspace_name_length,
             upgrade_v1_23.create_role_service_schema,
             upgrade_v1_23.remove_right_types_table,
+        ]),
+        ((2, 0, 0), [
+            upgrade_v2_0.adjust_db_for_image_mosaic,
         ]),
     ],
     consts.MIGRATION_TYPE_DATA: [

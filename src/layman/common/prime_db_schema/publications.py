@@ -149,6 +149,7 @@ select p.id as id_publication,
        p.type,
        p.name,
        p.title,
+       p.description,
        p.uuid::text,
        p.geodata_type,
        p.style_type,
@@ -266,6 +267,7 @@ from {DB_SCHEMA}.workspaces w inner join
               publication_name,): {'id': id_publication,
                                    'name': publication_name,
                                    'title': title,
+                                   'description': description,
                                    'uuid': uuid,
                                    'type': publication_type,
                                    'geodata_type': geodata_type,
@@ -288,7 +290,7 @@ from {DB_SCHEMA}.workspaces w inner join
                                    '_layer_maps': layer_maps or [],
                                    '_wfs_wms_status': settings.EnumWfsWmsStatus(wfs_wms_status) if wfs_wms_status else None,
                                    }
-             for id_publication, workspace_name, publication_type, publication_name, title, uuid, geodata_type, style_type, image_mosaic, updated_at, xmin, ymin, xmax, ymax,
+             for id_publication, workspace_name, publication_type, publication_name, title, description, uuid, geodata_type, style_type, image_mosaic, updated_at, xmin, ymin, xmax, ymax,
              srid, external_table_uri, read_users_roles, write_users_roles, map_layers, layer_maps, wfs_wms_status, _
              in values}
 
@@ -475,8 +477,8 @@ def insert_publication(workspace_name, info):
     check_publication_info(workspace_name, info)
 
     insert_publications_sql = f'''insert into {DB_SCHEMA}.publications as p
-        (id_workspace, name, title, type, uuid, style_type, geodata_type, everyone_can_read, everyone_can_write, updated_at, image_mosaic, external_table_uri, wfs_wms_status) values
-        (%s, %s, %s, %s, %s, %s, %s, %s, %s, current_timestamp, %s, PGP_SYM_ENCRYPT(%s::text, %s::text), %s )
+        (id_workspace, name, title, description, type, uuid, style_type, geodata_type, everyone_can_read, everyone_can_write, updated_at, image_mosaic, external_table_uri, wfs_wms_status) values
+        (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, current_timestamp, %s, PGP_SYM_ENCRYPT(%s::text, %s::text), %s )
 returning id
 ;'''
 
@@ -491,6 +493,7 @@ returning id
     data = (id_workspace,
             info.get("name"),
             info.get("title"),
+            info.get("description"),
             info.get("publ_type_name"),
             info.get("uuid"),
             info.get('style_type'),
@@ -562,6 +565,7 @@ def update_publication(workspace_name, info):
 
     update_publications_sql = f'''update {DB_SCHEMA}.publications set
     title = coalesce(%s, title),
+    description = coalesce(%s, description),
     style_type = coalesce(%s, style_type),
     everyone_can_read = coalesce(%s, everyone_can_read),
     everyone_can_write = coalesce(%s, everyone_can_write),
@@ -576,6 +580,7 @@ returning id
 ;'''
 
     data = (info.get("title"),
+            info.get("description"),
             info.get('style_type'),
             access_rights_changes['read']['EVERYONE'],
             access_rights_changes['write']['EVERYONE'],
