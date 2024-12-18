@@ -1,4 +1,3 @@
-from enum import Enum
 from collections import namedtuple, OrderedDict
 
 from layman import settings
