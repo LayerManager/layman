@@ -709,7 +709,7 @@ Body parameters:
 #### Response
 Content-Type: `application/json`
 
-JSON object, same as in case of [GET Workspace Map](#get-workspace-map).
+JSON object, same as in case of [POST Workspace Maps](#post-workspace-maps).
 
 ### DELETE Workspace Map
 Delete existing map and all associated sources, including map-composition JSON file and map thumbnail. The currently running [asynchronous tasks](async-tasks.md) of affected map are aborted.
