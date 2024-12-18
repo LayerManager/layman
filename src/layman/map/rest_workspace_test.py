@@ -456,13 +456,14 @@ def test_patch_map(client):
 
         assert resp_json['uuid'] == uuid_str
         assert resp_json['url'] == url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname)
-        assert resp_json['title'] == "Jiné administrativn\u00ed \u010dlen\u011bn\u00ed Libereck\u00e9ho kraje"
-        assert resp_json['description'] == "Jiný popis"
-        map_file = resp_json['file']
+        get_json = client.get(rest_path).get_json()
+        assert get_json['title'] == "Jiné administrativn\u00ed \u010dlen\u011bn\u00ed Libereck\u00e9ho kraje"
+        assert get_json['description'] == "Jiný popis"
+        map_file = get_json['file']
         assert 'status' not in map_file
         assert 'path' in map_file
         assert map_file['url'] == url_for_external('rest_workspace_map_file.get', workspace=workspace, mapname=mapname)
-        thumbnail = resp_json['thumbnail']
+        thumbnail = get_json['thumbnail']
         assert 'status' in thumbnail
         assert thumbnail['status'] in ['PENDING', 'STARTED']
 
@@ -510,9 +511,9 @@ def test_patch_map(client):
             'title': title,
         })
         assert response.status_code == 200, response.get_json()
-        resp_json = response.get_json()
-        assert resp_json['title'] == "Nový název"
-        assert resp_json['description'] == "Jiný popis"
+        get_json = client.get(rest_path).get_json()
+        assert get_json['title'] == "Nový název"
+        assert get_json['description'] == "Jiný popis"
 
     with app.app_context():
         description = 'Nový popis'
@@ -520,9 +521,9 @@ def test_patch_map(client):
             'description': description,
         })
         assert response.status_code == 200
-        resp_json = response.get_json()
-        assert resp_json['title'] == "Nový název"
-        assert resp_json['description'] == "Nový popis"
+        get_json = client.get(rest_path).get_json()
+        assert get_json['title'] == "Nový název"
+        assert get_json['description'] == "Nový popis"
 
         uuid.check_redis_consistency(expected_publ_num_by_type={
             f'{MAP_TYPE}': publication_counter.get()

@@ -9,7 +9,7 @@ from layman.common import rest as rest_util
 from layman.util import check_workspace_name_decorator
 from layman.authn import authenticate
 from layman.authz import authorize_workspace_publications_decorator
-from . import util, MAP_REST_PATH_NAME
+from . import util, MAP_REST_PATH_NAME, get_map_patch_keys
 from .filesystem import input_file, thumbnail
 
 bp = Blueprint('rest_workspace_map', __name__)
@@ -108,7 +108,10 @@ def patch(workspace, mapname):
         'layman.map.filesystem.input_file' if file_changed else None
     )
 
-    info = util.get_complete_map_info(workspace, mapname, x_forwarded_items=x_forwarded_items)
+    patch_keys = get_map_patch_keys()
+    info = util.get_map_info(workspace, mapname, context={'keys': patch_keys, 'x_forwarded_items': x_forwarded_items})
+    info['url'] = layman_util.get_workspace_publication_url(info['type'], workspace, mapname, x_forwarded_items=x_forwarded_items)
+    info = {key: value for key, value in info.items() if key in patch_keys}
 
     return jsonify(info), 200
 
