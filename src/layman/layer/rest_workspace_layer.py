@@ -55,7 +55,7 @@ def patch(workspace, layername):
                                                               'original_data_source', ]})
     kwargs = {
         'title': info.get('title', info['name']) or '',
-        'description': info.get('description', '') or '',
+        'description': info.get('description'),
     }
 
     # FILE
@@ -109,8 +109,9 @@ def patch(workspace, layername):
         kwargs['title'] = request.form['title']
 
     # DESCRIPTION
-    if len(request.form.get('description', '')) > 0:
-        kwargs['description'] = request.form['description']
+    description = request.form.get('description')
+    if description and len(description) > 0:
+        kwargs['description'] = description
 
     # SLD
     style_file = None
