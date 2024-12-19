@@ -16,6 +16,25 @@
   - eslint-config-next 13 -> 14
   - next 13 -> 14
   - semantic-ui-react 2 -> 3.0.0-beta.2
+- Upgrade Python dependencies
+  - attrs 23.1.0 -> 24.3.0
+  - certifi 2023.11.17 -> 2024.12.14 (suggested by dependabot)
+  - flask 3.0.0 -> 3.0.3
+  - gunicorn 20.1.0 -> 22.0.0 (suggested by dependabot)
+  - idna 3.6 -> 3.10 (suggested by dependabot)
+  - importlib-metadata 7.0.0 -> 8.4.0
+  - jinja2 3.1.2 -> 3.1.4 (suggested by dependabot)
+  - jsonschema 4.20.0 -> 4.23.0
+  - lxml 4.9.3 -> 5.3.0
+  - owslib 0.29.3 -> 0.31.0
+  - pillow 10.1.0 -> 10.4.0 (suggested by dependabot)
+  - pipenv 2020.11.15 -> 2024.4.0
+  - pytz 2023.3.post1 -> 2024.2
+  - requests 2.31.0 -> 2.32.0
+  - tornado 6.4.0 -> 6.4.2 (suggested by dependabot)
+  - urllib3 2.31.0 -> 2.32.0 (suggested by dependabot)
+  - werkzeug 3.0.1 -> 3.0.6 (suggested by dependabot)
+  - zipp 3.17.0 -> 3.19.1 (suggested by dependabot)
 - All changes from [v1.23.1](#v1231) and [v1.23.2](#v1232).
 
 ## v1.23.2

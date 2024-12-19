@@ -3,7 +3,7 @@ FROM osgeo/gdal:ubuntu-small-3.3.0
 RUN apt-get clean && apt-get update && apt-get upgrade -y && \
     apt-get -y -qq install nano python3-pip python3-lxml && \
     apt-get -y -qq install firefox firefox-geckodriver && \
-    pip install pipenv==2020.11.15
+    pip install pipenv==2024.4.0
 
 RUN mkdir /code
 WORKDIR /code

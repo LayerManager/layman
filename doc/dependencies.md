@@ -19,15 +19,15 @@
 | name | version | license | used by | env | bin or src | purpose |
 | --- | --- | --- | --- | --- | --- | --- |
 | [python](https://www.python.org/) | 3.8 | Python Software Foundation License | gdal/docker | prod | bin | to run Layman |
-| [python3-lxml](https://lxml.de/installation.html) | 4.5 | BSD 3-Clause | Dockerfile | prod | bin | to query XML with full XPath 1.0 |
+| [python3-lxml](https://lxml.de/installation.html) | 5.3 | BSD 3-Clause | Dockerfile | prod | bin | to query XML with full XPath 1.0 |
 | [gdal](http://www.gdal.org/) | 3.3.0 | MIT | gdal/docker | prod | bin | to import vector files into DB |
 | [firefox](https://www.mozilla.org/firefox/) | 95+ | MPL | Dockerfile | prod | bin | for client-side map rendering and integration testing |
 | [firefox-geckodriver](https://www.ubuntuupdates.org/package/ubuntu_mozilla_security/bionic/main/base/firefox-geckodriver) | 95+ | MPL | Dockerfile | prod | bin | for client-side map rendering and integration testing |
-| [pipenv](https://pypi.org/project/pipenv/) | 2020.11.15 | MIT | Dockerfile | prod | bin | to install Python dependencies |
+| [pipenv](https://pypi.org/project/pipenv/) | 2024.4.0 | MIT | Dockerfile | prod | bin | to install Python dependencies |
 | [node.js](https://nodejs.org/) | 22 | MIT | client/docker/Dockerfile | prod | bin | to run Layman Test Client |
 | [node.js](https://nodejs.org/) | 16 | MIT | timgen/Dockerfile | prod | bin | to run Timgen |
 | [npm](https://www.npmjs.com/get-npm) | 10 | Artistic License 2.0 | client/docker/Dockerfile | prod | bin | to install node.js dependencies |
-| [gunicorn](https://gunicorn.org/) | 20 | MIT | requirements.production.txt | opt | bin | as Flask production server |
+| [gunicorn](https://gunicorn.org/) | 22 | MIT | requirements.production.txt | opt | bin | as Flask production server |
 | [nginx](http://nginx.org/) | 1.16 | BSD 2-Clause | docker-compose.yml | opt | bin | as production server |
 
 ### Python dependencies
