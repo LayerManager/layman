@@ -45,7 +45,6 @@ def refresh_wms(
     geodata_type = info['geodata_type']
     crs = info['native_crs']
 
-    assert description is not None
     assert title is not None
     geoserver_workspace = wms.get_geoserver_workspace(workspace)
     geoserver.ensure_workspace(workspace)
@@ -152,7 +151,6 @@ def refresh_wfs(
     if geodata_type != settings.GEODATA_TYPE_VECTOR:
         raise NotImplementedError(f"Unknown geodata type: {geodata_type}")
 
-    assert description is not None
     assert title is not None
     geoserver.ensure_workspace(workspace)
 

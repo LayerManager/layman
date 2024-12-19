@@ -145,7 +145,7 @@ def post(workspace):
         title = layername
 
     # DESCRIPTION
-    description = request.form.get('description', '')
+    description = request.form.get('description')
 
     # Style
     style_file = None

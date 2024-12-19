@@ -32,8 +32,9 @@ def provide_map(workspace, map, *, file_path):
                                        map,
                                        uuid_str,
                                        map,
+                                       None,
                                        access_rights,
-                                       None
+                                       None,
                                        )
         uuid_common.assign_publication_uuid(MAP_TYPE, workspace, map, uuid_str=uuid_str)
 
