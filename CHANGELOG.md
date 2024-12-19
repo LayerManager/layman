@@ -16,7 +16,7 @@
   - eslint-config-next 13 -> 14
   - next 13 -> 14
   - semantic-ui-react 2 -> 3.0.0-beta.2
-- Upgrade Python dependencies
+- [#1028](https://github.com/LayerManager/layman/issues/1028) Upgrade Python dependencies
   - attrs 23.1.0 -> 24.3.0
   - certifi 2023.11.17 -> 2024.12.14 (suggested by dependabot)
   - flask 3.0.0 -> 3.0.3
