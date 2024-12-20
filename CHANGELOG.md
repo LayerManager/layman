@@ -17,7 +17,7 @@
   - eslint-config-next 13 -> 14
   - next 13 -> 14
   - semantic-ui-react 2 -> 3.0.0-beta.2
-- Upgrade Python dependencies
+- [#1028](https://github.com/LayerManager/layman/issues/1028) Upgrade Python dependencies
   - attrs 23.1.0 -> 24.3.0
   - certifi 2023.11.17 -> 2024.12.14 (suggested by dependabot)
   - flask 3.0.0 -> 3.0.3
@@ -36,6 +36,11 @@
   - urllib3 2.31.0 -> 2.32.0 (suggested by dependabot)
   - werkzeug 3.0.1 -> 3.0.6 (suggested by dependabot)
   - zipp 3.17.0 -> 3.19.1 (suggested by dependabot)
+- [#1028](https://github.com/LayerManager/layman/issues/1028) Upgrade Node.js of Timgen from v16 to v22 and dependencies:
+  - encodeurl 1 -> 2
+  - express 4.18 -> 4.21
+  - http-proxy-middleware 2.0.6 -> 2.0.7
+  - vite 3.2.7 -> 3.2.11
 - All changes from [v1.23.1](#v1231) and [v1.23.2](#v1232).
 
 ## v1.23.2
