@@ -48,7 +48,7 @@ MIGRATIONS = {
             upgrade_v1_23.remove_right_types_table,
         ]),
         ((2, 0, 0), [
-            upgrade_v2_0.adjust_db_for_image_mosaic,
+            upgrade_v2_0.adjust_db_for_description,
         ]),
     ],
     consts.MIGRATION_TYPE_DATA: [
@@ -78,6 +78,9 @@ MIGRATIONS = {
         ]),
         ((1, 23, 0), [
             upgrade_v1_23.delete_user_roles,
+        ]),
+        ((2, 0, 0), [
+            upgrade_v2_0.adjust_publications_description,
         ]),
     ],
 }
