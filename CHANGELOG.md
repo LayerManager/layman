@@ -14,6 +14,7 @@
 - [#1009](https://github.com/LayerManager/layman/issues/1009) Fill column `description` in `publications` table in prime DB schema. Value is taken from GeoServer for layers and from filesystem for maps.
 ### Changes
 - [#1009](https://github.com/LayerManager/layman/issues/1009) PATCH Workspace [Layer](doc/rest.md#patch-workspace-layer)/[Map](doc/rest.md#patch-workspace-map) returns same response as POST Workspace [Layers](doc/rest.md#post-workspace-layers)/[Maps](doc/rest.md#post-workspace-maps) with only `name`, `uuid`, `url` and for Layer also optional `files_to_upload` keys.
+- [#1009](https://github.com/LayerManager/layman/issues/1009) Deprecated key `file_type` was removed from endpoints GET [Publications](doc/rest.md#get-publications)/[Layers](doc/rest.md#get-layers)/[Workspace Layers](doc/rest.md#get-workspace-layers)/[Workspace Layer](doc/rest.md#get-workspace-layer) response.
 - [#1028](https://github.com/LayerManager/layman/issues/1028) Upgrade Node.js of Laymen Test Client from v18 to v22 and dependencies:
   - eslint-config-next 13 -> 14
   - next 13 -> 14

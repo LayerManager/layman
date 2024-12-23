@@ -259,9 +259,6 @@ def get_publications(publication_type, actor, request_args=None, workspace=None,
             'native_crs': info['native_crs'],
             'native_bounding_box': info['native_bounding_box'],
             'geodata_type': info['geodata_type'],
-            'file': {
-                'file_type': info['geodata_type'],
-            },
             'wfs_wms_status': info['_wfs_wms_status'].value if info['_wfs_wms_status'] else None,
         }
         multi_info_keys_to_remove = layman_util.get_multi_info_keys_to_remove(info['type'])

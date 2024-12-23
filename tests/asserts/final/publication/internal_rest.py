@@ -15,8 +15,6 @@ def same_values_in_internal_and_rest(workspace, publ_type, name, rest_publicatio
     rest_publication_detail = copy.deepcopy(rest_publication_detail)
     for key in ('layman_metadata', 'sld', 'url', 'db_table'):
         rest_publication_detail.pop(key, None)
-    if 'file' in rest_publication_detail:
-        rest_publication_detail['file'].pop('file_type', None)
 
     if 'image_mosaic' not in rest_publication_detail:
         publ_info.pop('image_mosaic')

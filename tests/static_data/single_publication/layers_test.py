@@ -53,7 +53,6 @@ def test_info(workspace, publ_type, publication):
     assert info_keys == item_keys, f'info={info}'
     assert info['wms'].get('url') == wms_url, f'r_json={info}, wms_url={wms_url}'
     assert 'url' in info['wms'], f'info={info}'
-    assert info.get('file', {}).get('file_type') == data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('geodata_type')
     if 'wfs' in info:
         assert info['wfs'].get('url') == wfs_url, f'r_json={info}, wfs_url={wfs_url}'
 

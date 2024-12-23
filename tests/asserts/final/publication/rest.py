@@ -69,17 +69,9 @@ def same_values_in_detail_and_multi(workspace, publ_type, name, rest_publication
     expected_keys = ['workspace', 'name', 'title', 'uuid', 'url', 'updated_at', 'access_rights', 'bounding_box',
                      'native_crs', 'native_bounding_box']
     if publ_type == process_client.LAYER_TYPE:
-        expected_keys += ['geodata_type', 'file']
+        expected_keys += ['geodata_type']
     rest_detail = copy.deepcopy(rest_publication_detail)
     exp_info = {k: v for k, v in rest_detail.items() if k in expected_keys}
-
-    # adjust deprecated `file` key
-    if 'file' in exp_info:
-        exp_info['file'] = {k: v for k, v in exp_info['file'].items() if k == 'file_type'}
-    elif publ_type == process_client.LAYER_TYPE:
-        exp_info['file'] = {
-            'file_type': exp_info['geodata_type'],
-        }
 
     # add other expected keys
     exp_info['workspace'] = workspace
