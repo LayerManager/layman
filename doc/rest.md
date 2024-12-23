@@ -72,8 +72,6 @@ JSON array of objects representing available layers and maps with following stru
 - **native_crs**: Code of native CRS in form "EPSG:&lt;code&gt;", e.g. "EPSG:4326".
 - **native_bounding_box**: List of 4 floats and one string. Bounding box coordinates [minx, miny, maxx, maxy] in native CRS.
 - *geodata_type*: String. Available only for layers. Either `vector`, `raster`, or `unknown`. Value `unknown` is used if input files are zipped and still being uploaded.
-- *~~file~~*: **Deprecated**.
-  - *~~file_type~~*: **Deprecated**. Replaced by **geodata_type** at root level, contains same info. Available only for layers.
 - *wfs_wms_status*: String. Available only for layers. Status of layer availability in WMS (and WFS in case of vector data) endpoints. Either `AVAILABLE`, `PREPARING`, or `NOT_AVAILABLE`.
 
 Headers:
@@ -315,7 +313,6 @@ JSON object with following structure:
     - Replaced by *paths*, which contains list of all data files.
     - String. Path to input data file. Path is relative to workspace directory.  
     If data file was sent in ZIP archive to the server, path includes also path to the main file inside ZIP file. E.g. `layers/zipped_shapefile/input_file/zipped_shapefile.zip/layer_main_file.shp`
-  - *~~file_type~~*: **Deprecated**. Replaced by **geodata_type** at root level, contains same info.
   - *status*: Status information about saving and availability of files. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - *db*, available only for vector layers

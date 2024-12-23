@@ -84,7 +84,7 @@ PUBLICATION_TYPES = {
         },
         'info_keys': {'name', 'uuid', 'layman_metadata', 'url', 'title', 'description', 'updated_at',
                       'thumbnail', 'file', 'metadata', 'access_rights', 'bounding_box', },
-        'multi_info_keys_to_remove': ['file', 'geodata_type', 'wfs_wms_status', ],
+        'multi_info_keys_to_remove': ['geodata_type', 'wfs_wms_status', ],
         'patch_keys': ['name', 'uuid', 'url'],
     }
 }

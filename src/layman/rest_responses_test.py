@@ -79,9 +79,6 @@ class TestResponsesClass:
         'native_bounding_box': list(test_data.SMALL_LAYER_NATIVE_BBOX),
         'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}',
         'geodata_type': settings.GEODATA_TYPE_VECTOR,
-        'file': {
-            'file_type': settings.GEODATA_TYPE_VECTOR,
-        },
         'wfs_wms_status': settings.EnumWfsWmsStatus.AVAILABLE.value,
         'publication_type': 'layer',
     }
@@ -116,7 +113,6 @@ class TestResponsesClass:
         'geodata_type': 'vector',
         'file': {'path': f'layers/{publication}/input_file/{publication}.geojson',
                  'paths': [f'layers/{publication}/input_file/{publication}.geojson'],
-                 'file_type': 'vector',
                  },
         'metadata': {'comparison_url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}/'
                                        f'metadata-comparison',
