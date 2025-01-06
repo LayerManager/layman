@@ -33,9 +33,6 @@ class TestLayer(base_test.TestSingleRestPublication):
         rest_info_pre = process_client.get_workspace_layer(layer.workspace, layer.name)
 
         table_name = f"layer_{rest_info_pre['uuid'].replace('-', '_')}"
-        assert rest_info_pre['db_table'] == {
-            'name': table_name
-        }
         assert rest_info_pre['db'] == {
             'schema': layer.workspace,
             'table': table_name,
@@ -51,9 +48,6 @@ class TestLayer(base_test.TestSingleRestPublication):
 
         rest_info_post = process_client.get_workspace_layer(layer.workspace, layer.name)
 
-        assert rest_info_post['db_table'] == {
-            'status': 'NOT_AVAILABLE',
-        }
         assert rest_info_post['db'] == {
             'status': 'NOT_AVAILABLE',
         }
