@@ -29,9 +29,6 @@ def get_expected_urls_in_rest_response(workspace, publ_type, name, *, rest_metho
             result['wms'] = {
                 'url': f'{proxy_proto}://{proxy_host}{proxy_prefix}/geoserver/{workspace}_wms/ows',
             }
-            result['sld'] = {
-                'url': f'{proxy_proto}://{proxy_host}{proxy_prefix}/rest/workspaces/{workspace}/{publ_type_directory}/{name}/style',
-            }
             result['style'] = {
                 'url': f'{proxy_proto}://{proxy_host}{proxy_prefix}/rest/workspaces/{workspace}/{publ_type_directory}/{name}/style',
             }

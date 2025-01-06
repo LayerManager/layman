@@ -116,22 +116,22 @@ PUBLICATION_TYPES = {
         'info_keys': {
             (settings.GEODATA_TYPE_VECTOR, settings.EnumOriginalDataSource.FILE.value): {
                 'name', 'uuid', 'layman_metadata', 'url', 'title', 'description', 'updated_at', 'wms', 'wfs', 'thumbnail', 'file',
-                'db', 'metadata', 'style', 'sld', 'access_rights', 'bounding_box', 'native_crs', 'native_bounding_box',
+                'db', 'metadata', 'style', 'access_rights', 'bounding_box', 'native_crs', 'native_bounding_box',
                 'original_data_source', 'geodata_type', 'db_table',
             },
             (settings.GEODATA_TYPE_VECTOR, settings.EnumOriginalDataSource.TABLE.value): {
                 'name', 'uuid', 'layman_metadata', 'url', 'title', 'description', 'updated_at', 'wms', 'wfs', 'thumbnail',
-                'db', 'metadata', 'style', 'sld', 'access_rights', 'bounding_box', 'native_crs', 'native_bounding_box',
+                'db', 'metadata', 'style', 'access_rights', 'bounding_box', 'native_crs', 'native_bounding_box',
                 'original_data_source', 'geodata_type',
             },
             settings.GEODATA_TYPE_RASTER: {
                 'name', 'uuid', 'layman_metadata', 'url', 'title', 'description', 'updated_at', 'wms', 'thumbnail', 'file', 'metadata',
-                'style', 'sld', 'access_rights', 'bounding_box', 'native_crs', 'native_bounding_box', 'image_mosaic',
+                'style', 'access_rights', 'bounding_box', 'native_crs', 'native_bounding_box', 'image_mosaic',
                 'original_data_source', 'geodata_type',
             },
             settings.GEODATA_TYPE_UNKNOWN: {
                 'name', 'uuid', 'layman_metadata', 'url', 'title', 'description', 'updated_at', 'wms', 'thumbnail', 'file', 'metadata',
-                'style', 'sld', 'access_rights', 'bounding_box', 'native_crs', 'native_bounding_box', 'original_data_source', 'geodata_type',
+                'style', 'access_rights', 'bounding_box', 'native_crs', 'native_bounding_box', 'original_data_source', 'geodata_type',
             },
         },
         'multi_info_keys_to_remove': [],

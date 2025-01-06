@@ -119,8 +119,6 @@ class TestResponsesClass:
                      'csw_url': f'{settings.CSW_PROXY_URL}',
                      'identifier': None,
                      'record_url': None},
-        'sld': {'type': 'sld',
-                'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}/style'},
         'style': {'type': 'sld',
                   'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}/style'},
         'thumbnail': {'path': f'layers/{publication}/thumbnail/{publication}.png',
