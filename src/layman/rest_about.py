@@ -31,7 +31,6 @@ def get_version():
         current_version = upgrade.get_current_version(migration_type)
         migrations[f'last-{migration_type}-migration'] =\
             f'{current_version[0]}.{current_version[1]}.{current_version[2]}-{current_version[3]}'
-    migrations['last-migration'] = migrations[f'last-{upgrade.consts.MIGRATION_TYPE_SCHEMA}-migration']  # for backward compatibility
     result = {'about': {'applications': {'layman': {'version': clean_version(version),
                                                     'release-timestamp': release_date,
                                                     },
