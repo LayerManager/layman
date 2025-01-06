@@ -26,8 +26,6 @@
 - **workspace_name**, string `^[a-z][a-z0-9]*(_[a-z0-9]+)*$`
    - string identifying [workspace](models.md#workspace)
   
-**_NOTE:_** Before version 1.10.0, workspace-related endpoints did not include `/workspaces` in their path. These old endpoints are still functional, but deprecated. More specifically, they return HTTP header **Deprecation**. If you get such header in response, rewrite your client to use new endpoint path. Old endpoints will stop working in the next major release.
-
 ## Publications
 ### URL
 `/rest/publications`

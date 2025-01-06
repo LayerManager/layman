@@ -1,7 +1,7 @@
 import os
 from flask import Blueprint, send_file, current_app as app, g
 
-from layman import LaymanError, util as layman_util
+from layman import LaymanError
 from layman.util import check_workspace_name_decorator
 from layman.authn import authenticate
 from layman.authz import authorize_workspace_publications_decorator
@@ -19,12 +19,6 @@ bp = Blueprint('rest_workspace_map_thumbnail', __name__)
 @authorize_workspace_publications_decorator
 def before_request():
     pass
-
-
-@bp.after_request
-def after_request(response):
-    layman_util.check_deprecated_url(response)
-    return response
 
 
 @bp.route(f"/{MAP_REST_PATH_NAME}/<mapname>/thumbnail", methods=['GET'])

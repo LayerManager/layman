@@ -155,14 +155,6 @@ def to_safe_names(unsafe_names, type_name):
     return values
 
 
-def check_deprecated_url(response):
-    regexp = rf'^/rest/{settings.REST_WORKSPACES_PREFIX}\b.*$'
-    if not re.match(regexp, request.path):
-        response.headers['Deprecation'] = 'version=v2'
-        response.headers['Link'] = f'<{request.url.replace("/rest/",f"/rest/{settings.REST_WORKSPACES_PREFIX}/")}>; rel="alternate"'
-    return response
-
-
 def check_workspace_name_decorator(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
