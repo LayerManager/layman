@@ -332,9 +332,6 @@ JSON object with following structure:
   - *type*: String. Type of used style. Either 'sld' or 'qml'.
   - *status*: Status information about publishing style. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
-- **~~sld~~**
-  - **Deprecated**
-  - Replaced by **style**, contains same info
 - **original_data_source**: String. Either `file` if layer was published from file, or `database_table` if layer was published from external database table 
 - *metadata*
   - *identifier*: String. Identifier of metadata record in CSW instance.

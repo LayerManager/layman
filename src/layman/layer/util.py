@@ -110,7 +110,6 @@ def _get_complete_layer_info(workspace, layername, *, x_forwarded_items=None):
         }
 
     complete_info.update(partial_info)
-    complete_info['sld'] = complete_info['style']
     file_type = complete_info.get('_file', {}).get('file_type')
     if complete_info['geodata_type'] == settings.GEODATA_TYPE_UNKNOWN and file_type and file_type != settings.GEODATA_TYPE_UNKNOWN:
         complete_info['geodata_type'] = file_type
