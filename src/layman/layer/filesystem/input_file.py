@@ -64,7 +64,6 @@ def get_layer_info(workspace, layername):
         file_type = get_file_type(rel_main_filepath)
         result = {
             'file': {
-                'path': rel_main_filepath,
                 'paths': [os.path.relpath(filepath, common_util.get_workspace_dir(workspace)) for filepath in main_files],
             },
             '_file': {

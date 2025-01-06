@@ -305,11 +305,6 @@ JSON object with following structure:
 - **file**
   - *paths*: List of strings. Paths to all main input data files. Path is relative to workspace directory.  
   If data file was sent in ZIP archive to the server, path includes also path to the main file inside ZIP file. E.g. `layers/zipped_shapefile/input_file/zipped_shapefile.zip/layer_main_file.shp`
-  - *~~path~~*:
-    - **Deprecated**
-    - Replaced by *paths*, which contains list of all data files.
-    - String. Path to input data file. Path is relative to workspace directory.  
-    If data file was sent in ZIP archive to the server, path includes also path to the main file inside ZIP file. E.g. `layers/zipped_shapefile/input_file/zipped_shapefile.zip/layer_main_file.shp`
   - *status*: Status information about saving and availability of files. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - *db*, available only for vector layers

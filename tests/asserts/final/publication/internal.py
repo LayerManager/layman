@@ -189,7 +189,6 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                                },
                                            },
                                            'file': {
-                                               'path': f'{publ_type_dir}/{name}/input_file/{name}.{file_extension}',
                                                'paths': [f'{publ_type_dir}/{name}/input_file/{name}.{file_extension}'],
                                            },
                                        })
@@ -208,7 +207,6 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                                }
                                            },
                                            'file': {
-                                               'path': f'{publ_type_dir}/{name}/input_file/{archive_path}{filenames[0]}',
                                                'paths': [
                                                    f'{publ_type_dir}/{name}/input_file/{archive_path}{filename}'
                                                    for filename in filenames

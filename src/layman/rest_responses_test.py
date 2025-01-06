@@ -111,8 +111,7 @@ class TestResponsesClass:
                'geo_column': 'wkb_geometry',
                },
         'geodata_type': 'vector',
-        'file': {'path': f'layers/{publication}/input_file/{publication}.geojson',
-                 'paths': [f'layers/{publication}/input_file/{publication}.geojson'],
+        'file': {'paths': [f'layers/{publication}/input_file/{publication}.geojson'],
                  },
         'metadata': {'comparison_url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}/'
                                        f'metadata-comparison',
