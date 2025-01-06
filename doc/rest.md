@@ -867,6 +867,3 @@ JSON object representing current application version:
     - **layman**:
       - **last-schema-migration**: String. Identifier of the last successful schema migration in format 'X.Y.Z-m'.
       - **last-data-migration**: String. Identifier of the last successful data migration in format 'X.Y.Z-m'.
-      - **~~last-migration~~**:
-        - **deprecated parameter**
-        - alias for *last-schema-migration* parameter

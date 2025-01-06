@@ -24,7 +24,5 @@ def test_version():
 
     assert 'data' in result['about'].keys()
     assert 'layman' in result['about']['data'].keys()
-    assert 'last-migration' in result['about']['data']['layman'].keys()
     assert 'last-data-migration' in result['about']['data']['layman'].keys()
     assert 'last-schema-migration' in result['about']['data']['layman'].keys()
-    assert result['about']['data']['layman']['last-migration'] == result['about']['data']['layman']['last-schema-migration']
