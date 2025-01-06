@@ -151,8 +151,6 @@ def post(workspace):
     style_file = None
     if 'style' in request.files and not request.files['style'].filename == '':
         style_file = request.files['style']
-    elif 'sld' in request.files and not request.files['sld'].filename == '':
-        style_file = request.files['sld']
     style_type = input_style.get_style_type_from_file_storage(style_file)
 
     if geodata_type == settings.GEODATA_TYPE_RASTER and style_type.code == 'qml':

@@ -204,9 +204,6 @@ Body parameters:
 - *access_rights.write*, string
    - comma-separated names of [users](./models.md#user) and [roles](./models.md#role) who will get [write access](./security.md#publication-access-rights) to this publication
    - default value is current authenticated user, or EVERYONE if published by anonymous
-- ~~sld~~, SLD file
-   - **deprecated parameter**
-   - alias for *style* parameter
 - *overview_resampling*, string
    - supported only for raster layers
    - method used by [`gdaladdo`](https://gdal.org/en/stable/programs/gdaladdo.html#cmdoption-gdaladdo-r) for overview resampling when normalizing raster layer
@@ -404,9 +401,6 @@ Body parameters:
    - comma-separated names of [users](./models.md#user) and [roles](./models.md#role) who will get [read access](./security.md#publication-access-rights) to this publication
 - *access_rights.write*, string
    - comma-separated names of [users](./models.md#user) and [roles](./models.md#role) who will get [write access](./security.md#publication-access-rights) to this publication
-- ~~sld~~, SLD file
-   - **deprecated parameter**
-   - alias for *style* parameter
 - *overview_resampling*, string
    - supported only for raster layers
    - method used by [`gdaladdo`](https://gdal.org/en/stable/programs/gdaladdo.html#cmdoption-gdaladdo-r) for overview resampling when normalizing raster layer
