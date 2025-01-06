@@ -104,10 +104,6 @@ def _get_complete_layer_info(workspace, layername, *, x_forwarded_items=None):
         'title': layername,
         'description': '',
     })
-    if original_data_source == settings.EnumOriginalDataSource.FILE.value and partial_info.get('db', {}).get('table') is not None:
-        partial_info['db_table'] = {
-            'name': partial_info['db']['table'],
-        }
 
     complete_info.update(partial_info)
     file_type = complete_info.get('_file', {}).get('file_type')

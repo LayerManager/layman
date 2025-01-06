@@ -13,7 +13,7 @@ def same_values_in_internal_and_rest(workspace, publ_type, name, rest_publicatio
 
     # adjust rest_publication_detail, see get_complete_(layer|map)_info
     rest_publication_detail = copy.deepcopy(rest_publication_detail)
-    for key in ('layman_metadata', 'url', 'db_table'):
+    for key in ('layman_metadata', 'url'):
         rest_publication_detail.pop(key, None)
 
     if 'image_mosaic' not in rest_publication_detail:
