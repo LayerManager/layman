@@ -117,8 +117,6 @@ def patch(workspace, layername):
     style_file = None
     if 'style' in request.files and not request.files['style'].filename == '':
         style_file = request.files['style']
-    elif 'sld' in request.files and not request.files['sld'].filename == '':
-        style_file = request.files['sld']
 
     delete_from = None
     style_type = None
