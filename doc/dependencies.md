@@ -6,7 +6,7 @@
 | [postgresql](https://www.postgresql.org/) | 13.3 | PostgreSQL | layermanager/docker-postgis | prod-external | bin | to store vector data effectively |
 | [postgis](https://postgis.net/) | 3.1 | GNU GPL v2 | layermanager/docker-postgis | prod-external | bin | to store vector data effectively |
 | [geoserver](https://github.com/geoserver/geoserver) | 2.21.2 | GNU GPL v2 | docker.osgeo.org/geoserver | prod-external | bin | to provide WMS/WFS endpoints |
-| [qgis-server](https://docs.qgis.org/3.16/en/docs/server_manual/index.html) | 3.16 | GNU GPL v2 | jirikcz/qgis-server | prod-external | bin | to provide WMS endpoint |
+| [qgis-server](https://docs.qgis.org/3.16/en/docs/server_manual/index.html) | 3.40.2 | GNU GPL v2 | layermanager/qgis-server | prod-external | bin | to provide WMS endpoint |
 | [redis](https://redis.io/) | 4.0.11 | BSD 3-Clause | docker-library/redis | prod-external | bin | celery message broker, source of truth for server side |
 | [micka](https://github.com/hsrs-cz/Micka) | [v2020.014](https://github.com/hsrs-cz/Micka/releases/tag/v2020.014) | BSD 3-Clause | jirikcz/micka | prod-external | bin | to provide CSW endpoint |
 | [Wagtail](https://wagtail.org/) + [extensions](#wagtail-extensions) | 4.2 | BSD 3-Clause | deps/wagtail/laymanportal/requirements.txt | opt | bin | as OAuth2 provider |
@@ -84,7 +84,7 @@
 | [libxslt1.1](http://xmlsoft.org/libxslt/) | MIT | python3-lxml | prod | bin | |
 | [gdal/docker](https://github.com/OSGeo/gdal/tree/master/docker) | MIT License | Dockerfile | prod | bin | |
 | [docker.osgeo.org/geoserver](https://github.com/geoserver/docker) | GNU GPL v2 | docker-compose.yml | dev | bin | |
-| [jirikcz/qgis-server](https://github.com/LayerManager/docker-qgis-server) | GNU GPL v3 | docker-compose.yml | dev | bin | |
+| [layermanager/qgis-server](https://github.com/LayerManager/docker-qgis-server) | GNU GPL v3 | docker-compose.yml | dev | bin | |
 | [layermanager/docker-postgis](https://github.com/layermanager/docker-postgis) | MIT | docker-compose.yml | dev | bin | |
 | [jirikcz/micka](https://github.com/LayerManager/docker-micka) | GNU GPL v3 | docker-compose.yml | prod-external | bin | |
 | [samtux/micka](https://github.com/samtux/docker-micka) | GNU GPL v3 | jirikcz/micka | prod-external | src | |

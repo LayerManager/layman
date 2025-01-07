@@ -1,1 +1,1 @@
-FROM jirikcz/qgis-server:3.16.1
+FROM layermanager/qgis-server:3.40.2
