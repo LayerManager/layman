@@ -63,7 +63,7 @@ def main():
         try:
             response = requests.get(
                 settings.LAYMAN_QGIS_URL,
-                timeout=0.1
+                timeout=1
             )
             expected_text = "<ServerException>Project file error. For OWS services: please provide a SERVICE and a MAP parameter pointing to a valid QGIS project file</ServerException>"
             if response.status_code == 500 and expected_text in response.text:
