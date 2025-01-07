@@ -143,6 +143,7 @@ PUBLICATIONS = {
         TEST_DATA: {
             'title': 'Title defined',
             'thumbnail': 'sample/style/test_qgis_style_applied_in_thumbnail_layer.png',
+            'max_pixel_diffs': 80,
             'geodata_type': settings.GEODATA_TYPE_VECTOR,
             'style_type': 'qml',
             'style_file_type': 'qml',
@@ -158,6 +159,7 @@ PUBLICATIONS = {
         TEST_DATA: {
             'title': 'Title defined',
             'thumbnail': 'sample/style/test_qgis_style_applied_in_thumbnail_layer.png',
+            'max_pixel_diffs': 80,
             'geodata_type': settings.GEODATA_TYPE_VECTOR,
             'style_type': 'qml',
             'style_file_type': 'qml',
