@@ -16,9 +16,11 @@ from ..data import ensure_publication
 def test_thumbnail(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
 
-    exp_thumbnail = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('thumbnail')
+    publ_data = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA]
+    exp_thumbnail = publ_data.get('thumbnail')
     if exp_thumbnail:
-        asserts_internal.thumbnail_equals(workspace, publ_type, publication, exp_thumbnail)
+        asserts_internal.thumbnail_equals(workspace, publ_type, publication, exp_thumbnail,
+                                          max_diffs=publ_data.get('max_pixel_diffs'))
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_ALL_PUBLICATIONS)
