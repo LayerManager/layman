@@ -1,5 +1,6 @@
 import shutil
 import tempfile
+import time
 import logging
 from flask import Blueprint, jsonify, request, current_app as app, g
 
@@ -47,12 +48,17 @@ def get(workspace, layername):
 @util.lock_decorator
 def patch(workspace, layername):
     app.logger.info(f"PATCH Layer, actor={g.user}")
+    logger.info(f"*********************************************************************************")
 
     x_forwarded_items = layman_util.get_x_forwarded_items(request.headers)
 
+    start = time.time()
     info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername,
                                             context={'keys': ['title', 'name', 'description', 'table_uri', 'geodata_type', 'style_type',
                                                               'original_data_source', ]})
+    end = time.time()
+    logger.info(f"1. get_publication_info : {end - start}")
+    start = time.time()
     kwargs = {
         'title': info.get('title', info['name']) or '',
         'description': info.get('description'),
@@ -254,6 +260,10 @@ def patch(workspace, layername):
                 shutil.move(temp_dir, input_file.get_layer_input_file_dir(workspace, layername))
         publications.set_wfs_wms_status(workspace, LAYER_TYPE, layername, settings.EnumWfsWmsStatus.PREPARING)
 
+    end = time.time()
+    logger.info(f"mezitím : {end - start}")
+
+    start = time.time()
     util.patch_layer(
         workspace,
         layername,
@@ -261,11 +271,16 @@ def patch(workspace, layername):
         delete_from,
         'layman.layer.filesystem.input_chunk' if use_chunk_upload else delete_from
     )
+    end = time.time()
+    logger.info(f"patch_layer : {end - start}")
 
     app.logger.info('PATCH Layer changes done')
     patch_keys = get_layer_patch_keys()
     info = util.get_layer_info(workspace, layername, context={'keys': patch_keys, 'x_forwarded_items': x_forwarded_items})
+    start = time.time()
     info['url'] = layman_util.get_workspace_publication_url(info['type'], workspace, layername, x_forwarded_items=x_forwarded_items)
+    end = time.time()
+    logger.info(f"2. get_publication_info : {end - start}")
     info.update(layer_result)
     info = {key: value for key, value in info.items() if key in patch_keys}
 
