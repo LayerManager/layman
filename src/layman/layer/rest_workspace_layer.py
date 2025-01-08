@@ -169,6 +169,10 @@ def patch(workspace, layername):
             'found': {
                 'time_regex_format': time_regex_format,
             }})
+    end = time.time()
+    logger.info(f"mezitím 1: {end - start}")
+
+    start = time.time()
     slugified_time_regex_format = input_file.slugify_timeseries_filename_pattern(time_regex_format) if time_regex_format else None
 
     name_normalized_tif_by_layer = time_regex is None
@@ -210,7 +214,15 @@ def patch(workspace, layername):
     kwargs['name_input_file_by_layer'] = name_input_file_by_layer
     kwargs['enable_more_main_files'] = enable_more_main_files
 
+    end = time.time()
+    logger.info(f"mezitím 2: {end - start}")
+
+    start = time.time()
     props_to_refresh = util.get_same_or_missing_prop_names(workspace, layername)
+    end = time.time()
+    logger.info(f"get_same_or_missing_prop_names : {end - start}")
+
+    start = time.time()
     kwargs['metadata_properties_to_refresh'] = props_to_refresh
     kwargs['external_table_uri'] = external_table_uri
     is_external_table = not input_files and (bool(external_table_uri) or info.get('original_data_source') == settings.EnumOriginalDataSource.TABLE.value)
@@ -261,7 +273,7 @@ def patch(workspace, layername):
         publications.set_wfs_wms_status(workspace, LAYER_TYPE, layername, settings.EnumWfsWmsStatus.PREPARING)
 
     end = time.time()
-    logger.info(f"mezitím : {end - start}")
+    logger.info(f"delete : {end - start}")
 
     start = time.time()
     util.patch_layer(
