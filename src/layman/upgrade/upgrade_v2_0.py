@@ -1,4 +1,5 @@
 import logging
+import requests
 
 from db import util as db_util
 from layman import settings
@@ -25,15 +26,20 @@ def adjust_publications_description():
     query = f'''select w.name, p.type, p.name
     from {DB_SCHEMA}.publications p inner join
          {DB_SCHEMA}.workspaces w on w.id = p.id_workspace
+    where p.type = %s
+       or p.wfs_wms_status = %s
     ;'''
-    publications = db_util.run_query(query)
+    publications = db_util.run_query(query, (MAP_TYPE, settings.EnumWfsWmsStatus.AVAILABLE.value, ))
 
     for workspace, publ_type, publication in publications:
         logger.info(f'    Adjust description of {publ_type} {workspace}.{publication}')
         get_info = {LAYER_TYPE: gs_wms.get_layer_info,
                     MAP_TYPE: input_file.get_map_info,
                     }[publ_type]
-        description = get_info(workspace, publication)['description']
+        try:
+            description = get_info(workspace, publication)['description']
+        except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout, requests.exceptions.HTTPError):
+            description = None
 
         query = f'''update {DB_SCHEMA}.publications set
         description = %s
