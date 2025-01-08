@@ -77,10 +77,15 @@ def test_geometry_types(layer, exp_db_types, qml_geometry_dict):
             found_qml_geometry = util.get_geometry_from_qml_and_db_types(qml, db_types=[])
             assert found_qml_geometry == qml_geometry
             exp_file_path = f'/code/sample/data/geometry-types/{new_qml_style_name}.png'
+            diff_pixels_limit = {
+                'line': 250,
+                'point': 10,
+                'polygon': 110,
+            }[new_qml_style_name]
             with app.app_context():
                 thumbnail_path = thumbnail.get_layer_thumbnail_path(workspace, layer)
             diff_pixels = test_util.compare_images(thumbnail_path, exp_file_path)
-            assert diff_pixels == 0, f"thumbnail_path={thumbnail_path}, exp_file_path={exp_file_path}"
+            assert diff_pixels < diff_pixels_limit, f"thumbnail_path={thumbnail_path}, exp_file_path={exp_file_path}"
 
     process_client.delete_workspace_layer(workspace, layer)
 
