@@ -205,9 +205,10 @@ def test_fill_project_template(workspace, publ_type, publication):
     assert excinfo.value.response.status_code == 500
 
     with app.app_context():
-        layer_bbox = layer_db.get_bbox(workspace, table_name)
+        real_bbox = layer_db.get_bbox(workspace, table_name)
         layer_crs = layer_db.get_table_crs(workspace, table_name, use_internal_srid=True)
-    layer_bbox = layer_bbox if not bbox_util.is_empty(layer_bbox) else crs_def.CRSDefinitions[layer_crs].default_bbox
+    layer_bbox = bbox_util.ensure_bbox_with_area(real_bbox, crs_def.CRSDefinitions[layer_crs].no_area_bbox_padding) \
+        if not bbox_util.is_empty(real_bbox) else crs_def.CRSDefinitions[layer_crs].default_bbox
     with app.app_context():
         qml_path = qgis_util.get_original_style_path(workspace, publication)
     parser = ET.XMLParser(remove_blank_text=True)
