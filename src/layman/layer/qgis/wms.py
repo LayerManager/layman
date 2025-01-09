@@ -63,12 +63,13 @@ def save_qgs_file(workspace, layer):
                                                                                     'table_uri']})
     uuid = info['uuid']
     qgis.ensure_layer_dir(workspace, layer)
-    layer_bbox = info['native_bounding_box']
+    real_bbox = info['native_bounding_box']
     crs = info['native_crs']
     table_uri = info['_table_uri']
     table_name = table_uri.table
     db_schema = table_uri.schema
-    layer_bbox = layer_bbox if not bbox_util.is_empty(layer_bbox) else crs_def.CRSDefinitions[crs].default_bbox
+    layer_bbox = bbox_util.ensure_bbox_with_area(real_bbox, crs_def.CRSDefinitions[crs].no_area_bbox_padding) \
+        if not bbox_util.is_empty(real_bbox) else crs_def.CRSDefinitions[crs].default_bbox
     qml = util.get_original_style_xml(workspace, layer)
     db_types = db.get_geometry_types(db_schema, table_name, column_name=table_uri.geo_column, uri_str=table_uri.db_uri_str)
     qml_geometry = util.get_geometry_from_qml_and_db_types(qml, db_types)
