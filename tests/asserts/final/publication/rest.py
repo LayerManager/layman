@@ -18,7 +18,7 @@ def get_expected_urls_in_rest_response(workspace, publ_type, name, *, rest_metho
     result = {
         'url': f'{proxy_proto}://{proxy_host}{proxy_prefix}/rest/workspaces/{workspace}/{publ_type_directory}/{name}'
     }
-    if rest_method in ['patch', 'get']:
+    if rest_method in ['get']:
         result['thumbnail'] = {
             'url': f'{proxy_proto}://{proxy_host}{proxy_prefix}/rest/workspaces/{workspace}/{publ_type_directory}/{name}/thumbnail'
         }
