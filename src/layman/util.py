@@ -426,9 +426,11 @@ def get_publication_info(workspace, publ_type, publ_name, context=None):
         'extra_keys': context.get('extra_keys', []),
         'x_forwarded_items': context.get('x_forwarded_items'),
     })
-
+    keys_to_remove = get_multi_info_keys_to_remove(publ_type)
     result = {}
     for source, partial_info in partial_infos.items():
+        for key in keys_to_remove:
+            partial_info.pop(key, None) 
         merge_infos(result, partial_info, comment=f'source={source}')
 
     if 'actor_name' in context and result:
