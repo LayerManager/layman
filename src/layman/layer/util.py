@@ -70,10 +70,8 @@ def fill_in_partial_info_statuses(info, chain_info):
 
 def get_layer_info(workspace, layername, context=None):
     partial_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context)
-
-    chain_info = get_layer_chain(workspace, layername)
-
-    filled_partial_info = fill_in_partial_info_statuses(partial_info, chain_info)
+    chain_info = get_layer_chain(workspace, layername)    
+    filled_partial_info = fill_in_partial_info_statuses(partial_info, chain_info)   
     return filled_partial_info
 
 
@@ -85,8 +83,7 @@ def clear_publication_info(layer_info, file_type):
 
 
 def _get_complete_layer_info(workspace, layername, *, x_forwarded_items=None):
-    partial_info = get_layer_info(workspace, layername, context={'x_forwarded_items': x_forwarded_items})
-
+    partial_info = get_layer_info(workspace, layername, context={'x_forwarded_items': x_forwarded_items}) 
     if not any(partial_info):
         raise LaymanError(15, {'layername': layername})
 
@@ -104,17 +101,24 @@ def _get_complete_layer_info(workspace, layername, *, x_forwarded_items=None):
         'title': layername,
         'description': '',
     })
-
+    if original_data_source == settings.EnumOriginalDataSource.FILE.value and partial_info.get('db', {}).get('table') is not None:
+        partial_info['db_table'] = {
+            'name': partial_info['db']['table'],
+        }            
     complete_info.update(partial_info)
+    complete_info['sld'] = complete_info['style']
+    #complete_info['layer_maps'] = partial_info['_layer_maps']
     file_type = complete_info.get('_file', {}).get('file_type')
     if complete_info['geodata_type'] == settings.GEODATA_TYPE_UNKNOWN and file_type and file_type != settings.GEODATA_TYPE_UNKNOWN:
         complete_info['geodata_type'] = file_type
+    if 'file' in complete_info:
+        complete_info['file']['file_type'] = complete_info['geodata_type']
 
     complete_info = clear_publication_info(complete_info, geodata_type)
 
     complete_info.pop('layman_metadata')
     complete_info['layman_metadata'] = {'publication_status': layman_util.get_publication_status(workspace, LAYER_TYPE, layername,
-                                                                                                 complete_info, item_keys)}
+                                                                                                 complete_info, item_keys)}    
     return complete_info
 
 

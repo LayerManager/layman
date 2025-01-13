@@ -10,7 +10,7 @@ from layman.util import check_workspace_name_decorator
 from layman import settings, authn, util as layman_util
 from layman.authn import authenticate
 from layman.authz import authorize_workspace_publications_decorator
-from . import util, LAYER_REST_PATH_NAME, LAYER_TYPE, get_layer_patch_keys
+from . import util, LAYER_REST_PATH_NAME, LAYER_TYPE
 from .filesystem import input_file, input_style, input_chunk, util as fs_util
 
 bp = Blueprint('rest_workspace_layer', __name__)
@@ -26,14 +26,18 @@ def before_request():
     pass
 
 
+@bp.after_request
+def after_request(response):
+    layman_util.check_deprecated_url(response)
+    return response
+
+
 @bp.route(f"/{LAYER_REST_PATH_NAME}/<layername>", methods=['GET'])
 def get(workspace, layername):
     # pylint: disable=unused-argument
-    app.logger.info(f"GET Layer, actor={g.user}")
-
+    app.logger.info(f"GET Layer, actor={g.user}")   
     x_forwarded_items = layman_util.get_x_forwarded_items(request.headers)
-    info = util.get_complete_layer_info(workspace, layername, x_forwarded_items=x_forwarded_items)
-
+    info = util.get_complete_layer_info(workspace, layername, x_forwarded_items=x_forwarded_items)  
     return jsonify(info), 200
 
 
@@ -49,7 +53,7 @@ def patch(workspace, layername):
                                                               'original_data_source', ]})
     kwargs = {
         'title': info.get('title', info['name']) or '',
-        'description': info.get('description'),
+        'description': info.get('description', '') or '',
     }
 
     # FILE
@@ -103,14 +107,15 @@ def patch(workspace, layername):
         kwargs['title'] = request.form['title']
 
     # DESCRIPTION
-    description = request.form.get('description')
-    if description and len(description) > 0:
-        kwargs['description'] = description
+    if len(request.form.get('description', '')) > 0:
+        kwargs['description'] = request.form['description']
 
     # SLD
     style_file = None
     if 'style' in request.files and not request.files['style'].filename == '':
         style_file = request.files['style']
+    elif 'sld' in request.files and not request.files['sld'].filename == '':
+        style_file = request.files['sld']
 
     delete_from = None
     style_type = None
@@ -125,7 +130,7 @@ def patch(workspace, layername):
     # Overview resampling
     overview_resampling = request.form.get('overview_resampling', '')
     if overview_resampling and overview_resampling not in settings.OVERVIEW_RESAMPLING_METHOD_LIST:
-        raise LaymanError(2, {'expected': 'Resampling method for gdaladdo utility, https://gdal.org/en/stable/programs/gdaladdo.html',
+        raise LaymanError(2, {'expected': 'Resampling method for gdaladdo utility, https://gdal.org/programs/gdaladdo.html',
                               'parameter': 'overview_resampling',
                               'detail': {'found': 'no_overview_resampling',
                                          'supported_values': settings.OVERVIEW_RESAMPLING_METHOD_LIST}, })
@@ -255,11 +260,8 @@ def patch(workspace, layername):
     )
 
     app.logger.info('PATCH Layer changes done')
-    patch_keys = get_layer_patch_keys()
-    info = util.get_layer_info(workspace, layername, context={'keys': patch_keys, 'x_forwarded_items': x_forwarded_items})
-    info['url'] = layman_util.get_workspace_publication_url(info['type'], workspace, layername, x_forwarded_items=x_forwarded_items)
+    info = util.get_complete_layer_info(workspace, layername, x_forwarded_items=x_forwarded_items)
     info.update(layer_result)
-    info = {key: value for key, value in info.items() if key in patch_keys}
 
     return jsonify(info), 200
 

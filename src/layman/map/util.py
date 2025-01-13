@@ -136,8 +136,7 @@ def clear_publication_info(layer_info):
 
 
 def _get_complete_map_info(workspace, mapname, *, x_forwarded_items=None):
-    partial_info = get_map_info(workspace, mapname, context={'x_forwarded_items': x_forwarded_items})
-
+    partial_info = get_map_info(workspace, mapname, context={'x_forwarded_items': x_forwarded_items}) 
     if not any(partial_info):
         raise LaymanError(26, {'mapname': mapname})
 
@@ -157,9 +156,8 @@ def _get_complete_map_info(workspace, mapname, *, x_forwarded_items=None):
 
     complete_info['layman_metadata'] = {'publication_status': layman_util.get_publication_status(workspace, MAP_TYPE, mapname,
                                                                                                  complete_info, item_keys)}
-
-    complete_info = clear_publication_info(complete_info)
-
+    
+    complete_info = clear_publication_info(complete_info)    
     return complete_info
 
 
