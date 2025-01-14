@@ -13,6 +13,7 @@
 #### Data migrations
 - [#1009](https://github.com/LayerManager/layman/issues/1009) Fill column `description` in `publications` table in prime DB schema. Value is taken from GeoServer for layers and from filesystem for maps.
 ### Changes
+- [#942](https://github.com/LayerManager/layman/issues/942) New key `used_in_maps` was added to responses of requests [GET Publications](doc/rest.md#get-publications), [GET Layers](doc/rest.md#get-layers), [GET Workspace Layers](doc/rest.md#get-workspace-layers), and [GET Workspace Layer](doc/rest.md#get-workspace-layer).
 - [#909](https://github.com/LayerManager/layman/issues/909) Upgrade QGIS Server from v3.32.2 to v3.40.2. Also use docker hub repo [layermanager/qgis-server](https://hub.docker.com/repository/docker/layermanager/qgis-server) instead of jirikcz/qgis-server,
     - Precision error of EPSG:5514 in QGIS WMS GetMap increased from 0.5 m to 3.2 m. The error appears if either data CRS or WMS GetMap CRS is EPSG:5514 and the other one is not.
 - [#1009](https://github.com/LayerManager/layman/issues/1009) PATCH Workspace [Layer](doc/rest.md#patch-workspace-layer)/[Map](doc/rest.md#patch-workspace-map) returns same response as POST Workspace [Layers](doc/rest.md#post-workspace-layers)/[Maps](doc/rest.md#post-workspace-maps) with only `name`, `uuid`, `url` and for Layer also optional `files_to_upload` keys.

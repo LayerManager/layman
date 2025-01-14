@@ -66,7 +66,7 @@ def same_values_in_detail_and_multi(workspace, publ_type, name, rest_publication
     expected_keys = ['workspace', 'name', 'title', 'uuid', 'url', 'updated_at', 'access_rights', 'bounding_box',
                      'native_crs', 'native_bounding_box']
     if publ_type == process_client.LAYER_TYPE:
-        expected_keys += ['geodata_type']
+        expected_keys += ['geodata_type', 'used_in_maps']
     rest_detail = copy.deepcopy(rest_publication_detail)
     exp_info = {k: v for k, v in rest_detail.items() if k in expected_keys}
 

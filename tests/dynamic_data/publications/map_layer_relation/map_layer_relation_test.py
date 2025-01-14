@@ -206,7 +206,7 @@ class TestPublication(base_test.TestSingleRestPublication):
         with app.app_context():
             found_layer_maps = [
                 (m['workspace'], m['name'])
-                for m in get_publication_info(*layer, context={'keys': ['layer_maps']})['_layer_maps']
+                for m in get_publication_info(*layer, context={'keys': ['used_in_maps']})['used_in_maps']
                 if m['workspace'] in workspaces_to_check
             ]
         assert found_layer_maps == exp_layer_maps
