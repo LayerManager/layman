@@ -281,7 +281,7 @@ class TestLayer(base_test.TestSingleRestPublication):
         for out_crs, extent, img_size, wms_version, diff_line_width in EXP_WMS_PICTURES:
             out_crs_code = out_crs.split(':')[1]
             pixel_diff_limit = math.ceil(circle_perimeter * diff_line_width * num_circles)
-            exp_img_suffix = ''
+            exp_img_suffix = '_ok'
             wms_spatial_precision(layer.workspace, layer.type, layer.name, wms_version=wms_version,
                                   crs=out_crs, extent=extent, img_size=img_size,
                                   pixel_diff_limit=pixel_diff_limit,
