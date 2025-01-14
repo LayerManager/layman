@@ -64,7 +64,7 @@ PUBLICATION_TYPES = {
             ('layman.layer.prime_db_schema.table', InternalSourceTypeDef(info_items=[
                 'access_rights', 'name', 'title', 'uuid', 'bounding_box', 'style_type', 'native_crs',
                 'native_bounding_box', 'geodata_type', 'updated_at', 'id', 'type', 'image_mosaic', 'table_uri',
-                'original_data_source', 'wfs_wms_status', 'layer_maps']),),
+                'original_data_source', 'wfs_wms_status', 'used_in_maps']),),
             ('layman.layer.filesystem.input_chunk', InternalSourceTypeDef(info_items=['file', ]),),
             ('layman.layer.filesystem.input_file', InternalSourceTypeDef(info_items=['file', ]),),
             ('layman.layer.filesystem.input_style', InternalSourceTypeDef(info_items=[]),),
