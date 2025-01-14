@@ -71,6 +71,9 @@ JSON array of objects representing available layers and maps with following stru
 - **native_bounding_box**: List of 4 floats and one string. Bounding box coordinates [minx, miny, maxx, maxy] in native CRS.
 - *geodata_type*: String. Available only for layers. Either `vector`, `raster`, or `unknown`. Value `unknown` is used if input files are zipped and still being uploaded.
 - *wfs_wms_status*: String. Available only for layers. Status of layer availability in WMS (and WFS in case of vector data) endpoints. Either `AVAILABLE`, `PREPARING`, or `NOT_AVAILABLE`.
+- *used_in_maps*: JSON array of objects. Available only for layers. List of maps in which the layer is used.
+  - *name*: String. Name of the map where the layer is used.
+  - *workspace*: String. Workspace to which the map belongs. 
 
 Headers:
 - **X-Total-Count**: Total number of layers available from the request, taking into account all filtering parameters except `limit` and `offset`. Example `"247"`.
@@ -333,7 +336,9 @@ JSON object with following structure:
 - **native_bounding_box**: List of 4 floats. Bounding box coordinates [minx, miny, maxx, maxy] in native CRS.
 - *image_mosaic*: Boolean. True for raster layers using `image_mosaic` plugin in GeoServer, so far only [timeseries](models.md#timeseries) layers. Available only for raster layer
 - **geodata_type**: String. Either `vector`, `raster`, or `unknown`. Value `unknown` is used if input files are zipped and still being uploaded.
-
+- **used_in_maps**: JSON array of objects. List of maps in which the layer is used.
+  - **name**: String. Name of the map where the layer is used.
+  - **workspace**: String. Workspace to which the map belongs. 
 ### PATCH Workspace Layer
 Update information about existing layer. First, it deletes sources of the layer (except external DB table published using `external_table_uri`), and then it publishes them again with new parameters. The processing chain is similar to [POST Workspace Layers](#post-workspace-layers).
 

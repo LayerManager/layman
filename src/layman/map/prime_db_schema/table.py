@@ -19,7 +19,7 @@ def get_map_info(workspace, mapname):
         info.pop('_wfs_wms_status', None)
         info.pop('original_data_source', None)
         info.pop('geodata_type', None)
-        info.pop('_layer_maps', None)
+        info.pop('used_in_maps', None)
     return info
 
 

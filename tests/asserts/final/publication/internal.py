@@ -173,7 +173,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                        'original_data_source': settings.EnumOriginalDataSource.TABLE.value if external_table_uri else settings.EnumOriginalDataSource.FILE.value,
                                        'geodata_type': geodata_type,
                                        '_wfs_wms_status': settings.EnumWfsWmsStatus.AVAILABLE,
-                                       '_layer_maps': [],
+                                       'used_in_maps': [],
                                    })
 
         if file_extension:

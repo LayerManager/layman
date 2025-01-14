@@ -81,6 +81,7 @@ class TestResponsesClass:
         'geodata_type': settings.GEODATA_TYPE_VECTOR,
         'wfs_wms_status': settings.EnumWfsWmsStatus.AVAILABLE.value,
         'publication_type': 'layer',
+        'used_in_maps': [],
     }
     expected_maps = {
         **expected_common_multi,
@@ -125,6 +126,7 @@ class TestResponsesClass:
         'wfs': {'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{workspace}/wfs'},
         'wms': {'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{workspace}_wms/ows'},
         'original_data_source': 'file',
+        'used_in_maps': [],
     }
     expected_map = {
         **expected_common,

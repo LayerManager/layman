@@ -67,7 +67,7 @@ PUBLICATION_TYPES = {
             ('layman.layer.prime_db_schema.table', InternalSourceTypeDef(info_items=[
                 'access_rights', 'name', 'title', 'uuid', 'bounding_box', 'style_type', 'native_crs',
                 'native_bounding_box', 'geodata_type', 'updated_at', 'id', 'type', 'image_mosaic', 'table_uri',
-                'original_data_source', 'wfs_wms_status', 'layer_maps', 'description', ]),),
+                'original_data_source', 'wfs_wms_status', 'used_in_maps', 'description', ]),),
             ('layman.layer.filesystem.input_chunk', InternalSourceTypeDef(info_items=['file', ]),),
             ('layman.layer.filesystem.input_file', InternalSourceTypeDef(info_items=['file', ]),),
             ('layman.layer.filesystem.input_style', InternalSourceTypeDef(info_items=[]),),
@@ -117,21 +117,21 @@ PUBLICATION_TYPES = {
             (settings.GEODATA_TYPE_VECTOR, settings.EnumOriginalDataSource.FILE.value): {
                 'name', 'uuid', 'layman_metadata', 'url', 'title', 'description', 'updated_at', 'wms', 'wfs', 'thumbnail', 'file',
                 'db', 'metadata', 'style', 'access_rights', 'bounding_box', 'native_crs', 'native_bounding_box',
-                'original_data_source', 'geodata_type',
+                'original_data_source', 'geodata_type', 'used_in_maps',
             },
             (settings.GEODATA_TYPE_VECTOR, settings.EnumOriginalDataSource.TABLE.value): {
                 'name', 'uuid', 'layman_metadata', 'url', 'title', 'description', 'updated_at', 'wms', 'wfs', 'thumbnail',
                 'db', 'metadata', 'style', 'access_rights', 'bounding_box', 'native_crs', 'native_bounding_box',
-                'original_data_source', 'geodata_type',
+                'original_data_source', 'geodata_type', 'used_in_maps',
             },
             settings.GEODATA_TYPE_RASTER: {
                 'name', 'uuid', 'layman_metadata', 'url', 'title', 'description', 'updated_at', 'wms', 'thumbnail', 'file', 'metadata',
                 'style', 'access_rights', 'bounding_box', 'native_crs', 'native_bounding_box', 'image_mosaic',
-                'original_data_source', 'geodata_type',
+                'original_data_source', 'geodata_type', 'used_in_maps',
             },
             settings.GEODATA_TYPE_UNKNOWN: {
                 'name', 'uuid', 'layman_metadata', 'url', 'title', 'description', 'updated_at', 'wms', 'thumbnail', 'file', 'metadata',
-                'style', 'access_rights', 'bounding_box', 'native_crs', 'native_bounding_box', 'original_data_source', 'geodata_type',
+                'style', 'access_rights', 'bounding_box', 'native_crs', 'native_bounding_box', 'original_data_source', 'geodata_type', 'used_in_maps',
             },
         },
         'multi_info_keys_to_remove': [],

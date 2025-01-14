@@ -287,7 +287,7 @@ from {DB_SCHEMA}.workspaces w inner join
                                    'access_rights': {'read': read_users_roles.split(','),
                                                      'write': write_users_roles.split(',')},
                                    '_map_layers': map_layers or [],
-                                   '_layer_maps': layer_maps or [],
+                                   'used_in_maps': layer_maps or [],
                                    '_wfs_wms_status': settings.EnumWfsWmsStatus(wfs_wms_status) if wfs_wms_status else None,
                                    }
              for id_publication, workspace_name, publication_type, publication_name, title, description, uuid, geodata_type, style_type, image_mosaic, updated_at, xmin, ymin, xmax, ymax,
