@@ -142,7 +142,7 @@ def raise_if_not_complete_status(response):
     status = resp_json.get('layman_metadata', {}).get('publication_status')
     if status != 'COMPLETE':
         failed_source_key = next((k for k, v in resp_json.items() if isinstance(v, dict) and v.get('status') == 'FAILURE'), None)
-        if failed_source_key and resp_json[failed_source_key].get('error').get('code'):
+        if failed_source_key and resp_json[failed_source_key].get('error', {}).get('code'):
             failed_source = resp_json[failed_source_key]
             error_desc = failed_source['error']
             raise LaymanError(error_desc['code'],
