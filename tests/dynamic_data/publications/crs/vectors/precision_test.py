@@ -188,6 +188,22 @@ EXP_WMS_PICTURES = [
     (crs_def.CRS_84, (16.606580653, 49.198905759, 16.606874005, 49.199074214), (560, 321), '1.1.1', 2),
 ]
 
+EXP_WMS_PICTURES_QGIS_FIXES = {
+    # Tuples of (output CRS, source data CRS).
+    # WMS GetMap of QGIS server is shifted about 3.2 meters in these cases.
+    # This is probably bug in QGIS Server, and we are not able to fix it.
+    # But we still want to check that the precision error is constant, so we use different expected images in such cases.
+    (crs_def.CRS_84, crs_def.EPSG_5514),
+    (crs_def.EPSG_3857, crs_def.EPSG_5514),
+    (crs_def.EPSG_4326, crs_def.EPSG_5514),
+    (crs_def.EPSG_32633, crs_def.EPSG_5514),
+    (crs_def.EPSG_32634, crs_def.EPSG_5514),
+    (crs_def.EPSG_5514, crs_def.EPSG_3857),
+    (crs_def.EPSG_5514, crs_def.EPSG_4326),
+    (crs_def.EPSG_5514, crs_def.EPSG_32633),
+    (crs_def.EPSG_5514, crs_def.EPSG_32634),
+}
+
 
 class TestLayer(base_test.TestSingleRestPublication):
 
@@ -281,7 +297,10 @@ class TestLayer(base_test.TestSingleRestPublication):
         for out_crs, extent, img_size, wms_version, diff_line_width in EXP_WMS_PICTURES:
             out_crs_code = out_crs.split(':')[1]
             pixel_diff_limit = math.ceil(circle_perimeter * diff_line_width * num_circles)
-            exp_img_suffix = '_ok'
+            if style_type == 'qml' and (out_crs, crs_id) in EXP_WMS_PICTURES_QGIS_FIXES:
+                exp_img_suffix = f'_bad_qml_src_{epsg_code}'
+            else:
+                exp_img_suffix = '_ok'
             wms_spatial_precision(layer.workspace, layer.type, layer.name, wms_version=wms_version,
                                   crs=out_crs, extent=extent, img_size=img_size,
                                   pixel_diff_limit=pixel_diff_limit,
