@@ -195,9 +195,11 @@ def patch(workspace, layername):
     kwargs['name_normalized_tif_by_layer'] = name_normalized_tif_by_layer
     kwargs['name_input_file_by_layer'] = name_input_file_by_layer
     kwargs['enable_more_main_files'] = enable_more_main_files
-
+    request_method = request.method.lower()
+    kwargs['http_method'] = request_method
     props_to_refresh = util.get_same_or_missing_prop_names(workspace, layername)
     kwargs['metadata_properties_to_refresh'] = props_to_refresh
+
     kwargs['external_table_uri'] = external_table_uri
     is_external_table = not input_files and (bool(external_table_uri) or info.get('original_data_source') == settings.EnumOriginalDataSource.TABLE.value)
     kwargs['original_data_source'] = settings.EnumOriginalDataSource.TABLE.value if is_external_table else settings.EnumOriginalDataSource.FILE.value
@@ -212,7 +214,6 @@ def patch(workspace, layername):
                                       )
 
     if delete_from is not None:
-        request_method = request.method.lower()
         deleted = util.delete_layer(workspace, layername, source=delete_from, http_method=request_method)
         if style_file is None:
             try:
@@ -227,8 +228,6 @@ def patch(workspace, layername):
 
         kwargs.update({
             'crs_id': crs_id,
-            'http_method': request_method,
-            'metadata_properties_to_refresh': props_to_refresh,
         })
 
         if delete_from == 'layman.layer.filesystem.input_file':
@@ -245,6 +244,8 @@ def patch(workspace, layername):
             elif input_files:
                 shutil.move(temp_dir, input_file.get_layer_input_file_dir(workspace, layername))
         publications.set_wfs_wms_status(workspace, LAYER_TYPE, layername, settings.EnumWfsWmsStatus.PREPARING)
+    else:
+        delete_from = 'layman.layer.micka.soap'
 
     util.patch_layer(
         workspace,

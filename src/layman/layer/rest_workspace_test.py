@@ -654,6 +654,7 @@ def test_patch_layer_title(client):
         })
         assert response.status_code == 200, response.get_json()
 
+        flask_client.wait_till_layer_ready(workspace, layername)
         chain_info = util.get_layer_chain(workspace, layername)
         assert chain_info is not None and celery_util.is_chain_ready(chain_info)
 

@@ -28,6 +28,15 @@ def test_patch_after_feature_change_concurrency(publication_type):
                                                check_response_fn=empty_method_returns_true,
                                                raise_if_not_complete=False)
     queue = celery.get_run_after_chain_queue(workspace, publication_type, publication)
+    if publication_type == process_client.LAYER_TYPE:
+        assert len(queue) == 1, queue
+        assert queue == ['layman.util::patch_after_feature_change', ]
+        lock = redis.get_publication_lock(workspace, publication_type, publication)
+        assert lock == common_const.PUBLICATION_LOCK_PATCH
+        process_client.wait_for_publication_status(workspace, publication_type, publication)
+
+        process_client.patch_after_feature_change(workspace, publication_type, publication)
+        queue = celery.get_run_after_chain_queue(workspace, publication_type, publication)
     assert len(queue) == 0, queue
     lock = redis.get_publication_lock(workspace, publication_type, publication)
     assert lock == common_const.PUBLICATION_LOCK_FEATURE_CHANGE
