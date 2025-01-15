@@ -30,5 +30,7 @@ WFS respects [publication access rights](security.md#publication-access-rights).
 ### Known issues
 For layers in `EPSG:5514` and WFS requests in `CRS:84`, the features may have wrong coordinates by hundreds of meters. For requests in `EPSG:4326`, coordinates are correct.
 
+For layers with QML style, there is precision error about 3.2 meters in some WMS GetMap requests. The error appears if either data CRS or WMS GetMap CRS is `EPSG:5514` and the other one is not.
+
 ## Catalogue Service
 [Catalogue Service (CSW)](https://www.ogc.org/publications/standard/cat/) is implemented using [Micka](https://github.com/hsrs-cz/Micka).
