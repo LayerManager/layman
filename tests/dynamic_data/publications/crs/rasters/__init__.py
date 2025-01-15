@@ -169,7 +169,7 @@ def generate(workspace=None):
                     'extent': extent,
                     'img_size': img_size,
                     'wms_version': wms_version,
-                    'diff_line_width': 0,
+                    'pixel_diff_limit': 0,
                     'obtained_file_path': f'tmp/artifacts/test_spatial_precision_wms/cz_raster_{crs_code}/{wms_crs.split(":")[1]}.png',
                     'expected_file_path': f'{DIRECTORY}/cz_{crs_code}/{wms_crs.split(":")[1]}.png',
                 })
