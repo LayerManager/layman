@@ -11,7 +11,7 @@ make test-src
 make test-static
 ```
 
-### Run other tests in `tests` folder
+### Run other tests in `tests` folder, mainly `dynamic_data` subfolder
 ```
 make test-dynamic
 ```
