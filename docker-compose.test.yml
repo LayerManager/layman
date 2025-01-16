@@ -5,7 +5,7 @@ services:
       container_name: layman_test
       image: layman_dev:latest
       user: ${UID_GID}
-      command: bash test.sh
+      command: bash test_src.sh
       env_file:
          - .env.test
       environment:
@@ -18,8 +18,8 @@ services:
         - ./test_tools:/code/test_tools
         - ./tests:/code/tests
         - ./tmp:/code/tmp
-        - ./test.sh:/code/test.sh
-        - ./test_separated.sh:/code/test_separated.sh
+        - ./test_src.sh:/code/test_src.sh
+        - ./test_dynamic.sh:/code/test_dynamic.sh
         - ./test_static.sh:/code/test_static.sh
         - ./pytest.ini:/code/pytest.ini
         - ./.pylintrc:/code/.pylintrc

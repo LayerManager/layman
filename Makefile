@@ -229,11 +229,11 @@ test-dynamic:
 	docker compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --no-deps layman_test bash -c "bash ensure-test-data.sh && python3 src/assert_db.py"
 	docker compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --no-deps -u root layman_test bash -c "cd src && python3 -B drop_layman_role_service_schema.py && python3 -B setup_geoserver.py"
 	docker compose -f docker-compose.deps.yml -f docker-compose.test.yml up --force-recreate --no-deps -d celery_worker_test
-	docker compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --name layman_test_run_1 -e "TEST_TYPE=$(test_type)" layman_test bash -c "bash test_separated.sh $(max_fail)"
+	docker compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --name layman_test_run_1 -e "TEST_TYPE=$(test_type)" layman_test bash -c "bash test_dynamic.sh $(max_fail)"
 
 test-dynamic-fast:
 	docker compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --no-deps -u root layman_test bash -c "cd src && python3 -B drop_layman_role_service_schema.py && python3 -B setup_geoserver.py"
-	docker compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --no-deps --name layman_test_run_1 -e "TEST_TYPE=$(test_type)" layman_test bash -c "bash test_separated.sh $(max_fail)"
+	docker compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --no-deps --name layman_test_run_1 -e "TEST_TYPE=$(test_type)" layman_test bash -c "bash test_dynamic.sh $(max_fail)"
 
 test-static:
 	mkdir -p tmp

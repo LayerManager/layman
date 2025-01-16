@@ -11,7 +11,7 @@ tmp
 .git*
 docker-compose.*
 Makefile
-test.sh
+test_src.sh
 
 *.pyc
 **/__pycache__
