@@ -1,5 +1,3 @@
-.PHONY: test
-
 start-demo:
 	mkdir -p layman_data deps/qgis/data
 	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client timgen
