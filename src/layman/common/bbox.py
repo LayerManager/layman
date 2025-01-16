@@ -70,6 +70,12 @@ def ensure_bbox_with_area(bbox, no_area_padding):
     return result
 
 
+def get_bbox_to_publish(native_bbox, native_crs):
+    result = ensure_bbox_with_area(native_bbox, crs_def.CRSDefinitions[native_crs].no_area_bbox_padding) \
+        if not is_empty(native_bbox) else crs_def.CRSDefinitions[native_crs].default_bbox
+    return result
+
+
 def transform(bbox, crs_from, crs_to):
     if is_empty(bbox):
         return None, None, None, None

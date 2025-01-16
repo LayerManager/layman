@@ -76,6 +76,27 @@ def test_ensure_bbox_with_area(bbox, no_area_padding, expected_result):
     assert bbox_util.ensure_bbox_with_area(bbox, no_area_padding) == expected_result
 
 
+@pytest.mark.parametrize('bbox, crs, expected_result', [
+    ((1, 1, 4, 4,), crs_def.EPSG_4326, (1, 1, 4, 4,)),
+    ((1, 2, 1, 2,), crs_def.EPSG_4326, (0.99999, 1.99999, 1.00001, 2.00001)),
+    ((1, 2, 1, 2,), crs_def.EPSG_3857, (-9, -8, 11, 12)),
+    ((None, None, None, None,), crs_def.EPSG_4326, (
+        -180,
+        -90,
+        180,
+        90,
+    )),
+    ((None, None, None, None,), crs_def.EPSG_3857, (
+        -20026376.39,
+        -20048966.10,
+        20026376.39,
+        20048966.10,
+    )),
+])
+def test_get_bbox_to_publish(bbox, crs, expected_result):
+    assert bbox_util.get_bbox_to_publish(bbox, crs) == expected_result
+
+
 @pytest.mark.parametrize('bbox, crs_from, crs_to, expected_bbox', [
     (
         crs_def.CRSDefinitions[crs_def.EPSG_4326].default_bbox,

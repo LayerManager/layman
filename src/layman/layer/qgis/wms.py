@@ -1,7 +1,6 @@
 import os
 from owslib.wms import WebMapService
 
-import crs as crs_def
 from layman import patch_mode, settings, util as layman_util
 from layman.common import bbox as bbox_util, empty_method, empty_method_returns_none, empty_method_returns_dict
 from . import util, LAYER_TYPE
@@ -68,8 +67,7 @@ def save_qgs_file(workspace, layer):
     table_uri = info['_table_uri']
     table_name = table_uri.table
     db_schema = table_uri.schema
-    layer_bbox = bbox_util.ensure_bbox_with_area(real_bbox, crs_def.CRSDefinitions[crs].no_area_bbox_padding) \
-        if not bbox_util.is_empty(real_bbox) else crs_def.CRSDefinitions[crs].default_bbox
+    layer_bbox = bbox_util.get_bbox_to_publish(real_bbox, crs)
     qml = util.get_original_style_xml(workspace, layer)
     db_types = db.get_geometry_types(db_schema, table_name, column_name=table_uri.geo_column, uri_str=table_uri.db_uri_str)
     qml_geometry = util.get_geometry_from_qml_and_db_types(qml, db_types)

@@ -1,7 +1,6 @@
 import os
 import pathlib
 
-import crs as crs_def
 from geoserver import util as gs_util
 from layman import settings, LaymanError, patch_mode
 from layman.util import url_for, get_publication_info
@@ -69,8 +68,7 @@ def generate_layer_thumbnail(workspace, layername):
     wms_url = layer_info['_wms']['url']
     native_bbox = layer_info['native_bounding_box']
     native_crs = layer_info['native_crs']
-    raw_bbox = native_bbox if not bbox_util.is_empty(native_bbox) else crs_def.CRSDefinitions[native_crs].default_bbox
-    bbox = bbox_util.ensure_bbox_with_area(raw_bbox, crs_def.CRSDefinitions[native_crs].no_area_bbox_padding)
+    bbox = bbox_util.get_bbox_to_publish(native_bbox, native_crs)
     tn_bbox = gs_util.get_square_bbox(bbox)
     ensure_layer_thumbnail_dir(workspace, layername)
     tn_path = get_layer_thumbnail_path(workspace, layername)
