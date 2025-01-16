@@ -1,30 +1,48 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
-<qgis saveUserFull="layman" saveUser="layman" projectname="" version="3.12.3-București">
+<qgis saveUserFull="layman" saveUser="layman" projectname="" saveDateTime="{creation_iso_datetime}" version="3.40.2-Bratislava">
   <homePath path=""/>
   <title></title>
-  <autotransaction active="0"/>
-  <evaluateDefaultValues active="0"/>
-  <trust active="0"/>
+  <transaction mode="Disabled"/>
+  <projectFlags set=""/>
   <projectCrs>
-    <spatialrefsys>
+    <spatialrefsys nativeFormat="Wkt">
       {qgis_template_spatialrefsys}
     </spatialrefsys>
   </projectCrs>
+  <verticalCrs>
+    <spatialrefsys nativeFormat="Wkt">
+      <wkt></wkt>
+      <proj4></proj4>
+      <srsid>0</srsid>
+      <srid>0</srid>
+      <authid></authid>
+      <description></description>
+      <projectionacronym></projectionacronym>
+      <ellipsoidacronym></ellipsoidacronym>
+      <geographicflag>false</geographicflag>
+    </spatialrefsys>
+  </verticalCrs>
+  <elevation-shading-renderer is-active="0" light-altitude="45" edl-distance-unit="0" edl-strength="1000" edl-is-active="1" hillshading-is-multidirectional="0" edl-distance="0.5" light-azimuth="315" hillshading-z-factor="1" combined-method="0" hillshading-is-active="0"/>
   <layer-tree-group>
-    <customproperties/>
-    <layer-tree-layer source="dbname='{db_name}' host={db_host} port={db_port} user='{db_user}' password='{db_password}' sslmode=disable key='{primary_key_column}' srid={srid} type={source_type} checkPrimaryKeyUnicity='1' table=&quot;{db_schema}&quot;.&quot;{db_table}&quot; ({geo_column})" providerKey="postgres" legend_exp="" checked="Qt::Checked" id="{layer_name}_{layer_uuid}" expanded="1" name="{layer_name}">
-      <customproperties/>
+    <customproperties>
+      <Option/>
+    </customproperties>
+    <layer-tree-layer source="dbname='{db_name}' host={db_host} port={db_port} user='{db_user}' password='{db_password}' sslmode=disable key='{primary_key_column}' srid={srid} type={source_type} checkPrimaryKeyUnicity='1' table=&quot;{db_schema}&quot;.&quot;{db_table}&quot; ({geo_column})" providerKey="postgres" legend_exp="" checked="Qt::Checked" id="{layer_name}_{layer_uuid}" expanded="1" name="{layer_name}" patch_size="-1,-1" legend_split_behavior="0">
+      <customproperties>
+        <Option/>
+      </customproperties>
     </layer-tree-layer>
     <custom-order enabled="0">
       <item>{layer_name}_{layer_uuid}</item>
     </custom-order>
   </layer-tree-group>
-  <snapping-settings mode="2" tolerance="12" unit="1" enabled="0" type="1" intersection-snapping="0">
+  <snapping-settings mode="2" tolerance="20" unit="1" enabled="1" type="1" intersection-snapping="0" scaleDependencyMode="0" maxScale="0" self-snapping="0" minScale="0">
     <individual-layer-settings>
-      <layer-setting tolerance="12" id="{layer_name}_{layer_uuid}" enabled="0" type="1" units="1"/>
+      <layer-setting tolerance="20" id="{layer_name}_{layer_uuid}" enabled="1" type="1" units="1" maxScale="0" minScale="0"/>
     </individual-layer-settings>
   </snapping-settings>
   <relations/>
+  <polymorphicRelations/>
   <mapcanvas name="theMapCanvas" annotationsVisible="1">
     <units>meters</units>
     <extent>
@@ -32,8 +50,8 @@
     </extent>
     <rotation>0</rotation>
     <destinationsrs>
-      <spatialrefsys>
-      {qgis_template_spatialrefsys}
+      <spatialrefsys nativeFormat="Wkt">
+        {qgis_template_spatialrefsys}
       </spatialrefsys>
     </destinationsrs>
     <rendermaptile>0</rendermaptile>
@@ -43,19 +61,28 @@
   <legend updateDrawingOrder="true">
     <legendlayer showFeatureCount="0" drawingOrder="-1" open="true" checked="Qt::Checked" name="{layer_name}">
       <filegroup open="true" hidden="false">
-        <legendlayerfile visible="1" layerid="{layer_name}_{layer_uuid}" isInOverview="0"/>
+        <legendlayerfile visible="1" isInOverview="0" layerid="{layer_name}_{layer_uuid}"/>
       </filegroup>
     </legendlayer>
   </legend>
   <mapViewDocks/>
-  <mapViewDocks3D/>
   <projectlayers>
     {layer_qml}
   </projectlayers>
   <layerorder>
     <layer id="{layer_name}_{layer_uuid}"/>
   </layerorder>
+  <labelEngineSettings/>
   <properties>
+    <CopyrightLabel>
+      <Enabled type="int">0</Enabled>
+      <Label type="QString"></Label>
+      <MarginH type="int">1</MarginH>
+      <MarginV type="int">1</MarginV>
+    </CopyrightLabel>
+    <Digitizing>
+      <AvoidIntersectionsMode type="int">0</AvoidIntersectionsMode>
+    </Digitizing>
     <Gui>
       <CanvasColorBluePart type="int">255</CanvasColorBluePart>
       <CanvasColorGreenPart type="int">255</CanvasColorGreenPart>
@@ -69,7 +96,7 @@
       <filterByMap type="bool">false</filterByMap>
     </Legend>
     <Measure>
-      <Ellipsoid type="QString">WGS84</Ellipsoid>
+      <Ellipsoid type="QString">EPSG:7030</Ellipsoid>
     </Measure>
     <Measurement>
       <AreaUnits type="QString">m2</AreaUnits>
@@ -78,6 +105,7 @@
     <PAL>
       <CandidatesLinePerCM type="double">5</CandidatesLinePerCM>
       <CandidatesPolygonPerCM type="double">2.5</CandidatesPolygonPerCM>
+      <DrawLabelMetrics type="bool">false</DrawLabelMetrics>
       <DrawRectOnly type="bool">false</DrawRectOnly>
       <DrawUnplaced type="bool">false</DrawUnplaced>
       <PlacementEngineVersion type="int">1</PlacementEngineVersion>
@@ -86,7 +114,7 @@
       <ShowingCandidates type="bool">false</ShowingCandidates>
       <ShowingPartialsLabels type="bool">true</ShowingPartialsLabels>
       <TextFormat type="int">0</TextFormat>
-      <UnplacedColor type="QString">255,0,0,255</UnplacedColor>
+      <UnplacedColor type="QString">255,0,0,255,rgb:1,0,0,1</UnplacedColor>
     </PAL>
     <Paths>
       <Absolute type="bool">false</Absolute>
@@ -108,6 +136,7 @@
     </WFSTLayers>
     <WFSUrl type="QString"></WFSUrl>
     <WMSAccessConstraints type="QString">None</WMSAccessConstraints>
+    <WMSAddLayerGroupsLegendGraphic type="bool">false</WMSAddLayerGroupsLegendGraphic>
     <WMSAddWktGeometry type="bool">false</WMSAddWktGeometry>
     <WMSContactMail type="QString"></WMSContactMail>
     <WMSContactOrganization type="QString"></WMSContactOrganization>
@@ -118,6 +147,7 @@
       {wms_crs_list_values}
     </WMSCrsList>
     <WMSDefaultMapUnitsPerMm type="double">1</WMSDefaultMapUnitsPerMm>
+    <WMSFeatureInfoUseAttributeFormSettings type="bool">false</WMSFeatureInfoUseAttributeFormSettings>
     <WMSFees type="QString">conditions unknown</WMSFees>
     <WMSImageQuality type="int">90</WMSImageQuality>
     <WMSKeywordList type="QStringList">
@@ -131,6 +161,7 @@
     <WMSServiceAbstract type="QString"></WMSServiceAbstract>
     <WMSServiceCapabilities type="bool">false</WMSServiceCapabilities>
     <WMSServiceTitle type="QString"></WMSServiceTitle>
+    <WMSSkipNameForGroup type="bool">false</WMSSkipNameForGroup>
     <WMSTileBuffer type="int">0</WMSTileBuffer>
     <WMSUrl type="QString"></WMSUrl>
     <WMSUseLayerIDs type="bool">false</WMSUseLayerIDs>
@@ -156,13 +187,15 @@
     </WMTSPngLayers>
     <WMTSUrl type="QString"></WMTSUrl>
   </properties>
+  <dataDefinedServerProperties>
+    <Option type="Map">
+      <Option value="" name="name" type="QString"/>
+      <Option name="properties"/>
+      <Option value="collection" name="type" type="QString"/>
+    </Option>
+  </dataDefinedServerProperties>
   <visibility-presets/>
-  <transformContext>
-    <srcDest source="EPSG:3035" sourceTransform="+towgs84=0,0,0" destTransform="" dest="EPSG:4326"/>
-    <srcDest source="EPSG:3857" sourceTransform="" destTransform="+towgs84=0,0,0" dest="EPSG:3035"/>
-    <srcDest source="EPSG:3857" sourceTransform="" destTransform="+towgs84=0,0,0" dest="EPSG:4258"/>
-    <srcDest source="EPSG:5514" sourceTransform="+towgs84=572.213,85.334,461.94,4.9732,1.529,5.2484,3.5378" destTransform="" dest="EPSG:3857"/>
-  </transformContext>
+  <transformContext/>
   <projectMetadata>
     <identifier></identifier>
     <parentidentifier></parentidentifier>
@@ -171,27 +204,61 @@
     <title></title>
     <abstract></abstract>
     <links/>
+    <dates>
+      <date value="{creation_iso_datetime}" type="Created"/>
+    </dates>
     <author>layman</author>
     <creation>{creation_iso_datetime}</creation>
   </projectMetadata>
   <Annotations/>
   <Layouts/>
+  <mapViewDocks3D/>
   <Bookmarks/>
-  <ProjectViewSettings UseProjectScales="0">
+  <Sensors/>
+  <ProjectViewSettings rotation="0" UseProjectScales="0">
     <Scales/>
   </ProjectViewSettings>
-  <ProjectDisplaySettings>
+  <ProjectStyleSettings colorModel="Rgb" RandomizeDefaultSymbolColor="1" DefaultSymbolOpacity="1" iccProfileId="attachment:///" projectStyleId="attachment:///MewKpo_styles.db">
+    <databases/>
+  </ProjectStyleSettings>
+  <ProjectTimeSettings frameRate="1" timeStepUnit="h" timeStep="1" cumulativeTemporalRange="0" totalMovieFrames="100"/>
+  <ElevationProperties FilterInvertSlider="0">
+    <terrainProvider type="flat">
+      <TerrainProvider offset="0" scale="1"/>
+    </terrainProvider>
+  </ElevationProperties>
+  <ProjectDisplaySettings CoordinateType="MapCrs" CoordinateAxisOrder="Default">
     <BearingFormat id="bearing">
       <Option type="Map">
-        <Option value="" type="QChar" name="decimal_separator"/>
+        <Option type="invalid" name="decimal_separator"/>
         <Option value="6" type="int" name="decimals"/>
         <Option value="0" type="int" name="direction_format"/>
         <Option value="0" type="int" name="rounding_type"/>
         <Option value="false" type="bool" name="show_plus"/>
         <Option value="true" type="bool" name="show_thousand_separator"/>
         <Option value="false" type="bool" name="show_trailing_zeros"/>
-        <Option value="" type="QChar" name="thousand_separator"/>
+        <Option type="invalid" name="thousand_separator"/>
       </Option>
     </BearingFormat>
+    <GeographicCoordinateFormat id="geographiccoordinate">
+      <Option type="Map">
+        <Option value="DecimalDegrees" name="angle_format" type="QString"/>
+        <Option name="decimal_separator" type="invalid"/>
+        <Option value="6" name="decimals" type="int"/>
+        <Option value="0" name="rounding_type" type="int"/>
+        <Option value="false" name="show_leading_degree_zeros" type="bool"/>
+        <Option value="false" name="show_leading_zeros" type="bool"/>
+        <Option value="false" name="show_plus" type="bool"/>
+        <Option value="false" name="show_suffix" type="bool"/>
+        <Option value="true" name="show_thousand_separator" type="bool"/>
+        <Option value="false" name="show_trailing_zeros" type="bool"/>
+        <Option name="thousand_separator" type="invalid"/>
+      </Option>
+    </GeographicCoordinateFormat>
+    <CoordinateCustomCrs>
+      <spatialrefsys nativeFormat="Wkt">
+        {qgis_template_spatialrefsys}
+      </spatialrefsys>
+    </CoordinateCustomCrs>
   </ProjectDisplaySettings>
 </qgis>
