@@ -1,7 +1,5 @@
-<maplayer wkbType="{wkb_type}" refreshOnNotifyMessage="" simplifyDrawingHints="1" autoRefreshEnabled="0" simplifyDrawingTol="1"
-          simplifyMaxScale="1" minScale="100000000" hasScaleBasedVisibilityFlag="0" simplifyAlgorithm="0" labelsEnabled="0" type="vector"
-          autoRefreshTime="0" styleCategories="AllStyleCategories" readOnly="0" maxScale="0" simplifyLocal="1" geometry="{qml_geometry}"
-          refreshOnNotifyEnabled="0">
+<maplayer wkbType="{wkb_type}" refreshOnNotifyMessage="" simplifyDrawingHints="1" autoRefreshMode="Disabled" simplifyDrawingTol="1" simplifyMaxScale="1" minScale="100000000" hasScaleBasedVisibilityFlag="0" simplifyAlgorithm="0" labelsEnabled="0" type="vector" autoRefreshTime="0" styleCategories="AllStyleCategories" readOnly="0"  maxScale="0" simplifyLocal="1" geometry="{qml_geometry}" refreshOnNotifyEnabled="0"
+          legendPlaceholderImage="" symbologyReferenceScale="-1">
     <extent>
         {extent}
     </extent>
@@ -14,7 +12,7 @@
     </keywordList>
     <layername>{layer_name}</layername>
     <srs>
-        <spatialrefsys>
+        <spatialrefsys nativeFormat="Wkt">
             {qgis_template_spatialrefsys}
         </spatialrefsys>
     </srs>
@@ -25,11 +23,21 @@
         <type>dataset</type>
         <title></title>
         <abstract></abstract>
+        <contact>
+            <name></name>
+            <organization></organization>
+            <position></position>
+            <voice></voice>
+            <fax></fax>
+            <email></email>
+            <role></role>
+        </contact>
         <links/>
+        <dates/>
         <fees></fees>
         <encoding></encoding>
         <crs>
-            <spatialrefsys>
+            <spatialrefsys nativeFormat="Wkt">
               {qgis_template_spatialrefsys}
             </spatialrefsys>
         </crs>
@@ -39,7 +47,6 @@
     <vectorjoins/>
     <layerDependencies/>
     <dataDependencies/>
-    <legend type="default-vector"/>
     <expressionfields/>
     <map-layer-style-manager current="default">
         <map-layer-style name="default"/>

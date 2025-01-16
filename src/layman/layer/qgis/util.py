@@ -252,15 +252,22 @@ def get_source_type(db_types, qml_geometry):
 
 
 FIELD_XML_ATTRIBUTES = [
+    ("/qgis/temporal", "startField"),
+    ("/qgis/temporal", "durationField"),
+    ("/qgis/temporal", "endField"),
     ("/qgis/renderer-v2", "attr"),
     ("/qgis/fieldConfiguration/field", "name"),
     ("/qgis/aliases/alias", "field"),
+    ("/qgis/splitPolicies/policy", "field"),
+    ("/qgis/duplicatePolicies/policy", "field"),
     ("/qgis/defaults/default", "field"),
     ("/qgis/constraints/constraint", "field"),
     ("/qgis/constraintExpressions/constraint", "field"),
     ("/qgis/attributetableconfig/columns/column[@type='field']", "name"),
     ("/qgis/editable/field", "name"),
     ("/qgis/labelOnTop/field", "name"),
+    ("/qgis/reuseLastValue/field", "name"),
+    ("/qgis/LinearlyInterpolatedDiagramRenderer/DiagramCategory/attribute", "field"),
 ]
 
 
@@ -284,7 +291,7 @@ def ensure_attributes_in_qml(qml, attrs_to_ensure):
 
     parser = ET.XMLParser(remove_blank_text=True)
     field_template = """
-        <field configurationFlags="None" name="{field_name}">
+        <field configurationFlags="NoFlag" name="{field_name}">
           <editWidget type="TextEdit">
             <config>
               <Option/>
