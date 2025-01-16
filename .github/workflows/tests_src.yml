@@ -48,7 +48,7 @@ jobs:
 
       - name: Run tests
         run: |
-          make test
+          make test-src
 
       - name: Usage info
         if: always()

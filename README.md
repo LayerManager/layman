@@ -290,10 +290,10 @@ Default values are defined in [.env.test](.env.test)
 ```bash
 # test related mainly to REST API endpoints of layers and maps
 make test-static
-make test-separated
+make test-dynamic
 
 # other tests
-make test
+make test-src
 ```
 
 For more information about tests, look at [test-related documentation for developers](tests/README.md).

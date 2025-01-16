@@ -3,7 +3,7 @@
 ## Usage
 ### Run tests in `src` folder
 ```
-make test
+make test-src
 ```
 
 ### Run tests in `tests/static_data` folder
@@ -13,7 +13,7 @@ make test-static
 
 ### Run other tests in `tests` folder
 ```
-make test-separated
+make test-dynamic
 ```
 Additional parameters for pytest command
 - `--nocleanup`: Do not delete publications after tests
