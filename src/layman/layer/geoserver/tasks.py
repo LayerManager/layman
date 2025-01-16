@@ -85,8 +85,7 @@ def refresh_wms(
         file_paths = next(iter(info['_file']['paths'].values()))
         gs_file_path = file_paths['normalized_geoserver']
         real_bbox = info['native_bounding_box']
-        bbox = bbox_util.ensure_bbox_with_area(real_bbox, crs_def.CRSDefinitions[crs].no_area_bbox_padding) \
-            if not bbox_util.is_empty(real_bbox) else crs_def.CRSDefinitions[crs].default_bbox
+        bbox = bbox_util.get_bbox_to_publish(real_bbox, crs)
         lat_lon_bbox = bbox_util.transform(bbox, crs, crs_def.EPSG_4326)
         if not image_mosaic:
             coverage_store_name = wms.get_geotiff_store_name(layername)
