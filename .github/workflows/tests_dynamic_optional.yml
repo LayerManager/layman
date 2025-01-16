@@ -1,11 +1,8 @@
-name: DynamicIntegrationTests
+name: TestsDynamicOptional
 
 on:
-  push:
-    branches:
-      - master
-      - '[1-9].*.x'
-  pull_request:
+  schedule:
+    - cron: '0 5 * * 0'
   workflow_dispatch:
 
 concurrency:
@@ -13,7 +10,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  DynamicIntegrationTests:
+  TestsDynamicOptional:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -48,7 +45,7 @@ jobs:
 
       - name: Run tests
         run: |
-          make test-separated
+          make test-separated test_type=optional max_fail=0
 
       - name: Usage info
         if: always()

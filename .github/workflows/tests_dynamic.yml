@@ -1,4 +1,4 @@
-name: IntegrationTests
+name: TestsDynamic
 
 on:
   push:
@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  IntegrationTests:
+  TestsDynamic:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -48,7 +48,7 @@ jobs:
 
       - name: Run tests
         run: |
-          make test
+          make test-separated
 
       - name: Usage info
         if: always()
@@ -78,5 +78,6 @@ jobs:
         with:
           name: test_artifacts
           path: |
+            sudo chown -R $(id -un) layman_data_test
             tmp/artifacts/
             layman_data_test/
