@@ -48,7 +48,7 @@ jobs:
 
       - name: Run tests
         run: |
-          make test-separated
+          make test-dynamic
 
       - name: Usage info
         if: always()
