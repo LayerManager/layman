@@ -8,6 +8,7 @@ from .. import db
 from ..filesystem import thumbnail
 
 
+@pytest.mark.parametrize('qml_version', ['3.16.2', '3.40.2'])
 @pytest.mark.parametrize('layer, exp_db_types, qml_geometry_dict', [
     ('all', {'ST_Point', 'ST_MultiPoint', 'ST_LineString', 'ST_MultiLineString', 'ST_Polygon', 'ST_MultiPolygon',
              'ST_GeometryCollection'}, {
@@ -44,9 +45,9 @@ from ..filesystem import thumbnail
     }),
 ])
 @pytest.mark.usefixtures('ensure_layman')
-def test_geometry_types(layer, exp_db_types, qml_geometry_dict):
+def test_geometry_types(layer, exp_db_types, qml_geometry_dict, qml_version):
     def get_qml_style_path(style_name):
-        return f'/code/sample/data/geometry-types/{style_name}.qml' if style_name else None
+        return f'/code/sample/data/geometry-types/{style_name}-v{qml_version}.qml' if style_name else None
 
     workspace = 'test_geometry_types_workspace'
     process_client.publish_workspace_layer(workspace, layer, file_paths=[f'/code/sample/data/geometry-types/{layer}.geojson'], )
