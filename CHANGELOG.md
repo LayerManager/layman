@@ -53,6 +53,7 @@
   - express 4.18 -> 4.21
   - http-proxy-middleware 2.0.6 -> 2.0.7
   - vite 3.2.7 -> 3.2.11
+- Unify names of GitHub Actions, make targets and shell scripts for tests.
 - All changes from [v1.23.1](#v1231) and [v1.23.2](#v1232).
 
 ## v1.23.2
