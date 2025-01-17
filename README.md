@@ -1,8 +1,9 @@
 # layman
-![CodeQuality](https://github.com/LayerManager/layman/workflows/CodeQuality/badge.svg?branch=master)
-![TestsSrc](https://github.com/LayerManager/layman/workflows/TestsSrc/badge.svg?branch=master)
-![TestsDynamic](https://github.com/LayerManager/layman/workflows/TestsDynamic/badge.svg?branch=master)
-![TestsStatic](https://github.com/LayerManager/layman/workflows/TestsStatic/badge.svg?branch=master)
+[![CodeQuality](https://github.com/LayerManager/layman/actions/workflows/code_quality.yml/badge.svg)](https://github.com/LayerManager/layman/actions/workflows/code_quality.yml)
+[![TestsSrc](https://github.com/LayerManager/layman/actions/workflows/tests_src.yml/badge.svg)](https://github.com/LayerManager/layman/actions/workflows/tests_src.yml)
+[![TestsDynamic](https://github.com/LayerManager/layman/actions/workflows/tests_dynamic.yml/badge.svg)](https://github.com/LayerManager/layman/actions/workflows/tests_dynamic.yml)
+[![TestsStatic](https://github.com/LayerManager/layman/actions/workflows/tests_static.yml/badge.svg)](https://github.com/LayerManager/layman/actions/workflows/tests_static.yml)
+[![TestsDynamicOptional](https://github.com/LayerManager/layman/actions/workflows/tests_dynamic_optional.yml/badge.svg)](https://github.com/LayerManager/layman/actions/workflows/tests_dynamic_optional.yml)
 
 Publishing geospatial data online through [REST API](doc/rest.md).
 
