@@ -6,12 +6,12 @@ from werkzeug.datastructures import FileStorage
 
 from layman.http import LaymanError
 from layman.util import check_workspace_name_decorator, url_for
-from layman import authn, util as layman_util
+from layman import authn, util as layman_util, uuid
 from layman.authn import authenticate, get_authn_username
 from layman.authz import authorize_workspace_publications_decorator
 from layman.common import redis as redis_util, rest as rest_common
 from . import util, MAP_TYPE, MAP_REST_PATH_NAME
-from .filesystem import input_file, uuid
+from .filesystem import input_file, uuid as fs_uuid
 
 bp = Blueprint('rest_workspace_maps', __name__)
 
@@ -37,6 +37,11 @@ def get(workspace):
 def post(workspace):
     app.logger.info(f"POST Maps, actor={g.user}")
     x_forwarded_items = layman_util.get_x_forwarded_items(request.headers)
+
+    # UUID
+    input_uuid = request.form.get('uuid')
+    input_uuid = input_uuid if input_uuid else None
+    uuid.check_input_uuid(input_uuid)
 
     # FILE
     if 'file' in request.files and not request.files['file'].filename == '':
@@ -94,7 +99,7 @@ def post(workspace):
                                           kwargs,
                                           )
         # register map uuid
-        uuid_str = uuid.assign_map_uuid(workspace, mapname)
+        uuid_str = fs_uuid.assign_map_uuid(workspace, mapname, uuid_str=input_uuid)
         kwargs['uuid'] = uuid_str
 
         map_result.update({

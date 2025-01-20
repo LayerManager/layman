@@ -6,6 +6,7 @@ from redis import WatchError
 
 from layman import LaymanError, celery as celery_util, util as layman_util
 from layman.common import redis as redis_util
+from layman.common.prime_db_schema import publications as prime_db_publications
 from . import settings
 
 UUID_SET_KEY = f'{__name__}:UUID_SET'
@@ -175,3 +176,12 @@ def check_redis_consistency(expected_publ_num_by_type=None):
             if t[1] == workspace and t[2] == publication_name and t[0].startswith(publication_type)
         ), None) is not None
     return total_publs_by_type
+
+
+def check_input_uuid(uuid):
+    if uuid:
+        if not is_valid_uuid(uuid):
+            raise LaymanError(2, {'parameter': 'uuid', 'message': f'UUID `{uuid}` is not valid uuid', })
+        publications_by_uuid = prime_db_publications.get_publication_infos(uuid=uuid)
+        if publications_by_uuid:
+            raise LaymanError(2, {'parameter': 'uuid', 'message': f'UUID `{uuid}` value already in use', })
