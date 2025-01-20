@@ -27,11 +27,12 @@ class CalculatedColumnType:
     params: tuple = tuple()
 
 
-def get_publication_infos(workspace_name=None, pub_type=None, style_type=None, ):
-    return get_publication_infos_with_metainfo(workspace_name, pub_type, style_type,)['items']
+def get_publication_infos(workspace_name=None, pub_type=None, *, style_type=None, ):
+    return get_publication_infos_with_metainfo(workspace_name, pub_type, style_type=style_type,)['items']
 
 
-def get_publication_infos_with_metainfo(workspace_name=None, pub_type=None, style_type=None,
+def get_publication_infos_with_metainfo(workspace_name=None, pub_type=None, *,
+                                        style_type=None,
                                         reader=None, writer=None,
                                         reader_roles=None, writer_roles=None,
                                         limit=None, offset=None,

@@ -463,7 +463,8 @@ def get_publication_infos_with_metainfo(workspace=None, publ_type=None, context=
     reader_roles = list(get_user_roles(username=reader)) if reader and reader != settings.ANONYM_USER else None
     writer_roles = list(get_user_roles(username=writer)) if writer and writer != settings.ANONYM_USER else None
 
-    infos = publications.get_publication_infos_with_metainfo(workspace, publ_type, style_type,
+    infos = publications.get_publication_infos_with_metainfo(workspace, publ_type,
+                                                             style_type=style_type,
                                                              reader=reader, writer=writer,
                                                              reader_roles=reader_roles, writer_roles=writer_roles,
                                                              limit=limit, offset=offset,
