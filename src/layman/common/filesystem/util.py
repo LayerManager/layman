@@ -50,7 +50,7 @@ def ensure_workspace(workspace):
 def delete_workspace(workspace):
     workspacedir = get_workspace_dir(workspace)
     try:
-        os.rmdir(workspacedir)
+        shutil.rmtree(workspacedir)
     except FileNotFoundError:
         pass
 
