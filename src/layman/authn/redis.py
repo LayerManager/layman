@@ -37,3 +37,18 @@ def import_authn_to_redis():
         save_username_reservation(username, iss_id, sub)
         current_app.logger.info(
             f'Import authn into redis: username {username}, iss_id {iss_id}, sub {sub}')
+
+
+def delete_user(username):
+    current_app.logger.info(f'Removing user {username} from REDIS')
+    authn_info = prime_db_schema.get_authn_info(username)
+    if not authn_info:
+        current_app.logger.info(f'User {username} has no authn info in DB, skipping Redis deletion.')
+        return
+
+    iss_id = authn_info['iss_id']
+    sub = authn_info['sub']
+    rds = settings.LAYMAN_REDIS
+    key = _get_issid_sub_2_username_key(iss_id, sub)
+    rds.delete(key)
+    current_app.logger.info(f'Removed user {username} from REDIS (iss_id={iss_id}, sub={sub})')

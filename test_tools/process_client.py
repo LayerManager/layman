@@ -793,3 +793,24 @@ def get_workspace_publication_thumbnail(publication_type, workspace, name, *, ac
     response = requests.get(r_url, headers=headers, timeout=HTTP_TIMEOUT)
     raise_layman_error(response)
     return response.content
+
+
+def get_users(*, headers=None):
+    headers = headers or {}
+    with app.app_context():
+        r_url = url_for('rest_users.get')
+    response = requests.get(r_url, headers=headers, timeout=HTTP_TIMEOUT)
+    response.raise_for_status()
+    return response.json()
+
+
+def delete_user(username, *, actor_name):
+    with app.app_context():
+        url = url_for('rest_user.delete', username=username)
+    headers = {}
+    if actor_name:
+        assert TOKEN_HEADER not in headers
+    if actor_name and actor_name != settings.ANONYM_USER:
+        headers.update(get_authz_headers(actor_name))
+    response = requests.delete(url, headers=headers, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
+    return response

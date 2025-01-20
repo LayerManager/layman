@@ -95,3 +95,8 @@ def get_username_suggestions_from_claims(claims):
     if email is not None:
         result.append(email.split('@')[0])
     return result
+
+
+def delete_user(username=None):
+    authn_redis.delete_user(username)
+    delete_whole_user(username)
