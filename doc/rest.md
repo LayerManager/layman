@@ -18,6 +18,7 @@
 |Workspace Map Thumbnail|`/rest/workspaces/<workspace_name>/maps/<mapname>/thumbnail`|[GET](#get-workspace-map-thumbnail)| x | x | x |
 |Workspace Map Metadata Comparison|`/rest/workspaces/<workspace_name>/layers/<layername>/metadata-comparison`|[GET](#get-workspace-map-metadata-comparison) | x | x | x |
 |Users|`/rest/users`|[GET](#get-users)| x | x | x |
+|User|`/rest/users/<username>`| x | x | x | [DELETE](#delete-user) |
 |Current [User](models.md#user)|`/rest/current-user`|[GET](#get-current-user)| x | [PATCH](#patch-current-user) | [DELETE](#delete-current-user) |
 |Roles|`/rest/roles`|[GET](#get-roles)| x | x | x |
 |Version|`/rest/about/version`|[GET](#get-version)| x | x | x |
@@ -790,6 +791,26 @@ JSON array of objects representing users of Layman with following structure:
 - **family_name**: String. Family name of the user
 - **middle_name**: String. Middle name of the user
 - **name**: String. Whole name of the user (given_name + middle_name + family_name).
+
+## User
+
+### URL
+`/rest/users/<username>`
+
+#### Endpoint path parameters
+- **username**  
+   - The username of the user to be deleted.
+
+### DELETE User
+Delete a user account including his [personal workspace](models.md#personal-workspace) and all publications in this workspace (layers and maps).
+
+#### Request
+No request parameters.
+
+#### Response
+Content-Type: `application/json`
+
+- *username*: String. [Username](models.md#username) of deleted user. 
 
 ## Current User
 ### URL
