@@ -46,9 +46,6 @@ from ..filesystem import thumbnail
 ])
 @pytest.mark.usefixtures('ensure_layman')
 def test_geometry_types(layer, exp_db_types, qml_geometry_dict, qml_version):
-    def get_qml_style_path(style_name):
-        return f'/code/sample/data/geometry-types/{style_name}-v{qml_version}.qml' if style_name else None
-
     workspace = 'test_geometry_types_workspace'
     process_client.publish_workspace_layer(workspace, layer, file_paths=[f'/code/sample/data/geometry-types/{layer}.geojson'], )
     with app.app_context():
@@ -58,9 +55,8 @@ def test_geometry_types(layer, exp_db_types, qml_geometry_dict, qml_version):
 
     qgis_geometries = ['Point', 'Line', 'Polygon', 'Unknown geometry']
 
-    old_qml_style_name = None
     for qml_geometry in qgis_geometries:
-        exp_source_type, new_qml_style_name = qml_geometry_dict.get(qml_geometry, (None, None))
+        exp_source_type, qml_style_name = qml_geometry_dict.get(qml_geometry, (None, None))
         if exp_source_type is None:
             with pytest.raises(LaymanError) as excinfo:
                 util.get_source_type(db_types, qml_geometry)
@@ -69,20 +65,19 @@ def test_geometry_types(layer, exp_db_types, qml_geometry_dict, qml_version):
             source_type = util.get_source_type(db_types, qml_geometry)
             assert source_type == exp_source_type, f"qml_geometry={qml_geometry}, exp_source_type={exp_source_type}, " \
                                                    f"source_type={source_type}, db_types={db_types}"
-        if new_qml_style_name:
-            if new_qml_style_name != old_qml_style_name:
-                process_client.patch_workspace_layer(workspace, layer, style_file=get_qml_style_path(new_qml_style_name))
-                old_qml_style_name = new_qml_style_name
+        if qml_style_name:
+            style_file_path = f'/code/sample/data/geometry-types/{qml_style_name}-v{qml_version}.qml'
+            process_client.patch_workspace_layer(workspace, layer, style_file=style_file_path)
             with app.app_context():
                 qml = util.get_original_style_xml(workspace, layer)
             found_qml_geometry = util.get_geometry_from_qml_and_db_types(qml, db_types=[])
             assert found_qml_geometry == qml_geometry
-            exp_file_path = f'/code/sample/data/geometry-types/{new_qml_style_name}.png'
+            exp_file_path = f'/code/sample/data/geometry-types/{qml_style_name}.png'
             diff_pixels_limit = {
                 'line': 250,
                 'point': 10,
                 'polygon': 110,
-            }[new_qml_style_name]
+            }[qml_style_name]
             with app.app_context():
                 thumbnail_path = thumbnail.get_layer_thumbnail_path(workspace, layer)
             diff_pixels = test_util.compare_images(thumbnail_path, exp_file_path)
