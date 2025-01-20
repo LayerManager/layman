@@ -26,6 +26,47 @@ def ensure_user(username, sub):
     users.ensure_user(id_workspace_user, userinfo)
 
 
+class TestGetPublicationInfos:
+    workspace = 'test_get_publication_infos'
+    name = 'test_get_publication_infos_map'
+    publication_type = MAP_TYPE
+    uuid = uuid.uuid4()
+
+    publication_info = {"name": name,
+                        "title": name,
+                        "publ_type_name": publication_type,
+                        "uuid": uuid,
+                        "actor_name": settings.ANONYM_USER,
+                        "access_rights": {
+                            "read": {settings.RIGHTS_EVERYONE_ROLE, },
+                            "write": {settings.RIGHTS_EVERYONE_ROLE, },
+                        },
+                        'image_mosaic': False,
+                        }
+
+    @pytest.fixture(scope="function", autouse=True)
+    def provide_data(self, request):
+        with app.app_context():
+            workspaces.ensure_workspace(self.workspace)
+            publications.insert_publication(self.workspace, self.publication_info)
+        yield
+        if request.node.session.testsfailed == 0:
+            with app.app_context():
+                publications.delete_publication(self.workspace, self.publication_type, self.name)
+                workspaces.delete_workspace(self.workspace)
+
+    @pytest.mark.parametrize("query_params, expected_publications", [
+        ({}, [(workspace, publication_type, name)]),
+        ({"uuid": uuid}, [(workspace, publication_type, name)]),
+        ({"uuid": '959c95fb-ab54-47a6-9694-402926b8fd29'}, []),
+    ])
+    def test_get_publication_infos(self, query_params, expected_publications):
+        response = publications.get_publication_infos(**query_params)
+        assert len(response) == len(expected_publications), f'{response=}\n{expected_publications=}'
+        for idx, pub_key in enumerate(response.keys()):
+            assert pub_key == expected_publications[idx], f'{idx=}\n{pub_key=}, {expected_publications[idx]=}\n\n{response=}\n{expected_publications=}'
+
+
 class TestOnlyValidUserNames:
     workspace_name = 'test_only_valid_names_workspace'
     username = 'test_only_valid_names_user'
