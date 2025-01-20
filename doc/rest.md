@@ -134,6 +134,9 @@ Check [Asynchronous file upload](async-file-upload.md) example.
 Content-Type: `multipart/form-data`, `application/x-www-form-urlencoded`
 
 Body parameters:
+- *uuid*, string, e.g. `959c95fb-ab54-47a6-9694-402926b8fd29`
+   - layer primary key
+   - used if specified, otherwise generated
 - *file*, file(s) or file name(s)
    - exactly one of `file` or `external_table_uri` must be set
    - one of following options is expected:
@@ -557,6 +560,9 @@ Response to this request may be returned sooner than the processing chain is fin
 Content-Type: `multipart/form-data`
 
 Body parameters:
+- *uuid*, string, e.g. `959c95fb-ab54-47a6-9694-402926b8fd29`
+   - map primary key
+   - used if specified, otherwise generated
 - **file**, JSON file
    - must be valid against [map-composition schema](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema)
    - layer is considered [internal](models.md#internal-map-layer) if

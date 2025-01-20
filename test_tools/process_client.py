@@ -357,6 +357,7 @@ def publish_workspace_publication(publication_type,
                                   workspace,
                                   name,
                                   *,
+                                  uuid=None,
                                   file_paths=None,
                                   external_table_uri=None,
                                   headers=None,
@@ -427,6 +428,8 @@ def publish_workspace_publication(publication_type,
     files = []
     with ExitStack() as stack:
         data = {}
+        if uuid:
+            data["uuid"] = uuid
         if not do_not_post_name:
             data['name'] = name
             data['title'] = title
