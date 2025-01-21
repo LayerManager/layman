@@ -16,6 +16,7 @@
 - [#942](https://github.com/LayerManager/layman/issues/942) New key `used_in_maps` was added to responses of requests [GET Publications](doc/rest.md#get-publications), [GET Layers](doc/rest.md#get-layers), [GET Workspace Layers](doc/rest.md#get-workspace-layers), and [GET Workspace Layer](doc/rest.md#get-workspace-layer).
 - [#909](https://github.com/LayerManager/layman/issues/909) Upgrade QGIS Server from v3.32.2 to v3.40.2. Also use docker hub repo [layermanager/qgis-server](https://hub.docker.com/repository/docker/layermanager/qgis-server) instead of jirikcz/qgis-server,
     - Precision error of EPSG:5514 in QGIS WMS GetMap increased from 0.5 m to 3.2 m. The error appears if either data CRS or WMS GetMap CRS is EPSG:5514 and the other one is not.
+    - QML styles up to v3.40.2 are supported.
 - [#1009](https://github.com/LayerManager/layman/issues/1009) PATCH Workspace [Layer](doc/rest.md#patch-workspace-layer)/[Map](doc/rest.md#patch-workspace-map) returns same response as POST Workspace [Layers](doc/rest.md#post-workspace-layers)/[Maps](doc/rest.md#post-workspace-maps) with only `name`, `uuid`, `url` and for Layer also optional `files_to_upload` keys.
 - [#1009](https://github.com/LayerManager/layman/issues/1009) Updating Micka record as part of PATCH Workspace [Layer](doc/rest.md#patch-workspace-layer) runs asynchronously to make PATCH request faster.
 - [#1009](https://github.com/LayerManager/layman/issues/1009) Deprecated endpoint, parameters and keys were removed:
@@ -794,7 +795,7 @@ make timgen-build
     - New docker container with QGIS server called `qgis` in demo configuration.
     - New directory [LAYMAN_QGIS_DATA_DIR](doc/env-settings.md#LAYMAN_QGIS_DATA_DIR) is used to store [layer QGS files](doc/data-storage.md#filesystem).
     - [WMS](doc/endpoints.md#web-map-service) is moved to dedicated [GeoServer workspace](doc/data-storage.md#geoserver) whose name is composed from Layman's [workspace](doc/models.md#workspace) name and suffix `_wms`. [WFS](doc/endpoints.md#web-feature-service) remains in GeoServer workspace whose name is equal to Layman's workspace name.
-    - Layers with [QGIS style](https://docs.qgis.org/3.16/en/docs/user_manual/style_library/style_manager.html#exporting-items) are published on [GeoServer dedicated WMS workspace](doc/data-storage.md#geoserver) through WMS cascade from QGIS server, where they are stored as QGS file. All layers are published directly from PostgreSQL database to GeoServer for [WFS workspace](doc/data-storage.md#geoserver).
+    - Layers with [QGIS style](https://docs.qgis.org/3.40/en/docs/user_manual/style_library/style_manager.html#exporting-items) are published on [GeoServer dedicated WMS workspace](doc/data-storage.md#geoserver) through WMS cascade from QGIS server, where they are stored as QGS file. All layers are published directly from PostgreSQL database to GeoServer for [WFS workspace](doc/data-storage.md#geoserver).
     - SLD style published in dedicated WMS GeoServer workspace.
     - New environment variables [LAYMAN_QGIS_HOST](doc/env-settings.md#LAYMAN_QGIS_HOST), [LAYMAN_QGIS_PORT](doc/env-settings.md#LAYMAN_QGIS_PORT), [LAYMAN_QGIS_PATH](doc/env-settings.md#LAYMAN_QGIS_PATH), and [LAYMAN_QGIS_DATA_DIR](doc/env-settings.md#LAYMAN_QGIS_DATA_DIR).
     - Workspace name can not end with '_wms'. In such case, error with code 45 is raised.
