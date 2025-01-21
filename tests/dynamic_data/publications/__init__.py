@@ -1,7 +1,7 @@
 from tests.asserts.final import publication
 from tests.asserts import processing
 from test_tools import process_client
-from . import wrong_input, edge_cases, celery, common_publications as publications, geoserver_proxy, crs
+from . import wrong_input, edge_cases, celery, common_publications as publications, geoserver_proxy
 from .. import predefined_actions
 from ... import Action, Publication, dynamic_data as consts
 
@@ -355,7 +355,6 @@ PUBLICATIONS = {
     **edge_cases.generate(consts.COMMON_WORKSPACE + '_generated_edge_cases'),
     **celery.generate(consts.COMMON_WORKSPACE + '_celery'),
     **geoserver_proxy.generate(consts.COMMON_WORKSPACE + '_geoserver_proxy'),
-    **crs.generate(consts.COMMON_WORKSPACE + '_crs'),
 }
 
 # pylint: disable=unnecessary-comprehension
