@@ -25,6 +25,10 @@ TEST_CASES = {
     },
     'qml': {
         'style_file': 'sample/style/small_layer.qml',
+        'exp_version': '3.40.2-Bratislava',
+    },
+    'qml_3_16': {
+        'style_file': 'sample/style/small_layer_v3.16.qml',
         'exp_version': '3.16.3-Hannover',
     },
 }
