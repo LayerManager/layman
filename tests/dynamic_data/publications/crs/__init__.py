@@ -5,7 +5,6 @@ import crs as crs_def
 from tests.asserts import processing
 from tests.asserts.final import publication
 from test_tools import process_client, util
-from . import rasters
 from .. import common_publications as publications
 from .... import Action, Publication, dynamic_data as consts
 
@@ -189,5 +188,4 @@ def generate_local(workspace=None):
 def generate(workspace=None):
     return {
         **generate_local(workspace),
-        **rasters.generate(workspace + '_rasters'),
     }
