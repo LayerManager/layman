@@ -12,7 +12,7 @@ The WMS proxy parses request and adapts it in case of WMS GetMap requests:
 WMS respects [publication access rights](security.md#publication-access-rights). If user asks for layer he has not read access to by GetMap or GetFeatureInfo request, GeoServer returns standard ServiceExceptionReport (code LayerNotDefined).
 
 ### GetLegendGraphic
-GetLegendGraphic query is answered directly by GeoServer for layers with SLD style and can be parametrized according to [GeoServer documentation](https://docs.geoserver.org/latest/en/user/services/wms/get_legend_graphic/index.html). For layers with QML style is such query redirected by GeoServer to QGIS server and can be parametrized according to [QGIS documentation](https://docs.qgis.org/3.16/en/docs/server_manual/services.html?highlight=getlegendgraphic#getlegendgraphics). 
+GetLegendGraphic query is answered directly by GeoServer for layers with SLD style and can be parametrized according to [GeoServer documentation](https://docs.geoserver.org/latest/en/user/services/wms/get_legend_graphic/index.html). For layers with QML style is such query redirected by GeoServer to QGIS server and can be parametrized according to [QGIS documentation](https://docs.qgis.org/3.40/en/docs/server_manual/services/wms.html#getlegendgraphic). 
 
 ## Web Feature Service
 [Web Feature Service (WFS)](https://www.ogc.org/publications/standard/wfs/) endpoint is implemented using combination of Layman's authentication proxy, Layman's WFS proxy, and [GeoServer](https://docs.geoserver.org/2.21.x/en/user/services/wfs/reference.html).
