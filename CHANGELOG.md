@@ -5,7 +5,7 @@
 ### Upgrade requirements
 - Change environment variable [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION):
   ```
-  LAYMAN_CLIENT_VERSION=00c3ceac509354cd2d53fce30041e63e35efaa69
+  LAYMAN_CLIENT_VERSION=9f20d0c2efb924334af373bfb90726db12285d71
   ```
 ### Migrations and checks
 #### Schema migrations
