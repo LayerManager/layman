@@ -112,7 +112,8 @@ def test_wms_layer(workspace, publ_type, publication):
     wms_layers_url = urljoin(GS_REST_WORKSPACES, f'{workspace}_wms/wmslayers/')
 
     with app.app_context():
-        info = layman_util.get_publication_info(workspace, publ_type, publication, context={'keys': ['wms']})
+        info = layman_util.get_publication_info(workspace, publ_type, publication, context={'keys': ['wms', 'uuid']})
+    uuid = info["uuid"]
 
     if style_file_type:
         assert (os.path.exists(expected_style_file + '.qml')) == (style_file_type == 'qml')
@@ -126,7 +127,7 @@ def test_wms_layer(workspace, publ_type, publication):
     assert response.status_code == 200, response.json()
     if style == 'qml':
         wms_stores = [store['name'] for store in response.json()['wmsStores']['wmsStore']]
-        assert f'{DEFAULT_WMS_QGIS_STORE_PREFIX}_{publication}' in wms_stores, response.json()
+        assert f'{DEFAULT_WMS_QGIS_STORE_PREFIX}_{uuid}' in wms_stores, response.json()
     elif style == 'sld':
         url = urljoin(GS_REST, f'workspaces/{workspace}_wms/styles/{publication}')
 

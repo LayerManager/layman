@@ -82,12 +82,12 @@ def adjust_layer_metadata_url_on_gs():
 
         if geodata_type == settings.GEODATA_TYPE_RASTER:
             wms_body = {"coverage": metadata_links}
-            store_name = wms.get_image_mosaic_store_name(layer) if image_mosaic else wms.get_geotiff_store_name(layer)
+            store_name = wms.get_image_mosaic_store_name(uuid=uuid) if image_mosaic else wms.get_geotiff_store_name(uuid=uuid)
             wms_url = urljoin(GS_REST_WORKSPACES, f'{wms_workspace}/coveragestores/{store_name}/coverages/{layer}')
         elif geodata_type == settings.GEODATA_TYPE_VECTOR:
             if style_type == 'sld':
                 wms_body = {"featureType": metadata_links}
-                store_name = gs_util.get_external_db_store_name(layer) if external_table_uri else gs_common_util.DEFAULT_DB_STORE_NAME
+                store_name = gs_util.get_external_db_store_name(uuid=uuid) if external_table_uri else gs_common_util.DEFAULT_DB_STORE_NAME
                 wms_url = urljoin(GS_REST_WORKSPACES, f'{wms_workspace}/datastores/{store_name}/featuretypes/{layer}')
             elif style_type == 'qml':
                 wms_layer = gs_common_util.get_wms_layer(wms_workspace, layer, auth=auth)
@@ -99,7 +99,7 @@ def adjust_layer_metadata_url_on_gs():
 
             # WFS
             wfs_body = {"featureType": metadata_links}
-            wfs_store = gs_util.get_external_db_store_name(layer) if external_table_uri else gs_common_util.DEFAULT_DB_STORE_NAME
+            wfs_store = gs_util.get_external_db_store_name(uuid=uuid) if external_table_uri else gs_common_util.DEFAULT_DB_STORE_NAME
             response = requests.put(
                 urljoin(GS_REST_WORKSPACES, f'{workspace}/datastores/{wfs_store}/featuretypes/{layer}'),
                 data=json.dumps(wfs_body),

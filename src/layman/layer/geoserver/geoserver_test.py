@@ -47,7 +47,7 @@ def test_geoserver_bbox():
                        ((None, None, None, None), crs_def.CRSDefinitions[crs].max_bbox),
                        ]
 
-    process_client.publish_workspace_layer(workspace, layer, style_file='sample/style/small_layer.qml')
+    response = process_client.publish_workspace_layer(workspace, layer, style_file='sample/style/small_layer.qml')
 
     assert_util.assert_wfs_bbox(workspace, layer, expected_bbox_1)
     assert_util.assert_wms_bbox(workspace, layer, expected_bbox_1)
@@ -56,12 +56,17 @@ def test_geoserver_bbox():
         'description': '',
         'title': layer,
         'access_rights': None,
+        'uuid': response['uuid'],
+    }
+    wms_kwargs = {
+        **kwargs,
+        'store_in_geoserver': True,
     }
 
     # test WFS
     for bbox, expected_bbox in expected_bboxes:
-        wfs.delete_layer(workspace, layer)
         with app.app_context():
+            wfs.delete_layer(workspace, layer)
             publications.set_bbox(workspace, process_client.LAYER_TYPE, layer, bbox, crs, )
             wfs.delete_layer(workspace, layer)
             tasks.refresh_wfs.apply(args=[workspace, layer],
@@ -71,22 +76,22 @@ def test_geoserver_bbox():
 
     # test WMS
     for bbox, expected_bbox in expected_bboxes:
-        wms.delete_layer(workspace, layer)
         with app.app_context():
+            wms.delete_layer(workspace, layer)
             publications.set_bbox(workspace, process_client.LAYER_TYPE, layer, bbox, crs, )
-            tasks.refresh_wms.apply(args=[workspace, layer, True],
-                                    kwargs=kwargs,
+            tasks.refresh_wms.apply(args=[workspace, layer],
+                                    kwargs=wms_kwargs,
                                     )
         assert_util.assert_wms_bbox(workspace, layer, expected_bbox)
 
     # test cascade WMS from QGIS
     for bbox, expected_bbox in expected_bboxes:
-        wms.delete_layer(workspace, layer)
         with app.app_context():
+            wms.delete_layer(workspace, layer)
             publications.set_bbox(workspace, process_client.LAYER_TYPE, layer, bbox, crs, )
             wms.delete_layer(workspace, layer)
-            tasks.refresh_wms.apply(args=[workspace, layer, False],
-                                    kwargs=kwargs,
+            tasks.refresh_wms.apply(args=[workspace, layer],
+                                    kwargs=wms_kwargs,
                                     )
         assert_util.assert_wms_bbox(workspace, layer, expected_bbox)
 

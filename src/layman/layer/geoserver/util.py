@@ -56,5 +56,5 @@ def wfs_proxy(wfs_url, xml=None, version=None, headers=None):
     return wfs
 
 
-def get_external_db_store_name(layer):
-    return f'{DEFAULT_EXTERNAL_DB_STORE_PREFIX}_{layer}'
+def get_external_db_store_name(*, uuid):
+    return f'{DEFAULT_EXTERNAL_DB_STORE_PREFIX}_{uuid}'

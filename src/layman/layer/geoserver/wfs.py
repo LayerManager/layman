@@ -26,7 +26,7 @@ def get_flask_proxy_key(workspace):
     return FLASK_PROXY_KEY.format(workspace=workspace)
 
 
-def patch_layer(workspace, layername, title, description, original_data_source, access_rights=None):
+def patch_layer(workspace, layername, *, uuid, title, description, original_data_source, access_rights=None):
     if not get_layer_info(workspace, layername):
         return
     info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['geodata_type', ]})
@@ -34,7 +34,7 @@ def patch_layer(workspace, layername, title, description, original_data_source, 
     if geodata_type != settings.GEODATA_TYPE_VECTOR:
         raise NotImplementedError(f"Unknown geodata type: {geodata_type}")
 
-    store_name = get_external_db_store_name(layername) if original_data_source == settings.EnumOriginalDataSource.TABLE.value else gs_util.DEFAULT_DB_STORE_NAME
+    store_name = get_external_db_store_name(uuid=uuid) if original_data_source == settings.EnumOriginalDataSource.TABLE.value else gs_util.DEFAULT_DB_STORE_NAME
     gs_util.patch_feature_type(workspace, layername, store_name=store_name, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
     clear_cache(workspace)
 
@@ -48,9 +48,10 @@ def patch_layer(workspace, layername, title, description, original_data_source, 
 
 
 def delete_layer(workspace, layername):
+    uuid = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['uuid'], })['uuid']
     gs_util.delete_feature_type(workspace, layername, settings.LAYMAN_GS_AUTH)
-    gs_util.delete_feature_type(workspace, layername, settings.LAYMAN_GS_AUTH, store=get_external_db_store_name(layername))
-    gs_util.delete_db_store(workspace, settings.LAYMAN_GS_AUTH, store_name=get_external_db_store_name(layername))
+    gs_util.delete_feature_type(workspace, layername, settings.LAYMAN_GS_AUTH, store=get_external_db_store_name(uuid=uuid))
+    gs_util.delete_db_store(workspace, settings.LAYMAN_GS_AUTH, store_name=get_external_db_store_name(uuid=uuid))
     clear_cache(workspace)
 
     gs_util.delete_security_roles(f"{workspace}.{layername}.r", settings.LAYMAN_GS_AUTH)

@@ -199,6 +199,7 @@ def publish_layer(workspace, layer, *, file_path, style_type, style_file, ):
 
             geoserver.publish_layer_from_qgis(workspace,
                                               layer,
+                                              uuid=uuid_str,
                                               description=layer,
                                               title=layer,
                                               metadata_url=metadata_url,

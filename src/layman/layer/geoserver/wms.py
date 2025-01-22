@@ -34,7 +34,7 @@ def get_flask_proxy_key(workspace):
     return FLASK_PROXY_KEY.format(workspace=workspace)
 
 
-def patch_layer(workspace, layername, original_data_source, title, description, access_rights=None):
+def patch_layer(workspace, layername, *, uuid, original_data_source, title, description, access_rights=None):
     if not get_layer_info(workspace, layername):
         return
     geoserver_workspace = get_geoserver_workspace(workspace)
@@ -42,16 +42,16 @@ def patch_layer(workspace, layername, original_data_source, title, description, 
     geodata_type = info['geodata_type']
     if geodata_type == settings.GEODATA_TYPE_VECTOR:
         if info['_style_type'] == 'sld':
-            store_name = get_external_db_store_name(layername) if original_data_source == settings.EnumOriginalDataSource.TABLE.value else gs_util.DEFAULT_DB_STORE_NAME
+            store_name = get_external_db_store_name(uuid=uuid) if original_data_source == settings.EnumOriginalDataSource.TABLE.value else gs_util.DEFAULT_DB_STORE_NAME
             gs_util.patch_feature_type(geoserver_workspace, layername, store_name=store_name, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
         if info['_style_type'] == 'qml':
             gs_util.patch_wms_layer(geoserver_workspace, layername, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
     elif geodata_type == settings.GEODATA_TYPE_RASTER:
         image_mosaic = info['image_mosaic']
         if image_mosaic:
-            store = get_image_mosaic_store_name(layername)
+            store = get_image_mosaic_store_name(uuid=uuid)
         else:
-            store = get_geotiff_store_name(layername)
+            store = get_geotiff_store_name(uuid=uuid)
         gs_util.patch_coverage(geoserver_workspace, layername, store, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
     else:
         raise NotImplementedError(f"Unknown geodata type: {geodata_type}")
@@ -68,13 +68,14 @@ def patch_layer(workspace, layername, original_data_source, title, description, 
 
 def delete_layer(workspace, layername):
     geoserver_workspace = get_geoserver_workspace(workspace)
+    uuid = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['uuid'], })['uuid']
     gs_util.delete_feature_type(geoserver_workspace, layername, settings.LAYMAN_GS_AUTH)
-    gs_util.delete_feature_type(geoserver_workspace, layername, settings.LAYMAN_GS_AUTH, store=get_external_db_store_name(layername))
+    gs_util.delete_feature_type(geoserver_workspace, layername, settings.LAYMAN_GS_AUTH, store=get_external_db_store_name(uuid=uuid))
     gs_util.delete_wms_layer(geoserver_workspace, layername, settings.LAYMAN_GS_AUTH)
-    gs_util.delete_wms_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, get_qgis_store_name(layername))
-    gs_util.delete_coverage_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, get_geotiff_store_name(layername))
-    gs_util.delete_coverage_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, get_image_mosaic_store_name(layername))
-    gs_util.delete_db_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, store_name=get_external_db_store_name(layername))
+    gs_util.delete_wms_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, get_qgis_store_name(uuid=uuid))
+    gs_util.delete_coverage_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, get_geotiff_store_name(uuid=uuid))
+    gs_util.delete_coverage_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, get_image_mosaic_store_name(uuid=uuid))
+    gs_util.delete_db_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, store_name=get_external_db_store_name(uuid=uuid))
     clear_cache(workspace)
 
     gs_util.delete_security_roles(f"{geoserver_workspace}.{layername}.r", settings.LAYMAN_GS_AUTH)
@@ -294,13 +295,13 @@ def get_layman_workspace(geoserver_workspace):
     return workspace
 
 
-def get_qgis_store_name(layer):
-    return f'{DEFAULT_WMS_QGIS_STORE_PREFIX}_{layer}'
+def get_qgis_store_name(*, uuid):
+    return f'{DEFAULT_WMS_QGIS_STORE_PREFIX}_{uuid}'
 
 
-def get_geotiff_store_name(layer):
-    return f'{DEFAULT_GEOTIFF_STORE_PREFIX}_{layer}'
+def get_geotiff_store_name(*, uuid):
+    return f'{DEFAULT_GEOTIFF_STORE_PREFIX}_{uuid}'
 
 
-def get_image_mosaic_store_name(layer):
-    return f'{DEFAULT_IMAGE_MOSAIC_STORE_PREFIX}_{layer}'
+def get_image_mosaic_store_name(*, uuid):
+    return f'{DEFAULT_IMAGE_MOSAIC_STORE_PREFIX}_{uuid}'

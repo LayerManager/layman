@@ -32,7 +32,7 @@ def ensure_workspace(workspace, auth=settings.LAYMAN_GS_AUTH):
             gs_util.create_db_store(wspace, auth, workspace, pg_conn=settings.PG_CONN)
 
 
-def create_external_db_store(workspace, layer, table_uri, auth=settings.LAYMAN_GS_AUTH):
+def create_external_db_store(workspace, *, uuid, table_uri, auth=settings.LAYMAN_GS_AUTH):
     pg_conn = {
         'host': table_uri.hostname,
         'port': table_uri.port,
@@ -40,7 +40,7 @@ def create_external_db_store(workspace, layer, table_uri, auth=settings.LAYMAN_G
         'user': table_uri.username,
         'password': table_uri.password,
     }
-    store_name = get_external_db_store_name(layer)
+    store_name = get_external_db_store_name(uuid=uuid)
     gs_util.create_db_store(workspace,
                             auth,
                             table_uri.schema,
@@ -121,9 +121,9 @@ def publish_layer_from_db(workspace, layername, description, title, *, crs, tabl
     gs_util.post_feature_type(geoserver_workspace, layername, description, title, bbox, crs, settings.LAYMAN_GS_AUTH, lat_lon_bbox=lat_lon_bbox, table_name=table_name, metadata_url=metadata_url, store_name=store_name)
 
 
-def publish_layer_from_qgis(workspace, layer, description, title, *, metadata_url, geoserver_workspace=None):
+def publish_layer_from_qgis(workspace, layer, description, title, *, uuid, metadata_url, geoserver_workspace=None):
     geoserver_workspace = geoserver_workspace or workspace
-    store_name = wms.get_qgis_store_name(layer)
+    store_name = wms.get_qgis_store_name(uuid=uuid)
     info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['wms', 'native_crs', ]})
     layer_capabilities_url = info['_wms']['qgis_capabilities_url']
     crs = info['native_crs']
