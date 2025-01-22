@@ -30,6 +30,8 @@ def refresh_wms(
         self,
         workspace,
         layername,
+        *,
+        uuid,
         store_in_geoserver,
         description=None,
         title=None,
@@ -40,7 +42,7 @@ def refresh_wms(
         original_data_source=settings.EnumOriginalDataSource.FILE.value,
 ):
     info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': [
-        'file', 'geodata_type', 'native_bounding_box', 'native_crs', 'table_uri', 'uuid'
+        'file', 'geodata_type', 'native_bounding_box', 'native_crs', 'table_uri'
     ]})
     geodata_type = info['geodata_type']
     crs = info['native_crs']
@@ -48,7 +50,7 @@ def refresh_wms(
     assert title is not None
     geoserver_workspace = wms.get_geoserver_workspace(workspace)
     geoserver.ensure_workspace(workspace)
-    metadata_url = micka_util.get_metadata_url(info['uuid'], url_type=micka_util.RecordUrlType.XML)
+    metadata_url = micka_util.get_metadata_url(uuid, url_type=micka_util.RecordUrlType.XML)
 
     if self.is_aborted():
         raise AbortedException
@@ -138,12 +140,14 @@ def refresh_wfs(
         self,
         workspace,
         layername,
+        *,
+        uuid,
         description=None,
         title=None,
         access_rights=None,
         original_data_source=settings.EnumOriginalDataSource.FILE.value,
 ):
-    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['geodata_type', 'native_crs', 'table_uri', 'uuid']})
+    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['geodata_type', 'native_crs', 'table_uri']})
     geodata_type = info['geodata_type']
     if geodata_type == settings.GEODATA_TYPE_RASTER:
         return
@@ -164,7 +168,7 @@ def refresh_wfs(
                                                         layer=layername,
                                                         table_uri=table_uri,
                                                         )
-    metadata_url = micka_util.get_metadata_url(info['uuid'], url_type=micka_util.RecordUrlType.XML)
+    metadata_url = micka_util.get_metadata_url(uuid, url_type=micka_util.RecordUrlType.XML)
     geoserver.publish_layer_from_db(workspace, layername, description, title, crs=crs, table_name=table_name, metadata_url=metadata_url, store_name=store_name)
     geoserver.set_security_rules(workspace, layername, access_rights, settings.LAYMAN_GS_AUTH, workspace)
     wfs.clear_cache(workspace)
