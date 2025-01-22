@@ -46,10 +46,11 @@ def patch(workspace, layername):
 
     info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername,
                                             context={'keys': ['title', 'name', 'description', 'table_uri', 'geodata_type', 'style_type',
-                                                              'original_data_source', ]})
+                                                              'original_data_source', 'uuid']})
     kwargs = {
         'title': info.get('title', info['name']) or '',
         'description': info.get('description'),
+        'uuid': info['uuid'],
     }
 
     # FILE

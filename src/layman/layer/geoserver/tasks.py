@@ -62,7 +62,7 @@ def refresh_wms(
             store_name = None
             if original_data_source == settings.EnumOriginalDataSource.TABLE.value:
                 store_name = geoserver.create_external_db_store(workspace=geoserver_workspace,
-                                                                layer=layername,
+                                                                uuid=uuid,
                                                                 table_uri=table_uri,
                                                                 )
             geoserver.publish_layer_from_db(workspace,
@@ -80,6 +80,7 @@ def refresh_wms(
                                               layername,
                                               description,
                                               title,
+                                              uuid=uuid,
                                               metadata_url=metadata_url,
                                               geoserver_workspace=geoserver_workspace,
                                               )
@@ -90,12 +91,12 @@ def refresh_wms(
         bbox = bbox_util.get_bbox_to_publish(real_bbox, crs)
         lat_lon_bbox = bbox_util.transform(bbox, crs, crs_def.EPSG_4326)
         if not image_mosaic:
-            coverage_store_name = wms.get_geotiff_store_name(layername)
+            coverage_store_name = wms.get_geotiff_store_name(uuid=uuid)
             coverage_type = gs_util.COVERAGESTORE_GEOTIFF
             enable_time_dimension = False
             source_file_or_dir = gs_file_path
         else:
-            coverage_store_name = wms.get_image_mosaic_store_name(layername)
+            coverage_store_name = wms.get_image_mosaic_store_name(uuid=uuid)
             source_file_or_dir = os.path.dirname(gs_file_path)
             file_path = file_paths['normalized_absolute']
             dir_path = os.path.dirname(file_path)
@@ -165,7 +166,7 @@ def refresh_wfs(
     if original_data_source == settings.EnumOriginalDataSource.TABLE.value:
         table_uri = info['_table_uri']
         store_name = geoserver.create_external_db_store(workspace=workspace,
-                                                        layer=layername,
+                                                        uuid=uuid,
                                                         table_uri=table_uri,
                                                         )
     metadata_url = micka_util.get_metadata_url(uuid, url_type=micka_util.RecordUrlType.XML)

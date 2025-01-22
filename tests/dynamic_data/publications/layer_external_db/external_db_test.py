@@ -230,8 +230,9 @@ class TestLayer(base_test.TestSingleRestPublication):
         assert_util.is_publication_valid_and_complete(layer)
         with app.app_context():
             publ_info = get_publication_info(layer.workspace, layer.type, layer.name,
-                                             context={'keys': ['table_uri']})
+                                             context={'keys': ['table_uri', 'uuid']})
         table_uri = publ_info['_table_uri']
+        uuid = publ_info['uuid']
         style_type = os.path.splitext(rest_args['style_file'])[1][1:] if rest_args['style_file'] else 'sld'
         assert style_type in ['sld', 'qml']
         publ_type_detail = (settings.GEODATA_TYPE_VECTOR, style_type)
@@ -251,7 +252,7 @@ class TestLayer(base_test.TestSingleRestPublication):
 
         # check GeoServer store of external DB exists
         only_default_db_store = {'postgresql'}
-        both_db_stores = {'postgresql', f'external_db_{layer.name}'}
+        both_db_stores = {'postgresql', f'external_db_{uuid}'}
         exp_wms_stores = both_db_stores if style_type == 'sld' else only_default_db_store
         gs_asserts.assert_stores(layer.workspace, exp_wfs_stores=both_db_stores, exp_wms_stores=exp_wms_stores)
 

@@ -121,18 +121,19 @@ def test_adjust_layer_metadata_url_on_gs():
         with app.app_context():
             publ_info = layman_util.get_publication_info(workspace, process_client.LAYER_TYPE, layer,
                                                          context={'keys': {'geodata_type', 'style_type', 'image_mosaic',
-                                                                           'original_data_source'}})
+                                                                           'original_data_source', 'uuid'}})
+        uuid = publ_info['uuid']
         wms_workspace = wms.get_geoserver_workspace(workspace)
 
         if publ_info['geodata_type'] == settings.GEODATA_TYPE_RASTER:
-            store_name = wms.get_image_mosaic_store_name(layer) if publ_info['image_mosaic'] else wms.get_geotiff_store_name(layer)
+            store_name = wms.get_image_mosaic_store_name(uuid=uuid) if publ_info['image_mosaic'] else wms.get_geotiff_store_name(uuid=uuid)
             wms_coverage = gs_common_util.get_coverage(wms_workspace, store_name, layer, gs_rest_workspaces=GS_REST_WORKSPACES)
             wms_coverage['metadataLinks'] = {}
             wms_body = {"coverage": wms_coverage}
             wms_url = urljoin(GS_REST_WORKSPACES, f'{wms_workspace}/coveragestores/{store_name}/coverages/{layer}')
         elif publ_info['geodata_type'] == settings.GEODATA_TYPE_VECTOR:
             if publ_info['_style_type'] == 'sld':
-                store_name = gs_util.get_external_db_store_name(layer) if publ_info[
+                store_name = gs_util.get_external_db_store_name(uuid=uuid) if publ_info[
                     'original_data_source'] == settings.EnumOriginalDataSource.TABLE.value else gs_common_util.DEFAULT_DB_STORE_NAME
                 wms_feature_type = gs_common_util.get_feature_type(wms_workspace, store_name, layer, gs_rest_workspaces=GS_REST_WORKSPACES)
                 wms_feature_type['metadataLinks'] = {}
@@ -147,7 +148,7 @@ def test_adjust_layer_metadata_url_on_gs():
                 raise NotImplementedError(f"Unknown style type: {publ_info['_style_type']}")
 
             # WFS
-            wfs_store = gs_util.get_external_db_store_name(layer) if publ_info[
+            wfs_store = gs_util.get_external_db_store_name(uuid=uuid) if publ_info[
                 'original_data_source'] == settings.EnumOriginalDataSource.TABLE.value else gs_common_util.DEFAULT_DB_STORE_NAME
 
             wfs_inner_body = gs_common_util.get_feature_type(workspace, wfs_store, layer, gs_rest_workspaces=GS_REST_WORKSPACES)
