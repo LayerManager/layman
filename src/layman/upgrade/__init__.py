@@ -14,71 +14,19 @@ logger = logging.getLogger(__name__)
 MIGRATION_TYPES = [consts.MIGRATION_TYPE_SCHEMA, consts.MIGRATION_TYPE_DATA]
 
 MIN_UPGRADEABLE_VERSION = {
-    consts.MIGRATION_TYPE_DATA: (1, 14, 0, 0),
-    consts.MIGRATION_TYPE_SCHEMA: (1, 13, 0, 0),
-    consts.MORE_INFO_VERSION: '1.17.0',
+    consts.MIGRATION_TYPE_DATA: (1, 23, 0, 3),
+    consts.MIGRATION_TYPE_SCHEMA: (1, 23, 0, 0),
+    consts.MORE_INFO_VERSION: '2.0.0',
 }
 
 
 MIGRATIONS = {
     consts.MIGRATION_TYPE_SCHEMA: [
-        ((1, 16, 0), [
-            upgrade_v1_16.adjust_db_for_srid,
-        ]),
-        ((1, 17, 0), [
-            upgrade_v1_17.adjust_db_for_file_type,
-        ]),
-        ((1, 18, 0), [
-            upgrade_v1_18.adjust_db_for_image_mosaic,
-        ]),
-        ((1, 20, 0), [
-            upgrade_v1_20.adjust_db_for_table_uri,
-            upgrade_v1_20.rename_file_type_to_geodata_type,
-        ]),
-        ((1, 21, 0), [
-            upgrade_v1_21.adjust_db_for_wfs_wms_status,
-        ]),
-        ((1, 22, 0), [
-            upgrade_v1_22.create_map_layer_relation_table,
-        ]),
-        ((1, 23, 0), [
-            upgrade_v1_23.adjust_db_for_roles,
-            upgrade_v1_23.restrict_workspace_name_length,
-            upgrade_v1_23.create_role_service_schema,
-            upgrade_v1_23.remove_right_types_table,
-        ]),
         ((2, 0, 0), [
             upgrade_v2_0.adjust_db_for_description,
         ]),
     ],
     consts.MIGRATION_TYPE_DATA: [
-        ((1, 16, 0), [
-            upgrade_v1_16.adjust_db_publication_layer_srid_data,
-            upgrade_v1_16.adjust_maps,
-            upgrade_v1_16.adjust_db_publication_srid_constraint,
-            upgrade_v1_16.ensure_gs_users,
-        ]),
-        ((1, 17, 0), [
-            upgrade_v1_17.adjust_publications_file_type,
-            upgrade_v1_17.adjust_db_publication_file_type_constraint,
-            upgrade_v1_17.rename_table_names,
-        ]),
-        ((1, 21, 0), [
-            upgrade_v1_21.adjust_publications_wfs_wms_status,
-            upgrade_v1_21.adjust_layer_metadata_url_on_gs,
-        ]),
-        ((1, 21, 1), [
-            upgrade_v1_21.ensure_sub_uniqueness,
-        ]),
-        ((1, 22, 0), [
-            upgrade_v1_22.ensure_issuer_sub_uniqueness,
-            upgrade_v1_22.fix_issuer_id,
-            upgrade_v1_22.remove_authn_txt_files,
-            upgrade_v1_22.insert_map_layer_relations,
-        ]),
-        ((1, 23, 0), [
-            upgrade_v1_23.delete_user_roles,
-        ]),
         ((2, 0, 0), [
             upgrade_v2_0.adjust_publications_description,
         ]),
@@ -102,6 +50,22 @@ def run_db_init():
     upgrade_v1_12.adjust_prime_db_schema_for_fulltext_search()
     upgrade_v1_12.adjust_prime_db_schema_for_last_change_search()
     upgrade_v1_12.adjust_prime_db_schema_for_bbox_search()
+    upgrade_v1_16.adjust_db_for_srid()
+    upgrade_v1_17.adjust_db_for_file_type()
+    upgrade_v1_18.adjust_db_for_image_mosaic()
+    upgrade_v1_20.adjust_db_for_table_uri()
+    upgrade_v1_20.rename_file_type_to_geodata_type()
+    upgrade_v1_21.adjust_db_for_wfs_wms_status()
+    upgrade_v1_22.create_map_layer_relation_table()
+    upgrade_v1_23.adjust_db_for_roles()
+    upgrade_v1_23.restrict_workspace_name_length()
+    upgrade_v1_23.create_role_service_schema()
+    upgrade_v1_23.remove_right_types_table()
+
+    upgrade_v1_16.adjust_db_publication_srid_constraint()
+    upgrade_v1_17.adjust_db_publication_file_type_constraint()
+    upgrade_v1_21.ensure_sub_uniqueness()
+    upgrade_v1_22.ensure_issuer_sub_uniqueness()
     for mig_type in MIGRATION_TYPES:
         set_current_migration_version(mig_type, MIN_UPGRADEABLE_VERSION[mig_type])
 
