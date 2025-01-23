@@ -123,7 +123,7 @@ class TestResponsesClass:
         'thumbnail': {'path': f'layers/{publication}/thumbnail/{publication}.png',
                       'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}/thumbnail'},
         'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}',
-        'wfs': {'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{workspace}/wfs'},
+        'wfs': {'name': publication, 'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{workspace}/wfs'},
         'wms': {'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{workspace}_wms/ows'},
         'original_data_source': 'file',
         'used_in_maps': [],
