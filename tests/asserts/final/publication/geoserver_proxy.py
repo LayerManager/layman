@@ -1,4 +1,4 @@
-from layman import app, settings, util as layman_util
+from layman import app, settings, util as layman_util, names
 from layman.layer.geoserver import util as gs_util
 from layman.util import XForwardedClass
 from test_tools import util as test_util, process_client, geoserver_client
@@ -40,10 +40,11 @@ def workspace_wfs_2_0_0_capabilities_available_if_vector(workspace, publ_type, n
         file_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['geodata_type']})
     geodata_type = file_info['geodata_type']
     if geodata_type == settings.GEODATA_TYPE_VECTOR:
+        gs_layername = names.get_name_by_source(name=name, publication_type=publ_type)
         wfs_inst = gs_util.wfs_proxy(wfs_url=internal_wfs_url, version='2.0.0', headers=headers)
 
         assert wfs_inst.contents
-        wfs_name = f'{workspace}:{name}'
+        wfs_name = f'{workspace}:{gs_layername}'
         assert wfs_name in wfs_inst.contents, "Layer not found in Capabilities."
         wfs_layer = wfs_inst.contents[wfs_name]
         assert len(wfs_layer.metadataUrls) == 1

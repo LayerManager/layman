@@ -1,6 +1,6 @@
 import pytest
 
-from layman import settings, app
+from layman import settings, app, names
 from layman.layer.qgis import util as qgis_util, wms as qgis_wms
 from test_tools import process, process_client, geoserver_client
 
@@ -51,14 +51,17 @@ def test_custom_srs_list(ensure_layer):
     ensure_layer(workspace, layer_sld1)
     ensure_layer(workspace, layer_qgis1, style_file=source_style_file_path)
 
+    wfs_name_sld1 = names.get_name_by_source(name=layer_sld1, publication_type=process_client.LAYER_TYPE)['wfs']
+    wfs_name_qgis1 = names.get_name_by_source(name=layer_qgis1, publication_type=process_client.LAYER_TYPE)['wfs']
+
     with app.app_context():
         init_output_epsg_codes_set = {crs.replace(':', '::') for crs in settings.LAYMAN_OUTPUT_SRS_LIST}
-        assert_gs_wms_output_srs_list(workspace, layer_sld1, settings.LAYMAN_OUTPUT_SRS_LIST)
-        assert_wfs_output_srs_list(workspace, layer_sld1, init_output_epsg_codes_set)
+        assert_gs_wms_output_srs_list(workspace, wfs_name_sld1, settings.LAYMAN_OUTPUT_SRS_LIST)
+        assert_wfs_output_srs_list(workspace, wfs_name_sld1, init_output_epsg_codes_set)
         assert not qgis_wms.get_layer_info(workspace, layer_sld1)
 
-        assert_gs_wms_output_srs_list(workspace, layer_qgis1, settings.LAYMAN_OUTPUT_SRS_LIST)
-        assert_wfs_output_srs_list(workspace, layer_qgis1, init_output_epsg_codes_set)
+        assert_gs_wms_output_srs_list(workspace, wfs_name_qgis1, settings.LAYMAN_OUTPUT_SRS_LIST)
+        assert_wfs_output_srs_list(workspace, wfs_name_qgis1, init_output_epsg_codes_set)
         assert_qgis_output_srs_list(workspace, layer_qgis1, settings.LAYMAN_OUTPUT_SRS_LIST)
         assert_qgis_wms_output_srs_list(workspace, layer_qgis1, settings.LAYMAN_OUTPUT_SRS_LIST)
 
@@ -67,15 +70,18 @@ def test_custom_srs_list(ensure_layer):
     })
     ensure_layer(workspace, layer_sld2)
     ensure_layer(workspace, layer_qgis2, style_file=source_style_file_path)
+
     output_epsg_codes_set = {crs.replace(':', '::') for crs in output_crs_list}
     with app.app_context():
         for layer in [layer_sld1, layer_sld2, ]:
-            assert_gs_wms_output_srs_list(workspace, layer, output_crs_list)
-            assert_wfs_output_srs_list(workspace, layer, output_epsg_codes_set)
+            wfs_name_sld = names.get_name_by_source(name=layer, publication_type=process_client.LAYER_TYPE)['wfs']
+            assert_gs_wms_output_srs_list(workspace, wfs_name_sld, output_crs_list)
+            assert_wfs_output_srs_list(workspace, wfs_name_sld, output_epsg_codes_set)
             assert not qgis_wms.get_layer_info(workspace, layer)
         for layer in [layer_qgis1, layer_qgis2, ]:
-            assert_gs_wms_output_srs_list(workspace, layer, output_crs_list)
-            assert_wfs_output_srs_list(workspace, layer, output_epsg_codes_set)
+            wfs_name_qgis = names.get_name_by_source(name=layer, publication_type=process_client.LAYER_TYPE)['wfs']
+            assert_gs_wms_output_srs_list(workspace, wfs_name_qgis, output_crs_list)
+            assert_wfs_output_srs_list(workspace, wfs_name_qgis, output_epsg_codes_set)
             assert_qgis_output_srs_list(workspace, layer, output_crs_list)
             assert_qgis_wms_output_srs_list(workspace, layer, output_crs_list)
 
