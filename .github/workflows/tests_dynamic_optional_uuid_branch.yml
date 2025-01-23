@@ -1,19 +1,20 @@
-name: TestsDynamicOptional
+name: TestsDynamicOptionalUuidBranch
 
 on:
   schedule:
-    - cron: '0 5 * * 0'
-  workflow_dispatch:
+    - cron: '0 3 * * 0'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
-  TestsDynamicOptional:
+  TestsDynamicOptionalUuidBranch:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: 1048-UUID-master
 
       - name: View versions
         run: |
