@@ -10,7 +10,7 @@ from layman.common import empty_method_returns_true, bbox as bbox_util
 from layman.common.micka import util as micka_util
 from layman.http import LaymanError
 from . import wms, wfs, sld
-from .. import geoserver, LAYER_TYPE
+from .. import geoserver
 
 logger = get_task_logger(__name__)
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
@@ -41,7 +41,7 @@ def refresh_wms(
         slugified_time_regex_format=None,
         original_data_source=settings.EnumOriginalDataSource.FILE.value,
 ):
-    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': [
+    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': [
         'file', 'geodata_type', 'native_bounding_box', 'native_crs', 'table_uri'
     ]})
     geodata_type = info['geodata_type']
@@ -148,7 +148,7 @@ def refresh_wfs(
         access_rights=None,
         original_data_source=settings.EnumOriginalDataSource.FILE.value,
 ):
-    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['geodata_type', 'native_crs', 'table_uri']})
+    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['geodata_type', 'native_crs', 'table_uri']})
     geodata_type = info['geodata_type']
     if geodata_type == settings.GEODATA_TYPE_RASTER:
         return
