@@ -1,0 +1,80 @@
+name: TestsDynamicOptional
+
+on:
+  schedule:
+    - cron: '0 5 * * 0'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  TestsDynamicOptional:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: View versions
+        run: |
+          docker -v
+          docker compose version
+
+      - name: Usage info
+        run: |
+          df -h
+          free -m
+
+      - name: Build
+        run: |
+          cp .env.test .env
+          make pull-dev-images
+          docker compose --compatibility -f docker-compose.deps.yml -f docker-compose.test.yml pull redis postgresql nginx-qgis
+          docker compose --compatibility -f docker-compose.deps.yml -f docker-compose.test.yml build --parallel qgis geoserver micka
+
+      - name: Download test data
+        run: |
+          mkdir -p tmp
+          docker compose --compatibility -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --no-deps layman_test bash -c "bash ensure-test-data.sh"
+
+      - name: Usage info
+        if: always()
+        run: |
+          df -h
+          free -m
+
+      - name: Run tests
+        run: |
+          make test-dynamic test_type=optional max_fail=0
+
+      - name: Usage info
+        if: always()
+        run: |
+          df -h
+          free -m
+
+      - name: Save logs to files
+        if: failure()
+        run: |
+          mkdir logs
+          docker logs layman-celery_worker_test-1 &> logs/log_celery_worker.txt
+          docker logs timgen &> logs/log_timgen.txt
+          docker logs micka &> logs/log_micka.txt
+          docker logs layman-geoserver-1 &> logs/log_geoserver.txt
+
+      - name: Upload logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test_logs
+          path: logs
+
+      - name: Upload artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test_artifacts
+          path: |
+            sudo chown -R $(id -un) layman_data_test
+            tmp/artifacts/
+            layman_data_test/
