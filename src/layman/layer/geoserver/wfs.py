@@ -2,7 +2,7 @@ from urllib.parse import urljoin
 from flask import current_app
 
 from geoserver import util as gs_util
-from layman import settings, patch_mode
+from layman import settings, patch_mode, names
 from layman.cache import mem_redis
 from layman.common import geoserver as gs_common, empty_method_returns_none, empty_method
 from layman.layer.util import is_layer_chain_ready
@@ -129,18 +129,22 @@ def clear_cache(workspace):
 
 
 def get_layer_info(workspace, layername, *, x_forwarded_items=None):
+    gs_layername = names.get_name_by_source(name=layername,
+                                            publication_type=LAYER_TYPE,
+                                            )['wfs']
     wfs = get_wfs_proxy(workspace)
     if wfs is None:
         return {}
     wfs_proxy_url = get_wfs_url(workspace, external_url=True, x_forwarded_items=x_forwarded_items)
 
-    wfs_layername = f"{workspace}:{layername}"
+    wfs_layername = f"{workspace}:{gs_layername}"
     if wfs_layername not in wfs.contents:
         return {}
     return {
         'title': wfs.contents[wfs_layername].title,
         'description': wfs.contents[wfs_layername].abstract,
         'wfs': {
+            'name': gs_layername,
             'url': wfs_proxy_url
         },
     }

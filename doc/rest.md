@@ -299,6 +299,7 @@ JSON object with following structure:
     - NOT_AVAILABLE: source is not available, e.g. because publishing process failed
   - *error*: If status is FAILURE, this may contain error object.
 - *wfs*, available only for vector layers
+  - *name*: String. Name of the layer on GeoServer in WFS workspace.
   - *url*: String. URL of WFS endpoint. It points to WFS endpoint of appropriate GeoServer workspace.
   - *status*: Status information about GeoServer import and availability of WFS feature type. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
