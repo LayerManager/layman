@@ -6,6 +6,7 @@ from layman.common import geoserver as gs_common
 from test_tools import process_client, role_service
 from tests import EnumTestTypes, Publication
 from tests.asserts.final.publication import util as assert_util
+from tests.asserts.final.publication.geoserver_util import get_wms_layername
 from tests.dynamic_data import base_test, base_test_classes
 
 pytest_generate_tests = base_test.pytest_generate_tests
@@ -86,8 +87,9 @@ class TestPublication(base_test.TestSingleRestPublication):
                 geodata_type = internal_info['geodata_type']
                 gs_workspace = internal_info['_wms']['workspace']
 
-                gs_layername = names.get_layer_names_by_source(uuid=internal_info['uuid'], )['wfs']
-                workspaces_and_layers = [(publication.workspace, gs_layername), (gs_workspace, publication.name)] if geodata_type != settings.GEODATA_TYPE_RASTER else [gs_workspace]
+                gs_wfs_layername = names.get_layer_names_by_source(uuid=internal_info['uuid'], )['wfs']
+                gs_wms_layername = get_wms_layername(publication.workspace, publication.name)
+                workspaces_and_layers = [(publication.workspace, gs_wfs_layername), (gs_workspace, gs_wms_layername)] if geodata_type != settings.GEODATA_TYPE_RASTER else [gs_workspace]
                 for wspace, gs_layername in workspaces_and_layers:
                     gs_expected_roles = gs_common.layman_users_and_roles_to_geoserver_roles(exp_rights)
                     rule = f'{wspace}.{gs_layername}.{right[0]}'

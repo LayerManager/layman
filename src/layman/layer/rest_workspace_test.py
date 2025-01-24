@@ -24,9 +24,10 @@ from layman.layer.geoserver import wms as geoserver_wms, sld as geoserver_sld
 from layman import celery as celery_util
 from layman.common.metadata import prop_equals_strict, PROPERTIES
 from layman.util import SimpleCounter
-from test_tools import flask_client, process_client
+from tests.asserts.final.publication.geoserver_util import get_wms_layername
 from test_tools.data import wfs as data_wfs
 from test_tools.util import url_for, url_for_external
+from test_tools import flask_client, process_client
 from . import util, LAYER_TYPE
 from .geoserver.util import wms_proxy
 
@@ -247,7 +248,8 @@ def test_post_layers_simple(client):
 
         wms_url = geoserver_wms.get_wms_url(workspace)
         wms = wms_proxy(wms_url)
-        assert layername in wms.contents
+        wms_layername = get_wms_layername(workspace, layername)
+        assert wms_layername in wms.contents
 
         from layman.layer import get_layer_type_def
         from layman.common.filesystem import uuid as common_uuid
@@ -406,7 +408,8 @@ def test_post_layers_shp(client):
 
     wms_url = geoserver_wms.get_wms_url(workspace)
     wms = wms_proxy(wms_url)
-    assert 'ne_110m_admin_0_countries_shp' in wms.contents
+    wms_layername = get_wms_layername(workspace, layername)
+    assert wms_layername in wms.contents
 
     publication_counter.increase()
     uuid.check_redis_consistency(expected_publ_num_by_type={
@@ -473,10 +476,11 @@ def test_post_layers_complex(client):
 
         wms_url = geoserver_wms.get_wms_url(workspace)
         wms = wms_proxy(wms_url)
-        assert 'countries' in wms.contents
-        assert wms['countries'].title == 'staty'
-        assert wms['countries'].abstract == 'popis států'
-        assert wms['countries'].styles['countries']['title'] == 'Generic Blue'
+        wms_layername = get_wms_layername(workspace, layername)
+        assert wms_layername in wms.contents
+        assert wms[wms_layername].title == 'staty'
+        assert wms[wms_layername].abstract == 'popis států'
+        assert wms[wms_layername].styles['countries']['title'] == 'Generic Blue'
 
         assert layername != ''
         rest_path = url_for('rest_workspace_layer.get', workspace=workspace, layername=layername)
@@ -726,9 +730,10 @@ def test_patch_layer_style(client):
 
         wms_url = geoserver_wms.get_wms_url(workspace)
         wms = wms_proxy(wms_url)
-        assert layername in wms.contents
-        assert wms[layername].title == 'countries in blue'
-        assert wms[layername].styles[layername]['title'] == 'Generic Blue'
+        wms_layername = get_wms_layername(workspace, layername)
+        assert wms_layername in wms.contents
+        assert wms[wms_layername].title == 'countries in blue'
+        assert wms[wms_layername].styles[layername]['title'] == 'Generic Blue'
 
         uuid.check_redis_consistency(expected_publ_num_by_type={
             f'{LAYER_TYPE}': publication_counter.get()

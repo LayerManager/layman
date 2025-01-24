@@ -21,7 +21,7 @@ from .. import util
 from ... import static_data as data
 from ...asserts.final import publication as publ_asserts
 from ..data import ensure_publication
-
+from ...asserts.final.publication.geoserver_util import get_wms_layername
 
 headers_sld = {
     'Accept': 'application/vnd.ogc.sld+xml',
@@ -110,6 +110,7 @@ def test_wms_layer(workspace, publ_type, publication):
     expected_qgis_file = f'/qgis/data/test/workspaces/{workspace}/layers/{publication}/{publication}.qgis'
     wms_stores_url = urljoin(GS_REST_WORKSPACES, f'{workspace}_wms/wmsstores/')
     wms_layers_url = urljoin(GS_REST_WORKSPACES, f'{workspace}_wms/wmslayers/')
+    wms_layername = get_wms_layername(workspace, publication)
 
     with app.app_context():
         info = layman_util.get_publication_info(workspace, publ_type, publication, context={'keys': ['wms', 'uuid']})
@@ -145,13 +146,13 @@ def test_wms_layer(workspace, publ_type, publication):
     assert response.status_code == 200, response.json()
     if style == 'qml':
         wms_layers = [layer['name'] for layer in response.json()['wmsLayers']['wmsLayer']]
-        assert publication in wms_layers, response.json()
+        assert wms_layername in wms_layers, response.json()
 
     get_map = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('get_map')
     if get_map:
         url_detail, expected_file, pixel_tolerance = get_map
-        url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{workspace}_wms/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image/png&TRANSPARENT=true&STYLES=&LAYERS={workspace}:{publication}&" + url_detail
-        obtained_file = f'tmp/artifacts/test_sld_style_applied_in_wms_{publication}.png'
+        url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{workspace}_wms/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image/png&TRANSPARENT=true&STYLES=&LAYERS={workspace}:{wms_layername}&" + url_detail
+        obtained_file = f'tmp/artifacts/test_sld_style_applied_in_wms_{wms_layername}.png'
 
         assert_util.assert_same_images(url, obtained_file, expected_file, pixel_tolerance)
 
@@ -165,7 +166,7 @@ def test_wms_layer(workspace, publ_type, publication):
         bbox = bbox_util.get_bbox_to_publish(layer_info['bounding_box'], crs)
         tn_bbox = gs_util.get_square_bbox(bbox)
 
-        response = gs_util.get_layer_thumbnail(wms_url, publication, tn_bbox, crs_def.EPSG_3857, headers=authn_headers, wms_version=VERSION)
+        response = gs_util.get_layer_thumbnail(wms_url, wms_layername, tn_bbox, crs_def.EPSG_3857, headers=authn_headers, wms_version=VERSION)
         response.raise_for_status()
         assert 'image' in response.headers['content-type'], f'response.headers={response.headers}, response.content={response.content}'
 
@@ -175,11 +176,11 @@ def test_wms_layer(workspace, publ_type, publication):
 
     for in_headers in headers_list_in:
         wms = geoserver_client.get_wms_capabilities(gs_workspace, headers=in_headers)
-        assert publication in set(wms.contents)
+        assert wms_layername in set(wms.contents)
 
     for out_headers in headers_list_out:
         wms = geoserver_client.get_wms_capabilities(gs_workspace, headers=out_headers)
-        assert publication not in set(wms.contents)
+        assert wms_layername not in set(wms.contents)
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_QML_LAYERS)
