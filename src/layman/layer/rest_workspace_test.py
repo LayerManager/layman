@@ -18,7 +18,7 @@ from layman import app
 from layman import settings
 from layman.layer.filesystem import uuid as layer_uuid
 from layman.layer.filesystem.thumbnail import get_layer_thumbnail_path
-from layman import uuid
+from layman import uuid, names
 from layman.layer import db
 from layman.layer.geoserver import wms as geoserver_wms, sld as geoserver_sld
 from layman import celery as celery_util
@@ -463,6 +463,7 @@ def test_post_layers_complex(client):
         resp_json = response.get_json()
         # print(resp_json)
         layername = resp_json[0]['name']
+        layeruuid = resp_json[0]['uuid']
 
         chain_info = util.get_layer_chain(workspace, layername)
         assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
@@ -506,7 +507,8 @@ def test_post_layers_complex(client):
         root = tree.getroot()
         assert root.attrib['version'] == '1.0.0'
 
-        feature_type = get_feature_type(workspace, 'postgresql', layername)
+        gs_layername = names.get_layer_names_by_source(uuid=layeruuid, )['wfs']
+        feature_type = get_feature_type(workspace, 'postgresql', gs_layername)
         attributes = feature_type['attributes']['attribute']
         assert next((
             a for a in attributes if a['name'] == 'sovereignt'
@@ -587,7 +589,9 @@ def test_uppercase_attr(client):
         ]:
             assert 'status' not in resp_json[source], f"{source}: {resp_json[source]}"
 
-        feature_type = get_feature_type(workspace, 'postgresql', layername)
+        layeruuid = resp_json['uuid']
+        gs_layername = names.get_layer_names_by_source(uuid=layeruuid, )['wfs']
+        feature_type = get_feature_type(workspace, 'postgresql', gs_layername)
         attributes = feature_type['attributes']['attribute']
         attr_names = ["id", "dpr_smer_k", "fid_zbg", "silnice", "silnice_bs", "typsil_p", "cislouseku", "jmeno",
                       "typsil_k", "peazkom1", "peazkom2", "peazkom3", "peazkom4", "vym_tahy_k", "vym_tahy_p",
@@ -778,6 +782,7 @@ def test_patch_layer_data(client):
         for key_to_check in keys_to_check:
             assert 'status' in get_json[key_to_check]
         flask_client.wait_till_layer_ready(workspace, layername)
+        layeruuid = get_json['uuid']
         # last_task['last'].get()
 
     with app.app_context():
@@ -787,7 +792,8 @@ def test_patch_layer_data(client):
 
         resp_json = response.get_json()
         assert resp_json['title'] == "populated places"
-        feature_type = get_feature_type(workspace, 'postgresql', layername)
+        gs_layername = names.get_layer_names_by_source(uuid=layeruuid, )['wfs']
+        feature_type = get_feature_type(workspace, 'postgresql', gs_layername)
         attributes = feature_type['attributes']['attribute']
         assert next((
             a for a in attributes if a['name'] == 'sovereignt'
@@ -1002,7 +1008,8 @@ def test_layer_with_different_geometry():
     file_paths = [
         'tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson',
     ]
-    process_client.publish_workspace_layer(workspace, layername, file_paths=file_paths)
+    response = process_client.publish_workspace_layer(workspace, layername, file_paths=file_paths)
+    layeruuid = response['uuid']
 
     url_path_ows = urljoin(urljoin(settings.LAYMAN_GS_URL, workspace), 'ows?service=WFS&request=Transaction')
     url_path_wfs = urljoin(urljoin(settings.LAYMAN_GS_URL, workspace), 'wfs?request=Transaction')
@@ -1012,7 +1019,8 @@ def test_layer_with_different_geometry():
         'Content-type': 'text/xml',
     }
 
-    data_xml = data_wfs.get_wfs20_insert_points(workspace, layername)
+    gs_layername = names.get_layer_names_by_source(uuid=layeruuid, )['wfs']
+    data_xml = data_wfs.get_wfs20_insert_points(workspace, gs_layername)
 
     response = requests.post(url_path_ows,
                              data=data_xml,
@@ -1030,7 +1038,7 @@ def test_layer_with_different_geometry():
                              )
     assert response.status_code == 200, f"HTTP Error {response.status_code}\n{response.text}"
 
-    data_xml2 = data_wfs.get_wfs20_insert_lines(workspace, layername)
+    data_xml2 = data_wfs.get_wfs20_insert_lines(workspace, gs_layername)
 
     response = requests.post(url_path_ows,
                              data=data_xml2,

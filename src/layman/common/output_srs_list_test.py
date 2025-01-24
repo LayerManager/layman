@@ -30,10 +30,11 @@ def delete_layer_after_test():
 def ensure_layer(delete_layer_after_test):
     def ensure_layer_internal(workspace, layername, file_paths=None, style_file=None):
         if (workspace, layername) not in LAYERS_TO_DELETE_AFTER_TEST:
-            process_client.publish_workspace_layer(workspace, layername, file_paths=file_paths, style_file=style_file)
+            response = process_client.publish_workspace_layer(workspace, layername, file_paths=file_paths, style_file=style_file)
             delete_layer_after_test(workspace, layername)
         else:
-            process_client.patch_workspace_layer(workspace, layername, file_paths=file_paths, style_file=style_file)
+            response = process_client.patch_workspace_layer(workspace, layername, file_paths=file_paths, style_file=style_file)
+        return response
     yield ensure_layer_internal
 
 
@@ -48,11 +49,11 @@ def test_custom_srs_list(ensure_layer):
     assert settings.LAYMAN_OUTPUT_SRS_LIST != output_crs_list
 
     process.ensure_layman_function(process.LAYMAN_DEFAULT_SETTINGS)
-    ensure_layer(workspace, layer_sld1)
-    ensure_layer(workspace, layer_qgis1, style_file=source_style_file_path)
+    uuid_sld1 = ensure_layer(workspace, layer_sld1)['uuid']
+    uuid_qgis1 = ensure_layer(workspace, layer_qgis1, style_file=source_style_file_path)['uuid']
 
-    wfs_name_sld1 = names.get_name_by_source(name=layer_sld1, publication_type=process_client.LAYER_TYPE)['wfs']
-    wfs_name_qgis1 = names.get_name_by_source(name=layer_qgis1, publication_type=process_client.LAYER_TYPE)['wfs']
+    wfs_name_sld1 = names.get_layer_names_by_source(uuid=uuid_sld1, )['wfs']
+    wfs_name_qgis1 = names.get_layer_names_by_source(uuid=uuid_qgis1, )['wfs']
 
     with app.app_context():
         init_output_epsg_codes_set = {crs.replace(':', '::') for crs in settings.LAYMAN_OUTPUT_SRS_LIST}
@@ -68,18 +69,18 @@ def test_custom_srs_list(ensure_layer):
     process.ensure_layman_function({
         'LAYMAN_OUTPUT_SRS_LIST': ','.join([str(code) for code in OUTPUT_SRS_LIST])
     })
-    ensure_layer(workspace, layer_sld2)
-    ensure_layer(workspace, layer_qgis2, style_file=source_style_file_path)
+    uuid_sld2 = ensure_layer(workspace, layer_sld2)['uuid']
+    wfs_name_qgis2 = ensure_layer(workspace, layer_qgis2, style_file=source_style_file_path)['uuid']
 
     output_epsg_codes_set = {crs.replace(':', '::') for crs in output_crs_list}
     with app.app_context():
-        for layer in [layer_sld1, layer_sld2, ]:
-            wfs_name_sld = names.get_name_by_source(name=layer, publication_type=process_client.LAYER_TYPE)['wfs']
+        for layer, uuid in [(layer_sld1, uuid_sld1), (layer_sld2, uuid_sld2), ]:
+            wfs_name_sld = names.get_layer_names_by_source(uuid=uuid, )['wfs']
             assert_gs_wms_output_srs_list(workspace, wfs_name_sld, output_crs_list)
             assert_wfs_output_srs_list(workspace, wfs_name_sld, output_epsg_codes_set)
             assert not qgis_wms.get_layer_info(workspace, layer)
-        for layer in [layer_qgis1, layer_qgis2, ]:
-            wfs_name_qgis = names.get_name_by_source(name=layer, publication_type=process_client.LAYER_TYPE)['wfs']
+        for layer, uuid in [(layer_qgis1, uuid_qgis1), (layer_qgis2, wfs_name_qgis2), ]:
+            wfs_name_qgis = names.get_layer_names_by_source(uuid=uuid, )['wfs']
             assert_gs_wms_output_srs_list(workspace, wfs_name_qgis, output_crs_list)
             assert_wfs_output_srs_list(workspace, wfs_name_qgis, output_epsg_codes_set)
             assert_qgis_output_srs_list(workspace, layer, output_crs_list)

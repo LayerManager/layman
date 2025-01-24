@@ -3,7 +3,7 @@ import pathlib
 import requests
 
 import crs as crs_def
-from layman import app, util as layman_util, settings
+from layman import app, util as layman_util, settings, names
 from layman.common import bbox as bbox_util
 from layman.layer.geoserver import wfs, wms
 from .process_client import LAYER_TYPE, get_workspace_layer_metadata_comparison, get_source_key_from_metadata_comparison
@@ -35,8 +35,10 @@ def assert_same_bboxes(bbox1, bbox2, precision):
 
 
 def assert_wfs_bbox(workspace, layer, expected_bbox, *, expected_bbox_crs='EPSG:3857'):
-    wfs_layer = f"{workspace}:{layer}"
     with app.app_context():
+        uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layer)
+        gs_layername = names.get_layer_names_by_source(uuid=uuid, )['wfs']
+        wfs_layer = f"{workspace}:{gs_layername}"
         wfs_inst = wfs.get_wfs_proxy(workspace)
     wfs_bbox_4326 = wfs_inst.contents[wfs_layer].boundingBoxWGS84
     with app.app_context():
