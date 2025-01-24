@@ -392,6 +392,10 @@ def merge_infos(target_info, partial_info, *, comment=None):
             target_info[key] = value
 
 
+def get_publication_uuid(workspace, publ_type, publ_name):
+    return get_publication_info(workspace, publ_type, publ_name, context={'keys': ['uuid', ]}).get('uuid')
+
+
 def _get_publication_by_uuid(uuid):
     from layman.common.prime_db_schema.publications import get_publication_infos as prime_db_schema_get_publication_infos
     prime_db_schema_info = prime_db_schema_get_publication_infos(uuid=uuid)
