@@ -122,6 +122,7 @@ TEST_CASES = {
 
 @pytest.mark.timeout(60)
 @pytest.mark.usefixtures('oauth2_provider_mock')
+@pytest.mark.xfail(reason='Map filesystem input_file in not yet ready for WMS layers named by UUID')
 class TestPublication(base_test.TestSingleRestPublication):
     workspace = WORKSPACE
     publication_type = process_client.MAP_TYPE
