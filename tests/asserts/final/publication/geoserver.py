@@ -14,7 +14,7 @@ def feature_spatial_precision(workspace, publ_type, name, *, feature_id, crs, ex
     assert publ_type == process_client.LAYER_TYPE
     with app.app_context():
         uuid = layman_util.get_publication_uuid(workspace, publ_type, name)
-        gs_layername = names.get_names_by_source(uuid=uuid, publication_type=publ_type)['wfs']
+    gs_layername = names.get_names_by_source(uuid=uuid, publication_type=publ_type)['wfs']
 
     feature_collection = geoserver_client.get_features(workspace, gs_layername, crs=crs)
     feature = next(f for f in feature_collection['features'] if f['properties']['point_id'] == feature_id)
@@ -78,11 +78,10 @@ def wfs_bbox(workspace, publ_type, name, *, exp_bbox, precision=0.00001):
     assert publ_type == process_client.LAYER_TYPE
     with app.app_context():
         uuid = layman_util.get_publication_uuid(workspace, publ_type, name)
-        gs_layername = names.get_names_by_source(uuid=uuid, publication_type=publ_type)['wfs']
-
-    wfs_layer = f"{workspace}:{gs_layername}"
-    with app.app_context():
         wfs_inst = wfs.get_wfs_proxy(workspace)
+    gs_layername = names.get_names_by_source(uuid=uuid, publication_type=publ_type)['wfs']
+    wfs_layer = f"{workspace}:{gs_layername}"
+
     bbox = wfs_inst.contents[wfs_layer].boundingBoxWGS84
     assert_util.assert_same_bboxes(exp_bbox, bbox, precision)
     assert bbox_util.contains_bbox(bbox, exp_bbox, precision=precision / 10000)
