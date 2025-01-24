@@ -283,6 +283,7 @@ JSON object with following structure:
 - **description**: String.
 - **updated_at**: String. Date and time of last POST/PATCH of the publication. Format is [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601), more specifically `YYYY-MM-DDThh:mm:ss.sss±hh:mm`, always in UTC. Sample value: `"2021-03-18T09:29:53.769233+00:00"`
 - **wms**
+  - *name*: String. Name of the layer on GeoServer in WMS workspace.
   - *url*: String. URL of WMS endpoint. It points to WMS endpoint of appropriate GeoServer workspace.
   - *time*, available only for time-series layers
     - **units**: String. Code of time format. Always `ISO8601`.
