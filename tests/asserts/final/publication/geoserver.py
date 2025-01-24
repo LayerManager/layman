@@ -3,7 +3,7 @@ from urllib import parse
 
 import crs as crs_def
 from geoserver import util as gs_util
-from layman import app, settings, util as layman_util
+from layman import app, settings, util as layman_util, names
 from layman.common import bbox as bbox_util
 from layman.layer.geoserver import wfs, wms
 from test_tools import geoserver_client, process_client, assert_util
@@ -12,8 +12,11 @@ from . import geoserver_util
 
 def feature_spatial_precision(workspace, publ_type, name, *, feature_id, crs, exp_coordinates, precision):
     assert publ_type == process_client.LAYER_TYPE
+    with app.app_context():
+        uuid = layman_util.get_publication_uuid(workspace, publ_type, name)
+        gs_layername = names.get_names_by_source(uuid=uuid, publication_type=publ_type)['wfs']
 
-    feature_collection = geoserver_client.get_features(workspace, name, crs=crs)
+    feature_collection = geoserver_client.get_features(workspace, gs_layername, crs=crs)
     feature = next(f for f in feature_collection['features'] if f['properties']['point_id'] == feature_id)
     for idx, coordinate in enumerate(feature['geometry']['coordinates']):
         assert abs(coordinate - exp_coordinates[idx]) <= precision, f"{crs}: expected coordinates={exp_coordinates}, found coordinates={feature['geometry']['coordinates']}"
@@ -73,8 +76,11 @@ def wms_spatial_precision(workspace, publ_type, name, *, crs, extent, img_size, 
 
 def wfs_bbox(workspace, publ_type, name, *, exp_bbox, precision=0.00001):
     assert publ_type == process_client.LAYER_TYPE
+    with app.app_context():
+        uuid = layman_util.get_publication_uuid(workspace, publ_type, name)
+        gs_layername = names.get_names_by_source(uuid=uuid, publication_type=publ_type)['wfs']
 
-    wfs_layer = f"{workspace}:{name}"
+    wfs_layer = f"{workspace}:{gs_layername}"
     with app.app_context():
         wfs_inst = wfs.get_wfs_proxy(workspace)
     bbox = wfs_inst.contents[wfs_layer].boundingBoxWGS84

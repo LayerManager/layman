@@ -1,6 +1,6 @@
 from enum import Enum
 
-from layman import names
+from layman import names, util, app
 from test_tools.data import wfs as data_wfs
 from . import process_client
 
@@ -28,8 +28,10 @@ def post_wfst(workspace, publ_type, name,
               wait_for_update=True,
               ):
     assert publ_type == process_client.LAYER_TYPE
+    with app.app_context():
+        uuid = util.get_publication_uuid(workspace=workspace, publ_type=publ_type, publ_name=name)
 
-    wfs_name = names.get_name_by_source(name=name, publication_type=publ_type)
+    wfs_name = names.get_names_by_source(uuid=uuid, publication_type=publ_type)['wfs'] or name
     data_xml = WfstOperationDef[(operation, version)](workspace, wfs_name)
 
     process_client.post_wfst(data_xml, headers=request_headers, url=request_url, workspace=request_workspace)

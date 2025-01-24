@@ -60,9 +60,15 @@ class TestResponsesClass:
     workspace = 'test_responses_workspace'
     publication = 'test_responses_publication'
     description = 'Toto je popisek.'
+    uuid = '97776002-efde-43f1-8618-26c0d69e4bf9'
     common_params = {
-        'description': description,
-    }
+        process_client.LAYER_TYPE: {
+            'uuid': uuid,
+            'description': description,
+        },
+        process_client.MAP_TYPE: {
+            'description': description,
+        }}
 
     expected_common_multi = {
         'access_rights': {'read': ['EVERYONE'], 'write': ['EVERYONE']},
@@ -123,7 +129,7 @@ class TestResponsesClass:
         'thumbnail': {'path': f'layers/{publication}/thumbnail/{publication}.png',
                       'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}/thumbnail'},
         'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}',
-        'wfs': {'name': publication, 'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{workspace}/wfs'},
+        'wfs': {'name': f'l_{uuid}', 'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{workspace}/wfs'},
         'wms': {'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{workspace}_wms/ows'},
         'original_data_source': 'file',
         'used_in_maps': [],
@@ -150,7 +156,7 @@ class TestResponsesClass:
     @pytest.fixture(scope="class")
     def provide_data(self):
         for publication_type in process_client.PUBLICATION_TYPES:
-            process_client.publish_workspace_publication(publication_type, self.workspace, self.publication, **self.common_params,)
+            process_client.publish_workspace_publication(publication_type, self.workspace, self.publication, **self.common_params[publication_type], )
         yield
         for publication_type in process_client.PUBLICATION_TYPES:
             process_client.delete_workspace_publication(publication_type, self.workspace, self.publication, )
