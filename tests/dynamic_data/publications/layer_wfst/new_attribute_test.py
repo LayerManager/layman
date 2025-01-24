@@ -262,8 +262,7 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
                     f"old_db_attributes={old_db_attributes[layer_name]}, attr_name={attr_name}"
 
             # assert that all attr_names are not yet presented in WFS feature type
-            with app.app_context():
-                gs_layer = names.get_layer_names_by_source(uuid=get_publication_uuid(*layer))['wfs']
+            gs_layer = names.get_layer_names_by_source(uuid=get_publication_uuid(*layer))['wfs']
             layer_schema = get_wfs_schema(wfs_url, typename=f"{workspace}:{gs_layer}",
                                           version=geoserver_wfs.VERSION, headers=AUTHN_HEADERS)
             old_wfs_properties[layer_name] = sorted(layer_schema['properties'].keys())
@@ -315,9 +314,8 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
     @staticmethod
     def prepare_wfst_data_and_new_attributes(layer, layer2, params):
         data_method = params['data_method']
-        with app.app_context():
-            gs_layer = names.get_layer_names_by_source(uuid=get_publication_uuid(*layer))['wfs']
-            gs_layer2 = names.get_layer_names_by_source(uuid=get_publication_uuid(*layer2))['wfs']
+        gs_layer = names.get_layer_names_by_source(uuid=get_publication_uuid(*layer))['wfs']
+        gs_layer2 = names.get_layer_names_by_source(uuid=get_publication_uuid(*layer2))['wfs']
         if params['simple']:
             attr_args_per_layer = params['attr_args_per_layer']
             assert len(attr_args_per_layer) == 1
