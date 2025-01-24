@@ -735,7 +735,7 @@ def patch_wms_layer(geoserver_workspace, layer, *, auth, bbox=None, title=None, 
     response.raise_for_status()
 
 
-def post_wms_layer(geoserver_workspace, layer, store_name, title, description, bbox, crs, auth, *, lat_lon_bbox, metadata_url):
+def post_wms_layer(geoserver_workspace, layer, native_layername, store_name, title, description, bbox, crs, auth, *, lat_lon_bbox, metadata_url):
     keywords = [
         "features",
         layer,
@@ -744,7 +744,7 @@ def post_wms_layer(geoserver_workspace, layer, store_name, title, description, b
     keywords = list(set(keywords))
     wms_layer_def = {
         "name": layer,
-        "nativeName": layer,
+        "nativeName": native_layername,
         "title": title,
         "abstract": description,
         "keywords": {

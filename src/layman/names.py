@@ -5,6 +5,7 @@ def get_names_by_source(*, uuid, publication_type):
     assert publication_type == LAYER_TYPE
     return {
         'wfs': f'l_{uuid}',
+        'wms': f'l_{uuid}',
     }
 
 
