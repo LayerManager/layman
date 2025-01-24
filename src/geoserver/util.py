@@ -327,7 +327,7 @@ def get_workspace_style_url(geoserver_workspace, style=None):
                    geoserver_workspace + '/styles/' + style)
 
 
-def post_workspace_sld_style(geoserver_workspace, layername, sld_file, launder_function):
+def post_workspace_sld_style(geoserver_workspace, layername, style_name, sld_file, launder_function):
     if sld_file is None:
         response = requests.get(
             urljoin(GS_REST_STYLES, 'generic.sld'),
@@ -365,7 +365,7 @@ def post_workspace_sld_style(geoserver_workspace, layername, sld_file, launder_f
         },
         auth=GS_AUTH,
         params={'raw': True,
-                'name': layername, },
+                'name': style_name, },
         timeout=GS_REST_TIMEOUT,
     )
     if response.status_code == 400:
@@ -376,7 +376,7 @@ def post_workspace_sld_style(geoserver_workspace, layername, sld_file, launder_f
                                 {
                                     "layer": {
                                         "defaultStyle": {
-                                            "name": geoserver_workspace + ':' + layername,
+                                            "name": geoserver_workspace + ':' + style_name,
                                             "workspace": geoserver_workspace,
                                         },
                                     }

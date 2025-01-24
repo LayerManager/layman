@@ -106,7 +106,7 @@ def create_layer_style(workspace, layername):
     layer_info = get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['wms']})
     geoserver_workspace = layer_info['_wms']['workspace']
     style_file = input_style.get_layer_file(workspace, layername)
-    gs_util.post_workspace_sld_style(geoserver_workspace, layername, style_file, launder_attribute_name)
+    gs_util.post_workspace_sld_style(geoserver_workspace, layername, layername, style_file, launder_attribute_name)
     wms.clear_cache(workspace)
 
 
