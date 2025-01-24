@@ -11,6 +11,8 @@ services:
       command: bash start.sh
       env_file:
          - .env
+      extra_hosts:
+         - "host.docker.internal:host-gateway"
       ports:
         - 8000:8000
       volumes:
@@ -43,6 +45,8 @@ services:
       environment:
         - C_FORCE_ROOT=true
         - LAYMAN_SKIP_REDIS_LOADING=true
+      extra_hosts:
+         - "host.docker.internal:host-gateway"
       volumes:
         - ./layman_data:/layman_data
         - ./sample:/code/sample
