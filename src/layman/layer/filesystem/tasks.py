@@ -168,10 +168,10 @@ def refresh_gdal(self, workspace, layername,
     bind=True,
     base=celery_app.AbortableTask
 )
-def refresh_thumbnail(self, workspace, layername):
+def refresh_thumbnail(self, workspace, layername, *, uuid):
     if self.is_aborted():
         raise AbortedException
-    thumbnail.generate_layer_thumbnail(workspace, layername)
+    thumbnail.generate_layer_thumbnail(workspace, layername, uuid=uuid)
 
     if self.is_aborted():
         thumbnail.delete_layer(workspace, layername)

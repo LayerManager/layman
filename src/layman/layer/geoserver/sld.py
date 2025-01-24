@@ -6,7 +6,7 @@ from layman.common.db import launder_attribute_name
 from layman.layer.filesystem import input_style
 from . import wms
 from .. import LAYER_TYPE
-from ...util import url_for, get_publication_info
+from ...util import url_for, get_publication_info, get_publication_info_by_uuid
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
@@ -102,11 +102,12 @@ def create_customized_grayscale_sld(*, file_path, min_value, max_value, nodata_v
         file.write(xml_str)
 
 
-def create_layer_style(workspace, layername):
-    layer_info = get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['wms']})
+def create_layer_style(*, uuid, workspace, layername, ):
+    layer_info = get_publication_info_by_uuid(uuid, context={'keys': ['wms']})
     geoserver_workspace = layer_info['_wms']['workspace']
+    gs_layername = layer_info['wms']['name']
     style_file = input_style.get_layer_file(workspace, layername)
-    gs_util.post_workspace_sld_style(geoserver_workspace, layername, layername, style_file, launder_attribute_name)
+    gs_util.post_workspace_sld_style(geoserver_workspace, gs_layername, layername, style_file, launder_attribute_name)
     wms.clear_cache(workspace)
 
 

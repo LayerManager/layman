@@ -132,34 +132,18 @@ def publish_layer_from_db_by_uuid(*, uuid, gs_layername, geoserver_workspace, de
     gs_util.post_feature_type(geoserver_workspace, gs_layername, description, title, bbox, crs, settings.LAYMAN_GS_AUTH, lat_lon_bbox=lat_lon_bbox, table_name=table_name, metadata_url=metadata_url, store_name=store_name)
 
 
-def publish_layer_from_db(workspace, layername, description, title, *, crs, table_name, metadata_url, geoserver_workspace=None, store_name=None):
-    uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layername)
-    geoserver_workspace = geoserver_workspace or workspace
-    publish_layer_from_db_by_uuid(uuid=uuid,
-                                  gs_layername=layername,
-                                  geoserver_workspace=geoserver_workspace,
-                                  description=description,
-                                  title=title,
-                                  crs=crs,
-                                  table_name=table_name,
-                                  metadata_url=metadata_url,
-                                  store_name=store_name,
-                                  )
-
-
-def publish_layer_from_qgis(workspace, layer, description, title, *, uuid, metadata_url, geoserver_workspace=None):
-    geoserver_workspace = geoserver_workspace or workspace
+def publish_layer_from_qgis(*, uuid, gs_layername, geoserver_workspace, qgis_layername, description, title, metadata_url, ):
     store_name = wms.get_qgis_store_name(uuid=uuid)
-    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['wms', 'native_crs', ]})
+    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['wms', 'native_crs', ]})
     layer_capabilities_url = info['_wms']['qgis_capabilities_url']
     crs = info['native_crs']
     gs_util.create_wms_store(geoserver_workspace,
                              settings.LAYMAN_GS_AUTH,
                              store_name,
                              layer_capabilities_url)
-    bbox = get_layer_bbox(workspace, layer)
+    bbox = get_layer_bbox_by_uuid(uuid=uuid)
     lat_lon_bbox = bbox_util.transform(bbox, crs, crs_def.EPSG_4326)
-    gs_util.post_wms_layer(geoserver_workspace, layer, store_name, title, description, bbox, crs, settings.LAYMAN_GS_AUTH,
+    gs_util.post_wms_layer(geoserver_workspace, gs_layername, qgis_layername, store_name, title, description, bbox, crs, settings.LAYMAN_GS_AUTH,
                            lat_lon_bbox=lat_lon_bbox, metadata_url=metadata_url)
 
 

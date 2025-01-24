@@ -3,7 +3,7 @@ import pathlib
 
 from geoserver import util as gs_util
 from layman import settings, LaymanError, patch_mode
-from layman.util import url_for, get_publication_info
+from layman.util import url_for, get_publication_info_by_uuid
 from layman.common import empty_method, empty_method_returns_dict, bbox as bbox_util
 from layman.common.filesystem import util as common_util
 from . import util, input_file
@@ -60,21 +60,23 @@ def get_layer_thumbnail_path(workspace, layername):
     return os.path.join(thumbnail_dir, layername + '.png')
 
 
-def generate_layer_thumbnail(workspace, layername):
+def generate_layer_thumbnail(workspace, layername, *, uuid=None):
+    uuid = uuid or get_publication_uuid(workspace, LAYER_TYPE, layername)
     headers = {
         settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE: settings.LAYMAN_GS_USER,
     }
-    layer_info = get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['wms', 'native_bounding_box', 'native_crs', ]})
+    layer_info = get_publication_info_by_uuid(uuid, context={'keys': ['wms', 'native_bounding_box', 'native_crs', ]})
     wms_url = layer_info['_wms']['url']
     native_bbox = layer_info['native_bounding_box']
     native_crs = layer_info['native_crs']
+    gs_layername = layer_info['wms']['name']
     bbox = bbox_util.get_bbox_to_publish(native_bbox, native_crs)
     tn_bbox = gs_util.get_square_bbox(bbox)
     ensure_layer_thumbnail_dir(workspace, layername)
     tn_path = get_layer_thumbnail_path(workspace, layername)
 
     from layman.layer.geoserver.wms import VERSION
-    response = gs_util.get_layer_thumbnail(wms_url, layername, tn_bbox, native_crs, headers=headers, wms_version=VERSION)
+    response = gs_util.get_layer_thumbnail(wms_url, gs_layername, tn_bbox, native_crs, headers=headers, wms_version=VERSION)
     if "png" not in response.headers['content-type'].lower():
         raise LaymanError("Thumbnail rendering failed", data=response.content)
     response.raise_for_status()
