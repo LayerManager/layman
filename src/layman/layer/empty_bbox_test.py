@@ -6,6 +6,7 @@ from layman import names
 from layman.layer.geoserver import wms as gs_wms
 from test_tools import process_client
 from test_tools.data import wfs as wfs_data_util
+from tests.asserts.final.publication.geoserver_util import get_wms_layername
 
 
 def get_shp_file_paths(shp_file_path):
@@ -46,19 +47,20 @@ def test_empty_shapefile(layername, file_paths):
     title = layername
 
     uuid = process_client.publish_workspace_layer(workspace, layername, file_paths=file_paths)['uuid']
+    wms_layername = get_wms_layername(workspace=workspace, name=layername)
 
-    wms_layer = assert_wms_layer(workspace, layername, title)
+    wms_layer = assert_wms_layer(workspace, wms_layername, title)
     native_bbox = wms_layer.boundingBox
     wgs_bbox = wms_layer.boundingBoxWGS84
 
     title = 'new title'
     process_client.patch_workspace_layer(workspace, layername, title=title)
-    wms_layer = assert_wms_layer(workspace, layername, title)
+    wms_layer = assert_wms_layer(workspace, wms_layername, title)
     assert wms_layer.boundingBox == native_bbox
     assert wms_layer.boundingBoxWGS84 == wgs_bbox
 
     wfs_t_insert_point(workspace, uuid=uuid)
-    wms_layer = assert_wms_layer(workspace, layername, title)
+    wms_layer = assert_wms_layer(workspace, wms_layername, title)
     assert wms_layer.boundingBox == native_bbox
     assert wms_layer.boundingBoxWGS84 == wgs_bbox
 

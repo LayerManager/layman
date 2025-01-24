@@ -6,6 +6,7 @@ import crs as crs_def
 from layman import app, util as layman_util, settings, names
 from layman.common import bbox as bbox_util
 from layman.layer.geoserver import wfs, wms
+from tests.asserts.final.publication.geoserver_util import get_wms_layername
 from .process_client import LAYER_TYPE, get_workspace_layer_metadata_comparison, get_source_key_from_metadata_comparison
 from .util import compare_images
 
@@ -49,7 +50,8 @@ def assert_wfs_bbox(workspace, layer, expected_bbox, *, expected_bbox_crs='EPSG:
 def assert_wms_bbox(workspace, layer, expected_bbox, *, expected_bbox_crs='EPSG:3857'):
     with app.app_context():
         wms_inst = wms.get_wms_proxy(workspace)
-    wms_layer = wms_inst.contents[layer]
+    wms_layername = get_wms_layername(workspace, layer)
+    wms_layer = wms_inst.contents[wms_layername]
     bbox = next(bbox[:4] for bbox in wms_layer.crs_list if bbox[4] == expected_bbox_crs)
     assert_same_bboxes(expected_bbox, bbox, 0.00001)
 

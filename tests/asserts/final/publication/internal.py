@@ -158,6 +158,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
         'image_mosaic': False,
     }
     if publ_type == process_client.LAYER_TYPE:
+        uuid = pub_info["uuid"]
         geodata_type = publ_type_detail[0]
         util.recursive_dict_update(expected_detail,
                                    {
@@ -165,7 +166,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                            'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/{publ_type_dir}/{name}/style',
                                        },
                                        'wms': {
-                                           'name': f'{name}',
+                                           'name': f'l_{uuid}',
                                            'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{workspace}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}/ows'},
                                        '_wms': {
                                            'url': f'{settings.LAYMAN_GS_URL}{workspace}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}/ows',
@@ -216,7 +217,6 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                        })
 
         if geodata_type == settings.GEODATA_TYPE_VECTOR:
-            uuid = pub_info["uuid"]
             if external_table_uri:
                 table_uri = external_table_uri
                 util.recursive_dict_update(expected_detail,

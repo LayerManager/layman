@@ -1,4 +1,5 @@
 import os
+import pytest
 import crs as crs_def
 import tests
 from test_tools import process_client
