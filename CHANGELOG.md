@@ -14,7 +14,7 @@
 #### Data migrations
 - [#1009](https://github.com/LayerManager/layman/issues/1009) Fill column `description` in `publications` table in prime DB schema. Value is taken from GeoServer for layers and from filesystem for maps.
 ### Changes
-- [#1048](https://github.com/LayerManager/layman/issues/1048) New key `wfs`.`name` was added to [GET Workspace Layer](doc/rest.md#get-workspace-layer) response.
+- [#1048](https://github.com/LayerManager/layman/issues/1048) New keys `wfs`.`name` and `wms`.`name` were added to [GET Workspace Layer](doc/rest.md#get-workspace-layer) response.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Names of [Feature types and Layers in GeoServer WFS workspace](doc/data-storage.md#geoserver) are `l_<uuid>`.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) POST Workspace [Layers](doc/rest.md#post-workspace-layers)/[Maps](doc/rest.md#post-workspace-maps) accepts new body parameter *uuid*.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Names of all GeoServer stores are derived from layer's `uuid` (previously were derived from layer's `name`). 

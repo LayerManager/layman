@@ -185,6 +185,7 @@ def get_layer_info(workspace, layername, *, x_forwarded_items=None):
         'title': wms.contents[layername].title,
         'description': wms.contents[layername].abstract,
         'wms': {
+            'name': layername,
             'url': wms_proxy_url,
         },
         '_wms': {
