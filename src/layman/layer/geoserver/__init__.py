@@ -81,25 +81,38 @@ def check_workspace_name(workspace):
         raise LaymanError(35, {'reserved_by': __name__, 'role': rolename})
 
 
-def set_security_rules(workspace, layer, access_rights, auth, geoserver_workspace):
-    geoserver_workspace = geoserver_workspace or workspace
+def set_security_rules_by_uuid(*, uuid, geoserver_workspace, geoserver_layername, access_rights, auth, ):
     layer_info = None
     if not access_rights or not access_rights.get('read') or not access_rights.get('write'):
-        layer_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer,
-                                                      context={'keys': ['access_rights', ]})
-
+        layer_info = layman_util.get_publication_info_by_uuid(uuid,
+                                                              context={'keys': ['access_rights', ]})
     read_roles = access_rights.get('read') if access_rights and access_rights.get('read') else layer_info['access_rights']['read']
     write_roles = access_rights.get('write') if access_rights and access_rights.get('write') else layer_info['access_rights']['write']
 
     security_read_roles = gs_common.layman_users_and_roles_to_geoserver_roles(read_roles)
-    gs_util.ensure_layer_security_roles(geoserver_workspace, layer, security_read_roles, 'r', auth)
+    gs_util.ensure_layer_security_roles(geoserver_workspace, geoserver_layername, security_read_roles, 'r', auth)
 
     security_write_roles = gs_common.layman_users_and_roles_to_geoserver_roles(write_roles)
-    gs_util.ensure_layer_security_roles(geoserver_workspace, layer, security_write_roles, 'w', auth)
+    gs_util.ensure_layer_security_roles(geoserver_workspace, geoserver_layername, security_write_roles, 'w', auth)
+
+
+def set_security_rules(workspace, layer, access_rights, auth, geoserver_workspace):
+    uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layer)
+    set_security_rules_by_uuid(uuid=uuid,
+                               geoserver_workspace=geoserver_workspace,
+                               geoserver_layername=layer,
+                               access_rights=access_rights,
+                               auth=auth,
+                               )
 
 
 def get_layer_bbox(workspace, layer):
-    layer_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['native_bounding_box', 'native_crs', ]})
+    uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layer)
+    return get_layer_bbox_by_uuid(uuid=uuid)
+
+
+def get_layer_bbox_by_uuid(*, uuid):
+    layer_info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['native_bounding_box', 'native_crs', ]})
     db_bbox = layer_info['native_bounding_box']
     crs = layer_info['native_crs']
     # GeoServer is not working good with degradeted bbox
@@ -110,15 +123,28 @@ def get_layer_bbox(workspace, layer):
 def get_layer_native_bbox(workspace, layer):
     bbox = get_layer_bbox(workspace, layer)
     crs = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['native_crs']})['native_crs']
-
     return gs_util.bbox_to_dict(bbox, crs)
 
 
-def publish_layer_from_db(workspace, layername, description, title, *, crs, table_name, metadata_url, geoserver_workspace=None, store_name=None):
-    geoserver_workspace = geoserver_workspace or workspace
-    bbox = get_layer_bbox(workspace, layername)
+def publish_layer_from_db_by_uuid(*, uuid, gs_layername, geoserver_workspace, description, title, crs, table_name, metadata_url, store_name=None):
+    bbox = get_layer_bbox_by_uuid(uuid=uuid)
     lat_lon_bbox = bbox_util.transform(bbox, crs, crs_def.EPSG_4326)
-    gs_util.post_feature_type(geoserver_workspace, layername, description, title, bbox, crs, settings.LAYMAN_GS_AUTH, lat_lon_bbox=lat_lon_bbox, table_name=table_name, metadata_url=metadata_url, store_name=store_name)
+    gs_util.post_feature_type(geoserver_workspace, gs_layername, description, title, bbox, crs, settings.LAYMAN_GS_AUTH, lat_lon_bbox=lat_lon_bbox, table_name=table_name, metadata_url=metadata_url, store_name=store_name)
+
+
+def publish_layer_from_db(workspace, layername, description, title, *, crs, table_name, metadata_url, geoserver_workspace=None, store_name=None):
+    uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layername)
+    geoserver_workspace = geoserver_workspace or workspace
+    publish_layer_from_db_by_uuid(uuid=uuid,
+                                  gs_layername=layername,
+                                  geoserver_workspace=geoserver_workspace,
+                                  description=description,
+                                  title=title,
+                                  crs=crs,
+                                  table_name=table_name,
+                                  metadata_url=metadata_url,
+                                  store_name=store_name,
+                                  )
 
 
 def publish_layer_from_qgis(workspace, layer, description, title, *, uuid, metadata_url, geoserver_workspace=None):

@@ -5,7 +5,7 @@ from celery.utils.log import get_task_logger
 import crs as crs_def
 from geoserver import util as gs_util
 from layman.celery import AbortedException
-from layman import celery_app, settings, util as layman_util
+from layman import celery_app, settings, util as layman_util, names
 from layman.common import empty_method_returns_true, bbox as bbox_util
 from layman.common.micka import util as micka_util
 from layman.http import LaymanError
@@ -148,6 +148,7 @@ def refresh_wfs(
         access_rights=None,
         original_data_source=settings.EnumOriginalDataSource.FILE.value,
 ):
+    gs_layername = names.get_layer_names_by_source(uuid=uuid, )['wfs']
     info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['geodata_type', 'native_crs', 'table_uri']})
     geodata_type = info['geodata_type']
     if geodata_type == settings.GEODATA_TYPE_RASTER:
@@ -170,13 +171,26 @@ def refresh_wfs(
                                                         table_uri=table_uri,
                                                         )
     metadata_url = micka_util.get_metadata_url(uuid, url_type=micka_util.RecordUrlType.XML)
-    geoserver.publish_layer_from_db(workspace, layername, description, title, crs=crs, table_name=table_name, metadata_url=metadata_url, store_name=store_name)
-    geoserver.set_security_rules(workspace, layername, access_rights, settings.LAYMAN_GS_AUTH, workspace)
+    geoserver.publish_layer_from_db_by_uuid(uuid=uuid,
+                                            gs_layername=gs_layername,
+                                            geoserver_workspace=workspace,
+                                            description=description,
+                                            title=title,
+                                            crs=crs,
+                                            table_name=table_name,
+                                            metadata_url=metadata_url,
+                                            store_name=store_name)
+    geoserver.set_security_rules_by_uuid(uuid=uuid,
+                                         geoserver_workspace=workspace,
+                                         geoserver_layername=gs_layername,
+                                         access_rights=access_rights,
+                                         auth=settings.LAYMAN_GS_AUTH,
+                                         )
     wfs.clear_cache(workspace)
 
     try:
-        wfs_info = wfs.get_layer_info(workspace=workspace,
-                                      layername=layername)
+        wfs_info = wfs.get_layer_info_by_uuid(workspace=workspace,
+                                              uuid=uuid)
     except BaseException:
         wfs_info = {}
 
