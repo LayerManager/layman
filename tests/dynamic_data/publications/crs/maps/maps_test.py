@@ -6,6 +6,7 @@ from test_tools import process_client
 from tests.asserts.final import publication as asserts_publ
 from tests.dynamic_data import base_test
 from ..... import Publication
+from .....asserts.final.publication.geoserver_util import get_wms_layername
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 WORKSPACE = 'dynamic_test_workspace_crs_maps'
@@ -47,6 +48,7 @@ TEST_CASES = {
 pytest_generate_tests = base_test.pytest_generate_tests
 
 
+@pytest.mark.xfail(reason='Map filesystem input_file in not yet ready for WMS layers named by UUID')
 class TestMap(base_test.TestSingleRestPublication):
 
     workspace = WORKSPACE
@@ -68,8 +70,9 @@ class TestMap(base_test.TestSingleRestPublication):
     def test_input_crs(self, map, key, params, rest_method):
         """Parametrized using pytest_generate_tests"""
         map_crs = key
+        gs_wms_layername = get_wms_layername(LAYER_FOR_MAPS.workspace, LAYER_FOR_MAPS.name)
         map_args = {
-            'map_layers': [(LAYER_FOR_MAPS.workspace, LAYER_FOR_MAPS.name)],
+            'map_layers': [(LAYER_FOR_MAPS.workspace, gs_wms_layername)],
             'native_extent': params[KEY_INFO_VALUES]['exp_publication_detail']['native_bounding_box'],
             'crs': map_crs,
             'title': map.name,

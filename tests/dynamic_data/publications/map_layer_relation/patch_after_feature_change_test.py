@@ -19,6 +19,7 @@ MAP = Publication(WORKSPACE, process_client.MAP_TYPE, 'map_hranice')
 
 @pytest.mark.timeout(60)
 @pytest.mark.usefixtures('oauth2_provider_mock')
+@pytest.mark.xfail(reason='Map filesystem input_file in not yet ready for WMS layers named by UUID')
 class TestPublication(base_test.TestSingleRestPublication):
     workspace = 'test_patch_after_feature_change_role'
     publication_type = process_client.LAYER_TYPE

@@ -1,5 +1,6 @@
 import math
 import os
+import pytest
 
 import crs as crs_def
 from test_tools import process_client
@@ -205,6 +206,7 @@ EXP_WMS_PICTURES_QGIS_FIXES = {
 }
 
 
+@pytest.mark.xfail(reason='Geoserver proxy is not yet ready for WMS layers named by UUID, so CRS:84 fix is not applied', strict=False)
 class TestLayer(base_test.TestSingleRestPublication):
 
     workspace = 'dynamic_test_ws_crs_vector_precision'

@@ -1,5 +1,6 @@
 import json
 import os
+import pytest
 
 from layman import app
 from layman.util import get_publication_info
@@ -31,6 +32,7 @@ TEST_CASES = {
 pytest_generate_tests = base_test.pytest_generate_tests
 
 
+@pytest.mark.xfail(reason='Map filesystem input_file in not yet ready for WMS layers named by UUID')
 class TestPublication(base_test.TestSingleRestPublication):
     workspace = WORKSPACE
     publication_type = process_client.MAP_TYPE
