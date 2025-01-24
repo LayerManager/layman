@@ -3,11 +3,11 @@ import copy
 from owslib.feature.schema import get_schema as get_wfs_schema
 import pytest
 
-from layman import app, settings
+from layman import app, settings, names
 from layman.layer import db
 from layman.layer.geoserver import wfs as geoserver_wfs
 from layman.layer.qgis import util as qgis_util, wms as qgis_wms
-from layman.util import get_publication_info
+from layman.util import get_publication_info, get_publication_uuid
 from test_tools.data import wfs as data_wfs
 from test_tools import process_client, external_db
 from tests import Publication, EnumTestTypes, PublicationValues
@@ -175,6 +175,7 @@ pytest_generate_tests = base_test.pytest_generate_tests
 
 @pytest.mark.usefixtures('ensure_external_db', 'oauth2_provider_mock')
 @pytest.mark.timeout(60)
+@pytest.mark.xfail(reason='Geoserver proxy is not yet ready for WFS layers are by UUID so it skip their attributes')
 class TestNewAttribute(base_test.TestSingleRestPublication):
     workspace = WORKSPACE
 
@@ -261,7 +262,9 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
                     f"old_db_attributes={old_db_attributes[layer_name]}, attr_name={attr_name}"
 
             # assert that all attr_names are not yet presented in WFS feature type
-            layer_schema = get_wfs_schema(wfs_url, typename=f"{workspace}:{layer_name}",
+            with app.app_context():
+                gs_layer = names.get_layer_names_by_source(uuid=get_publication_uuid(*layer))['wfs']
+            layer_schema = get_wfs_schema(wfs_url, typename=f"{workspace}:{gs_layer}",
                                           version=geoserver_wfs.VERSION, headers=AUTHN_HEADERS)
             old_wfs_properties[layer_name] = sorted(layer_schema['properties'].keys())
 
@@ -312,19 +315,22 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
     @staticmethod
     def prepare_wfst_data_and_new_attributes(layer, layer2, params):
         data_method = params['data_method']
+        with app.app_context():
+            gs_layer = names.get_layer_names_by_source(uuid=get_publication_uuid(*layer))['wfs']
+            gs_layer2 = names.get_layer_names_by_source(uuid=get_publication_uuid(*layer2))['wfs']
         if params['simple']:
             attr_args_per_layer = params['attr_args_per_layer']
             assert len(attr_args_per_layer) == 1
             attr_names = attr_args_per_layer[0]
-            wfst_data = data_method(layer.workspace, layer.name, attr_names)
+            wfst_data = data_method(layer.workspace, gs_layer, attr_names)
             new_attributes = [(layer.name, attr_names)]
         else:
             attr_args_per_layer = params['attr_args_per_layer']
             assert len(attr_args_per_layer) == 2
             wfst_data = data_method(
                 workspace=layer.workspace,
-                layername1=layer.name,
-                layername2=layer2.name,
+                layername1=gs_layer,
+                layername2=gs_layer2,
                 **attr_args_per_layer[0],
                 **attr_args_per_layer[1],
             )

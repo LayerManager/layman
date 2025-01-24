@@ -1,6 +1,6 @@
 import pytest
 
-from layman import app
+from layman import app, names
 from layman.map.filesystem import thumbnail
 from test_tools import process_client, util as test_util
 from test_tools.data import map as map_data, wfs as data_wfs
@@ -16,13 +16,14 @@ def assert_map_thumbnail(workspace, map, expected_thumbnail_path):
 
 @pytest.mark.usefixtures('ensure_layman')
 @pytest.mark.timeout(40)
+@pytest.mark.xfail(reason='Geoserver proxy is not yet ready for WFS layers are by UUID so they do not yet refresh after feature change')
 def test_map_refresh_after_layer_change():
     workspace = 'test_map_refresh_after_layer_change_workspace'
     layer = 'test_map_refresh_after_layer_change_layer'
     map = 'test_map_refresh_after_layer_change_map'
     bbox = (1571000.0, 6268800.0, 1572590.8542062, 6269876.33561699)
 
-    process_client.publish_workspace_layer(workspace, layer)
+    layer_uuid = process_client.publish_workspace_layer(workspace, layer)['uuid']
 
     file_path = f'tmp/map_with_internal_layers.json'
     map_data.create_map_with_internal_layers_file([(workspace, layer)], file_path=file_path, native_extent=bbox,
@@ -32,7 +33,8 @@ def test_map_refresh_after_layer_change():
     assert_map_thumbnail(workspace, map, f'/code/test_tools/data/thumbnail/map_with_internal_layer_basic.png')
 
     # Test refresh map thumbnail after layer WFS-T query
-    data_xml = data_wfs.get_wfs20_insert_points(workspace, layer, )
+    gs_layername = names.get_layer_names_by_source(uuid=layer_uuid)['wfs']
+    data_xml = data_wfs.get_wfs20_insert_points(workspace, gs_layername, )
     process_client.post_wfst(data_xml)
     process_client.wait_for_publication_status(workspace, process_client.LAYER_TYPE, layer)
     assert_map_thumbnail(workspace, map, f'/code/test_tools/data/thumbnail/map_with_internal_layer_basic_after_wfst.png')

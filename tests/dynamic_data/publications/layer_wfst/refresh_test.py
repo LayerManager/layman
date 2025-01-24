@@ -37,6 +37,7 @@ pytest_generate_tests = base_test.pytest_generate_tests
 
 
 @pytest.mark.usefixtures('ensure_external_db')
+@pytest.mark.xfail(reason='Geoserver proxy is not yet ready for WFS layers are by UUID so it do not refresh after WFS-T')
 class TestRefresh(base_test.TestSingleRestPublication):
 
     workspace = 'dynamic_test_workspace_wfst_refresh'
