@@ -389,8 +389,8 @@ remove-all-docker-containers:
 	docker rm $$(docker ps -aq)
 
 stop-and-remove-all-docker-containers:
-	docker stop $$(docker ps -q)
-	docker rm $$(docker ps -aq)
+	docker stop $$(docker ps -q) || true
+	docker rm $$(docker ps -aq) || true
 
 remark:
 	remark --frail *.md */*.md */*/*.md
