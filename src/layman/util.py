@@ -404,6 +404,8 @@ def _get_publication_by_uuid(uuid):
 
 
 def get_publication_info_by_uuid(uuid, context=None):
+    if uuid is None:
+        return {}
     workspace, publ_type, name = _get_publication_by_uuid(uuid)
     return get_publication_info(workspace=workspace, publ_type=publ_type, publ_name=name, context=context)
 
