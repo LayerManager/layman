@@ -19,3 +19,6 @@
 /deps/**/venv
 
 **/geckodriver.log
+
+# only because of tests/migration_to_v2_0 test
+/Pipfile*
