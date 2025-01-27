@@ -24,12 +24,13 @@ def before_request():
 def get(workspace, layername):
     app.logger.info(f"GET Style, actor={g.user}, workspace={workspace}, layername={layername}")
 
-    style_type = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['style_type'], })['_style_type']
+    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['style_type', 'uuid'], })
+
+    style_type = info['_style_type']
+    uuid = info['uuid']
     result = None
     if style_type == 'sld':
-        response = sld.get_style_response(workspace,
-                                          layername,
-                                          auth=settings.LAYMAN_GS_AUTH)
+        response = sld.get_style_response(uuid=uuid, auth=settings.LAYMAN_GS_AUTH)
         excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
         headers = {key: value for (key, value) in response.headers.items() if key.lower() not in excluded_headers}
 

@@ -1,6 +1,6 @@
 import os
 from geoserver import util as gs_util
-from layman import settings, patch_mode
+from layman import settings, patch_mode, util as layman_util, names
 from layman.common import empty_method, empty_method_returns_none, empty_method_returns_dict
 from layman.common.db import launder_attribute_name
 from layman.layer.filesystem import input_style
@@ -18,16 +18,23 @@ patch_layer = empty_method
 get_publication_uuid = empty_method_returns_none
 
 
-def get_workspace_style_url(workspace, layername):
-    layer_info = get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['wms']})
+def get_workspace_style_url(*, uuid):
+    layer_info = get_publication_info_by_uuid(uuid=uuid, context={'keys': ['wms']})
     geoserver_workspace = layer_info.get('_wms', {}).get('workspace')
-    return gs_util.get_workspace_style_url(geoserver_workspace, layername) if geoserver_workspace else None
+    gs_layername = names.get_layer_names_by_source(uuid=uuid)['wms']
+    return gs_util.get_workspace_style_url(geoserver_workspace, gs_layername) if geoserver_workspace else None
 
 
 def delete_layer(workspace, layername):
-    layer_info = get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['wms']})
+    uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layername)
+    return delete_layer_by_uuid(workspace=workspace, uuid=uuid, )
+
+
+def delete_layer_by_uuid(*, workspace, uuid):
+    layer_info = get_publication_info_by_uuid(uuid=uuid, context={'keys': ['wms']})
     geoserver_workspace = layer_info.get('_wms', {}).get('workspace')
-    sld_stream = gs_util.delete_workspace_style(geoserver_workspace, layername, auth=settings.LAYMAN_GS_AUTH) \
+    gs_style_name = names.get_layer_names_by_source(uuid=uuid)['wms']
+    sld_stream = gs_util.delete_workspace_style(geoserver_workspace, gs_style_name, auth=settings.LAYMAN_GS_AUTH) \
         if geoserver_workspace else None
     wms.clear_cache(workspace)
     if sld_stream:
@@ -42,7 +49,12 @@ def delete_layer(workspace, layername):
 
 
 def get_layer_info(workspace, layername, *, x_forwarded_items=None):
-    response = get_style_response(workspace, layername, gs_util.headers_sld['1.0.0'], settings.LAYMAN_GS_AUTH)
+    uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layername)
+    return get_layer_info_by_uuid(workspace, uuid=uuid, layername=layername, x_forwarded_items=x_forwarded_items)
+
+
+def get_layer_info_by_uuid(workspace, *, uuid, layername, x_forwarded_items=None):
+    response = get_style_response(uuid=uuid, headers=gs_util.headers_sld['1.0.0'], auth=settings.LAYMAN_GS_AUTH)
     if response and response.status_code == 200:
         url = url_for('rest_workspace_layer_style.get', workspace=workspace, layername=layername, x_forwarded_items=x_forwarded_items)
         info = {
@@ -107,12 +119,13 @@ def create_layer_style(*, uuid, workspace, layername, ):
     geoserver_workspace = layer_info['_wms']['workspace']
     gs_layername = layer_info['wms']['name']
     style_file = input_style.get_layer_file(workspace, layername)
-    gs_util.post_workspace_sld_style(geoserver_workspace, gs_layername, layername, style_file, launder_attribute_name)
+    gs_util.post_workspace_sld_style(geoserver_workspace, gs_layername, gs_layername, style_file, launder_attribute_name)
     wms.clear_cache(workspace)
 
 
-def get_style_response(workspace, layername, headers=None, auth=None):
-    layer_info = get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['wms']})
+def get_style_response(*, uuid, headers=None, auth=None):
+    layer_info = get_publication_info_by_uuid(uuid, context={'keys': ['wms']})
     geoserver_workspace = layer_info.get('_wms', {}).get('workspace')
-    return gs_util.get_workspace_style_response(geoserver_workspace, layername, headers, auth) \
+    gs_style_name = names.get_layer_names_by_source(uuid=uuid)['wms']
+    return gs_util.get_workspace_style_response(geoserver_workspace, gs_style_name, headers, auth) \
         if geoserver_workspace else None
