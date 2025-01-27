@@ -34,9 +34,9 @@ def get_flask_proxy_key(workspace):
     return FLASK_PROXY_KEY.format(workspace=workspace)
 
 
-def patch_layer_by_uuid(*, workspace, uuid, original_data_source, title, description, access_rights=None):
+def patch_layer_by_uuid(*, workspace, uuid, directory_name, original_data_source, title, description, access_rights=None):
     gs_layername = names.get_layer_names_by_source(uuid=uuid, )['wms']
-    if not get_layer_info_by_uuid(workspace, uuid=uuid):
+    if not get_layer_info_by_uuid(workspace, uuid=uuid, gdal_layername=directory_name,):
         return
     geoserver_workspace = get_geoserver_workspace(workspace)
     info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['style_type', 'geodata_type', 'image_mosaic'], })
@@ -71,6 +71,7 @@ def patch_layer_by_uuid(*, workspace, uuid, original_data_source, title, descrip
 def patch_layer(workspace, layername, *, uuid, title, description, original_data_source, access_rights=None):
     patch_layer_by_uuid(workspace=workspace,
                         uuid=uuid,
+                        directory_name=layername,
                         title=title,
                         description=description,
                         original_data_source=original_data_source,
@@ -192,10 +193,10 @@ def get_timeregex_props(workspace, layername):
 
 def get_layer_info(workspace, layername, *, x_forwarded_items=None):
     uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layername)
-    return get_layer_info_by_uuid(workspace, uuid=uuid, x_forwarded_items=x_forwarded_items)
+    return get_layer_info_by_uuid(workspace, uuid=uuid, gdal_layername=layername, x_forwarded_items=x_forwarded_items)
 
 
-def get_layer_info_by_uuid(workspace, *, uuid, x_forwarded_items=None):
+def get_layer_info_by_uuid(workspace, *, uuid, gdal_layername, x_forwarded_items=None):
     wms = get_wms_proxy(workspace)
     if wms is None or uuid is None:
         return {}
@@ -219,7 +220,7 @@ def get_layer_info_by_uuid(workspace, *, uuid, x_forwarded_items=None):
     if 'time' in wms.contents[gs_layername].dimensions:
         result['wms']['time'] = {
             **wms.contents[gs_layername].dimensions['time'],
-            **get_timeregex_props(workspace, gs_layername),
+            **get_timeregex_props(workspace, gdal_layername),
         }
     return result
 

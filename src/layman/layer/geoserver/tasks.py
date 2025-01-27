@@ -124,7 +124,9 @@ def refresh_wms(
 
     try:
         wms_info = wms.get_layer_info_by_uuid(workspace=workspace,
-                                              uuid=uuid)
+                                              uuid=uuid,
+                                              gdal_layername=layername,
+                                              )
     except BaseException:
         wms_info = {}
 
