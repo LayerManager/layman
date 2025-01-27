@@ -480,7 +480,7 @@ def test_post_layers_complex(client):
         assert wms_layername in wms.contents
         assert wms[wms_layername].title == 'staty'
         assert wms[wms_layername].abstract == 'popis států'
-        assert wms[wms_layername].styles['countries']['title'] == 'Generic Blue'
+        assert wms[wms_layername].styles[f'l_{layeruuid}']['title'] == 'Generic Blue'
 
         assert layername != ''
         rest_path = url_for('rest_workspace_layer.get', workspace=workspace, layername=layername)
@@ -500,7 +500,7 @@ def test_post_layers_complex(client):
         ]:
             assert 'status' not in resp_json[source]
 
-        style_url = geoserver_sld.get_workspace_style_url(workspace, layername)
+        style_url = geoserver_sld.get_workspace_style_url(uuid=layeruuid)
         response = requests.get(style_url + '.sld',
                                 auth=settings.LAYMAN_GS_AUTH,
                                 timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
@@ -733,7 +733,7 @@ def test_patch_layer_style(client):
         wms_layername = get_wms_layername(workspace, layername)
         assert wms_layername in wms.contents
         assert wms[wms_layername].title == 'countries in blue'
-        assert wms[wms_layername].styles[layername]['title'] == 'Generic Blue'
+        assert wms[wms_layername].styles[wms_layername]['title'] == 'Generic Blue'
 
         uuid.check_redis_consistency(expected_publ_num_by_type={
             f'{LAYER_TYPE}': publication_counter.get()

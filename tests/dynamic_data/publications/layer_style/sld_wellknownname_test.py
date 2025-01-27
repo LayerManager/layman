@@ -3,6 +3,7 @@ import requests
 
 from geoserver import util as gs_util
 from micka import NAMESPACES
+from layman import names
 from test_tools import process_client
 from tests import Publication
 from tests.dynamic_data import base_test
@@ -14,9 +15,11 @@ class TestPublication(base_test.TestSingleRestPublication):
     layername = 'layer_sld_wellknownname'
 
     def test_sld_wellknownname(self, ):
-        self.post_publication(Publication(self.workspace, self.publication_type, self.layername))
+        response = self.post_publication(Publication(self.workspace, self.publication_type, self.layername))
+        uuid = response['uuid']
+        gs_style_name = names.get_layer_names_by_source(uuid=uuid)['wms']
         response = requests.get(
-            gs_util.get_workspace_style_url(self.workspace + '_wms', self.layername),
+            gs_util.get_workspace_style_url(self.workspace + '_wms', gs_style_name),
             auth=gs_util.GS_AUTH,
             headers=gs_util.headers_sld['1.0.0'],
             timeout=gs_util.GS_REST_TIMEOUT,
