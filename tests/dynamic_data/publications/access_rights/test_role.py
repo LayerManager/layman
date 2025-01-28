@@ -87,7 +87,7 @@ class TestPublication(base_test.TestSingleRestPublication):
                 geodata_type = internal_info['geodata_type']
                 gs_workspace = internal_info['_wms']['workspace']
 
-                gs_wfs_layername = names.get_layer_names_by_source(uuid=internal_info['uuid'], )['wfs']
+                gs_wfs_layername = names.get_layer_names_by_source(uuid=internal_info['uuid'], ).wfs.name
                 gs_wms_layername = get_wms_layername(publication.workspace, publication.name)
                 workspaces_and_layers = [(publication.workspace, gs_wfs_layername), (gs_workspace, gs_wms_layername)] if geodata_type != settings.GEODATA_TYPE_RASTER else [gs_workspace]
                 for wspace, gs_layername in workspaces_and_layers:

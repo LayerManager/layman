@@ -511,7 +511,7 @@ def test_post_layers_complex(client):
         root = tree.getroot()
         assert root.attrib['version'] == '1.0.0'
 
-        gs_layername = names.get_layer_names_by_source(uuid=layeruuid, )['wfs']
+        gs_layername = names.get_layer_names_by_source(uuid=layeruuid, ).wfs.name
         feature_type = get_feature_type(workspace, 'postgresql', gs_layername)
         attributes = feature_type['attributes']['attribute']
         assert next((
@@ -594,7 +594,7 @@ def test_uppercase_attr(client):
             assert 'status' not in resp_json[source], f"{source}: {resp_json[source]}"
 
         layeruuid = resp_json['uuid']
-        gs_layername = names.get_layer_names_by_source(uuid=layeruuid, )['wfs']
+        gs_layername = names.get_layer_names_by_source(uuid=layeruuid, ).wfs.name
         feature_type = get_feature_type(workspace, 'postgresql', gs_layername)
         attributes = feature_type['attributes']['attribute']
         attr_names = ["id", "dpr_smer_k", "fid_zbg", "silnice", "silnice_bs", "typsil_p", "cislouseku", "jmeno",
@@ -797,7 +797,7 @@ def test_patch_layer_data(client):
 
         resp_json = response.get_json()
         assert resp_json['title'] == "populated places"
-        gs_layername = names.get_layer_names_by_source(uuid=layeruuid, )['wfs']
+        gs_layername = names.get_layer_names_by_source(uuid=layeruuid, ).wfs.name
         feature_type = get_feature_type(workspace, 'postgresql', gs_layername)
         attributes = feature_type['attributes']['attribute']
         assert next((
@@ -1024,7 +1024,7 @@ def test_layer_with_different_geometry():
         'Content-type': 'text/xml',
     }
 
-    gs_layername = names.get_layer_names_by_source(uuid=layeruuid, )['wfs']
+    gs_layername = names.get_layer_names_by_source(uuid=layeruuid, ).wfs.name
     data_xml = data_wfs.get_wfs20_insert_points(workspace, gs_layername)
 
     response = requests.post(url_path_ows,

@@ -27,7 +27,7 @@ def get_flask_proxy_key(workspace):
 
 
 def patch_layer_by_uuid(*, workspace, uuid, title, description, original_data_source, access_rights=None):
-    gs_layername = names.get_layer_names_by_source(uuid=uuid, )['wfs']
+    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wfs.name
     if not get_layer_info_by_uuid(workspace, uuid=uuid):
         return
     info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['geodata_type', ]})
@@ -60,7 +60,7 @@ def patch_layer(workspace, layername, *, uuid, title, description, original_data
 
 
 def delete_layer_by_uuid(*, workspace, uuid):
-    gs_layername = names.get_names_by_source(uuid=uuid, publication_type=LAYER_TYPE)['wfs']
+    gs_layername = names.get_names_by_source(uuid=uuid, publication_type=LAYER_TYPE).wfs.name
     gs_util.delete_feature_type(workspace, gs_layername, settings.LAYMAN_GS_AUTH)
     gs_util.delete_feature_type(workspace, gs_layername, settings.LAYMAN_GS_AUTH, store=get_external_db_store_name(uuid=uuid))
     gs_util.delete_db_store(workspace, settings.LAYMAN_GS_AUTH, store_name=get_external_db_store_name(uuid=uuid))
@@ -151,7 +151,7 @@ def get_layer_info(workspace, layername, *, x_forwarded_items=None):
 
 
 def get_layer_info_by_uuid(workspace, *, uuid, x_forwarded_items=None):
-    gs_layername = names.get_layer_names_by_source(uuid=uuid, )['wfs']
+    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wfs.name
     wfs = get_wfs_proxy(workspace)
     if wfs is None or uuid is None:
         return {}
@@ -177,7 +177,7 @@ def get_metadata_comparison(workspace, layername):
 
 def get_metadata_comparison_by_uuid(*, workspace, uuid):
     info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['geodata_type', ]})
-    gs_layername = names.get_layer_names_by_source(uuid=uuid, )['wfs']
+    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wfs.name
     geodata_type = info['geodata_type']
     if geodata_type in (settings.GEODATA_TYPE_RASTER, settings.GEODATA_TYPE_UNKNOWN):
         return {}

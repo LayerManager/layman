@@ -32,7 +32,7 @@ def assert_wms_layer(workspace, layername, exp_title):
 
 
 def wfs_t_insert_point(workspace, *, uuid):
-    gs_layername = names.get_layer_names_by_source(uuid=uuid, )['wfs']
+    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wfs.name
     wfs_t_data = wfs_data_util.get_wfs20_insert_points(workspace, gs_layername)
     process_client.post_wfst(wfs_t_data, workspace=workspace)
 

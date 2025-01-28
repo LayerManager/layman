@@ -39,7 +39,7 @@ def assert_wfs_bbox(workspace, layer, expected_bbox, *, expected_bbox_crs='EPSG:
     with app.app_context():
         uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layer)
         wfs_inst = wfs.get_wfs_proxy(workspace)
-    gs_layername = names.get_layer_names_by_source(uuid=uuid, )['wfs']
+    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wfs.name
     wfs_layer = f"{workspace}:{gs_layername}"
     wfs_bbox_4326 = wfs_inst.contents[wfs_layer].boundingBoxWGS84
     with app.app_context():

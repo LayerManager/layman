@@ -35,7 +35,7 @@ def get_flask_proxy_key(workspace):
 
 
 def patch_layer_by_uuid(*, workspace, uuid, directory_name, original_data_source, title, description, access_rights=None):
-    gs_layername = names.get_layer_names_by_source(uuid=uuid, )['wms']
+    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wms.name
     if not get_layer_info_by_uuid(workspace, uuid=uuid, gdal_layername=directory_name,):
         return
     geoserver_workspace = get_geoserver_workspace(workspace)
@@ -81,7 +81,7 @@ def patch_layer(workspace, layername, *, uuid, title, description, original_data
 
 def delete_layer_by_uuid(*, workspace, uuid):
     geoserver_workspace = get_geoserver_workspace(workspace)
-    gs_layername = names.get_names_by_source(uuid=uuid, publication_type=LAYER_TYPE)['wms']
+    gs_layername = names.get_names_by_source(uuid=uuid, publication_type=LAYER_TYPE).wms.name
     gs_util.delete_feature_type(geoserver_workspace, gs_layername, settings.LAYMAN_GS_AUTH)
     gs_util.delete_feature_type(geoserver_workspace, gs_layername, settings.LAYMAN_GS_AUTH, store=get_external_db_store_name(uuid=uuid))
     gs_util.delete_wms_layer(geoserver_workspace, gs_layername, settings.LAYMAN_GS_AUTH)
@@ -201,7 +201,7 @@ def get_layer_info_by_uuid(workspace, *, uuid, gdal_layername, x_forwarded_items
     if wms is None or uuid is None:
         return {}
     wms_proxy_url = get_wms_url(workspace, external_url=True, x_forwarded_items=x_forwarded_items)
-    gs_layername = names.get_layer_names_by_source(uuid=uuid, )['wms']
+    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wms.name
 
     if gs_layername not in wms.contents:
         return {}
@@ -234,7 +234,7 @@ def get_metadata_comparison_by_uuid(*, workspace, uuid):
     wms = get_wms_direct(workspace)
     if wms is None:
         return {}
-    gs_layername = names.get_layer_names_by_source(uuid=uuid, )['wms']
+    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wms.name
     cap_op = wms.getOperationByName('GetCapabilities')
     wms_url = next(
         (

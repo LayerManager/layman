@@ -41,7 +41,7 @@ def refresh_wms(
         slugified_time_regex_format=None,
         original_data_source=settings.EnumOriginalDataSource.FILE.value,
 ):
-    gs_layername = names.get_layer_names_by_source(uuid=uuid, )['wms']
+    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wms.name
     info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': [
         'file', 'geodata_type', 'native_bounding_box', 'native_crs', 'table_uri'
     ]})
@@ -155,7 +155,7 @@ def refresh_wfs(
         access_rights=None,
         original_data_source=settings.EnumOriginalDataSource.FILE.value,
 ):
-    gs_layername = names.get_layer_names_by_source(uuid=uuid, )['wfs']
+    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wfs.name
     info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['geodata_type', 'native_crs', 'table_uri']})
     geodata_type = info['geodata_type']
     if geodata_type == settings.GEODATA_TYPE_RASTER:
