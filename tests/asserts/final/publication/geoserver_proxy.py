@@ -42,7 +42,7 @@ def workspace_wfs_2_0_0_capabilities_available_if_vector(workspace, publ_type, n
         file_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['geodata_type']})
     geodata_type = file_info['geodata_type']
     if geodata_type == settings.GEODATA_TYPE_VECTOR:
-        gs_layername = names.get_names_by_source(uuid=uuid, publication_type=publ_type)['wfs']
+        gs_layername = names.get_names_by_source(uuid=uuid, publication_type=publ_type).wfs.name
         wfs_inst = gs_util.wfs_proxy(wfs_url=internal_wfs_url, version='2.0.0', headers=headers)
 
         assert wfs_inst.contents

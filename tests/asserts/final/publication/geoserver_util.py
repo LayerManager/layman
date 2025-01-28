@@ -16,4 +16,4 @@ def is_complete_in_workspace_wms_instance(wms_instance, name, *, validate_metada
 def get_wms_layername(workspace, name):
     with app.app_context():
         uuid = layman_util.get_publication_uuid(workspace, process_client.LAYER_TYPE, name)
-    return names.get_layer_names_by_source(uuid=uuid, )['wms']
+    return names.get_layer_names_by_source(uuid=uuid, ).wms.name

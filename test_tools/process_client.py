@@ -728,7 +728,7 @@ def post_wfst_with_xml_getter(workspace, layer, *, xml_getter, actor_name=None, 
 
     with app.app_context():
         uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layer)
-    gs_layername = names.get_layer_names_by_source(uuid=uuid, )['wfs']
+    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wfs.name
 
     xml = xml_getter(workspace, gs_layername, **xml_getter_params)
     post_wfst(xml, headers=headers, workspace=workspace)

@@ -33,7 +33,7 @@ def test_map_refresh_after_layer_change():
     assert_map_thumbnail(workspace, map, f'/code/test_tools/data/thumbnail/map_with_internal_layer_basic.png')
 
     # Test refresh map thumbnail after layer WFS-T query
-    gs_layername = names.get_layer_names_by_source(uuid=layer_uuid)['wfs']
+    gs_layername = names.get_layer_names_by_source(uuid=layer_uuid).wfs.name
     data_xml = data_wfs.get_wfs20_insert_points(workspace, gs_layername, )
     process_client.post_wfst(data_xml)
     process_client.wait_for_publication_status(workspace, process_client.LAYER_TYPE, layer)
