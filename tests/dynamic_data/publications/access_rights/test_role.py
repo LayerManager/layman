@@ -6,7 +6,6 @@ from layman.common import geoserver as gs_common
 from test_tools import process_client, role_service
 from tests import EnumTestTypes, Publication
 from tests.asserts.final.publication import util as assert_util
-from tests.asserts.final.publication.geoserver_util import get_wms_layername
 from tests.dynamic_data import base_test, base_test_classes
 
 pytest_generate_tests = base_test.pytest_generate_tests
@@ -75,6 +74,7 @@ class TestPublication(base_test.TestSingleRestPublication):
 
         info = process_client.get_workspace_publication(publication.type, publication.workspace, publication.name,
                                                         actor_name=USERNAME)
+        uuid = info['uuid']
         for right, exp_rights in [('read', USER_ROLE1_ROLE2),
                                   ('write', USER_ROLE1),
                                   ]:
@@ -82,14 +82,13 @@ class TestPublication(base_test.TestSingleRestPublication):
 
             if publication.type == process_client.LAYER_TYPE:
                 with app.app_context():
-                    internal_info = layman_util.get_publication_info(publication.workspace, publication.type, publication.name, {'keys': ['geodata_type', 'wms', 'uuid']})
+                    internal_info = layman_util.get_publication_info(publication.workspace, publication.type, publication.name, {'keys': ['geodata_type', 'wms', ]})
 
                 geodata_type = internal_info['geodata_type']
                 gs_workspace = internal_info['_wms']['workspace']
 
-                gs_wfs_layername = names.get_layer_names_by_source(uuid=internal_info['uuid'], ).wfs.name
-                gs_wms_layername = get_wms_layername(publication.workspace, publication.name)
-                workspaces_and_layers = [(publication.workspace, gs_wfs_layername), (gs_workspace, gs_wms_layername)] if geodata_type != settings.GEODATA_TYPE_RASTER else [gs_workspace]
+                all_names = names.get_layer_names_by_source(uuid=uuid, )
+                workspaces_and_layers = [(publication.workspace, all_names.wfs.name), (gs_workspace, all_names.wms.name)] if geodata_type != settings.GEODATA_TYPE_RASTER else [gs_workspace]
                 for wspace, gs_layername in workspaces_and_layers:
                     gs_expected_roles = gs_common.layman_users_and_roles_to_geoserver_roles(exp_rights)
                     rule = f'{wspace}.{gs_layername}.{right[0]}'

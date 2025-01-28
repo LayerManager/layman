@@ -10,7 +10,8 @@ def is_complete_in_workspace_wms(workspace, publ_type, name, *, version, headers
 
     with app.app_context():
         wms_url = test_util.url_for('geoserver_proxy_bp.proxy', subpath=workspace + settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX + '/ows')
-    gs_layername = geoserver_util.get_wms_layername(workspace, name)
+        uuid = layman_util.get_publication_uuid(workspace, publ_type, name)
+    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wms.name
     wms_inst = gs_util.wms_proxy(wms_url, version=version, headers=headers)
     validate_metadata_url = version != '1.1.1'
     geoserver_util.is_complete_in_workspace_wms_instance(wms_inst, gs_layername, validate_metadata_url=validate_metadata_url)
@@ -57,7 +58,9 @@ def wms_legend_url_with_x_forwarded_headers(workspace, publ_type, name, headers=
     assert publ_type == process_client.LAYER_TYPE
     x_forwarded_items = XForwardedClass(proto='https', host='abc.cz:4142', prefix='/layman-proxy')
     headers = headers or {}
-    gs_layername = geoserver_util.get_wms_layername(workspace, name)
+    with app.app_context():
+        uuid = layman_util.get_publication_uuid(workspace, publ_type, name)
+    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wms.name
 
     for input_workspace, key in [(workspace + settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX, gs_layername),
                                  ('', f'{workspace + settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}:{gs_layername}'), ]:

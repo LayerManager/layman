@@ -6,7 +6,7 @@ import crs as crs_def
 from layman import app, util as layman_util, settings, names
 from layman.common import bbox as bbox_util
 from layman.layer.geoserver import wfs, wms
-from tests.asserts.final.publication.geoserver_util import get_wms_layername
+from layman.util import get_publication_uuid
 from .process_client import LAYER_TYPE, get_workspace_layer_metadata_comparison, get_source_key_from_metadata_comparison
 from .util import compare_images
 
@@ -35,9 +35,8 @@ def assert_same_bboxes(bbox1, bbox2, precision):
         assert abs(bbox2[i] - bbox1[i]) <= precision, (bbox1, bbox2, precision, i)
 
 
-def assert_wfs_bbox(workspace, layer, expected_bbox, *, expected_bbox_crs='EPSG:3857'):
+def assert_wfs_bbox(workspace, uuid, expected_bbox, *, expected_bbox_crs='EPSG:3857'):
     with app.app_context():
-        uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layer)
         wfs_inst = wfs.get_wfs_proxy(workspace)
     gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wfs.name
     wfs_layer = f"{workspace}:{gs_layername}"
@@ -47,10 +46,10 @@ def assert_wfs_bbox(workspace, layer, expected_bbox, *, expected_bbox_crs='EPSG:
     assert_same_bboxes(expected_bbox, wfs_bbox, 0.00001)
 
 
-def assert_wms_bbox(workspace, layer, expected_bbox, *, expected_bbox_crs='EPSG:3857'):
+def assert_wms_bbox(workspace, uuid, expected_bbox, *, expected_bbox_crs='EPSG:3857'):
     with app.app_context():
         wms_inst = wms.get_wms_proxy(workspace)
-    wms_layername = get_wms_layername(workspace, layer)
+    wms_layername = names.get_layer_names_by_source(uuid=uuid, ).wms.name
     wms_layer = wms_inst.contents[wms_layername]
     bbox = next(bbox[:4] for bbox in wms_layer.crs_list if bbox[4] == expected_bbox_crs)
     assert_same_bboxes(expected_bbox, bbox, 0.00001)
@@ -70,17 +69,18 @@ def assert_all_sources_bbox(workspace, layer, expected_bbox_3857, *, expected_na
     bbox_3857 = tuple(info['bounding_box'])
     native_bbox = tuple(info['native_bounding_box'])
     native_crs = info['native_crs']
+    uuid = get_publication_uuid(workspace, LAYER_TYPE, layer)
 
     assert_same_bboxes(expected_bbox_3857, bbox_3857, 0.00001)
     if expected_native_bbox is not None:
         assert_same_bboxes(expected_native_bbox, native_bbox, 0)
         assert expected_native_crs == native_crs
 
-    assert_wfs_bbox(workspace, layer, expected_bbox_3857)
-    assert_wms_bbox(workspace, layer, expected_bbox_3857)
+    assert_wfs_bbox(workspace, uuid, expected_bbox_3857)
+    assert_wms_bbox(workspace, uuid, expected_bbox_3857)
     if expected_native_bbox is not None:
-        assert_wfs_bbox(workspace, layer, expected_native_bbox, expected_bbox_crs=expected_native_crs)
-        assert_wms_bbox(workspace, layer, expected_native_bbox, expected_bbox_crs=expected_native_crs)
+        assert_wfs_bbox(workspace, uuid, expected_native_bbox, expected_bbox_crs=expected_native_crs)
+        assert_wms_bbox(workspace, uuid, expected_native_bbox, expected_bbox_crs=expected_native_crs)
 
     with app.app_context():
         expected_bbox_4326 = bbox_util.transform(expected_bbox_3857, crs_from=crs_def.EPSG_3857, crs_to=crs_def.EPSG_4326, )
