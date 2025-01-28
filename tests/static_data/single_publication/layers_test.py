@@ -8,7 +8,7 @@ import pytest
 
 import crs as crs_def
 from geoserver import GS_REST_WORKSPACES, GS_REST, GS_AUTH, util as gs_util
-from layman import settings, app, util as layman_util
+from layman import settings, app, util as layman_util, names
 from layman.common import bbox as bbox_util
 from layman.common.micka import util as micka_common_util
 from layman.layer import util as layer_util, db as layer_db, get_layer_info_keys
@@ -21,7 +21,6 @@ from .. import util
 from ... import static_data as data
 from ...asserts.final import publication as publ_asserts
 from ..data import ensure_publication
-from ...asserts.final.publication.geoserver_util import get_wms_layername
 
 headers_sld = {
     'Accept': 'application/vnd.ogc.sld+xml',
@@ -110,7 +109,9 @@ def test_wms_layer(workspace, publ_type, publication):
     expected_qgis_file = f'/qgis/data/test/workspaces/{workspace}/layers/{publication}/{publication}.qgis'
     wms_stores_url = urljoin(GS_REST_WORKSPACES, f'{workspace}_wms/wmsstores/')
     wms_layers_url = urljoin(GS_REST_WORKSPACES, f'{workspace}_wms/wmslayers/')
-    wms_layername = get_wms_layername(workspace, publication)
+    with app.app_context():
+        uuid = layman_util.get_publication_uuid(workspace, process_client.LAYER_TYPE, publication)
+    wms_layername = names.get_layer_names_by_source(uuid=uuid, ).wms.name
 
     with app.app_context():
         info = layman_util.get_publication_info(workspace, publ_type, publication, context={'keys': ['wms', 'uuid']})

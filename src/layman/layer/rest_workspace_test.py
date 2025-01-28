@@ -11,8 +11,6 @@ import sys
 import requests
 import pytest
 
-from ..names import get_layer_names_by_source
-
 del sys.modules['layman']
 
 from geoserver.util import get_feature_type
@@ -25,8 +23,8 @@ from layman.layer import db
 from layman.layer.geoserver import wms as geoserver_wms, sld as geoserver_sld
 from layman import celery as celery_util
 from layman.common.metadata import prop_equals_strict, PROPERTIES
+from layman.names import get_layer_names_by_source
 from layman.util import SimpleCounter
-from tests.asserts.final.publication.geoserver_util import get_wms_layername
 from test_tools.data import wfs as data_wfs
 from test_tools.util import url_for, url_for_external
 from test_tools import flask_client, process_client
@@ -250,7 +248,8 @@ def test_post_layers_simple(client):
 
         wms_url = geoserver_wms.get_wms_url(workspace)
         wms = wms_proxy(wms_url)
-        wms_layername = get_wms_layername(workspace, layername)
+        layeruuid = layer_info['uuid']
+        wms_layername = names.get_layer_names_by_source(uuid=layeruuid).wms.name
         assert wms_layername in wms.contents
 
         from layman.layer import get_layer_type_def
@@ -262,6 +261,7 @@ def test_post_layers_simple(client):
         with open(uuid_filename, "r", encoding="utf-8") as file:
             uuid_str = file.read().strip()
         assert uuid.is_valid_uuid(uuid_str)
+        assert uuid_str == layeruuid
         assert settings.LAYMAN_REDIS.sismember(uuid.UUID_SET_KEY, uuid_str)
         assert settings.LAYMAN_REDIS.exists(uuid.get_uuid_metadata_key(uuid_str))
         assert settings.LAYMAN_REDIS.hexists(
@@ -402,6 +402,7 @@ def test_post_layers_shp(client):
             'name': layername,
         })
     assert response.status_code == 200
+    layeruuid = response.json[0]['uuid']
 
     chain_info = util.get_layer_chain(workspace, layername)
     assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
@@ -410,7 +411,7 @@ def test_post_layers_shp(client):
 
     wms_url = geoserver_wms.get_wms_url(workspace)
     wms = wms_proxy(wms_url)
-    wms_layername = get_wms_layername(workspace, layername)
+    wms_layername = names.get_layer_names_by_source(uuid=layeruuid).wms.name
     assert wms_layername in wms.contents
 
     publication_counter.increase()
@@ -714,7 +715,7 @@ def test_patch_layer_style(client):
                 'title': 'countries in blue'
             })
         assert response.status_code == 200
-        layeruuid = response['uuid']
+        layeruuid = response.json['uuid']
 
         # last_task = util._get_layer_task(workspace, layername)
 
