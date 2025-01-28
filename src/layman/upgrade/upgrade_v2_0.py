@@ -2,7 +2,8 @@ import logging
 import requests
 
 from db import util as db_util
-from layman import settings
+from geoserver import util as gs_util
+from layman import settings, names
 from layman.layer import LAYER_TYPE
 from layman.layer.geoserver.wms import get_wms_proxy
 from layman.map import MAP_TYPE
@@ -51,3 +52,12 @@ def adjust_publications_description():
         db_util.run_statement(query, params)
 
     logger.info(f'    Adjusting publications description DONE')
+
+
+def ensure_gs_workspaces():
+    logger.info(f'    Ensure GS workspaces')
+    all_gs_workspaces = gs_util.get_all_workspaces(auth=settings.LAYMAN_GS_AUTH)
+    assert names.GEOSERVER_WFS_WORKSPACE not in all_gs_workspaces
+    assert names.GEOSERVER_WMS_WORKSPACE not in all_gs_workspaces
+    gs_util.ensure_workspace(names.GEOSERVER_WFS_WORKSPACE, auth=settings.LAYMAN_GS_AUTH)
+    gs_util.ensure_workspace(names.GEOSERVER_WMS_WORKSPACE, auth=settings.LAYMAN_GS_AUTH)
