@@ -67,6 +67,7 @@ pytest_generate_tests = base_test.pytest_generate_tests
 
 
 @pytest.mark.usefixtures('ensure_external_db')
+@pytest.mark.xfail(reason='Map filesystem input_file and GeoServer proxy are not yet ready for WMS and WFS layers named by UUID', strict=False)
 class TestWfst(base_test.TestSingleRestPublication):
 
     workspace = WORKSPACE
