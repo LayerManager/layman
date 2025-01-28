@@ -18,7 +18,7 @@ def test_issue_738():
     with app.app_context():
         layer_info = laymen_util.get_publication_info(workspace, process_client.LAYER_TYPE, layer, context={'keys': ['wms', 'uuid']})
     geoserver_workspace = layer_info.get('_wms', {}).get('workspace')
-    style_name = names.get_layer_names_by_source(uuid=layer_info['uuid']).wms.name
+    style_name = names.get_layer_names_by_source(uuid=layer_info['uuid']).sld.name
 
     response = gs_util.get_workspace_style_response(geoserver_workspace=geoserver_workspace,
                                                     stylename=style_name,

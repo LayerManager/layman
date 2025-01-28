@@ -12,13 +12,15 @@ class NameForSource:
 class Names:
     wfs: NameForSource
     wms: NameForSource
+    sld: NameForSource
 
 
 def get_names_by_source(*, uuid, publication_type):
     assert publication_type == LAYER_TYPE
     return Names(
         wfs=NameForSource(name=f'l_{uuid}'),
-        wms=NameForSource(name=f'l_{uuid}')
+        wms=NameForSource(name=f'l_{uuid}'),
+        sld=NameForSource(name=uuid),
     )
 
 

@@ -21,8 +21,8 @@ get_publication_uuid = empty_method_returns_none
 def get_workspace_style_url(*, uuid):
     layer_info = get_publication_info_by_uuid(uuid=uuid, context={'keys': ['wms']})
     geoserver_workspace = layer_info.get('_wms', {}).get('workspace')
-    gs_layername = names.get_layer_names_by_source(uuid=uuid).wms.name
-    return gs_util.get_workspace_style_url(geoserver_workspace, gs_layername) if geoserver_workspace else None
+    style_name = names.get_layer_names_by_source(uuid=uuid).sld.name
+    return gs_util.get_workspace_style_url(geoserver_workspace, style_name) if geoserver_workspace else None
 
 
 def delete_layer(workspace, layername):
@@ -33,7 +33,7 @@ def delete_layer(workspace, layername):
 def delete_layer_by_uuid(*, workspace, uuid):
     layer_info = get_publication_info_by_uuid(uuid=uuid, context={'keys': ['wms']})
     geoserver_workspace = layer_info.get('_wms', {}).get('workspace')
-    gs_style_name = names.get_layer_names_by_source(uuid=uuid).wms.name
+    gs_style_name = names.get_layer_names_by_source(uuid=uuid).sld.name
     sld_stream = gs_util.delete_workspace_style(geoserver_workspace, gs_style_name, auth=settings.LAYMAN_GS_AUTH) \
         if geoserver_workspace else None
     wms.clear_cache(workspace)
@@ -117,15 +117,15 @@ def create_customized_grayscale_sld(*, file_path, min_value, max_value, nodata_v
 def create_layer_style(*, uuid, workspace, layername, ):
     layer_info = get_publication_info_by_uuid(uuid, context={'keys': ['wms']})
     geoserver_workspace = layer_info['_wms']['workspace']
-    gs_layername = layer_info['wms']['name']
+    all_names = names.get_layer_names_by_source(uuid=uuid)
     style_file = input_style.get_layer_file(workspace, layername)
-    gs_util.post_workspace_sld_style(geoserver_workspace, gs_layername, gs_layername, style_file, launder_attribute_name)
+    gs_util.post_workspace_sld_style(geoserver_workspace, all_names.wms.name, all_names.sld.name, style_file, launder_attribute_name)
     wms.clear_cache(workspace)
 
 
 def get_style_response(*, uuid, headers=None, auth=None):
     layer_info = get_publication_info_by_uuid(uuid, context={'keys': ['wms']})
     geoserver_workspace = layer_info.get('_wms', {}).get('workspace')
-    gs_style_name = names.get_layer_names_by_source(uuid=uuid).wms.name
+    gs_style_name = names.get_layer_names_by_source(uuid=uuid).sld.name
     return gs_util.get_workspace_style_response(geoserver_workspace, gs_style_name, headers, auth) \
         if geoserver_workspace else None
