@@ -32,6 +32,7 @@ git pull
 cp .env.dev .env
 sed -i -e "s/OAUTH2_INTROSPECTION_URL=.*/OAUTH2_INTROSPECTION_URL=http:\\/\\/host.docker.internal:8123\\/rest\\/test-oauth2\\/introspection?is_active=true/" .env
 sed -i -e "s/OAUTH2_USER_PROFILE_URL=.*/OAUTH2_USER_PROFILE_URL=http:\\/\\/host.docker.internal:8123\\/rest\\/test-oauth2\\/user-profile/" .env
+sed -i -e "s/FLASK_SECRET_KEY=.*/FLASK_SECRET_KEY=fb8727f383cacdbdcbf74d2f878b4141b15109f02cbe6117bb7d95605aa1f46f/" .env
 sed -i -e '/   layman_dev/a\' -e '      extra_hosts:\n         - "host.docker.internal:host-gateway"' docker-compose.dev.yml
 sed -i -e '/   celery_worker_dev/a\' -e '      extra_hosts:\n         - "host.docker.internal:host-gateway"' docker-compose.dev.yml
 docker pull layermanager/layman:dev-1-23
