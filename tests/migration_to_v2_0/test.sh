@@ -42,12 +42,11 @@ docker tag layermanager/layman:client-1-23 layman_client
 docker tag layermanager/layman:client-1-23 layman_client_test
 docker pull layermanager/layman:timgen-1-23
 docker tag layermanager/layman:timgen-1-23 timgen
-make wagtail-build && make micka-build && make qgis-build
+make micka-build && make qgis-build
 
 # start empty Layman 1.23.x
 make reset-data-directories
-make start-dev
-docker logs -f layman_dev 2>&1 | sed '/Layman successfully started/ q'
+./tmp/migration_to_v2_0/start-dev-without-wagtail.sh
 
 # activate python virtual environment, set environment variables
 source .venv/bin/activate
