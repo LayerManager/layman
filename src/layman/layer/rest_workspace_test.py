@@ -11,6 +11,8 @@ import sys
 import requests
 import pytest
 
+from ..names import get_layer_names_by_source
+
 del sys.modules['layman']
 
 from geoserver.util import get_feature_type
@@ -476,11 +478,12 @@ def test_post_layers_complex(client):
 
         wms_url = geoserver_wms.get_wms_url(workspace)
         wms = wms_proxy(wms_url)
-        wms_layername = get_wms_layername(workspace, layername)
+        all_names = get_layer_names_by_source(uuid=layeruuid)
+        wms_layername = all_names.wms.name
         assert wms_layername in wms.contents
         assert wms[wms_layername].title == 'staty'
         assert wms[wms_layername].abstract == 'popis států'
-        assert wms[wms_layername].styles[f'l_{layeruuid}']['title'] == 'Generic Blue'
+        assert wms[wms_layername].styles[all_names.sld.name]['title'] == 'Generic Blue'
 
         assert layername != ''
         rest_path = url_for('rest_workspace_layer.get', workspace=workspace, layername=layername)
@@ -711,6 +714,7 @@ def test_patch_layer_style(client):
                 'title': 'countries in blue'
             })
         assert response.status_code == 200
+        layeruuid = response['uuid']
 
         # last_task = util._get_layer_task(workspace, layername)
 
@@ -730,10 +734,11 @@ def test_patch_layer_style(client):
 
         wms_url = geoserver_wms.get_wms_url(workspace)
         wms = wms_proxy(wms_url)
-        wms_layername = get_wms_layername(workspace, layername)
+        all_names = get_layer_names_by_source(uuid=layeruuid)
+        wms_layername = all_names.wms.name
         assert wms_layername in wms.contents
         assert wms[wms_layername].title == 'countries in blue'
-        assert wms[wms_layername].styles[wms_layername]['title'] == 'Generic Blue'
+        assert wms[wms_layername].styles[all_names.sld.name]['title'] == 'Generic Blue'
 
         uuid.check_redis_consistency(expected_publ_num_by_type={
             f'{LAYER_TYPE}': publication_counter.get()
