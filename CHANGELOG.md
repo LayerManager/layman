@@ -13,6 +13,7 @@
 - [#1009](https://github.com/LayerManager/layman/issues/1009) Add column `description` to table `publications` in prime DB schema.
 #### Data migrations
 - [#1009](https://github.com/LayerManager/layman/issues/1009) Fill column `description` in `publications` table in prime DB schema. Value is taken from GeoServer for layers and from filesystem for maps.
+- [#1048](https://github.com/LayerManager/layman/issues/1048) New 
 ### Changes
 - [#1048](https://github.com/LayerManager/layman/issues/1048) New keys `wfs`.`name` and `wms`.`name` were added to [GET Workspace Layer](doc/rest.md#get-workspace-layer) response.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Names of [Feature types, Coverages, Layers and Styles in GeoServer WFS and WMS workspaces](doc/data-storage.md#geoserver) are derived from layer`uuid`.

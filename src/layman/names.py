@@ -3,6 +3,10 @@ from dataclasses import dataclass
 from .layer import LAYER_TYPE
 
 
+GEOSERVER_WFS_WORKSPACE = 'layman'
+GEOSERVER_WMS_WORKSPACE = 'layman_wms'
+
+
 @dataclass(frozen=True)
 class NameForSource:
     name: str
