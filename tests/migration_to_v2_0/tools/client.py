@@ -338,3 +338,17 @@ class RestClient:
         response = wait_for_rest(r_url, 60, 0.5, check_response=check_response_fn, headers=headers)
         if raise_if_not_complete:
             raise_if_not_complete_status(response)
+
+    def get_workspace_publication(self, publication_type, workspace, name, headers=None, *, actor_name=None):
+        headers = headers or {}
+        if actor_name:
+            assert TOKEN_HEADER not in headers
+        if actor_name and actor_name != settings.ANONYM_USER:
+            headers.update(get_authz_headers(actor_name))
+
+        publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
+
+        r_url = f"{self.base_url}/rest/workspaces/{workspace}/{publication_type_def.url_path_name}/{name}"
+        response = requests.get(r_url, headers=headers, timeout=HTTP_TIMEOUT)
+        raise_layman_error(response)
+        return response.json()
