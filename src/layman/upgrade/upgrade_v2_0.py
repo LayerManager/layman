@@ -4,7 +4,7 @@ import requests
 from db import util as db_util
 from layman import settings
 from layman.layer import LAYER_TYPE
-from layman.layer.geoserver import wms as gs_wms
+from layman.layer.geoserver.wms import get_wms_proxy
 from layman.map import MAP_TYPE
 from layman.map.filesystem import input_file
 
@@ -33,11 +33,12 @@ def adjust_publications_description():
 
     for workspace, publ_type, publication in publications:
         logger.info(f'    Adjust description of {publ_type} {workspace}.{publication}')
-        get_info = {LAYER_TYPE: gs_wms.get_layer_info,
-                    MAP_TYPE: input_file.get_map_info,
-                    }[publ_type]
         try:
-            description = get_info(workspace, publication)['description']
+            if publ_type == LAYER_TYPE:
+                wms = get_wms_proxy(workspace)
+                description = wms.contents[publication].abstract
+            else:
+                description = input_file.get_map_info(workspace, publication)['description']
         except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout, requests.exceptions.HTTPError):
             description = None
 
