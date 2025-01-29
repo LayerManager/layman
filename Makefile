@@ -360,7 +360,7 @@ nginx-restart:
 	docker compose -f docker-compose.demo.yml -f docker-compose.deps.demo.yml up --force-recreate --no-deps -d nginx
 
 qgis-build:
-	docker compose -f docker-compose.deps.yml -f docker-compose.dev.yml build nginx-qgis qgis
+	docker compose -f docker-compose.deps.yml -f docker-compose.dev.yml build qgis
 
 qgis-restart:
 	mkdir -p deps/qgis/data
