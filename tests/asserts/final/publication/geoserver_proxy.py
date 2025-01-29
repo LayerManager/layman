@@ -9,12 +9,12 @@ def is_complete_in_workspace_wms(workspace, publ_type, name, *, version, headers
     assert publ_type == process_client.LAYER_TYPE
 
     with app.app_context():
-        wms_url = test_util.url_for('geoserver_proxy_bp.proxy', subpath=workspace + settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX + '/ows')
         uuid = layman_util.get_publication_uuid(workspace, publ_type, name)
-    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wms.name
+        gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wms
+        wms_url = test_util.url_for('geoserver_proxy_bp.proxy', subpath=gs_layername.workspace + '/ows')
     wms_inst = gs_util.wms_proxy(wms_url, version=version, headers=headers)
     validate_metadata_url = version != '1.1.1'
-    geoserver_util.is_complete_in_workspace_wms_instance(wms_inst, gs_layername, validate_metadata_url=validate_metadata_url)
+    geoserver_util.is_complete_in_workspace_wms_instance(wms_inst, gs_layername.name, validate_metadata_url=validate_metadata_url)
 
 
 def is_complete_in_workspace_wms_1_3_0(workspace, publ_type, name, headers=None, *, actor_name=None):
@@ -35,19 +35,19 @@ def workspace_wfs_2_0_0_capabilities_available_if_vector(workspace, publ_type, n
         assert process_client.TOKEN_HEADER not in headers
     if actor_name and actor_name != settings.ANONYM_USER:
         headers.update(process_client.get_authz_headers(actor_name))
-    with app.app_context():
-        internal_wfs_url = test_util.url_for('geoserver_proxy_bp.proxy', subpath=workspace + '/wfs')
 
     with app.app_context():
         uuid = layman_util.get_publication_uuid(workspace, publ_type, name)
         file_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['geodata_type']})
     geodata_type = file_info['geodata_type']
     if geodata_type == settings.GEODATA_TYPE_VECTOR:
-        gs_layername = names.get_names_by_source(uuid=uuid, publication_type=publ_type).wfs.name
+        gs_layername = names.get_names_by_source(uuid=uuid, publication_type=publ_type).wfs
+        with app.app_context():
+            internal_wfs_url = test_util.url_for('geoserver_proxy_bp.proxy', subpath=gs_layername.workspace + '/wfs')
         wfs_inst = gs_util.wfs_proxy(wfs_url=internal_wfs_url, version='2.0.0', headers=headers)
 
         assert wfs_inst.contents
-        wfs_name = f'{workspace}:{gs_layername}'
+        wfs_name = f'{gs_layername.workspace}:{gs_layername.name}'
         assert wfs_name in wfs_inst.contents, "Layer not found in Capabilities."
         wfs_layer = wfs_inst.contents[wfs_name]
         assert len(wfs_layer.metadataUrls) == 1
@@ -60,10 +60,10 @@ def wms_legend_url_with_x_forwarded_headers(workspace, publ_type, name, headers=
     headers = headers or {}
     with app.app_context():
         uuid = layman_util.get_publication_uuid(workspace, publ_type, name)
-    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wms.name
+    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wms
 
-    for input_workspace, key in [(workspace + settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX, gs_layername),
-                                 ('', f'{workspace + settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}:{gs_layername}'), ]:
+    for input_workspace, key in [(gs_layername.workspace, gs_layername.name),
+                                 ('', f'{gs_layername.workspace}:{gs_layername.name}'), ]:
         for version in ['1.3.0', '1.1.1']:
             wms_inst = geoserver_client.get_wms_capabilities(input_workspace,
                                                              headers={**x_forwarded_items.headers,

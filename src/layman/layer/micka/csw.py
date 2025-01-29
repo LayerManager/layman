@@ -18,7 +18,7 @@ from layman.layer import db
 from layman.layer.geoserver import wms
 from layman.layer.geoserver import wfs
 from layman.layer import LAYER_TYPE
-from layman import settings, patch_mode, LaymanError, common
+from layman import settings, patch_mode, LaymanError, common, names
 from layman.util import url_for, get_publication_info
 
 logger = logging.getLogger(__name__)
@@ -150,7 +150,7 @@ def get_template_path_and_values(workspace, layername, http_method):
         spatial_resolution = {
             'scale_denominator': scale_denominator,
         }
-        wfs_url = wfs.get_wfs_url(workspace, external_url=True)
+        wfs_url = wfs.get_wfs_url(names.GEOSERVER_WFS_WORKSPACE, external_url=True)
     elif geodata_type == settings.GEODATA_TYPE_RASTER:
         languages = []
         bbox_sphere_size = prime_db_table.get_bbox_sphere_size(workspace, layername)
@@ -185,7 +185,7 @@ def get_template_path_and_values(workspace, layername, http_method):
         'graphic_url': url_for('rest_workspace_layer_thumbnail.get', workspace=workspace, layername=layername),
         'extent': extent,
         'temporal_extent': temporal_extent,
-        'wms_url': f"{wms.add_capabilities_params_to_url(wms.get_wms_url(workspace, external_url=True))}&LAYERS={layername}",
+        'wms_url': f"{wms.add_capabilities_params_to_url(wms.get_wms_url(names.GEOSERVER_WMS_WORKSPACE, external_url=True))}&LAYERS={layername}",
         'wfs_url': f"{wfs.add_capabilities_params_to_url(wfs_url)}&LAYERS={layername}" if wfs_url else None,
         'layer_endpoint': url_for('rest_workspace_layer.get', workspace=workspace, layername=layername),
         'spatial_resolution': spatial_resolution,

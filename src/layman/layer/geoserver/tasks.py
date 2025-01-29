@@ -41,7 +41,7 @@ def refresh_wms(
         slugified_time_regex_format=None,
         original_data_source=settings.EnumOriginalDataSource.FILE.value,
 ):
-    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wms.name
+    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wms
     info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': [
         'file', 'geodata_type', 'native_bounding_box', 'native_crs', 'table_uri'
     ]})
@@ -49,8 +49,7 @@ def refresh_wms(
     crs = info['native_crs']
 
     assert title is not None
-    geoserver_workspace = wms.get_geoserver_workspace(workspace)
-    geoserver.ensure_workspace(workspace)
+    geoserver.ensure_workspace(gs_layername.workspace)
     metadata_url = micka_util.get_metadata_url(uuid, url_type=micka_util.RecordUrlType.XML)
 
     if self.is_aborted():
@@ -62,13 +61,13 @@ def refresh_wms(
             table_name = table_uri.table
             store_name = None
             if original_data_source == settings.EnumOriginalDataSource.TABLE.value:
-                store_name = geoserver.create_external_db_store(workspace=geoserver_workspace,
+                store_name = geoserver.create_external_db_store(workspace=gs_layername.workspace,
                                                                 uuid=uuid,
                                                                 table_uri=table_uri,
                                                                 )
             geoserver.publish_layer_from_db_by_uuid(uuid=uuid,
-                                                    gs_layername=gs_layername,
-                                                    geoserver_workspace=geoserver_workspace,
+                                                    gs_layername=gs_layername.name,
+                                                    geoserver_workspace=gs_layername.workspace,
                                                     description=description,
                                                     title=title,
                                                     crs=crs,
@@ -77,8 +76,8 @@ def refresh_wms(
                                                     store_name=store_name)
         else:
             geoserver.publish_layer_from_qgis(uuid=uuid,
-                                              gs_layername=gs_layername,
-                                              geoserver_workspace=geoserver_workspace,
+                                              gs_layername=gs_layername.name,
+                                              geoserver_workspace=gs_layername.workspace,
                                               qgis_layername=layername,
                                               description=description,
                                               title=title,
@@ -107,35 +106,35 @@ def refresh_wms(
                 file.write(f'regex={slugified_time_regex}{timeregex_format_str}\n')
             coverage_type = gs_util.COVERAGESTORE_IMAGEMOSAIC
             enable_time_dimension = True
-        gs_util.create_coverage_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, coverage_store_name, source_file_or_dir, coverage_type=coverage_type)
-        gs_util.publish_coverage(geoserver_workspace, settings.LAYMAN_GS_AUTH, coverage_store_name, gs_layername, title,
+        gs_util.create_coverage_store(gs_layername.workspace, settings.LAYMAN_GS_AUTH, coverage_store_name, source_file_or_dir, coverage_type=coverage_type)
+        gs_util.publish_coverage(gs_layername.workspace, settings.LAYMAN_GS_AUTH, coverage_store_name, gs_layername.name, title,
                                  description, bbox, crs, lat_lon_bbox=lat_lon_bbox, metadata_url=metadata_url, enable_time_dimension=enable_time_dimension)
     else:
         raise NotImplementedError(f"Unknown geodata type: {geodata_type}")
 
     geoserver.set_security_rules_by_uuid(uuid=uuid,
-                                         geoserver_workspace=geoserver_workspace,
-                                         geoserver_layername=gs_layername,
+                                         geoserver_workspace=gs_layername.workspace,
+                                         geoserver_layername=gs_layername.name,
                                          access_rights=access_rights,
                                          auth=settings.LAYMAN_GS_AUTH,
                                          )
 
-    wms.clear_cache(workspace)
+    wms.clear_cache(gs_layername.workspace)
 
     try:
-        wms_info = wms.get_layer_info_by_uuid(workspace=workspace,
-                                              uuid=uuid,
+        wms_info = wms.get_layer_info_by_uuid(uuid=uuid,
                                               gdal_layername=layername,
+                                              gdal_workspace=workspace,
                                               )
     except BaseException:
         wms_info = {}
 
     if 'wms' not in wms_info:
-        wms.delete_layer_by_uuid(workspace=workspace, uuid=uuid)
+        wms.delete_layer_by_uuid(uuid=uuid)
         raise LaymanError(53,)
 
     if self.is_aborted():
-        wms.delete_layer_by_uuid(workspace=workspace, uuid=uuid)
+        wms.delete_layer_by_uuid(uuid=uuid)
         raise AbortedException
 
 
@@ -155,7 +154,8 @@ def refresh_wfs(
         access_rights=None,
         original_data_source=settings.EnumOriginalDataSource.FILE.value,
 ):
-    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wfs.name
+    # pylint: disable=unused-argument
+    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wfs
     info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['geodata_type', 'native_crs', 'table_uri']})
     geodata_type = info['geodata_type']
     if geodata_type == settings.GEODATA_TYPE_RASTER:
@@ -164,7 +164,7 @@ def refresh_wfs(
         raise NotImplementedError(f"Unknown geodata type: {geodata_type}")
 
     assert title is not None
-    geoserver.ensure_workspace(workspace)
+    geoserver.ensure_workspace(gs_layername.workspace)
 
     if self.is_aborted():
         raise AbortedException
@@ -173,14 +173,14 @@ def refresh_wfs(
     store_name = None
     if original_data_source == settings.EnumOriginalDataSource.TABLE.value:
         table_uri = info['_table_uri']
-        store_name = geoserver.create_external_db_store(workspace=workspace,
+        store_name = geoserver.create_external_db_store(workspace=gs_layername.workspace,
                                                         uuid=uuid,
                                                         table_uri=table_uri,
                                                         )
     metadata_url = micka_util.get_metadata_url(uuid, url_type=micka_util.RecordUrlType.XML)
     geoserver.publish_layer_from_db_by_uuid(uuid=uuid,
-                                            gs_layername=gs_layername,
-                                            geoserver_workspace=workspace,
+                                            gs_layername=gs_layername.name,
+                                            geoserver_workspace=gs_layername.workspace,
                                             description=description,
                                             title=title,
                                             crs=crs,
@@ -188,25 +188,24 @@ def refresh_wfs(
                                             metadata_url=metadata_url,
                                             store_name=store_name)
     geoserver.set_security_rules_by_uuid(uuid=uuid,
-                                         geoserver_workspace=workspace,
-                                         geoserver_layername=gs_layername,
+                                         geoserver_workspace=gs_layername.workspace,
+                                         geoserver_layername=gs_layername.name,
                                          access_rights=access_rights,
                                          auth=settings.LAYMAN_GS_AUTH,
                                          )
-    wfs.clear_cache(workspace)
+    wfs.clear_cache(gs_layername.workspace)
 
     try:
-        wfs_info = wfs.get_layer_info_by_uuid(workspace=workspace,
-                                              uuid=uuid)
+        wfs_info = wfs.get_layer_info_by_uuid(uuid=uuid)
     except BaseException:
         wfs_info = {}
 
     if 'wfs' not in wfs_info:
-        wfs.delete_layer(workspace, layername)
+        wfs.delete_layer_by_uuid(uuid=uuid)
         raise LaymanError(53,)
 
     if self.is_aborted():
-        wfs.delete_layer(workspace, layername)
+        wfs.delete_layer_by_uuid(uuid=uuid)
         raise AbortedException
 
 
@@ -223,5 +222,5 @@ def refresh_sld(self, workspace, layername, store_in_geoserver, *, uuid):
         sld.create_layer_style(uuid=uuid, workspace=workspace, layername=layername)
 
     if self.is_aborted():
-        sld.delete_layer(workspace, layername)
+        sld.delete_layer_by_uuid(uuid=uuid)
         raise AbortedException

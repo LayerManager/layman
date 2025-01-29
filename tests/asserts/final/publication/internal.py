@@ -6,7 +6,7 @@ import pytest
 
 import requests_util.url_util
 from db import util as db_util, TableUri
-from layman import app, util as layman_util, settings, celery
+from layman import app, util as layman_util, settings, celery, names
 from layman.common import bbox as bbox_util
 from layman.common.prime_db_schema import publications
 from layman.layer import LAYER_TYPE
@@ -167,10 +167,10 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                        },
                                        'wms': {
                                            'name': f'l_{uuid}',
-                                           'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{workspace}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}/ows'},
+                                           'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{names.GEOSERVER_WMS_WORKSPACE}/ows'},
                                        '_wms': {
-                                           'url': f'{settings.LAYMAN_GS_URL}{workspace}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}/ows',
-                                           'workspace': f'{workspace}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}'},
+                                           'url': f'{settings.LAYMAN_GS_URL}{names.GEOSERVER_WMS_WORKSPACE}/ows',
+                                           'workspace': f'{names.GEOSERVER_WMS_WORKSPACE}'},
                                        'description': None,
                                        'original_data_source': settings.EnumOriginalDataSource.TABLE.value if external_table_uri else settings.EnumOriginalDataSource.FILE.value,
                                        'geodata_type': geodata_type,
@@ -221,7 +221,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                 table_uri = external_table_uri
                 util.recursive_dict_update(expected_detail,
                                            {
-                                               'wfs': {'name': f'l_{uuid}', 'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{workspace}/wfs'},
+                                               'wfs': {'name': f'l_{uuid}', 'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{names.GEOSERVER_WFS_WORKSPACE}/wfs'},
                                                '_table_uri': table_uri,
                                                'db': {
                                                    'external_uri': requests_util.url_util.redact_uri(table_uri.db_uri_str),
@@ -241,7 +241,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                 )
                 util.recursive_dict_update(expected_detail,
                                            {
-                                               'wfs': {'name': f'l_{uuid}', 'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{workspace}/wfs'},
+                                               'wfs': {'name': f'l_{uuid}', 'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{names.GEOSERVER_WFS_WORKSPACE}/wfs'},
                                                '_file': {'file_type': 'vector'},
                                                'db': {
                                                    'schema': workspace,

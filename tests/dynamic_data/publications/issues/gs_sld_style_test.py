@@ -16,12 +16,11 @@ def test_issue_738():
                                            style_file='sample/style/basic.sld',
                                            )
     with app.app_context():
-        layer_info = laymen_util.get_publication_info(workspace, process_client.LAYER_TYPE, layer, context={'keys': ['wms', 'uuid']})
-    geoserver_workspace = layer_info.get('_wms', {}).get('workspace')
-    style_name = names.get_layer_names_by_source(uuid=layer_info['uuid']).sld.name
+        uuid = laymen_util.get_publication_uuid(workspace, process_client.LAYER_TYPE, layer)
+    style_name = names.get_layer_names_by_source(uuid=uuid).sld
 
-    response = gs_util.get_workspace_style_response(geoserver_workspace=geoserver_workspace,
-                                                    stylename=style_name,
+    response = gs_util.get_workspace_style_response(geoserver_workspace=style_name.workspace,
+                                                    stylename=style_name.name,
                                                     headers=gs_util.headers_sld['1.1.0'],
                                                     auth=settings.LAYMAN_GS_AUTH,
                                                     )

@@ -33,8 +33,8 @@ headers_sld = {
 @pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman')
 def test_info(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
-    wms_url = f"http://localhost:8000/geoserver/{workspace}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}/ows"
-    wfs_url = f"http://localhost:8000/geoserver/{workspace}/wfs"
+    wms_url = f"http://localhost:8000/geoserver/{names.GEOSERVER_WMS_WORKSPACE}/ows"
+    wfs_url = f"http://localhost:8000/geoserver/{names.GEOSERVER_WFS_WORKSPACE}/wfs"
     headers = data.HEADERS.get(data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_write', [None])[0])
     style = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA]['style_type']
 
@@ -107,15 +107,14 @@ def test_wms_layer(workspace, publ_type, publication):
     style_file_type = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('style_file_type')
     expected_style_file = f'/layman_data_test/workspaces/{workspace}/layers/{publication}/input_style/{publication}'
     expected_qgis_file = f'/qgis/data/test/workspaces/{workspace}/layers/{publication}/{publication}.qgis'
-    wms_stores_url = urljoin(GS_REST_WORKSPACES, f'{workspace}_wms/wmsstores/')
-    wms_layers_url = urljoin(GS_REST_WORKSPACES, f'{workspace}_wms/wmslayers/')
     with app.app_context():
         uuid = layman_util.get_publication_uuid(workspace, process_client.LAYER_TYPE, publication)
-    wms_layername = names.get_layer_names_by_source(uuid=uuid, ).wms.name
+    wms_layername = names.get_layer_names_by_source(uuid=uuid, ).wms
+    wms_stores_url = urljoin(GS_REST_WORKSPACES, f'{wms_layername.workspace}/wmsstores/')
+    wms_layers_url = urljoin(GS_REST_WORKSPACES, f'{wms_layername.workspace}/wmslayers/')
 
     with app.app_context():
-        info = layman_util.get_publication_info(workspace, publ_type, publication, context={'keys': ['wms', 'uuid']})
-    uuid = info["uuid"]
+        uuid = layman_util.get_publication_uuid(workspace, publ_type, publication)
 
     if style_file_type:
         assert (os.path.exists(expected_style_file + '.qml')) == (style_file_type == 'qml')
@@ -131,7 +130,7 @@ def test_wms_layer(workspace, publ_type, publication):
         wms_stores = [store['name'] for store in response.json()['wmsStores']['wmsStore']]
         assert f'{DEFAULT_WMS_QGIS_STORE_PREFIX}_{uuid}' in wms_stores, response.json()
     elif style == 'sld':
-        url = urljoin(GS_REST, f'workspaces/{workspace}_wms/styles/{uuid}')
+        url = urljoin(GS_REST, f'workspaces/{wms_layername.workspace}/styles/{uuid}')
 
         response = requests.get(url,
                                 auth=GS_AUTH,
@@ -147,27 +146,26 @@ def test_wms_layer(workspace, publ_type, publication):
     assert response.status_code == 200, response.json()
     if style == 'qml':
         wms_layers = [layer['name'] for layer in response.json()['wmsLayers']['wmsLayer']]
-        assert wms_layername in wms_layers, response.json()
+        assert wms_layername.name in wms_layers, response.json()
 
     get_map = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('get_map')
     if get_map:
         url_detail, expected_file, pixel_tolerance = get_map
-        url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{workspace}_wms/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image/png&TRANSPARENT=true&STYLES=&LAYERS={workspace}:{wms_layername}&" + url_detail
-        obtained_file = f'tmp/artifacts/test_sld_style_applied_in_wms_{wms_layername}.png'
+        url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{wms_layername.workspace}/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image/png&TRANSPARENT=true&STYLES=&LAYERS={wms_layername.workspace}:{wms_layername.name}&" + url_detail
+        obtained_file = f'tmp/artifacts/test_sld_style_applied_in_wms_{wms_layername.name}.png'
 
         assert_util.assert_same_images(url, obtained_file, expected_file, pixel_tolerance)
 
-    gs_workspace = info['_wms']['workspace']
     authn_headers = data.HEADERS.get(data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_write', [None])[0])
     for service_endpoint in ('ows', 'wms'):
-        wms_url = geoserver_client.get_wms_url(gs_workspace, service_endpoint)
+        wms_url = geoserver_client.get_wms_url(wms_layername.workspace, service_endpoint)
 
         layer_info = process_client.get_workspace_layer(workspace, publication, headers=authn_headers)
         crs = layer_info['native_crs']
         bbox = bbox_util.get_bbox_to_publish(layer_info['bounding_box'], crs)
         tn_bbox = gs_util.get_square_bbox(bbox)
 
-        response = gs_util.get_layer_thumbnail(wms_url, wms_layername, tn_bbox, crs_def.EPSG_3857, headers=authn_headers, wms_version=VERSION)
+        response = gs_util.get_layer_thumbnail(wms_url, wms_layername.name, tn_bbox, crs_def.EPSG_3857, headers=authn_headers, wms_version=VERSION)
         response.raise_for_status()
         assert 'image' in response.headers['content-type'], f'response.headers={response.headers}, response.content={response.content}'
 
@@ -176,12 +174,12 @@ def test_wms_layer(workspace, publ_type, publication):
     headers_list_out = all_auth_info['read'][util.KEY_NOT_AUTH][util.KEY_HEADERS]
 
     for in_headers in headers_list_in:
-        wms = geoserver_client.get_wms_capabilities(gs_workspace, headers=in_headers)
-        assert wms_layername in set(wms.contents)
+        wms = geoserver_client.get_wms_capabilities(wms_layername.workspace, headers=in_headers)
+        assert wms_layername.name in set(wms.contents)
 
     for out_headers in headers_list_out:
-        wms = geoserver_client.get_wms_capabilities(gs_workspace, headers=out_headers)
-        assert wms_layername not in set(wms.contents)
+        wms = geoserver_client.get_wms_capabilities(wms_layername.workspace, headers=out_headers)
+        assert wms_layername.name not in set(wms.contents)
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_QML_LAYERS)

@@ -34,44 +34,43 @@ def get_flask_proxy_key(workspace):
     return FLASK_PROXY_KEY.format(workspace=workspace)
 
 
-def patch_layer_by_uuid(*, workspace, uuid, directory_name, original_data_source, title, description, access_rights=None):
-    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wms.name
-    if not get_layer_info_by_uuid(workspace, uuid=uuid, gdal_layername=directory_name,):
+def patch_layer_by_uuid(*, uuid, gdal_layername, gdal_workspace, original_data_source, title, description, access_rights=None):
+    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wms
+    if not get_layer_info_by_uuid(uuid=uuid, gdal_layername=gdal_layername, gdal_workspace=gdal_workspace,):
         return
-    geoserver_workspace = get_geoserver_workspace(workspace)
     info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['style_type', 'geodata_type', 'image_mosaic'], })
     geodata_type = info['geodata_type']
     if geodata_type == settings.GEODATA_TYPE_VECTOR:
         if info['_style_type'] == 'sld':
             store_name = get_external_db_store_name(uuid=uuid) if original_data_source == settings.EnumOriginalDataSource.TABLE.value else gs_util.DEFAULT_DB_STORE_NAME
-            gs_util.patch_feature_type(geoserver_workspace, gs_layername, store_name=store_name, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
+            gs_util.patch_feature_type(gs_layername.workspace, gs_layername.name, store_name=store_name, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
         if info['_style_type'] == 'qml':
-            gs_util.patch_wms_layer(geoserver_workspace, gs_layername, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
+            gs_util.patch_wms_layer(gs_layername.workspace, gs_layername.name, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
     elif geodata_type == settings.GEODATA_TYPE_RASTER:
         image_mosaic = info['image_mosaic']
         if image_mosaic:
             store = get_image_mosaic_store_name(uuid=uuid)
         else:
             store = get_geotiff_store_name(uuid=uuid)
-        gs_util.patch_coverage(geoserver_workspace, gs_layername, store, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
+        gs_util.patch_coverage(gs_layername.workspace, gs_layername.name, store, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
     else:
         raise NotImplementedError(f"Unknown geodata type: {geodata_type}")
-    clear_cache(workspace)
+    clear_cache(gs_layername.workspace)
 
     if access_rights and access_rights.get('read'):
         security_read_roles = gs_common.layman_users_and_roles_to_geoserver_roles(access_rights['read'])
-        gs_util.ensure_layer_security_roles(geoserver_workspace, gs_layername, security_read_roles, 'r', settings.LAYMAN_GS_AUTH)
+        gs_util.ensure_layer_security_roles(gs_layername.workspace, gs_layername.name, security_read_roles, 'r', settings.LAYMAN_GS_AUTH)
 
     if access_rights and access_rights.get('write'):
         security_write_roles = gs_common.layman_users_and_roles_to_geoserver_roles(access_rights['write'])
-        gs_util.ensure_layer_security_roles(geoserver_workspace, gs_layername, security_write_roles, 'w', settings.LAYMAN_GS_AUTH)
+        gs_util.ensure_layer_security_roles(gs_layername.workspace, gs_layername.name, security_write_roles, 'w', settings.LAYMAN_GS_AUTH)
 
 
 # pylint: disable=unused-argument
 def patch_layer(workspace, layername, *, uuid, title, description, original_data_source, access_rights=None):
-    patch_layer_by_uuid(workspace=workspace,
-                        uuid=uuid,
-                        directory_name=layername,
+    patch_layer_by_uuid(uuid=uuid,
+                        gdal_layername=layername,
+                        gdal_workspace=workspace,
                         title=title,
                         description=description,
                         original_data_source=original_data_source,
@@ -79,34 +78,32 @@ def patch_layer(workspace, layername, *, uuid, title, description, original_data
                         )
 
 
-def delete_layer_by_uuid(*, workspace, uuid):
-    geoserver_workspace = get_geoserver_workspace(workspace)
-    gs_layername = names.get_names_by_source(uuid=uuid, publication_type=LAYER_TYPE).wms.name
-    gs_util.delete_feature_type(geoserver_workspace, gs_layername, settings.LAYMAN_GS_AUTH)
-    gs_util.delete_feature_type(geoserver_workspace, gs_layername, settings.LAYMAN_GS_AUTH, store=get_external_db_store_name(uuid=uuid))
-    gs_util.delete_wms_layer(geoserver_workspace, gs_layername, settings.LAYMAN_GS_AUTH)
-    gs_util.delete_wms_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, get_qgis_store_name(uuid=uuid))
-    gs_util.delete_coverage_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, get_geotiff_store_name(uuid=uuid))
-    gs_util.delete_coverage_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, get_image_mosaic_store_name(uuid=uuid))
-    gs_util.delete_db_store(geoserver_workspace, settings.LAYMAN_GS_AUTH, store_name=get_external_db_store_name(uuid=uuid))
-    clear_cache(workspace)
+def delete_layer_by_uuid(*, uuid):
+    gs_layername = names.get_names_by_source(uuid=uuid, publication_type=LAYER_TYPE).wms
+    gs_util.delete_feature_type(gs_layername.workspace, gs_layername.name, settings.LAYMAN_GS_AUTH)
+    gs_util.delete_feature_type(gs_layername.workspace, gs_layername.name, settings.LAYMAN_GS_AUTH, store=get_external_db_store_name(uuid=uuid))
+    gs_util.delete_wms_layer(gs_layername.workspace, gs_layername.name, settings.LAYMAN_GS_AUTH)
+    gs_util.delete_wms_store(gs_layername.workspace, settings.LAYMAN_GS_AUTH, get_qgis_store_name(uuid=uuid))
+    gs_util.delete_coverage_store(gs_layername.workspace, settings.LAYMAN_GS_AUTH, get_geotiff_store_name(uuid=uuid))
+    gs_util.delete_coverage_store(gs_layername.workspace, settings.LAYMAN_GS_AUTH, get_image_mosaic_store_name(uuid=uuid))
+    gs_util.delete_db_store(gs_layername.workspace, settings.LAYMAN_GS_AUTH, store_name=get_external_db_store_name(uuid=uuid))
+    clear_cache(gs_layername.workspace)
 
-    gs_util.delete_security_roles(f"{geoserver_workspace}.{gs_layername}.r", settings.LAYMAN_GS_AUTH)
-    gs_util.delete_security_roles(f"{geoserver_workspace}.{gs_layername}.w", settings.LAYMAN_GS_AUTH)
+    gs_util.delete_security_roles(f"{gs_layername.workspace}.{gs_layername.name}.r", settings.LAYMAN_GS_AUTH)
+    gs_util.delete_security_roles(f"{gs_layername.workspace}.{gs_layername.name}.w", settings.LAYMAN_GS_AUTH)
     return {}
 
 
 def delete_layer(workspace, layername):
     uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layername)
-    return delete_layer_by_uuid(workspace=workspace, uuid=uuid, )
+    return delete_layer_by_uuid(uuid=uuid, )
 
 
 def get_wms_url(workspace, external_url=False, *, x_forwarded_items=None):
     assert external_url or not x_forwarded_items
-    geoserver_workspace = get_geoserver_workspace(workspace)
     base_url = get_gs_proxy_server_url(x_forwarded_items=x_forwarded_items) + settings.LAYMAN_GS_PATH \
         if external_url else settings.LAYMAN_GS_URL
-    return urljoin(base_url, geoserver_workspace + '/ows')
+    return urljoin(base_url, workspace + '/ows')
 
 
 def get_wms_direct(workspace):
@@ -193,48 +190,48 @@ def get_timeregex_props(workspace, layername):
 
 def get_layer_info(workspace, layername, *, x_forwarded_items=None):
     uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layername)
-    return get_layer_info_by_uuid(workspace, uuid=uuid, gdal_layername=layername, x_forwarded_items=x_forwarded_items)
+    return get_layer_info_by_uuid(uuid=uuid, gdal_layername=layername, gdal_workspace=workspace, x_forwarded_items=x_forwarded_items)
 
 
-def get_layer_info_by_uuid(workspace, *, uuid, gdal_layername, x_forwarded_items=None):
-    wms = get_wms_proxy(workspace)
+def get_layer_info_by_uuid(*, uuid, gdal_layername, gdal_workspace, x_forwarded_items=None):
+    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wms
+    wms = get_wms_proxy(gs_layername.workspace)
     if wms is None or uuid is None:
         return {}
-    wms_proxy_url = get_wms_url(workspace, external_url=True, x_forwarded_items=x_forwarded_items)
-    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wms.name
+    wms_proxy_url = get_wms_url(gs_layername.workspace, external_url=True, x_forwarded_items=x_forwarded_items)
 
-    if gs_layername not in wms.contents:
+    if gs_layername.name not in wms.contents:
         return {}
     result = {
-        'title': wms.contents[gs_layername].title,
-        'description': wms.contents[gs_layername].abstract,
+        'title': wms.contents[gs_layername.name].title,
+        'description': wms.contents[gs_layername.name].abstract,
         'wms': {
-            'name': gs_layername,
+            'name': gs_layername.name,
             'url': wms_proxy_url,
         },
         '_wms': {
-            'url': get_wms_url(workspace, external_url=False),
-            'workspace': get_geoserver_workspace(workspace),
+            'url': get_wms_url(gs_layername.workspace, external_url=False),
+            'workspace': gs_layername.workspace,
         },
     }
-    if 'time' in wms.contents[gs_layername].dimensions:
+    if 'time' in wms.contents[gs_layername.name].dimensions:
         result['wms']['time'] = {
-            **wms.contents[gs_layername].dimensions['time'],
-            **get_timeregex_props(workspace, gdal_layername),
+            **wms.contents[gs_layername.name].dimensions['time'],
+            **get_timeregex_props(gdal_workspace, gdal_layername),
         }
     return result
 
 
 def get_metadata_comparison(workspace, layername):
     uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layername)
-    return get_metadata_comparison_by_uuid(workspace=workspace, uuid=uuid)
+    return get_metadata_comparison_by_uuid(uuid=uuid)
 
 
-def get_metadata_comparison_by_uuid(*, workspace, uuid):
-    wms = get_wms_direct(workspace)
+def get_metadata_comparison_by_uuid(*, uuid):
+    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wms
+    wms = get_wms_direct(gs_layername.workspace)
     if wms is None:
         return {}
-    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wms.name
     cap_op = wms.getOperationByName('GetCapabilities')
     wms_url = next(
         (
@@ -243,7 +240,7 @@ def get_metadata_comparison_by_uuid(*, workspace, uuid):
             if m.get("type").lower() == 'get'
         ), None
     )
-    wms_layer = wms.contents.get(gs_layername, None)
+    wms_layer = wms.contents.get(gs_layername.name, None)
     try:
         title = wms_layer.title
     except BaseException:
@@ -266,7 +263,7 @@ def get_metadata_comparison_by_uuid(*, workspace, uuid):
         current_app.logger.error(exc)
         reference_system = None
 
-    temporal_extent = wms.contents[gs_layername].dimensions['time']['values'] if gs_layername in wms.contents and 'time' in wms.contents[gs_layername].dimensions else None
+    temporal_extent = wms.contents[gs_layername.name].dimensions['time']['values'] if gs_layername.name in wms.contents and 'time' in wms.contents[gs_layername.name].dimensions else None
 
     props = {
         'wms_url': wms_url,
@@ -277,7 +274,7 @@ def get_metadata_comparison_by_uuid(*, workspace, uuid):
         'temporal_extent': temporal_extent,
     }
     # current_app.logger.info(f"props:\n{json.dumps(props, indent=2)}")
-    url = get_capabilities_url(workspace)
+    url = get_capabilities_url(gs_layername.workspace)
     return {
         f"{url}": props
     }
@@ -314,10 +311,6 @@ def get_capabilities_url(workspace):
     url = get_wms_url(workspace, external_url=True)
     url = add_capabilities_params_to_url(url)
     return url
-
-
-def get_geoserver_workspace(workspace):
-    return workspace + settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX
 
 
 def get_layman_workspace(geoserver_workspace):

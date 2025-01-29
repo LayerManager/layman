@@ -31,8 +31,8 @@ def post_wfst(workspace, publ_type, name,
     with app.app_context():
         uuid = util.get_publication_uuid(workspace=workspace, publ_type=publ_type, publ_name=name)
 
-    wfs_name = names.get_names_by_source(uuid=uuid, publication_type=publ_type).wfs.name or name
-    data_xml = WfstOperationDef[(operation, version)](workspace, wfs_name)
+    wfs_layer = names.get_names_by_source(uuid=uuid, publication_type=publ_type).wfs or names.NameForSource(workspace=workspace, name=name)
+    data_xml = WfstOperationDef[(operation, version)](wfs_layer.workspace, wfs_layer.name)
 
     process_client.post_wfst(data_xml, headers=request_headers, url=request_url, workspace=request_workspace)
 

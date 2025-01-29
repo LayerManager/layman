@@ -71,9 +71,9 @@ class TestMap(base_test.TestSingleRestPublication):
         """Parametrized using pytest_generate_tests"""
         map_crs = key
         uuid = layman_util.get_publication_uuid(LAYER_FOR_MAPS.workspace, process_client.LAYER_TYPE, LAYER_FOR_MAPS.name)
-        gs_wms_layername = names.get_layer_names_by_source(uuid=uuid).wms.name
+        gs_wms_layername = names.get_layer_names_by_source(uuid=uuid).wms
         map_args = {
-            'map_layers': [(LAYER_FOR_MAPS.workspace, gs_wms_layername)],
+            'map_layers': [(gs_wms_layername.workspace, gs_wms_layername.name)],
             'native_extent': params[KEY_INFO_VALUES]['exp_publication_detail']['native_bounding_box'],
             'crs': map_crs,
             'title': map.name,

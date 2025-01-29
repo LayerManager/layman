@@ -17,9 +17,9 @@ class TestPublication(base_test.TestSingleRestPublication):
     def test_sld_wellknownname(self, ):
         response = self.post_publication(Publication(self.workspace, self.publication_type, self.layername))
         uuid = response['uuid']
-        gs_style_name = names.get_layer_names_by_source(uuid=uuid).sld.name
+        gs_style_name = names.get_layer_names_by_source(uuid=uuid).sld
         response = requests.get(
-            gs_util.get_workspace_style_url(self.workspace + '_wms', gs_style_name),
+            gs_util.get_workspace_style_url(gs_style_name.workspace, gs_style_name.name),
             auth=gs_util.GS_AUTH,
             headers=gs_util.headers_sld['1.0.0'],
             timeout=gs_util.GS_REST_TIMEOUT,

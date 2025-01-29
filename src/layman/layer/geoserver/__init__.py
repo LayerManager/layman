@@ -25,11 +25,9 @@ def delete_whole_user(username, auth=settings.LAYMAN_GS_AUTH):
 
 
 def ensure_workspace(workspace, auth=settings.LAYMAN_GS_AUTH):
-    geoserver_wms_workspace = wms.get_geoserver_workspace(workspace)
-    for wspace in [workspace, geoserver_wms_workspace]:
-        created = gs_util.ensure_workspace(wspace, auth)
-        if created:
-            gs_util.create_db_store(wspace, auth, workspace, pg_conn=settings.PG_CONN)
+    created = gs_util.ensure_workspace(workspace, auth)
+    if created:
+        gs_util.create_db_store(workspace, auth, workspace, pg_conn=settings.PG_CONN)
 
 
 def create_external_db_store(workspace, *, uuid, table_uri, auth=settings.LAYMAN_GS_AUTH):
@@ -51,11 +49,7 @@ def create_external_db_store(workspace, *, uuid, table_uri, auth=settings.LAYMAN
 
 
 def delete_workspace(workspace, auth=settings.LAYMAN_GS_AUTH):
-    geoserver_wms_workspace = wms.get_geoserver_workspace(workspace)
-    for wspace in [workspace, geoserver_wms_workspace]:
-        gs_util.delete_db_store(wspace, auth)
-        gs_util.delete_workspace(wspace, auth)
-
+    pass
 
 def get_all_rules(auth):
     key = FLASK_RULES_KEY

@@ -50,8 +50,8 @@ def test_geoserver_bbox():
     response = process_client.publish_workspace_layer(workspace, layer, style_file='sample/style/small_layer.qml')
     uuid = response['uuid']
 
-    assert_util.assert_wfs_bbox(workspace, uuid, expected_bbox_1)
-    assert_util.assert_wms_bbox(workspace, uuid, expected_bbox_1)
+    assert_util.assert_wfs_bbox(uuid, expected_bbox_1)
+    assert_util.assert_wms_bbox(uuid, expected_bbox_1)
 
     kwargs = {
         'description': '',
@@ -73,7 +73,7 @@ def test_geoserver_bbox():
             tasks.refresh_wfs.apply(args=[workspace, layer],
                                     kwargs=kwargs,
                                     )
-        assert_util.assert_wfs_bbox(workspace, uuid, expected_bbox)
+        assert_util.assert_wfs_bbox(uuid, expected_bbox)
 
     # test WMS
     for bbox, expected_bbox in expected_bboxes:
@@ -83,7 +83,7 @@ def test_geoserver_bbox():
             tasks.refresh_wms.apply(args=[workspace, layer],
                                     kwargs=wms_kwargs,
                                     )
-        assert_util.assert_wms_bbox(workspace, uuid, expected_bbox)
+        assert_util.assert_wms_bbox(uuid, expected_bbox)
 
     # test cascade WMS from QGIS
     for bbox, expected_bbox in expected_bboxes:
@@ -94,6 +94,6 @@ def test_geoserver_bbox():
             tasks.refresh_wms.apply(args=[workspace, layer],
                                     kwargs=wms_kwargs,
                                     )
-        assert_util.assert_wms_bbox(workspace, uuid, expected_bbox)
+        assert_util.assert_wms_bbox(uuid, expected_bbox)
 
     process_client.delete_workspace_layer(workspace, layer)

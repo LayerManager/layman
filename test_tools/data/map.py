@@ -2,9 +2,9 @@ import json
 import os
 from pathlib import Path
 import crs as crs_def
-from layman import util as layman_util, app, settings
+from layman import util as layman_util, app, settings, names
 from layman.common import bbox
-from layman.layer.geoserver import util as layer_gs_util, wms as geoserver_wms
+from layman.layer.geoserver import util as layer_gs_util
 from .. import process_client
 
 
@@ -56,7 +56,8 @@ def get_map_with_internal_layers_json(layers, *, native_extent=None, native_crs=
     }
     gs_url = layer_gs_util.get_gs_proxy_server_url() + settings.LAYMAN_GS_PATH
     for workspace, layer in layers:
-        geoserver_workspace = geoserver_wms.get_geoserver_workspace(workspace)
+        uuid = layman_util.get_publication_uuid(workspace, process_client.LAYER_TYPE, layer)
+        wms_layer = names.get_layer_names_by_source(uuid=uuid).wms
         map_json['layers'].append({
             "metadata": {},
             "visibility": True,
@@ -64,9 +65,9 @@ def get_map_with_internal_layers_json(layers, *, native_extent=None, native_crs=
             "title": layer,
             "className": "HSLayers.Layer.WMS",
             "singleTile": True,
-            "url": f"{gs_url}{geoserver_workspace}/ows",
+            "url": f"{gs_url}{wms_layer.workspace}/ows",
             "params": {
-                "LAYERS": layer,
+                "LAYERS": wms_layer.name,
                 "FORMAT": "image/png"
             }
         })

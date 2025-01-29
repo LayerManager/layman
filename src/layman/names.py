@@ -1,14 +1,16 @@
 from dataclasses import dataclass
 
 from .layer import LAYER_TYPE
+from . import settings
 
 
 GEOSERVER_WFS_WORKSPACE = 'layman'
-GEOSERVER_WMS_WORKSPACE = 'layman_wms'
+GEOSERVER_WMS_WORKSPACE = f'{GEOSERVER_WFS_WORKSPACE}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}'
 
 
 @dataclass(frozen=True)
 class NameForSource:
+    workspace: str
     name: str
 
 
@@ -22,9 +24,9 @@ class Names:
 def get_names_by_source(*, uuid, publication_type):
     assert publication_type == LAYER_TYPE
     return Names(
-        wfs=NameForSource(name=f'l_{uuid}'),
-        wms=NameForSource(name=f'l_{uuid}'),
-        sld=NameForSource(name=uuid),
+        wfs=NameForSource(workspace=GEOSERVER_WFS_WORKSPACE, name=f'l_{uuid}'),
+        wms=NameForSource(workspace=GEOSERVER_WMS_WORKSPACE, name=f'l_{uuid}'),
+        sld=NameForSource(workspace=GEOSERVER_WMS_WORKSPACE, name=uuid),
     )
 
 
