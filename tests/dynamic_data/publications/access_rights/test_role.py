@@ -88,7 +88,7 @@ class TestPublication(base_test.TestSingleRestPublication):
                 gs_workspace = internal_info['_wms']['workspace']
 
                 all_names = names.get_layer_names_by_source(uuid=uuid, )
-                workspaces_and_layers = [(publication.workspace, all_names.wfs.name), (gs_workspace, all_names.wms.name)] if geodata_type != settings.GEODATA_TYPE_RASTER else [gs_workspace]
+                workspaces_and_layers = [(publication.workspace, all_names.wfs.name), (gs_workspace, all_names.wms.name)] if geodata_type != settings.GEODATA_TYPE_RASTER else [(gs_workspace, all_names.wms.name)]
                 for wspace, gs_layername in workspaces_and_layers:
                     gs_expected_roles = gs_common.layman_users_and_roles_to_geoserver_roles(exp_rights)
                     rule = f'{wspace}.{gs_layername}.{right[0]}'

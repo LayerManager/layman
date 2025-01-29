@@ -90,8 +90,9 @@ class TestLayer(base_test.TestSingleRestPublication):
     def test_layer(self, layer: Publication, rest_args, params):
         """Parametrized using pytest_generate_tests"""
         external_table_uri = f"{external_db.URI_STR}?schema={quote(DB_SCHEMA)}&table={quote(TABLE_POST)}&geo_column={GEO_COLUMN}"
-        self.post_publication(publication=layer,
-                              args={'external_table_uri': external_table_uri})
+        response = self.post_publication(publication=layer,
+                                         args={'external_table_uri': external_table_uri})
+        uuid = response['uuid']
 
         assert_util.is_publication_valid_and_complete(layer)
         exp_thumbnail = os.path.join(DIRECTORY, f"thumbnail_all.png")
@@ -108,10 +109,10 @@ class TestLayer(base_test.TestSingleRestPublication):
                                                        **params['exp_info_values'],
                                                        )
 
-        exp_existing_wfs_stores = {'postgresql', f'external_db_{layer.name}'} if params['exp_info_values'].get('external_table_uri') else {'postgresql'}
-        exp_deleted_wfs_stores = {} if params['exp_info_values'].get('external_table_uri') else {f'external_db_{layer.name}'}
-        exp_existing_wms_stores = {'postgresql', f'external_db_{layer.name}'} if params['exp_info_values'].get('external_table_uri') and params['exp_info_values']['publ_type_detail'][1] == 'sld' else {'postgresql'}
-        exp_deleted_wms_stores = {} if params['exp_info_values'].get('external_table_uri') and params['exp_info_values']['publ_type_detail'][1] == 'sld' else {f'external_db_{layer.name}'}
+        exp_existing_wfs_stores = {'postgresql', f'external_db_{uuid}'} if params['exp_info_values'].get('external_table_uri') else {'postgresql'}
+        exp_deleted_wfs_stores = {} if params['exp_info_values'].get('external_table_uri') else {f'external_db_{uuid}'}
+        exp_existing_wms_stores = {'postgresql', f'external_db_{uuid}'} if params['exp_info_values'].get('external_table_uri') and params['exp_info_values']['publ_type_detail'][1] == 'sld' else {'postgresql'}
+        exp_deleted_wms_stores = {} if params['exp_info_values'].get('external_table_uri') and params['exp_info_values']['publ_type_detail'][1] == 'sld' else {f'external_db_{uuid}'}
         gs_asserts.assert_stores(layer.workspace,
                                  exp_existing_wfs_stores=exp_existing_wfs_stores, exp_deleted_wfs_stores=exp_deleted_wfs_stores,
                                  exp_existing_wms_stores=exp_existing_wms_stores, exp_deleted_wms_stores=exp_deleted_wms_stores,
