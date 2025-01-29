@@ -29,8 +29,8 @@ jobs:
         run: |
           cp .env.test .env
           make pull-dev-images
-          docker compose --compatibility -f docker-compose.deps.yml -f docker-compose.test.yml pull redis postgresql nginx-qgis
-          docker compose --compatibility -f docker-compose.deps.yml -f docker-compose.test.yml build --parallel qgis geoserver micka
+          docker compose --compatibility -f docker-compose.deps.yml -f docker-compose.test.yml pull redis postgresql nginx-qgis geoserver
+          docker compose --compatibility -f docker-compose.deps.yml -f docker-compose.test.yml build --parallel qgis micka
 
       - name: Download test data
         run: |
