@@ -14,8 +14,8 @@ logger = logging.getLogger(__name__)
 MIGRATION_TYPES = [consts.MIGRATION_TYPE_SCHEMA, consts.MIGRATION_TYPE_DATA]
 
 MIN_UPGRADEABLE_VERSION = {
-    consts.MIGRATION_TYPE_DATA: (1, 23, 0, 3),
-    consts.MIGRATION_TYPE_SCHEMA: (1, 23, 0, 0),
+    consts.MIGRATION_TYPE_DATA: (1, 23, 0, 0),
+    consts.MIGRATION_TYPE_SCHEMA: (1, 23, 0, 3),
     consts.MORE_INFO_VERSION: '2.0.0',
 }
 
