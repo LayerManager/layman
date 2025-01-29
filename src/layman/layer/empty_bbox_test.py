@@ -20,20 +20,21 @@ def assert_non_empty_bbox(bbox):
     assert bbox[0] < bbox[2] and bbox[1] < bbox[3]
 
 
-def assert_wms_layer(workspace, layername, exp_title):
-    wms = WebMapService(gs_wms.get_wms_url(workspace), gs_wms.VERSION)
-    assert layername in wms.contents
-    wms_layer = wms[layername]
+def assert_wms_layer(uuid, exp_title):
+    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wms
+    wms = WebMapService(gs_wms.get_wms_url(gs_layername.workspace), gs_wms.VERSION)
+    assert gs_layername.name in wms.contents
+    wms_layer = wms[gs_layername.name]
     assert wms_layer.title == exp_title
     assert_non_empty_bbox(wms_layer.boundingBox)
     assert_non_empty_bbox(wms_layer.boundingBoxWGS84)
     return wms_layer
 
 
-def wfs_t_insert_point(workspace, *, uuid):
-    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wfs.name
-    wfs_t_data = wfs_data_util.get_wfs20_insert_points(workspace, gs_layername)
-    process_client.post_wfst(wfs_t_data, workspace=workspace)
+def wfs_t_insert_point(*, uuid):
+    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wfs
+    wfs_t_data = wfs_data_util.get_wfs20_insert_points(gs_layername.workspace, gs_layername.name)
+    process_client.post_wfst(wfs_t_data, workspace=gs_layername.workspace)
 
 
 @pytest.mark.parametrize('layername, file_paths', [
@@ -46,20 +47,19 @@ def test_empty_shapefile(layername, file_paths):
     title = layername
 
     uuid = process_client.publish_workspace_layer(workspace, layername, file_paths=file_paths)['uuid']
-    wms_layername = names.get_layer_names_by_source(uuid=uuid, ).wms.name
 
-    wms_layer = assert_wms_layer(workspace, wms_layername, title)
+    wms_layer = assert_wms_layer(uuid, title)
     native_bbox = wms_layer.boundingBox
     wgs_bbox = wms_layer.boundingBoxWGS84
 
     title = 'new title'
     process_client.patch_workspace_layer(workspace, layername, title=title)
-    wms_layer = assert_wms_layer(workspace, wms_layername, title)
+    wms_layer = assert_wms_layer(uuid, title)
     assert wms_layer.boundingBox == native_bbox
     assert wms_layer.boundingBoxWGS84 == wgs_bbox
 
-    wfs_t_insert_point(workspace, uuid=uuid)
-    wms_layer = assert_wms_layer(workspace, wms_layername, title)
+    wfs_t_insert_point(uuid=uuid)
+    wms_layer = assert_wms_layer(uuid, title)
     assert wms_layer.boundingBox == native_bbox
     assert wms_layer.boundingBoxWGS84 == wgs_bbox
 

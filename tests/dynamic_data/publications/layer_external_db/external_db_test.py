@@ -254,7 +254,7 @@ class TestLayer(base_test.TestSingleRestPublication):
         only_default_db_store = {'postgresql'}
         both_db_stores = {'postgresql', f'external_db_{uuid}'}
         exp_wms_stores = both_db_stores if style_type == 'sld' else only_default_db_store
-        gs_asserts.assert_stores(layer.workspace, exp_wfs_stores=both_db_stores, exp_wms_stores=exp_wms_stores)
+        gs_asserts.assert_stores(exp_wfs_stores=both_db_stores, exp_wms_stores=exp_wms_stores)
 
         # check metadata properties language and scale_denominator (they are derived from DB)
         comp = process_client.get_workspace_publication_metadata_comparison(layer.type, layer.workspace, layer.name)
@@ -274,7 +274,7 @@ class TestLayer(base_test.TestSingleRestPublication):
         process_client.delete_workspace_layer(layer.workspace, layer.name)
 
         # check GeoServer store of external DB does not exist anymore
-        gs_asserts.assert_stores(layer.workspace, exp_wfs_stores=only_default_db_store, exp_wms_stores=only_default_db_store)
+        gs_asserts.assert_stores(exp_wfs_stores=only_default_db_store, exp_wms_stores=only_default_db_store)
 
         # check there is no information about the layer anymore
         with app.app_context():

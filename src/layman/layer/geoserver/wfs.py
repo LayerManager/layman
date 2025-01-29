@@ -26,9 +26,9 @@ def get_flask_proxy_key(workspace):
     return FLASK_PROXY_KEY.format(workspace=workspace)
 
 
-def patch_layer_by_uuid(*, workspace, uuid, title, description, original_data_source, access_rights=None):
-    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wfs.name
-    if not get_layer_info_by_uuid(workspace, uuid=uuid):
+def patch_layer_by_uuid(*, uuid, title, description, original_data_source, access_rights=None):
+    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wfs
+    if not get_layer_info_by_uuid(uuid=uuid):
         return
     info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['geodata_type', ]})
     geodata_type = info['geodata_type']
@@ -36,22 +36,21 @@ def patch_layer_by_uuid(*, workspace, uuid, title, description, original_data_so
         raise NotImplementedError(f"Unknown geodata type: {geodata_type}")
 
     store_name = get_external_db_store_name(uuid=uuid) if original_data_source == settings.EnumOriginalDataSource.TABLE.value else gs_util.DEFAULT_DB_STORE_NAME
-    gs_util.patch_feature_type(workspace, gs_layername, store_name=store_name, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
-    clear_cache(workspace)
+    gs_util.patch_feature_type(gs_layername.workspace, gs_layername.name, store_name=store_name, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
+    clear_cache(gs_layername.workspace)
 
     if access_rights and access_rights.get('read'):
         security_read_roles = gs_common.layman_users_and_roles_to_geoserver_roles(access_rights['read'])
-        gs_util.ensure_layer_security_roles(workspace, gs_layername, security_read_roles, 'r', settings.LAYMAN_GS_AUTH)
+        gs_util.ensure_layer_security_roles(gs_layername.workspace, gs_layername.name, security_read_roles, 'r', settings.LAYMAN_GS_AUTH)
 
     if access_rights and access_rights.get('write'):
         security_write_roles = gs_common.layman_users_and_roles_to_geoserver_roles(access_rights['write'])
-        gs_util.ensure_layer_security_roles(workspace, gs_layername, security_write_roles, 'w', settings.LAYMAN_GS_AUTH)
+        gs_util.ensure_layer_security_roles(gs_layername.workspace, gs_layername.name, security_write_roles, 'w', settings.LAYMAN_GS_AUTH)
 
 
 # pylint: disable=unused-argument
 def patch_layer(workspace, layername, *, uuid, title, description, original_data_source, access_rights=None):
-    patch_layer_by_uuid(workspace=workspace,
-                        uuid=uuid,
+    patch_layer_by_uuid(uuid=uuid,
                         title=title,
                         description=description,
                         original_data_source=original_data_source,
@@ -59,21 +58,21 @@ def patch_layer(workspace, layername, *, uuid, title, description, original_data
                         )
 
 
-def delete_layer_by_uuid(*, workspace, uuid):
-    gs_layername = names.get_names_by_source(uuid=uuid, publication_type=LAYER_TYPE).wfs.name
-    gs_util.delete_feature_type(workspace, gs_layername, settings.LAYMAN_GS_AUTH)
-    gs_util.delete_feature_type(workspace, gs_layername, settings.LAYMAN_GS_AUTH, store=get_external_db_store_name(uuid=uuid))
-    gs_util.delete_db_store(workspace, settings.LAYMAN_GS_AUTH, store_name=get_external_db_store_name(uuid=uuid))
-    clear_cache(workspace)
+def delete_layer_by_uuid(*, uuid):
+    gs_layername = names.get_names_by_source(uuid=uuid, publication_type=LAYER_TYPE).wfs
+    gs_util.delete_feature_type(gs_layername.workspace, gs_layername.name, settings.LAYMAN_GS_AUTH)
+    gs_util.delete_feature_type(gs_layername.workspace, gs_layername.name, settings.LAYMAN_GS_AUTH, store=get_external_db_store_name(uuid=uuid))
+    gs_util.delete_db_store(gs_layername.workspace, settings.LAYMAN_GS_AUTH, store_name=get_external_db_store_name(uuid=uuid))
+    clear_cache(gs_layername.workspace)
 
-    gs_util.delete_security_roles(f"{workspace}.{gs_layername}.r", settings.LAYMAN_GS_AUTH)
-    gs_util.delete_security_roles(f"{workspace}.{gs_layername}.w", settings.LAYMAN_GS_AUTH)
+    gs_util.delete_security_roles(f"{gs_layername.workspace}.{gs_layername.name}.r", settings.LAYMAN_GS_AUTH)
+    gs_util.delete_security_roles(f"{gs_layername.workspace}.{gs_layername.name}.w", settings.LAYMAN_GS_AUTH)
     return {}
 
 
 def delete_layer(workspace, layername):
     uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layername)
-    return delete_layer_by_uuid(workspace=workspace, uuid=uuid, )
+    return delete_layer_by_uuid(uuid=uuid, )
 
 
 def get_wfs_url(workspace, external_url=False, *, x_forwarded_items=None):
@@ -147,24 +146,24 @@ def clear_cache(workspace):
 
 def get_layer_info(workspace, layername, *, x_forwarded_items=None):
     uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layername)
-    return get_layer_info_by_uuid(workspace, uuid=uuid, x_forwarded_items=x_forwarded_items)
+    return get_layer_info_by_uuid(uuid=uuid, x_forwarded_items=x_forwarded_items)
 
 
-def get_layer_info_by_uuid(workspace, *, uuid, x_forwarded_items=None):
-    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wfs.name
-    wfs = get_wfs_proxy(workspace)
+def get_layer_info_by_uuid(*, uuid, x_forwarded_items=None):
+    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wfs
+    wfs = get_wfs_proxy(gs_layername.workspace)
     if wfs is None or uuid is None:
         return {}
-    wfs_proxy_url = get_wfs_url(workspace, external_url=True, x_forwarded_items=x_forwarded_items)
+    wfs_proxy_url = get_wfs_url(gs_layername.workspace, external_url=True, x_forwarded_items=x_forwarded_items)
 
-    wfs_layername = f"{workspace}:{gs_layername}"
+    wfs_layername = f"{gs_layername.workspace}:{gs_layername.name}"
     if wfs_layername not in wfs.contents:
         return {}
     return {
         'title': wfs.contents[wfs_layername].title,
         'description': wfs.contents[wfs_layername].abstract,
         'wfs': {
-            'name': gs_layername,
+            'name': gs_layername.name,
             'url': wfs_proxy_url
         },
     }
@@ -172,19 +171,19 @@ def get_layer_info_by_uuid(workspace, *, uuid, x_forwarded_items=None):
 
 def get_metadata_comparison(workspace, layername):
     uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layername)
-    return get_metadata_comparison_by_uuid(workspace=workspace, uuid=uuid)
+    return get_metadata_comparison_by_uuid(uuid=uuid)
 
 
-def get_metadata_comparison_by_uuid(*, workspace, uuid):
+def get_metadata_comparison_by_uuid(*, uuid):
     info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['geodata_type', ]})
-    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wfs.name
+    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wfs
     geodata_type = info['geodata_type']
     if geodata_type in (settings.GEODATA_TYPE_RASTER, settings.GEODATA_TYPE_UNKNOWN):
         return {}
     if geodata_type != settings.GEODATA_TYPE_VECTOR:
         raise NotImplementedError(f"Unknown geodata type: {geodata_type}")
 
-    wfs = get_wfs_direct(workspace)
+    wfs = get_wfs_direct(gs_layername.workspace)
     if wfs is None:
         return {}
     cap_op = wfs.getOperationByName('GetCapabilities')
@@ -195,7 +194,7 @@ def get_metadata_comparison_by_uuid(*, workspace, uuid):
             if m.get("type").lower() == 'get'
         ), None
     )
-    wfs_layername = f"{workspace}:{gs_layername}"
+    wfs_layername = f"{gs_layername.workspace}:{gs_layername.name}"
     wfs_layer = wfs.contents.get(wfs_layername, None)
     try:
         title = wfs_layer.title
@@ -225,7 +224,7 @@ def get_metadata_comparison_by_uuid(*, workspace, uuid):
         'reference_system': reference_system,
     }
     # current_app.logger.info(f"props:\n{json.dumps(props, indent=2)}")
-    url = get_capabilities_url(workspace)
+    url = get_capabilities_url(gs_layername.workspace)
     return {
         f"{url}": props
     }

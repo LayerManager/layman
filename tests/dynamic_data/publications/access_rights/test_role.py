@@ -88,9 +88,9 @@ class TestPublication(base_test.TestSingleRestPublication):
                 gs_workspace = internal_info['_wms']['workspace']
 
                 all_names = names.get_layer_names_by_source(uuid=uuid, )
-                workspaces_and_layers = [(publication.workspace, all_names.wfs.name), (gs_workspace, all_names.wms.name)] if geodata_type != settings.GEODATA_TYPE_RASTER else [gs_workspace]
-                for wspace, gs_layername in workspaces_and_layers:
+                workspaces_and_layers = [(all_names.wfs.workspace, all_names.wfs.name), (all_names.wms.workspace, all_names.wms.name)] if geodata_type != settings.GEODATA_TYPE_RASTER else [(gs_workspace, all_names.wms.name)]
+                for gs_wspace, gs_layername in workspaces_and_layers:
                     gs_expected_roles = gs_common.layman_users_and_roles_to_geoserver_roles(exp_rights)
-                    rule = f'{wspace}.{gs_layername}.{right[0]}'
+                    rule = f'{gs_wspace}.{gs_layername}.{right[0]}'
                     gs_roles = gs_util.get_security_roles(rule, settings.LAYMAN_GS_AUTH)
-                    assert gs_expected_roles == gs_roles, f'gs_expected_roles={gs_expected_roles}, gs_roles={gs_roles}, wspace={wspace}, rule={rule}'
+                    assert gs_expected_roles == gs_roles, f'gs_expected_roles={gs_expected_roles}, gs_roles={gs_roles}, gs_wspace={gs_wspace}, rule={rule}'

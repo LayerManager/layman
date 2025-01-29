@@ -23,7 +23,6 @@ from layman.layer import db
 from layman.layer.geoserver import wms as geoserver_wms, sld as geoserver_sld
 from layman import celery as celery_util
 from layman.common.metadata import prop_equals_strict, PROPERTIES
-from layman.names import get_layer_names_by_source
 from layman.util import SimpleCounter
 from test_tools.data import wfs as data_wfs
 from test_tools.util import url_for, url_for_external
@@ -246,11 +245,11 @@ def test_post_layers_simple(client):
             assert isinstance(layer_info[key_to_check], str) \
                 or 'status' not in layer_info[key_to_check]
 
-        wms_url = geoserver_wms.get_wms_url(workspace)
-        wms = wms_proxy(wms_url)
         layeruuid = layer_info['uuid']
-        wms_layername = names.get_layer_names_by_source(uuid=layeruuid).wms.name
-        assert wms_layername in wms.contents
+        wms_layername = names.get_layer_names_by_source(uuid=layeruuid).wms
+        wms_url = geoserver_wms.get_wms_url(wms_layername.workspace)
+        wms = wms_proxy(wms_url)
+        assert wms_layername.name in wms.contents
 
         from layman.layer import get_layer_type_def
         from layman.common.filesystem import uuid as common_uuid
@@ -409,10 +408,10 @@ def test_post_layers_shp(client):
     flask_client.wait_till_layer_ready(workspace, layername)
     # last_task['last'].get()
 
-    wms_url = geoserver_wms.get_wms_url(workspace)
+    wms_layername = names.get_layer_names_by_source(uuid=layeruuid).wms
+    wms_url = geoserver_wms.get_wms_url(wms_layername.workspace)
     wms = wms_proxy(wms_url)
-    wms_layername = names.get_layer_names_by_source(uuid=layeruuid).wms.name
-    assert wms_layername in wms.contents
+    assert wms_layername.name in wms.contents
 
     publication_counter.increase()
     uuid.check_redis_consistency(expected_publ_num_by_type={
@@ -477,14 +476,14 @@ def test_post_layers_complex(client):
         # last_task['last'].get()
         assert celery_util.is_chain_ready(chain_info)
 
-        wms_url = geoserver_wms.get_wms_url(workspace)
+        all_names = names.get_layer_names_by_source(uuid=layeruuid)
+        wms_layername = all_names.wms
+        wms_url = geoserver_wms.get_wms_url(wms_layername.workspace)
         wms = wms_proxy(wms_url)
-        all_names = get_layer_names_by_source(uuid=layeruuid)
-        wms_layername = all_names.wms.name
-        assert wms_layername in wms.contents
-        assert wms[wms_layername].title == 'staty'
-        assert wms[wms_layername].abstract == 'popis států'
-        assert wms[wms_layername].styles[all_names.sld.name]['title'] == 'Generic Blue'
+        assert wms_layername.name in wms.contents
+        assert wms[wms_layername.name].title == 'staty'
+        assert wms[wms_layername.name].abstract == 'popis států'
+        assert wms[wms_layername.name].styles[all_names.sld.name]['title'] == 'Generic Blue'
 
         assert layername != ''
         rest_path = url_for('rest_workspace_layer.get', workspace=workspace, layername=layername)
@@ -515,8 +514,7 @@ def test_post_layers_complex(client):
         root = tree.getroot()
         assert root.attrib['version'] == '1.0.0'
 
-        gs_layername = names.get_layer_names_by_source(uuid=layeruuid, ).wfs.name
-        feature_type = get_feature_type(workspace, 'postgresql', gs_layername)
+        feature_type = get_feature_type(all_names.wfs.workspace, 'postgresql', all_names.wfs.name)
         attributes = feature_type['attributes']['attribute']
         assert next((
             a for a in attributes if a['name'] == 'sovereignt'
@@ -598,8 +596,8 @@ def test_uppercase_attr(client):
             assert 'status' not in resp_json[source], f"{source}: {resp_json[source]}"
 
         layeruuid = resp_json['uuid']
-        gs_layername = names.get_layer_names_by_source(uuid=layeruuid, ).wfs.name
-        feature_type = get_feature_type(workspace, 'postgresql', gs_layername)
+        gs_layername = names.get_layer_names_by_source(uuid=layeruuid, ).wfs
+        feature_type = get_feature_type(gs_layername.workspace, 'postgresql', gs_layername.name)
         attributes = feature_type['attributes']['attribute']
         attr_names = ["id", "dpr_smer_k", "fid_zbg", "silnice", "silnice_bs", "typsil_p", "cislouseku", "jmeno",
                       "typsil_k", "peazkom1", "peazkom2", "peazkom3", "peazkom4", "vym_tahy_k", "vym_tahy_p",
@@ -733,13 +731,13 @@ def test_patch_layer_style(client):
         get_json = client.get(rest_path).get_json()
         assert get_json['title'] == "countries in blue"
 
-        wms_url = geoserver_wms.get_wms_url(workspace)
+        all_names = names.get_layer_names_by_source(uuid=layeruuid)
+        wms_layername = all_names.wms
+        wms_url = geoserver_wms.get_wms_url(wms_layername.workspace)
         wms = wms_proxy(wms_url)
-        all_names = get_layer_names_by_source(uuid=layeruuid)
-        wms_layername = all_names.wms.name
-        assert wms_layername in wms.contents
-        assert wms[wms_layername].title == 'countries in blue'
-        assert wms[wms_layername].styles[all_names.sld.name]['title'] == 'Generic Blue'
+        assert wms_layername.name in wms.contents
+        assert wms[wms_layername.name].title == 'countries in blue'
+        assert wms[wms_layername.name].styles[all_names.sld.name]['title'] == 'Generic Blue'
 
         uuid.check_redis_consistency(expected_publ_num_by_type={
             f'{LAYER_TYPE}': publication_counter.get()
@@ -803,8 +801,8 @@ def test_patch_layer_data(client):
 
         resp_json = response.get_json()
         assert resp_json['title'] == "populated places"
-        gs_layername = names.get_layer_names_by_source(uuid=layeruuid, ).wfs.name
-        feature_type = get_feature_type(workspace, 'postgresql', gs_layername)
+        gs_layername = names.get_layer_names_by_source(uuid=layeruuid, ).wfs
+        feature_type = get_feature_type(gs_layername.workspace, 'postgresql', gs_layername.name)
         attributes = feature_type['attributes']['attribute']
         assert next((
             a for a in attributes if a['name'] == 'sovereignt'
@@ -1030,8 +1028,8 @@ def test_layer_with_different_geometry():
         'Content-type': 'text/xml',
     }
 
-    gs_layername = names.get_layer_names_by_source(uuid=layeruuid, ).wfs.name
-    data_xml = data_wfs.get_wfs20_insert_points(workspace, gs_layername)
+    gs_layername = names.get_layer_names_by_source(uuid=layeruuid, ).wfs
+    data_xml = data_wfs.get_wfs20_insert_points(gs_layername.workspace, gs_layername.name)
 
     response = requests.post(url_path_ows,
                              data=data_xml,
@@ -1049,7 +1047,7 @@ def test_layer_with_different_geometry():
                              )
     assert response.status_code == 200, f"HTTP Error {response.status_code}\n{response.text}"
 
-    data_xml2 = data_wfs.get_wfs20_insert_lines(workspace, gs_layername)
+    data_xml2 = data_wfs.get_wfs20_insert_lines(gs_layername.workspace, gs_layername.name)
 
     response = requests.post(url_path_ows,
                              data=data_xml2,

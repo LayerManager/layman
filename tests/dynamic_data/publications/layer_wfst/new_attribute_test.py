@@ -262,8 +262,8 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
                     f"old_db_attributes={old_db_attributes[layer_name]}, attr_name={attr_name}"
 
             # assert that all attr_names are not yet presented in WFS feature type
-            gs_layer = names.get_layer_names_by_source(uuid=get_publication_uuid(*layer)).wfs.name
-            layer_schema = get_wfs_schema(wfs_url, typename=f"{workspace}:{gs_layer}",
+            gs_layer = names.get_layer_names_by_source(uuid=get_publication_uuid(*layer)).wfs
+            layer_schema = get_wfs_schema(wfs_url, typename=f"{gs_layer.workspace}:{gs_layer.name}",
                                           version=geoserver_wfs.VERSION, headers=AUTHN_HEADERS)
             old_wfs_properties[layer_name] = sorted(layer_schema['properties'].keys())
 
@@ -314,21 +314,21 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
     @staticmethod
     def prepare_wfst_data_and_new_attributes(layer, layer2, params):
         data_method = params['data_method']
-        gs_layer = names.get_layer_names_by_source(uuid=get_publication_uuid(*layer)).wfs.name
-        gs_layer2 = names.get_layer_names_by_source(uuid=get_publication_uuid(*layer2)).wfs.name
+        gs_layer = names.get_layer_names_by_source(uuid=get_publication_uuid(*layer)).wfs
+        gs_layer2 = names.get_layer_names_by_source(uuid=get_publication_uuid(*layer2)).wfs
         if params['simple']:
             attr_args_per_layer = params['attr_args_per_layer']
             assert len(attr_args_per_layer) == 1
             attr_names = attr_args_per_layer[0]
-            wfst_data = data_method(layer.workspace, gs_layer, attr_names)
+            wfst_data = data_method(gs_layer.workspace, gs_layer.name, attr_names)
             new_attributes = [(layer.name, attr_names)]
         else:
             attr_args_per_layer = params['attr_args_per_layer']
             assert len(attr_args_per_layer) == 2
             wfst_data = data_method(
-                workspace=layer.workspace,
-                layername1=gs_layer,
-                layername2=gs_layer2,
+                workspace=gs_layer.workspace,
+                layername1=gs_layer.name,
+                layername2=gs_layer2.name,
                 **attr_args_per_layer[0],
                 **attr_args_per_layer[1],
             )
