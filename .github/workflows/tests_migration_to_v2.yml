@@ -30,15 +30,13 @@ jobs:
           df -h
           free -m
 
-      - name: Build
+      - name: Prepare local virtual environment
         run: |
-          cp .env.dev .env
-          make pull-dev-images
-          docker pull layermanager/layman:dev-1-23
-          docker pull layermanager/layman:client-1-23
-          docker pull layermanager/layman:timgen-1-23
-          docker compose --compatibility -f docker-compose.deps.yml -f docker-compose.dev.yml pull redis postgresql nginx-qgis
-          docker compose --compatibility -f docker-compose.deps.yml -f docker-compose.dev.yml build --parallel qgis geoserver micka
+          ./tests/migration_to_v2_0/prepare-venv.sh
+
+      - name: Switch to Layman v1.23, pull & build docker images
+        run: |
+          ./tmp/migration_to_v2_0/switch-to-layman-v1-23.sh
 
       - name: Usage info
         if: always()
@@ -46,15 +44,13 @@ jobs:
           df -h
           free -m
 
-      - name: Run tests
+      - name: Start Layman v1.23
         run: |
-          ./tests/migration_to_v2_0/test.sh
+          ./tmp/migration_to_v2_0/start-dev-without-wagtail.sh
 
-      - name: Usage info
-        if: always()
+      - name: Publish test data on Layman v1.23
         run: |
-          df -h
-          free -m
+          ./tmp/migration_to_v2_0/publish-data-on-v1-23.sh
 
       - name: Save logs to files
         if: failure()
