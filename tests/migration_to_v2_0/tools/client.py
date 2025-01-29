@@ -6,8 +6,8 @@ import os
 import shutil
 import tempfile
 import time
-from collections import namedtuple
 from contextlib import ExitStack
+from dataclasses import dataclass
 
 import requests
 import layman_settings as settings
@@ -31,67 +31,72 @@ PUBLICATION_TYPES = [
     MAP_TYPE,
 ]
 
-PublicationTypeDef = namedtuple('PublicationTypeDef', ['url_param_name',
-                                                       'get_publications_url',
-                                                       'post_workspace_publication_url',
-                                                       'patch_workspace_publication_url',
-                                                       'get_workspace_publications_url',
-                                                       'get_workspace_publication_url',
-                                                       'get_workspace_publication_thumbnail_url',
-                                                       'delete_workspace_publication_url',
-                                                       'delete_workspace_publications_url',
-                                                       'keys_to_check',
-                                                       'source_path',
-                                                       'get_workspace_metadata_comparison_url',
-                                                       'url_path_name'
-                                                       'post_workspace_publication_chunk',
-                                                       ])
-PUBLICATION_TYPES_DEF = {MAP_TYPE: PublicationTypeDef('mapname',
-                                                      'rest_maps.get',
-                                                      'rest_workspace_maps.post',
-                                                      'rest_workspace_map.patch',
-                                                      'rest_workspace_maps.get',
-                                                      'rest_workspace_map.get',
-                                                      'rest_workspace_map_thumbnail.get',
-                                                      'rest_workspace_map.delete_map',
-                                                      'rest_workspace_maps.delete',
-                                                      map_keys_to_check,
-                                                      'sample/layman.map/small_map.json',
-                                                      'rest_workspace_map_metadata_comparison.get',
-                                                      'maps',
-                                                      None,
-                                                      ),
-                         LAYER_TYPE: PublicationTypeDef('layername',
-                                                        'rest_layers.get',
-                                                        'rest_workspace_layers.post',
-                                                        'rest_workspace_layer.patch',
-                                                        'rest_workspace_layers.get',
-                                                        'rest_workspace_layer.get',
-                                                        'rest_workspace_layer_thumbnail.get',
-                                                        'rest_workspace_layer.delete_layer',
-                                                        'rest_workspace_layers.delete',
-                                                        layer_keys_to_check,
-                                                        'sample/layman.layer/small_layer.geojson',
-                                                        'rest_workspace_layer_metadata_comparison.get',
-                                                        'layers',
-                                                        'rest_workspace_layer_chunk.post',
-                                                        ),
-                         None: PublicationTypeDef('publicationname',
-                                                  'rest_publications.get',
-                                                  None,
-                                                  None,
-                                                  None,
-                                                  None,
-                                                  None,
-                                                  None,
-                                                  None,
-                                                  None,
-                                                  None,
-                                                  None,
-                                                  None,
-                                                  None,
-                                                  ),
-                         }
+
+@dataclass(frozen=True)
+class PublicationTypeDef:
+    url_param_name: str
+    get_publications_url: str
+    post_workspace_publication_url: str | None
+    patch_workspace_publication_url: str | None
+    get_workspace_publications_url: str | None
+    get_workspace_publication_url: str | None
+    get_workspace_publication_thumbnail_url: str | None
+    delete_workspace_publication_url: str | None
+    delete_workspace_publications_url: str | None
+    keys_to_check: list | None
+    source_path: str | None
+    get_workspace_metadata_comparison_url: str | None
+    url_path_name: str | None
+    post_workspace_publication_chunk: str | None
+
+
+PUBLICATION_TYPES_DEF = {
+    MAP_TYPE: PublicationTypeDef(url_param_name='mapname',
+                                 get_publications_url='rest_maps.get',
+                                 post_workspace_publication_url='rest_workspace_maps.post',
+                                 patch_workspace_publication_url='rest_workspace_map.patch',
+                                 get_workspace_publications_url='rest_workspace_maps.get',
+                                 get_workspace_publication_url='rest_workspace_map.get',
+                                 get_workspace_publication_thumbnail_url='rest_workspace_map_thumbnail.get',
+                                 delete_workspace_publication_url='rest_workspace_map.delete_map',
+                                 delete_workspace_publications_url='rest_workspace_maps.delete',
+                                 keys_to_check=map_keys_to_check,
+                                 source_path='sample/layman.map/small_map.json',
+                                 get_workspace_metadata_comparison_url='rest_workspace_map_metadata_comparison.get',
+                                 url_path_name='maps',
+                                 post_workspace_publication_chunk=None,
+                                 ),
+    LAYER_TYPE: PublicationTypeDef(url_param_name='layername',
+                                   get_publications_url='rest_layers.get',
+                                   post_workspace_publication_url='rest_workspace_layers.post',
+                                   patch_workspace_publication_url='rest_workspace_layer.patch',
+                                   get_workspace_publications_url='rest_workspace_layers.get',
+                                   get_workspace_publication_url='rest_workspace_layer.get',
+                                   get_workspace_publication_thumbnail_url='rest_workspace_layer_thumbnail.get',
+                                   delete_workspace_publication_url='rest_workspace_layer.delete_layer',
+                                   delete_workspace_publications_url='rest_workspace_layers.delete',
+                                   keys_to_check=layer_keys_to_check,
+                                   source_path='sample/layman.layer/small_layer.geojson',
+                                   get_workspace_metadata_comparison_url='rest_workspace_layer_metadata_comparison.get',
+                                   url_path_name='layers',
+                                   post_workspace_publication_chunk='rest_workspace_layer_chunk.post',
+                                   ),
+    None: PublicationTypeDef(url_param_name='publicationname',
+                             get_publications_url='rest_publications.get',
+                             post_workspace_publication_url=None,
+                             patch_workspace_publication_url=None,
+                             get_workspace_publications_url=None,
+                             get_workspace_publication_url=None,
+                             get_workspace_publication_thumbnail_url=None,
+                             delete_workspace_publication_url=None,
+                             delete_workspace_publications_url=None,
+                             keys_to_check=None,
+                             source_path=None,
+                             get_workspace_metadata_comparison_url=None,
+                             url_path_name=None,
+                             post_workspace_publication_chunk=None,
+                             ),
+}
 
 
 def get_authz_headers(username):
