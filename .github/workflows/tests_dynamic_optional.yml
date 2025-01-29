@@ -29,13 +29,13 @@ jobs:
         run: |
           cp .env.test .env
           make pull-dev-images
-          docker compose --compatibility -f docker-compose.deps.yml -f docker-compose.test.yml pull redis postgresql nginx-qgis geoserver
-          docker compose --compatibility -f docker-compose.deps.yml -f docker-compose.test.yml build --parallel qgis micka
+          docker compose -f docker-compose.deps.yml -f docker-compose.test.yml pull redis postgresql nginx-qgis geoserver
+          docker compose -f docker-compose.deps.yml -f docker-compose.test.yml build --parallel qgis micka
 
       - name: Download test data
         run: |
           mkdir -p tmp
-          docker compose --compatibility -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --no-deps layman_test bash -c "bash ensure-test-data.sh"
+          docker compose -f docker-compose.deps.yml -f docker-compose.test.yml run --rm --no-deps layman_test bash -c "bash ensure-test-data.sh"
 
       - name: Usage info
         if: always()

@@ -23,7 +23,7 @@ docker tag layermanager/layman:client-1-23 layman_client
 docker tag layermanager/layman:client-1-23 layman_client_test
 docker pull layermanager/layman:timgen-1-23
 docker tag layermanager/layman:timgen-1-23 timgen
-docker compose --compatibility -f docker-compose.deps.yml -f docker-compose.dev.yml pull redis postgresql nginx-qgis geoserver
+docker compose -f docker-compose.deps.yml -f docker-compose.dev.yml pull redis postgresql nginx-qgis geoserver
 make micka-build && make qgis-build
 
 make reset-data-directories
