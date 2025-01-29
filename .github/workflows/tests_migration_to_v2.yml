@@ -60,6 +60,14 @@ jobs:
         run: |
           make upgrade-dev
 
+      - name: Start Layman 2.0
+        run: |
+          ./tmp/migration_to_v2_0/start-dev-without-wagtail.sh
+
+      - name: Run migrated data tests
+        run: |
+          ./tmp/migration_to_v2_0/test-migrated-data.sh
+
       - name: Save logs to files
         if: failure()
         run: |

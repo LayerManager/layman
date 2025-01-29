@@ -20,5 +20,11 @@ set -exu
 # run standalone upgrade to Layman 2.0
 make upgrade-dev
 
+# start Layman 2.0
+./tmp/migration_to_v2_0/start-dev-without-wagtail.sh
+
+# run migrated data tests
+./tmp/migration_to_v2_0/test-migrated-data.sh
+
 ## switch back to current v2 branch
 #make stop-and-remove-all-docker-containers || true && git checkout -- docker-compose.dev.yml && git checkout "$(<tmp/migration_to_v2_0/current-v2-git-branch.txt)" && cp .env.dev .env && (git stash pop || true) && make pull-dev-images && make micka-build && make qgis-build && make reset-data-directories
