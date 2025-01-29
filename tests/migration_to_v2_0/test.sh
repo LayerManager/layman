@@ -6,7 +6,7 @@ set -exu
 ./tests/migration_to_v2_0/prepare-venv.sh
 
 # remember current git branch and switch to Layman 1.23.x
-source ./tmp/migration_to_v2_0/switch-to-layman-v1-23.sh
+./tmp/migration_to_v2_0/switch-to-layman-v1-23.sh
 
 # start empty Layman 1.23.x
 ./tmp/migration_to_v2_0/start-dev-without-wagtail.sh
@@ -23,5 +23,5 @@ git checkout -- docker-compose.dev.yml
 
 deactivate
 
-# switch back to current branch
-make stop-and-remove-all-docker-containers || true && git checkout -- docker-compose.dev.yml && git checkout $CURRENT_GIT_BRANCH && cp .env.dev .env && (git stash pop || true) && make pull-dev-images && make micka-build && make qgis-build && make reset-data-directories
+# switch back to current v2 branch
+make stop-and-remove-all-docker-containers || true && git checkout -- docker-compose.dev.yml && git checkout "$(<tmp/migration_to_v2_0/current-v2-git-branch.txt)" && cp .env.dev .env && (git stash pop || true) && make pull-dev-images && make micka-build && make qgis-build && make reset-data-directories

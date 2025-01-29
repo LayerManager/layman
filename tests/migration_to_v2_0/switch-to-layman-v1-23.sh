@@ -4,8 +4,7 @@ set -exu
 
 # remember current git branch and switch to Layman 1.23.x
 make stop-and-remove-all-docker-containers
-export CURRENT_GIT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
-echo "CURRENT_GIT_BRANCH = $CURRENT_GIT_BRANCH"
+git rev-parse --abbrev-ref HEAD > tmp/migration_to_v2_0/current-v2-git-branch.txt
 git stash clear
 git stash
 git fetch
