@@ -56,6 +56,10 @@ jobs:
         run: |
           ./tmp/migration_to_v2_0/switch-to-layman-v2-0.sh
 
+      - name: Run standalone upgrade to Layman 2.0
+        run: |
+          make upgrade-dev
+
       - name: Save logs to files
         if: failure()
         run: |
