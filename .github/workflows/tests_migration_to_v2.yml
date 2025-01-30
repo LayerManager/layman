@@ -32,11 +32,11 @@ jobs:
 
       - name: Prepare local virtual environment
         run: |
-          ./tests/migration_to_v2_0/prepare-venv.sh
+          ./migration_to_v2_0_tests/prepare-venv.sh
 
       - name: Switch to Layman v1.23, pull & build docker images
         run: |
-          ./tmp/migration_to_v2_0/switch-to-layman-v1-23.sh
+          ./tmp/migration_to_v2_0_tests/switch-to-layman-v1-23.sh
 
       - name: Usage info
         if: always()
@@ -46,15 +46,15 @@ jobs:
 
       - name: Start Layman v1.23
         run: |
-          ./tmp/migration_to_v2_0/start-dev-without-wagtail.sh
+          ./tmp/migration_to_v2_0_tests/start-dev-without-wagtail.sh
 
       - name: Prepare test data on Layman v1.23
         run: |
-          ./tmp/migration_to_v2_0/prepare-data-on-v1-23.sh
+          ./tmp/migration_to_v2_0_tests/prepare-data-on-v1-23.sh
 
       - name: Switch to original branch of Layman 2.0, pull & build docker images
         run: |
-          ./tmp/migration_to_v2_0/switch-to-layman-v2-0.sh
+          ./tmp/migration_to_v2_0_tests/switch-to-layman-v2-0.sh
 
       - name: Run standalone upgrade to Layman 2.0
         run: |
@@ -62,11 +62,11 @@ jobs:
 
       - name: Start Layman 2.0
         run: |
-          ./tmp/migration_to_v2_0/start-dev-without-wagtail.sh
+          ./tmp/migration_to_v2_0_tests/start-dev-without-wagtail.sh
 
       - name: Run migrated data tests
         run: |
-          ./tmp/migration_to_v2_0/test-migrated-data.sh
+          ./tmp/migration_to_v2_0_tests/test-migrated-data.sh
 
       - name: Save logs to files
         if: failure()
