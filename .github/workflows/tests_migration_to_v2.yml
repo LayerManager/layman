@@ -48,9 +48,9 @@ jobs:
         run: |
           ./tmp/migration_to_v2_0/start-dev-without-wagtail.sh
 
-      - name: Publish test data on Layman v1.23
+      - name: Prepare test data on Layman v1.23
         run: |
-          ./tmp/migration_to_v2_0/publish-data-on-v1-23.sh
+          ./tmp/migration_to_v2_0/prepare-data-on-v1-23.sh
 
       - name: Switch to original branch of Layman 2.0, pull & build docker images
         run: |
