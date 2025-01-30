@@ -15,7 +15,7 @@
 ### Changes
 - [#1048](https://github.com/LayerManager/layman/issues/1048) POST Workspace [Layers](doc/rest.md#post-workspace-layers)/[Maps](doc/rest.md#post-workspace-maps) accepts new body parameter *uuid*.
 - [#942](https://github.com/LayerManager/layman/issues/942) New key `used_in_maps` was added to responses of requests [GET Publications](doc/rest.md#get-publications), [GET Layers](doc/rest.md#get-layers), [GET Workspace Layers](doc/rest.md#get-workspace-layers), and [GET Workspace Layer](doc/rest.md#get-workspace-layer).
-- [#909](https://github.com/LayerManager/layman/issues/909) Upgrade QGIS Server from v3.32.2 to v3.40.2. Also use docker hub repo [layermanager/qgis-server](https://hub.docker.com/repository/docker/layermanager/qgis-server) instead of jirikcz/qgis-server,
+- [#909](https://github.com/LayerManager/layman/issues/909) Upgrade QGIS Server from v3.32.2 to v3.40.2. Also use docker hub repo [layermanager/qgis-server](https://hub.docker.com/r/layermanager/qgis-server) instead of jirikcz/qgis-server,
     - Precision error of EPSG:5514 in QGIS WMS GetMap increased from 0.5 m to 3.2 m. The error appears if either data CRS or WMS GetMap CRS is EPSG:5514 and the other one is not.
     - QML styles up to v3.40.2 are supported.
 - [#1009](https://github.com/LayerManager/layman/issues/1009) PATCH Workspace [Layer](doc/rest.md#patch-workspace-layer)/[Map](doc/rest.md#patch-workspace-map) returns same response as POST Workspace [Layers](doc/rest.md#post-workspace-layers)/[Maps](doc/rest.md#post-workspace-maps) with only `name`, `uuid`, `url` and for Layer also optional `files_to_upload` keys.
@@ -663,8 +663,8 @@ make timgen-build
 - [#380](https://github.com/LayerManager/layman/issues/380) Enable to upload geojson with "id" attribute with non-unique values.
 - [#383](https://github.com/LayerManager/layman/issues/383) Add new Makefile target `upgrade-after-timeout` to finish upgrade in case of GeoServer call timeout.
 - Fix [GET Workspace Layer](doc/rest.md#get-workspace-layer) documentation; `style` item was incorrectly used instead of `sld`.
-- [#347](https://github.com/LayerManager/layman/issues/347) Upgrade PostgreSQL 10 to 13.3 and PostGIS 2.4 to 3.1. Use docker image from [layermanager/postgis@hub.docker.com](https://hub.docker.com/repository/docker/layermanager/postgis), source is located at [layermanager/docker-postgis@github.com](https://github.com/LayerManager/docker-postgis).
-- [#367](https://github.com/LayerManager/layman/issues/367) Upgrade gdal from 2.4 to 3.3. Use docker image from [osgeo/gdal@hub.docker.com](https://hub.docker.com/repository/docker/osgeo/gdal), source is located at [osgeo/gdal@github.com](https://github.com/OSGeo/gdal/tree/master/docker).
+- [#347](https://github.com/LayerManager/layman/issues/347) Upgrade PostgreSQL 10 to 13.3 and PostGIS 2.4 to 3.1. Use docker image from [layermanager/postgis@hub.docker.com](https://hub.docker.com/r/layermanager/postgis), source is located at [layermanager/docker-postgis@github.com](https://github.com/LayerManager/docker-postgis).
+- [#367](https://github.com/LayerManager/layman/issues/367) Upgrade gdal from 2.4 to 3.3. Use docker image from [osgeo/gdal@hub.docker.com](https://hub.docker.com/r/osgeo/gdal), source is located at [osgeo/gdal@github.com](https://github.com/OSGeo/gdal/tree/master/docker).
 - [#367](https://github.com/LayerManager/layman/issues/367) Upgrade also
   - python from 3.6 to 3.8
   - flask from 1.1 to 2.0
