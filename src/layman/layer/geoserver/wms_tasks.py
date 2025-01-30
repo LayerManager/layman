@@ -3,7 +3,7 @@ from geoserver import util as gs_util
 from layman import celery_app, settings, util as layman_util, names
 from layman.common import bbox as bbox_util
 from layman.celery import AbortedException
-from . import wms, get_external_db_store_name
+from . import wms, get_external_db_store_name, get_internal_db_store_name
 from .. import geoserver, LAYER_TYPE
 
 headers_json = gs_util.headers_json
@@ -35,7 +35,7 @@ def patch_after_feature_change(
         lat_lon_bbox = bbox_util.transform(bbox, crs, crs_def.EPSG_4326)
         if style_type == 'sld':
             original_data_source = info['original_data_source']
-            store_name = get_external_db_store_name(uuid=info['uuid']) if original_data_source == settings.EnumOriginalDataSource.TABLE.value else gs_util.DEFAULT_DB_STORE_NAME
+            store_name = get_external_db_store_name(uuid=info['uuid']) if original_data_source == settings.EnumOriginalDataSource.TABLE.value else get_internal_db_store_name(db_schema=workspace)
             gs_util.patch_feature_type(wms_layername.workspace, wms_layername.name, auth=settings.LAYMAN_GS_AUTH, bbox=bbox, crs=crs,
                                        lat_lon_bbox=lat_lon_bbox, store_name=store_name)
         elif style_type == 'qml':

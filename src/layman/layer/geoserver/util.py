@@ -7,6 +7,7 @@ from geoserver.util import wms_direct, wfs_direct
 logger = logging.getLogger(__name__)
 CACHE_GS_PROXY_BASE_URL_KEY = f'{__name__}:GS_PROXY_BASE_URL'
 DEFAULT_EXTERNAL_DB_STORE_PREFIX = 'external_db'
+DEFAULT_INTERNAL_DB_STORE_PREFIX = 'postgresql'
 
 
 def get_gs_proxy_server_url(*, x_forwarded_items=None):
@@ -58,3 +59,7 @@ def wfs_proxy(wfs_url, xml=None, version=None, headers=None):
 
 def get_external_db_store_name(*, uuid):
     return f'{DEFAULT_EXTERNAL_DB_STORE_PREFIX}_{uuid}'
+
+
+def get_internal_db_store_name(*, db_schema):
+    return f'{DEFAULT_INTERNAL_DB_STORE_PREFIX}_{db_schema}'

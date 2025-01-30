@@ -16,7 +16,7 @@
 - [#1048](https://github.com/LayerManager/layman/issues/1048) New 
 ### Changes
 - [#1048](https://github.com/LayerManager/layman/issues/1048) New keys `wfs`.`name` and `wms`.`name` were added to [GET Workspace Layer](doc/rest.md#get-workspace-layer) response.
-- [#1048](https://github.com/LayerManager/layman/issues/1048) Names of [Feature types, Coverages, Layers and Styles in GeoServer WFS and WMS workspaces](doc/data-storage.md#geoserver) are derived from layer`uuid`. All GeoServer entities are created in the same workspaces, instead of separate workspaces for each Layman workspace.
+- [#1048](https://github.com/LayerManager/layman/issues/1048) Names of [Feature types, Coverages, Layers and Styles in GeoServer WFS and WMS workspaces](doc/data-storage.md#geoserver) are derived from layer`uuid`. All GeoServer entities are created in the same workspaces, instead of separate workspaces for each Layman workspace. Separate PostgreSQL datastore is created for each Layman user.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) POST Workspace [Layers](doc/rest.md#post-workspace-layers)/[Maps](doc/rest.md#post-workspace-maps) accepts new body parameter *uuid*.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Names of all GeoServer stores are derived from layer's `uuid` (previously were derived from layer's `name`). 
 - [#942](https://github.com/LayerManager/layman/issues/942) New key `used_in_maps` was added to responses of requests [GET Publications](doc/rest.md#get-publications), [GET Layers](doc/rest.md#get-layers), [GET Workspace Layers](doc/rest.md#get-workspace-layers), and [GET Workspace Layer](doc/rest.md#get-workspace-layer).

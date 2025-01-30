@@ -20,7 +20,7 @@ from layman.layer.filesystem import uuid as layer_uuid
 from layman.layer.filesystem.thumbnail import get_layer_thumbnail_path
 from layman import uuid, names
 from layman.layer import db
-from layman.layer.geoserver import wms as geoserver_wms, sld as geoserver_sld
+from layman.layer.geoserver import wms as geoserver_wms, sld as geoserver_sld, get_internal_db_store_name
 from layman import celery as celery_util
 from layman.common.metadata import prop_equals_strict, PROPERTIES
 from layman.util import SimpleCounter
@@ -514,7 +514,8 @@ def test_post_layers_complex(client):
         root = tree.getroot()
         assert root.attrib['version'] == '1.0.0'
 
-        feature_type = get_feature_type(all_names.wfs.workspace, 'postgresql', all_names.wfs.name)
+        db_store = get_internal_db_store_name(db_schema=workspace)
+        feature_type = get_feature_type(all_names.wfs.workspace, db_store, all_names.wfs.name)
         attributes = feature_type['attributes']['attribute']
         assert next((
             a for a in attributes if a['name'] == 'sovereignt'
@@ -597,7 +598,8 @@ def test_uppercase_attr(client):
 
         layeruuid = resp_json['uuid']
         gs_layername = names.get_layer_names_by_source(uuid=layeruuid, ).wfs
-        feature_type = get_feature_type(gs_layername.workspace, 'postgresql', gs_layername.name)
+        db_store = get_internal_db_store_name(db_schema=workspace)
+        feature_type = get_feature_type(gs_layername.workspace, db_store, gs_layername.name)
         attributes = feature_type['attributes']['attribute']
         attr_names = ["id", "dpr_smer_k", "fid_zbg", "silnice", "silnice_bs", "typsil_p", "cislouseku", "jmeno",
                       "typsil_k", "peazkom1", "peazkom2", "peazkom3", "peazkom4", "vym_tahy_k", "vym_tahy_p",
@@ -802,7 +804,8 @@ def test_patch_layer_data(client):
         resp_json = response.get_json()
         assert resp_json['title'] == "populated places"
         gs_layername = names.get_layer_names_by_source(uuid=layeruuid, ).wfs
-        feature_type = get_feature_type(gs_layername.workspace, 'postgresql', gs_layername.name)
+        db_store = get_internal_db_store_name(db_schema=workspace)
+        feature_type = get_feature_type(gs_layername.workspace, db_store, gs_layername.name)
         attributes = feature_type['attributes']['attribute']
         assert next((
             a for a in attributes if a['name'] == 'sovereignt'

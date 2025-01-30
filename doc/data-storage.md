@@ -116,9 +116,11 @@ Data changes made directly in vector data DB tables (both internal and external)
 PostgreSQL is used as persistent data store, so data survives Layman restart.
 
 ### GeoServer
+There are only two **[workspaces](https://docs.geoserver.org/2.21.x/en/user/data/webadmin/workspaces.html)** in GeoServer for all Layman layers. First workspace is meant for [WFS](endpoints.md#web-feature-service) and has the name `layman`. Second workspace is meant for [WMS](endpoints.md#web-map-service) and is named `layman_wms`.
+
 **[User](https://docs.geoserver.org/2.21.x/en/user/security/webadmin/ugr.html)** is created for every [user](models.md#user) who reserved [username](models.md#username). Username on GeoServer is the same as username on Layman.
 
-Two **[workspaces](https://docs.geoserver.org/2.21.x/en/user/data/webadmin/workspaces.html)** are created, each with one **[PostgreSQL datastore](https://docs.geoserver.org/2.21.x/en/user/data/app-schema/data-stores.html#postgis)**. First workspace is meant for [WFS](endpoints.md#web-feature-service) and has the name `layman`. Second workspace is meant for [WMS](endpoints.md#web-map-service) and is suffixed with `_wms`. Name of the datastore is `postgresql` for both workspaces. Every workspace-related information (including PostgreSQL datastore) is saved inside workspace.
+One **[PostgreSQL datastore](https://docs.geoserver.org/2.21.x/en/user/data/app-schema/data-stores.html#postgis)** named `postgresql_<username>` is created in each GeoServer workspace. Every workspace-related information (including PostgreSQL datastore) is saved inside workspace.
 
 For each vector layer from external PostGIS table, **[PostgreSQL datastore](https://docs.geoserver.org/2.21.x/en/user/data/app-schema/data-stores.html#postgis)** is created. Name of the data store is `external_db_<uuid>`.
 
