@@ -2,10 +2,10 @@
 
 set -exu
 
-# copy `tests/migration_to_v2_0` to folder ignored by git, so that `git checkout` won't affect it
-rm -rf tmp/migration_to_v2_0
+# copy `tests/migration_to_v2_0_tests` to folder ignored by git, so that `git checkout` won't affect it
+rm -rf tmp/migration_to_v2_0_tests
 mkdir -p tmp
-cp -r tests/migration_to_v2_0 tmp
+cp -r migration_to_v2_0_tests tmp
 
 # prepare python virtual environment to run python scripts on host (not in docker)
 deactivate || true

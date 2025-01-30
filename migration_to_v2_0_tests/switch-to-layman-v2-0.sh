@@ -6,7 +6,7 @@ make stop-and-remove-all-docker-containers || true
 git checkout -- docker-compose.dev.yml
 
 # switch to original branch of Layman 2.0
-git checkout "$(<tmp/migration_to_v2_0/original-v2-git-branch.txt)"
+git checkout "$(<tmp/migration_to_v2_0_tests/original-v2-git-branch.txt)"
 git stash pop || true
 cp .env.dev .env
 sed -i -e "s/OAUTH2_INTROSPECTION_URL=.*/OAUTH2_INTROSPECTION_URL=http:\\/\\/host.docker.internal:8123\\/rest\\/test-oauth2\\/introspection?is_active=true/" .env

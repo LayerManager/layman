@@ -69,7 +69,7 @@ PUBLICATIONS = [
 ]
 
 
-UUID_FILE_PATH = 'tmp/migration_to_v2_0/uuids.json'
+UUID_FILE_PATH = 'tmp/migration_to_v2_0_tests/uuids.json'
 
 
 def import_publication_uuids():

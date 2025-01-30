@@ -20,5 +20,5 @@
 
 **/geckodriver.log
 
-# only because of tests/migration_to_v2_0 test
+# only because of migration_to_v2_0_tests tests
 /Pipfile*
