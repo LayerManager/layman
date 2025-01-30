@@ -1,7 +1,7 @@
 from geoserver import util as gs_util
 from layman import celery_app, settings, util as layman_util, names
 from layman.celery import AbortedException
-from . import wfs, get_external_db_store_name
+from . import wfs, get_external_db_store_name, get_internal_db_store_name
 from .. import geoserver, LAYER_TYPE
 
 headers_json = gs_util.headers_json
@@ -32,7 +32,7 @@ def patch_after_feature_change(
     bbox = geoserver.get_layer_bbox_by_uuid(uuid=uuid)
     crs = info['native_crs']
     original_data_source = info['original_data_source']
-    store_name = get_external_db_store_name(uuid=info['uuid']) if original_data_source == settings.EnumOriginalDataSource.TABLE.value else gs_util.DEFAULT_DB_STORE_NAME
+    store_name = get_external_db_store_name(uuid=info['uuid']) if original_data_source == settings.EnumOriginalDataSource.TABLE.value else get_internal_db_store_name(db_schema=workspace)
     gs_layername = names.get_layer_names_by_source(uuid=uuid).wfs
     gs_util.patch_feature_type(gs_layername.workspace, gs_layername.name, auth=settings.LAYMAN_GS_AUTH, bbox=bbox, crs=crs,
                                store_name=store_name)

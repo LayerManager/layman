@@ -9,7 +9,7 @@ from layman.layer.util import is_layer_chain_ready
 from layman import util as layman_util
 from layman.layer import LAYER_TYPE
 import requests_util.retry
-from .util import get_gs_proxy_server_url, get_external_db_store_name
+from .util import get_gs_proxy_server_url, get_external_db_store_name, get_internal_db_store_name
 from . import wms
 
 FLASK_PROXY_KEY = f'{__name__}:PROXY:{{workspace}}'
@@ -26,7 +26,7 @@ def get_flask_proxy_key(workspace):
     return FLASK_PROXY_KEY.format(workspace=workspace)
 
 
-def patch_layer_by_uuid(*, uuid, title, description, original_data_source, access_rights=None):
+def patch_layer_by_uuid(*, uuid, title, description, original_data_source, access_rights=None, layman_workspace):
     gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wfs
     if not get_layer_info_by_uuid(uuid=uuid):
         return
@@ -35,7 +35,7 @@ def patch_layer_by_uuid(*, uuid, title, description, original_data_source, acces
     if geodata_type != settings.GEODATA_TYPE_VECTOR:
         raise NotImplementedError(f"Unknown geodata type: {geodata_type}")
 
-    store_name = get_external_db_store_name(uuid=uuid) if original_data_source == settings.EnumOriginalDataSource.TABLE.value else gs_util.DEFAULT_DB_STORE_NAME
+    store_name = get_external_db_store_name(uuid=uuid) if original_data_source == settings.EnumOriginalDataSource.TABLE.value else get_internal_db_store_name(db_schema=layman_workspace)
     gs_util.patch_feature_type(gs_layername.workspace, gs_layername.name, store_name=store_name, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
     clear_cache(gs_layername.workspace)
 
@@ -55,12 +55,14 @@ def patch_layer(workspace, layername, *, uuid, title, description, original_data
                         description=description,
                         original_data_source=original_data_source,
                         access_rights=access_rights,
+                        layman_workspace=workspace,
                         )
 
 
-def delete_layer_by_uuid(*, uuid):
+def delete_layer_by_uuid(*, uuid, db_schema):
+    db_store_name = get_internal_db_store_name(db_schema=db_schema)
     gs_layername = names.get_names_by_source(uuid=uuid, publication_type=LAYER_TYPE).wfs
-    gs_util.delete_feature_type(gs_layername.workspace, gs_layername.name, settings.LAYMAN_GS_AUTH)
+    gs_util.delete_feature_type(gs_layername.workspace, gs_layername.name, settings.LAYMAN_GS_AUTH, store=db_store_name)
     gs_util.delete_feature_type(gs_layername.workspace, gs_layername.name, settings.LAYMAN_GS_AUTH, store=get_external_db_store_name(uuid=uuid))
     gs_util.delete_db_store(gs_layername.workspace, settings.LAYMAN_GS_AUTH, store_name=get_external_db_store_name(uuid=uuid))
     clear_cache(gs_layername.workspace)
@@ -72,7 +74,7 @@ def delete_layer_by_uuid(*, uuid):
 
 def delete_layer(workspace, layername):
     uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layername)
-    return delete_layer_by_uuid(uuid=uuid, )
+    return delete_layer_by_uuid(uuid=uuid, db_schema=workspace)
 
 
 def get_wfs_url(workspace, external_url=False, *, x_forwarded_items=None):

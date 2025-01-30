@@ -64,9 +64,6 @@ SERVICE_TYPES = [
 ]
 
 
-DEFAULT_DB_STORE_NAME = 'postgresql'
-
-
 def get_roles(auth):
     r_url = GS_REST_ROLES
     response = requests.get(r_url,
@@ -188,7 +185,7 @@ def ensure_layer_security_roles(workspace, layername, roles, type, auth):
     ensure_security_roles(rule, roles, auth)
 
 
-def delete_feature_type(geoserver_workspace, feature_type_name, auth, *, store=DEFAULT_DB_STORE_NAME):
+def delete_feature_type(geoserver_workspace, feature_type_name, auth, *, store):
     response = requests.delete(
         urljoin(GS_REST_WORKSPACES,
                 geoserver_workspace + f'/datastores/{store}/featuretypes/' + feature_type_name),
@@ -203,9 +200,8 @@ def delete_feature_type(geoserver_workspace, feature_type_name, auth, *, store=D
         response.raise_for_status()
 
 
-def patch_feature_type(geoserver_workspace, feature_type_name, store_name=None, *, title=None, description=None, bbox=None, crs=None, auth, lat_lon_bbox=None):
+def patch_feature_type(geoserver_workspace, feature_type_name, store_name, *, title=None, description=None, bbox=None, crs=None, auth, lat_lon_bbox=None):
     assert (bbox is None) == (crs is None), f'bbox={bbox}, crs={crs}'
-    store_name = store_name or DEFAULT_DB_STORE_NAME
     ftype = {}
 
     if title is not None:
@@ -241,8 +237,7 @@ def patch_feature_type(geoserver_workspace, feature_type_name, store_name=None, 
     response.raise_for_status()
 
 
-def post_feature_type(geoserver_workspace, layername, description, title, bbox, crs, auth, *, lat_lon_bbox, table_name, metadata_url, store_name=None, ):
-    store_name = store_name or DEFAULT_DB_STORE_NAME
+def post_feature_type(geoserver_workspace, layername, description, title, bbox, crs, auth, *, lat_lon_bbox, table_name, metadata_url, store_name, ):
     keywords = [
         "features",
         layername,
@@ -440,7 +435,19 @@ def delete_workspace_style(geoserver_workspace, stylename, auth=None):
     return sld_stream
 
 
-def create_db_store(geoserver_workspace, auth, db_schema=None, pg_conn=None, name=DEFAULT_DB_STORE_NAME):
+def ensure_db_store(geoserver_workspace, auth, *, name, db_schema, pg_conn=None):
+    stores = get_db_stores(geoserver_workspace, auth)
+    store_names = {store['name'] for store in stores['dataStores']['dataStore']} if stores['dataStores'] else set()
+    if name not in store_names:
+        create_db_store(geoserver_workspace,
+                        auth,
+                        name=name,
+                        db_schema=db_schema,
+                        pg_conn=pg_conn,
+                        )
+
+
+def create_db_store(geoserver_workspace, auth, *, name, db_schema, pg_conn=None):
     db_schema = db_schema or geoserver_workspace
     response = requests.post(
         urljoin(GS_REST_WORKSPACES, geoserver_workspace + '/datastores'),
@@ -500,7 +507,7 @@ def get_db_stores(geoserver_workspace, auth, ):
     return json.loads(response.text)
 
 
-def delete_db_store(geoserver_workspace, auth, *, store_name=DEFAULT_DB_STORE_NAME):
+def delete_db_store(geoserver_workspace, auth, *, store_name):
     response = requests.delete(
         urljoin(GS_REST_WORKSPACES, geoserver_workspace + f'/datastores/{store_name}'),
         headers=headers_json,
