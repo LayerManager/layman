@@ -3,7 +3,6 @@ import pytest
 from tools.client import RestClient
 from tools.oauth2_provider_mock import OAuth2ProviderMock
 from tools.test_data import import_publication_uuids, PUBLICATIONS, Publication
-from . import asserts
 
 
 @pytest.fixture(scope="session")
@@ -34,4 +33,4 @@ def test_migrated_description(client, publication):
     assert publication.uuid is not None
     publ_detail = client.get_workspace_publication(publication.type, publication.workspace, publication.name,
                                                    actor_name=publication.owner)
-    asserts.assert_description(publ_detail=publ_detail, publication=publication)
+    assert publ_detail['description'] == publication.rest_args['description']
