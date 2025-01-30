@@ -23,7 +23,7 @@ def main():
 
             publ_detail = client.get_workspace_publication(publ.type, publ.workspace, publ.name, actor_name=publ.owner)
             assert publ_detail['layman_metadata']['publication_status'] == 'COMPLETE', f'rest_publication_detail={publ_detail}'
-            assert publ_detail['description'] == f"Description of {publ.name}", f'rest_publication_detail={publ_detail}'
+            assert publ_detail['description'] == publ.rest_args['description'], f'rest_publication_detail={publ_detail}'
 
         with open(UUID_FILE_PATH, 'w', encoding='utf-8') as uuid_file:
             json.dump(publ_uuids, uuid_file, ensure_ascii=False, indent=4)
