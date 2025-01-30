@@ -11,8 +11,8 @@ set -exu
 # start empty Layman 1.23.x
 ./tmp/migration_to_v2_0/start-dev-without-wagtail.sh
 
-# publish test data on Layman 1.23.x
-./tmp/migration_to_v2_0/publish-data-on-v1-23.sh
+# prepare test data on Layman 1.23.x
+./tmp/migration_to_v2_0/prepare-data-on-v1-23.sh
 
 # switch to original branch of Layman 2.0
 ./tmp/migration_to_v2_0/switch-to-layman-v2-0.sh
