@@ -30,7 +30,8 @@ post_layer = empty_method
 get_publication_uuid = empty_method_returns_none
 
 
-def get_flask_proxy_key(workspace):
+def get_flask_proxy_key():
+    workspace = names.GEOSERVER_WMS_WORKSPACE
     return FLASK_PROXY_KEY.format(workspace=workspace)
 
 
@@ -55,7 +56,7 @@ def patch_layer_by_uuid(*, uuid, gdal_layername, gdal_workspace, db_schema, orig
         gs_util.patch_coverage(gs_layername.workspace, gs_layername.name, store, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
     else:
         raise NotImplementedError(f"Unknown geodata type: {geodata_type}")
-    clear_cache(gs_layername.workspace)
+    clear_cache()
 
     if access_rights and access_rights.get('read'):
         security_read_roles = gs_common.layman_users_and_roles_to_geoserver_roles(access_rights['read'])
@@ -89,7 +90,7 @@ def delete_layer_by_uuid(*, uuid, db_schema):
     gs_util.delete_coverage_store(gs_layername.workspace, settings.LAYMAN_GS_AUTH, get_geotiff_store_name(uuid=uuid))
     gs_util.delete_coverage_store(gs_layername.workspace, settings.LAYMAN_GS_AUTH, get_image_mosaic_store_name(uuid=uuid))
     gs_util.delete_db_store(gs_layername.workspace, settings.LAYMAN_GS_AUTH, store_name=get_external_db_store_name(uuid=uuid))
-    clear_cache(gs_layername.workspace)
+    clear_cache()
 
     gs_util.delete_security_roles(f"{gs_layername.workspace}.{gs_layername.name}.r", settings.LAYMAN_GS_AUTH)
     gs_util.delete_security_roles(f"{gs_layername.workspace}.{gs_layername.name}.w", settings.LAYMAN_GS_AUTH)
@@ -101,35 +102,36 @@ def delete_layer(workspace, layername):
     return delete_layer_by_uuid(uuid=uuid, db_schema=workspace)
 
 
-def get_wms_url(workspace, external_url=False, *, x_forwarded_items=None):
+def get_wms_url(external_url=False, *, x_forwarded_items=None):
+    workspace = names.GEOSERVER_WMS_WORKSPACE
     assert external_url or not x_forwarded_items
     base_url = get_gs_proxy_server_url(x_forwarded_items=x_forwarded_items) + settings.LAYMAN_GS_PATH \
         if external_url else settings.LAYMAN_GS_URL
     return urljoin(base_url, workspace + '/ows')
 
 
-def get_wms_direct(workspace):
+def get_wms_direct():
     headers = {
         settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE: settings.LAYMAN_GS_USER,
     }
-    ows_url = get_wms_url(workspace)
+    ows_url = get_wms_url()
     from .util import wms_direct
-    key = get_flask_proxy_key(workspace)
+    key = get_flask_proxy_key()
     redis_obj = settings.LAYMAN_REDIS.hgetall(key)
     string_value = redis_obj['value'] if redis_obj else None
     return wms_direct(ows_url, xml=string_value, headers=headers)
 
 
-def get_wms_proxy(workspace):
+def get_wms_proxy():
     headers = {
         settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE: settings.LAYMAN_GS_USER,
         'X-Forwarded-Path': '',
         'X-Forwarded-Proto': settings.LAYMAN_PUBLIC_URL_SCHEME,
         'X-Forwarded-Host': settings.LAYMAN_PROXY_SERVER_NAME,
     }
-    key = get_flask_proxy_key(workspace)
+    key = get_flask_proxy_key()
 
-    ows_url = get_wms_url(workspace)
+    ows_url = get_wms_url()
 
     def create_string_value():
         response = requests_util.retry.get_session().get(ows_url, params={
@@ -153,10 +155,10 @@ def get_wms_proxy(workspace):
         return wms_proxy
 
     def currently_changing():
-        layerinfos = layman_util.get_publication_infos(workspace, LAYER_TYPE)
+        layerinfos = layman_util.get_publication_infos(publ_type=LAYER_TYPE)
         result = any((
             not is_layer_chain_ready(workspace, layername)
-            for (_, _, layername) in layerinfos
+            for (workspace, _, layername) in layerinfos
         ))
         return result
 
@@ -164,8 +166,8 @@ def get_wms_proxy(workspace):
     return wms_proxy
 
 
-def clear_cache(workspace):
-    key = get_flask_proxy_key(workspace)
+def clear_cache():
+    key = get_flask_proxy_key()
     mem_redis.delete(key)
 
 
@@ -197,10 +199,10 @@ def get_layer_info(workspace, layername, *, x_forwarded_items=None):
 
 def get_layer_info_by_uuid(*, uuid, gdal_layername, gdal_workspace, x_forwarded_items=None):
     gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wms
-    wms = get_wms_proxy(gs_layername.workspace)
+    wms = get_wms_proxy()
     if wms is None or uuid is None:
         return {}
-    wms_proxy_url = get_wms_url(gs_layername.workspace, external_url=True, x_forwarded_items=x_forwarded_items)
+    wms_proxy_url = get_wms_url(external_url=True, x_forwarded_items=x_forwarded_items)
 
     if gs_layername.name not in wms.contents:
         return {}
@@ -212,7 +214,7 @@ def get_layer_info_by_uuid(*, uuid, gdal_layername, gdal_workspace, x_forwarded_
             'url': wms_proxy_url,
         },
         '_wms': {
-            'url': get_wms_url(gs_layername.workspace, external_url=False),
+            'url': get_wms_url(external_url=False),
             'workspace': gs_layername.workspace,
         },
     }
@@ -231,7 +233,7 @@ def get_metadata_comparison(workspace, layername):
 
 def get_metadata_comparison_by_uuid(*, uuid):
     gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wms
-    wms = get_wms_direct(gs_layername.workspace)
+    wms = get_wms_direct()
     if wms is None:
         return {}
     cap_op = wms.getOperationByName('GetCapabilities')
@@ -276,7 +278,7 @@ def get_metadata_comparison_by_uuid(*, uuid):
         'temporal_extent': temporal_extent,
     }
     # current_app.logger.info(f"props:\n{json.dumps(props, indent=2)}")
-    url = get_capabilities_url(gs_layername.workspace)
+    url = get_capabilities_url()
     return {
         f"{url}": props
     }
@@ -309,8 +311,8 @@ def add_capabilities_params_to_url(url):
     return url
 
 
-def get_capabilities_url(workspace):
-    url = get_wms_url(workspace, external_url=True)
+def get_capabilities_url():
+    url = get_wms_url(external_url=True)
     url = add_capabilities_params_to_url(url)
     return url
 

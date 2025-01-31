@@ -247,7 +247,7 @@ def test_post_layers_simple(client):
 
         layeruuid = layer_info['uuid']
         wms_layername = names.get_layer_names_by_source(uuid=layeruuid).wms
-        wms_url = geoserver_wms.get_wms_url(wms_layername.workspace)
+        wms_url = geoserver_wms.get_wms_url()
         wms = wms_proxy(wms_url)
         assert wms_layername.name in wms.contents
 
@@ -409,7 +409,7 @@ def test_post_layers_shp(client):
     # last_task['last'].get()
 
     wms_layername = names.get_layer_names_by_source(uuid=layeruuid).wms
-    wms_url = geoserver_wms.get_wms_url(wms_layername.workspace)
+    wms_url = geoserver_wms.get_wms_url()
     wms = wms_proxy(wms_url)
     assert wms_layername.name in wms.contents
 
@@ -478,7 +478,7 @@ def test_post_layers_complex(client):
 
         all_names = names.get_layer_names_by_source(uuid=layeruuid)
         wms_layername = all_names.wms
-        wms_url = geoserver_wms.get_wms_url(wms_layername.workspace)
+        wms_url = geoserver_wms.get_wms_url()
         wms = wms_proxy(wms_url)
         assert wms_layername.name in wms.contents
         assert wms[wms_layername.name].title == 'staty'
@@ -735,7 +735,7 @@ def test_patch_layer_style(client):
 
         all_names = names.get_layer_names_by_source(uuid=layeruuid)
         wms_layername = all_names.wms
-        wms_url = geoserver_wms.get_wms_url(wms_layername.workspace)
+        wms_url = geoserver_wms.get_wms_url()
         wms = wms_proxy(wms_url)
         assert wms_layername.name in wms.contents
         assert wms[wms_layername.name].title == 'countries in blue'

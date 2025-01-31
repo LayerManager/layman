@@ -120,7 +120,7 @@ def refresh_wms(
                                          auth=settings.LAYMAN_GS_AUTH,
                                          )
 
-    wms.clear_cache(gs_layername.workspace)
+    wms.clear_cache()
 
     try:
         wms_info = wms.get_layer_info_by_uuid(uuid=uuid,

@@ -36,7 +36,7 @@ def adjust_publications_description():
         logger.info(f'    Adjust description of {publ_type} {workspace}.{publication}')
         try:
             if publ_type == LAYER_TYPE:
-                wms = get_wms_proxy(f'{workspace}_wms')
+                wms = get_wms_proxy(geoserver_workspace=f'{workspace}_wms')
                 description = wms.contents[publication].abstract
             else:
                 description = input_file.get_map_info(workspace, publication)['description']

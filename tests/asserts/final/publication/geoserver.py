@@ -94,7 +94,7 @@ def wms_geographic_bbox(workspace, publ_type, name, *, exp_bbox, precision=0.000
     with app.app_context():
         uuid = layman_util.get_publication_uuid(workspace, process_client.LAYER_TYPE, name)
         gs_layername = names.get_names_by_source(uuid=uuid, publication_type=publ_type).wms
-        wms_inst = wms.get_wms_proxy(gs_layername.workspace)
+        wms_inst = wms.get_wms_proxy()
     wms_layer = wms_inst.contents[gs_layername.name]
     bbox = wms_layer.boundingBoxWGS84
     assert_util.assert_same_bboxes(exp_bbox, bbox, precision)
@@ -108,7 +108,7 @@ def wms_bbox(workspace, publ_type, name, *, exp_bbox, crs, precision=0.00001, co
     with app.app_context():
         uuid = layman_util.get_publication_uuid(workspace, process_client.LAYER_TYPE, name)
         gs_layername = names.get_names_by_source(uuid=uuid, publication_type=publ_type).wms
-        wms_inst = wms.get_wms_proxy(gs_layername.workspace)
+        wms_inst = wms.get_wms_proxy()
     wms_layer = wms_inst.contents[gs_layername.name]
     bbox = next(bbox[:4] for bbox in wms_layer.crs_list if bbox[4] == crs)
     assert_util.assert_same_bboxes(exp_bbox, bbox, precision)
@@ -122,7 +122,7 @@ def wms_legend(workspace, publ_type, name, *, exp_legend, obtained_file_path):
     with app.app_context():
         uuid = layman_util.get_publication_uuid(workspace, process_client.LAYER_TYPE, name)
         gs_layername = names.get_names_by_source(uuid=uuid, publication_type=publ_type).wms
-        wms_inst = wms.get_wms_proxy(gs_layername.workspace)
+        wms_inst = wms.get_wms_proxy()
     wms_layer = wms_inst.contents[gs_layername.name]
     legend_url = next(iter(wms_layer.styles.values()))['legend']
     assert_util.assert_same_images(legend_url, obtained_file_path, exp_legend, 0)
@@ -134,7 +134,7 @@ def is_complete_in_internal_workspace_wms(workspace, publ_type, name):
     with app.app_context():
         uuid = layman_util.get_publication_uuid(workspace, process_client.LAYER_TYPE, name)
     gs_layername = names.get_names_by_source(uuid=uuid, publication_type=publ_type).wms
-    wms_inst = wms.get_wms_proxy(gs_layername.workspace)
+    wms_inst = wms.get_wms_proxy()
 
     geoserver_util.is_complete_in_workspace_wms_instance(wms_inst, gs_layername.name, validate_metadata_url=False)
 

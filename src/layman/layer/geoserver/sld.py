@@ -32,7 +32,7 @@ def delete_layer_by_uuid(*, uuid):
     gs_style_name = names.get_layer_names_by_source(uuid=uuid).sld
     sld_stream = gs_util.delete_workspace_style(gs_style_name.workspace, gs_style_name.name, auth=settings.LAYMAN_GS_AUTH) \
         if uuid else None
-    wms.clear_cache(gs_style_name.workspace)
+    wms.clear_cache()
     if sld_stream:
         result = {
             'style': {
@@ -114,7 +114,7 @@ def create_layer_style(*, uuid, workspace, layername, ):
     all_names = names.get_layer_names_by_source(uuid=uuid)
     style_file = input_style.get_layer_file(workspace, layername)
     gs_util.post_workspace_sld_style(all_names.sld.workspace, all_names.wms.name, all_names.sld.name, style_file, launder_attribute_name)
-    wms.clear_cache(workspace)
+    wms.clear_cache()
 
 
 def get_style_response(*, uuid, headers=None, auth=None):
