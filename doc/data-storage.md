@@ -120,7 +120,7 @@ There are only two **[workspaces](https://docs.geoserver.org/2.21.x/en/user/data
 
 **[User](https://docs.geoserver.org/2.21.x/en/user/security/webadmin/ugr.html)** is created for every [user](models.md#user) who reserved [username](models.md#username). Username on GeoServer is the same as username on Layman.
 
-One **[PostgreSQL datastore](https://docs.geoserver.org/2.21.x/en/user/data/app-schema/data-stores.html#postgis)** named `postgresql_<username>` is created in each GeoServer workspace. Every workspace-related information (including PostgreSQL datastore) is saved inside workspace.
+One **[PostgreSQL datastore](https://docs.geoserver.org/2.21.x/en/user/data/app-schema/data-stores.html#postgis)** per Layman workspace named `postgresql_<workspace>` is created in each GeoServer workspace.
 
 For each vector layer from external PostGIS table, **[PostgreSQL datastore](https://docs.geoserver.org/2.21.x/en/user/data/app-schema/data-stores.html#postgis)** is created. Name of the data store is `external_db_<uuid>`.
 
