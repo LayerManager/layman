@@ -49,7 +49,7 @@ def assert_wfs_bbox(uuid, expected_bbox, *, expected_bbox_crs='EPSG:3857'):
 def assert_wms_bbox(uuid, expected_bbox, *, expected_bbox_crs='EPSG:3857'):
     wms_layername = names.get_layer_names_by_source(uuid=uuid, ).wms
     with app.app_context():
-        wms_inst = wms.get_wms_proxy(wms_layername.workspace)
+        wms_inst = wms.get_wms_proxy()
     wms_layer = wms_inst.contents[wms_layername.name]
     bbox = next(bbox[:4] for bbox in wms_layer.crs_list if bbox[4] == expected_bbox_crs)
     assert_same_bboxes(expected_bbox, bbox, 0.00001)

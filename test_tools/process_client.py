@@ -312,7 +312,7 @@ def patch_workspace_publication(publication_type,
         wait_for_publication_status(workspace, publication_type, name, check_response_fn=check_response_fn,
                                     headers=headers, raise_if_not_complete=raise_if_not_complete)
     wfs.clear_cache(workspace)
-    wms.clear_cache(workspace)
+    wms.clear_cache()
     if temp_dir:
         shutil.rmtree(temp_dir)
     return response.json()
@@ -573,7 +573,7 @@ def finish_delete(workspace, url, headers, skip_404=False, ):
     status_codes_to_skip = {404} if skip_404 else set()
     raise_layman_error(response, status_codes_to_skip)
     wfs.clear_cache(workspace)
-    wms.clear_cache(workspace)
+    wms.clear_cache()
     return response.json()
 
 

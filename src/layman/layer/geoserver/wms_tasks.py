@@ -40,7 +40,7 @@ def patch_after_feature_change(
                                        lat_lon_bbox=lat_lon_bbox, store_name=store_name)
         elif style_type == 'qml':
             gs_util.patch_wms_layer(wms_layername.workspace, wms_layername.name, auth=settings.LAYMAN_GS_AUTH, bbox=bbox, crs=crs, lat_lon_bbox=lat_lon_bbox)
-        wms.clear_cache(wms_layername.workspace)
+        wms.clear_cache()
     elif geodata_type != settings.GEODATA_TYPE_RASTER:
         raise NotImplementedError(f"Unknown geodata type: {geodata_type}")
 
