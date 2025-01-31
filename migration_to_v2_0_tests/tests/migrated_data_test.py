@@ -3,8 +3,9 @@ import pytest
 from db import util as db_util
 import layman_settings as settings
 from tools.client import RestClient, LAYER_TYPE, MAP_TYPE
+from tools.http import LaymanError
 from tools.oauth2_provider_mock import OAuth2ProviderMock
-from tools.test_data import import_publication_uuids, PUBLICATIONS, Publication
+from tools.test_data import import_publication_uuids, PUBLICATIONS_TO_MIGRATE, INCOMPLETE_LAYERS, Publication
 
 
 DB_URI = f"postgresql://{settings.LAYMAN_PG_USER}:{settings.LAYMAN_PG_PASSWORD}@localhost:25433/{settings.LAYMAN_PG_DBNAME}"
@@ -33,7 +34,7 @@ def ids_fn(value):
 
 
 @pytest.mark.usefixtures("import_publication_uuids_fixture", "oauth2_provider_mock_fixture")
-@pytest.mark.parametrize("publication", PUBLICATIONS, ids=ids_fn)
+@pytest.mark.parametrize("publication", PUBLICATIONS_TO_MIGRATE, ids=ids_fn)
 def test_migrated_description(client, publication):
     assert publication.uuid is not None
     publ_detail = client.get_workspace_publication(publication.type, publication.workspace, publication.name,
@@ -49,11 +50,19 @@ def test_migrated_description(client, publication):
 @pytest.mark.usefixtures("import_publication_uuids_fixture", "oauth2_provider_mock_fixture")
 @pytest.mark.parametrize("publication", [
     pytest.param(publ, marks=pytest.mark.xfail(reason="Geoserver provider is not yet migrated"))
-    for publ in PUBLICATIONS if publ.type == LAYER_TYPE
+    for publ in PUBLICATIONS_TO_MIGRATE if publ.type == LAYER_TYPE
 ] + [
-    publ for publ in PUBLICATIONS if publ.type == MAP_TYPE
+    publ for publ in PUBLICATIONS_TO_MIGRATE if publ.type == MAP_TYPE
 ], ids=ids_fn)
 def test_complete_status(client, publication):
     publ_detail = client.get_workspace_publication(publication.type, publication.workspace, publication.name,
                                                    actor_name=publication.owner)
     assert publ_detail['layman_metadata']['publication_status'] == 'COMPLETE', f'rest_publication_detail={publ_detail}'
+
+
+@pytest.mark.usefixtures("import_publication_uuids_fixture")
+@pytest.mark.parametrize("layers", INCOMPLETE_LAYERS, ids=ids_fn)
+def test_deleted_incomplete_layers(client, layers):
+    with pytest.raises(LaymanError) as exc_info:
+        client.get_workspace_publication(layers.type, layers.workspace, layers.name, )
+    assert exc_info.value.code == 15

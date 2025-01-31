@@ -52,6 +52,15 @@ LAYER_RASTER_SLD = Publication(type=LAYER_TYPE,
                                },
                                )
 
+INCOMPLETE_LAYER_VECTOR_SLD = Publication(type=LAYER_TYPE,
+                                          workspace=USER_1,
+                                          name='incomplete_test_vector_layer_sld',
+                                          owner=USER_1,
+                                          rest_args={
+                                              'description': 'Description of incomplete_test_vector_layer_sld',
+                                          },
+                                          )
+
 MAP_1 = Publication(type=MAP_TYPE,
                     workspace=USER_1,
                     name='test_map_1',
@@ -61,12 +70,18 @@ MAP_1 = Publication(type=MAP_TYPE,
                     },
                     )
 
-PUBLICATIONS = [
+PUBLICATIONS_TO_MIGRATE = [
     LAYER_VECTOR_SLD,
     LAYER_VECTOR_QML,
     LAYER_RASTER_SLD,
     MAP_1,
 ]
+
+INCOMPLETE_LAYERS = [
+    INCOMPLETE_LAYER_VECTOR_SLD,
+]
+
+PUBLICATIONS = PUBLICATIONS_TO_MIGRATE + INCOMPLETE_LAYERS
 
 
 UUID_FILE_PATH = 'tmp/migration_to_v2_0_tests/uuids.json'
