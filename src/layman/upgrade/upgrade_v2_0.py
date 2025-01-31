@@ -1,11 +1,11 @@
 import logging
+from urllib.parse import urljoin
 import requests
 
 from db import util as db_util
 from geoserver import util as gs_util
 from layman import settings, names
 from layman.layer import LAYER_TYPE
-from layman.layer.geoserver.wms import get_wms_proxy
 from layman.map import MAP_TYPE
 from layman.map.filesystem import input_file
 
@@ -22,6 +22,14 @@ def adjust_db_for_description():
     db_util.run_statement(statement)
 
 
+def get_wms_capabilities(geoserver_workspace):
+    headers = {
+        settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE: settings.LAYMAN_GS_USER,
+    }
+    wms_url = urljoin(settings.LAYMAN_GS_URL, geoserver_workspace + '/ows')
+    return gs_util.wms_direct(wms_url, headers=headers)
+
+
 def adjust_publications_description():
     logger.info(f'    Adjust description of publications')
     query = f'''select w.name, p.type, p.name
@@ -36,7 +44,7 @@ def adjust_publications_description():
         logger.info(f'    Adjust description of {publ_type} {workspace}.{publication}')
         try:
             if publ_type == LAYER_TYPE:
-                wms = get_wms_proxy(geoserver_workspace=f'{workspace}_wms')
+                wms = get_wms_capabilities(geoserver_workspace=f'{workspace}_wms')
                 description = wms.contents[publication].abstract
             else:
                 description = input_file.get_map_info(workspace, publication)['description']
