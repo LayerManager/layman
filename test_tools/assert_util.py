@@ -38,7 +38,7 @@ def assert_same_bboxes(bbox1, bbox2, precision):
 def assert_wfs_bbox(uuid, expected_bbox, *, expected_bbox_crs='EPSG:3857'):
     gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wfs
     with app.app_context():
-        wfs_inst = wfs.get_wfs_proxy(gs_layername.workspace)
+        wfs_inst = wfs.get_wfs_proxy()
     wfs_layer = f"{gs_layername.workspace}:{gs_layername.name}"
     wfs_bbox_4326 = wfs_inst.contents[wfs_layer].boundingBoxWGS84
     with app.app_context():

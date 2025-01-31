@@ -36,7 +36,7 @@ def patch_after_feature_change(
     gs_layername = names.get_layer_names_by_source(uuid=uuid).wfs
     gs_util.patch_feature_type(gs_layername.workspace, gs_layername.name, auth=settings.LAYMAN_GS_AUTH, bbox=bbox, crs=crs,
                                store_name=store_name)
-    wfs.clear_cache(gs_layername.workspace)
+    wfs.clear_cache()
 
     if self.is_aborted():
         raise AbortedException

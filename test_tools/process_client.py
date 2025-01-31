@@ -311,7 +311,7 @@ def patch_workspace_publication(publication_type,
     if not do_not_upload_chunks:
         wait_for_publication_status(workspace, publication_type, name, check_response_fn=check_response_fn,
                                     headers=headers, raise_if_not_complete=raise_if_not_complete)
-    wfs.clear_cache(workspace)
+    wfs.clear_cache()
     wms.clear_cache()
     if temp_dir:
         shutil.rmtree(temp_dir)
@@ -568,11 +568,11 @@ def get_workspace_layer_style(workspace, layer, headers=None, *, actor_name=None
     return ET.parse(io.BytesIO(response.content))
 
 
-def finish_delete(workspace, url, headers, skip_404=False, ):
+def finish_delete(url, headers, skip_404=False, ):
     response = requests.delete(url, headers=headers, timeout=HTTP_TIMEOUT)
     status_codes_to_skip = {404} if skip_404 else set()
     raise_layman_error(response, status_codes_to_skip)
-    wfs.clear_cache(workspace)
+    wfs.clear_cache()
     wms.clear_cache()
     return response.json()
 
@@ -591,7 +591,7 @@ def delete_workspace_publication(publication_type, workspace, name, *, headers=N
                         workspace=workspace,
                         **{publication_type_def.url_param_name: name})
 
-    return finish_delete(workspace, r_url, headers, skip_404=skip_404)
+    return finish_delete(r_url, headers, skip_404=skip_404)
 
 
 delete_workspace_map = partial(delete_workspace_publication, MAP_TYPE)
@@ -611,7 +611,7 @@ def delete_workspace_publications(publication_type, workspace, headers=None, *, 
                         workspace=workspace,
                         )
 
-    return finish_delete(workspace, r_url, headers, )
+    return finish_delete(r_url, headers, )
 
 
 delete_workspace_maps = partial(delete_workspace_publications, MAP_TYPE)
