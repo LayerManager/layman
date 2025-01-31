@@ -22,7 +22,8 @@ pre_publication_action_check = empty_method
 post_layer = empty_method
 
 
-def get_flask_proxy_key(workspace):
+def get_flask_proxy_key():
+    workspace = names.GEOSERVER_WFS_WORKSPACE
     return FLASK_PROXY_KEY.format(workspace=workspace)
 
 
@@ -37,7 +38,7 @@ def patch_layer_by_uuid(*, uuid, title, description, original_data_source, acces
 
     store_name = get_external_db_store_name(uuid=uuid) if original_data_source == settings.EnumOriginalDataSource.TABLE.value else get_internal_db_store_name(db_schema=layman_workspace)
     gs_util.patch_feature_type(gs_layername.workspace, gs_layername.name, store_name=store_name, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
-    clear_cache(gs_layername.workspace)
+    clear_cache()
 
     if access_rights and access_rights.get('read'):
         security_read_roles = gs_common.layman_users_and_roles_to_geoserver_roles(access_rights['read'])
@@ -65,7 +66,7 @@ def delete_layer_by_uuid(*, uuid, db_schema):
     gs_util.delete_feature_type(gs_layername.workspace, gs_layername.name, settings.LAYMAN_GS_AUTH, store=db_store_name)
     gs_util.delete_feature_type(gs_layername.workspace, gs_layername.name, settings.LAYMAN_GS_AUTH, store=get_external_db_store_name(uuid=uuid))
     gs_util.delete_db_store(gs_layername.workspace, settings.LAYMAN_GS_AUTH, store_name=get_external_db_store_name(uuid=uuid))
-    clear_cache(gs_layername.workspace)
+    clear_cache()
 
     gs_util.delete_security_roles(f"{gs_layername.workspace}.{gs_layername.name}.r", settings.LAYMAN_GS_AUTH)
     gs_util.delete_security_roles(f"{gs_layername.workspace}.{gs_layername.name}.w", settings.LAYMAN_GS_AUTH)
@@ -77,35 +78,37 @@ def delete_layer(workspace, layername):
     return delete_layer_by_uuid(uuid=uuid, db_schema=workspace)
 
 
-def get_wfs_url(workspace, external_url=False, *, x_forwarded_items=None):
+def get_wfs_url(external_url=False, *, x_forwarded_items=None):
     assert external_url or not x_forwarded_items
+    workspace = names.GEOSERVER_WFS_WORKSPACE
     base_url = get_gs_proxy_server_url(x_forwarded_items=x_forwarded_items) + settings.LAYMAN_GS_PATH \
         if external_url else settings.LAYMAN_GS_URL
     return urljoin(base_url, workspace + '/wfs')
 
 
-def get_wfs_direct(workspace):
+def get_wfs_direct():
     headers = {
         settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE: settings.LAYMAN_GS_USER,
     }
-    ows_url = get_wfs_url(workspace)
+    ows_url = get_wfs_url()
     from .util import wfs_direct
-    key = get_flask_proxy_key(workspace)
+    key = get_flask_proxy_key()
     redis_obj = settings.LAYMAN_REDIS.hgetall(key)
     string_value = redis_obj['value'] if redis_obj else None
     return wfs_direct(ows_url, xml=string_value, headers=headers)
 
 
-def get_wfs_proxy(workspace):
+def get_wfs_proxy():
+    workspace = names.GEOSERVER_WFS_WORKSPACE
     headers = {
         settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE: settings.LAYMAN_GS_USER,
         'X-Forwarded-Proto': settings.LAYMAN_PUBLIC_URL_SCHEME,
         'X-Forwarded-Host': settings.LAYMAN_PROXY_SERVER_NAME,
         'X-Forwarded-Path': '',
     }
-    key = get_flask_proxy_key(workspace)
+    key = get_flask_proxy_key()
 
-    ows_url = get_wfs_url(workspace)
+    ows_url = get_wfs_url()
 
     def create_string_value():
         response = requests_util.retry.get_session().get(ows_url, params={
@@ -141,8 +144,8 @@ def get_wfs_proxy(workspace):
     return wfs_proxy
 
 
-def clear_cache(workspace):
-    key = get_flask_proxy_key(workspace)
+def clear_cache():
+    key = get_flask_proxy_key()
     mem_redis.delete(key)
 
 
@@ -153,10 +156,10 @@ def get_layer_info(workspace, layername, *, x_forwarded_items=None):
 
 def get_layer_info_by_uuid(*, uuid, x_forwarded_items=None):
     gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wfs
-    wfs = get_wfs_proxy(gs_layername.workspace)
+    wfs = get_wfs_proxy()
     if wfs is None or uuid is None:
         return {}
-    wfs_proxy_url = get_wfs_url(gs_layername.workspace, external_url=True, x_forwarded_items=x_forwarded_items)
+    wfs_proxy_url = get_wfs_url(external_url=True, x_forwarded_items=x_forwarded_items)
 
     wfs_layername = f"{gs_layername.workspace}:{gs_layername.name}"
     if wfs_layername not in wfs.contents:
@@ -185,7 +188,7 @@ def get_metadata_comparison_by_uuid(*, uuid):
     if geodata_type != settings.GEODATA_TYPE_VECTOR:
         raise NotImplementedError(f"Unknown geodata type: {geodata_type}")
 
-    wfs = get_wfs_direct(gs_layername.workspace)
+    wfs = get_wfs_direct()
     if wfs is None:
         return {}
     cap_op = wfs.getOperationByName('GetCapabilities')
@@ -226,7 +229,7 @@ def get_metadata_comparison_by_uuid(*, uuid):
         'reference_system': reference_system,
     }
     # current_app.logger.info(f"props:\n{json.dumps(props, indent=2)}")
-    url = get_capabilities_url(gs_layername.workspace)
+    url = get_capabilities_url()
     return {
         f"{url}": props
     }
@@ -238,7 +241,7 @@ def add_capabilities_params_to_url(url):
     return url
 
 
-def get_capabilities_url(workspace):
-    url = get_wfs_url(workspace, external_url=True)
+def get_capabilities_url():
+    url = get_wfs_url(external_url=True)
     url = add_capabilities_params_to_url(url)
     return url

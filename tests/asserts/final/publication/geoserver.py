@@ -80,7 +80,7 @@ def wfs_bbox(workspace, publ_type, name, *, exp_bbox, precision=0.00001):
     with app.app_context():
         uuid = layman_util.get_publication_uuid(workspace, publ_type, name)
         gs_layername = names.get_names_by_source(uuid=uuid, publication_type=publ_type).wfs
-        wfs_inst = wfs.get_wfs_proxy(gs_layername.workspace)
+        wfs_inst = wfs.get_wfs_proxy()
     wfs_layer = f"{gs_layername.workspace}:{gs_layername.name}"
 
     bbox = wfs_inst.contents[wfs_layer].boundingBoxWGS84

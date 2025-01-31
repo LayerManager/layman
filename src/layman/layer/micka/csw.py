@@ -150,7 +150,7 @@ def get_template_path_and_values(workspace, layername, http_method):
         spatial_resolution = {
             'scale_denominator': scale_denominator,
         }
-        wfs_url = wfs.get_wfs_url(names.GEOSERVER_WFS_WORKSPACE, external_url=True)
+        wfs_url = wfs.get_wfs_url(external_url=True)
     elif geodata_type == settings.GEODATA_TYPE_RASTER:
         languages = []
         bbox_sphere_size = prime_db_table.get_bbox_sphere_size(workspace, layername)

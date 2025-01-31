@@ -195,7 +195,7 @@ def refresh_wfs(
                                          access_rights=access_rights,
                                          auth=settings.LAYMAN_GS_AUTH,
                                          )
-    wfs.clear_cache(gs_layername.workspace)
+    wfs.clear_cache()
 
     try:
         wfs_info = wfs.get_layer_info_by_uuid(uuid=uuid)
