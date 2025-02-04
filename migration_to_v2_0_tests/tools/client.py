@@ -32,6 +32,7 @@ PUBLICATION_TYPES = [
 ]
 
 
+# pylint: disable=too-many-instance-attributes
 @dataclass(frozen=True)
 class PublicationTypeDef:
     url_param_name: str
