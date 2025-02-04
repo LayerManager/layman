@@ -46,7 +46,7 @@ jobs:
           #    F63 tests are usually about the confusion between identity and equality in Python. Use ==/!= to compare str, bytes, and int literals is the classic case. These are areas where a == b is True but a is b is False (or vice versa).
           #    F7 tests logic errors and syntax errors in type hints
           #    F82 tests are almost always undefined names which are usually a sign of a typo, missing imports, or code that has not been ported to Python 3. These also would be compile-time errors in a compiled language but in Python a NameError is raised which will halt/crash the script on the user.
-        run: flake8 --count --select=E9,F63,F7,F82 --show-source --statistics ./src ./test_tools ./tests ./migration_to_v2_0_tests
+        run: flake8 --count --select=E9,F63,F7,F82 --show-source --statistics ./src ./test_tools ./tests ./migration_to_v2_0_tests ./inspect_performance
 
   Flake_8_full_report:
     runs-on: ubuntu-latest
@@ -65,7 +65,7 @@ jobs:
 
       - name: Run flake8
           # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        run: flake8 --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics ./src ./test_tools ./tests ./migration_to_v2_0_tests
+        run: flake8 --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics ./src ./test_tools ./tests ./migration_to_v2_0_tests ./inspect_performance
 
   PyCodeStyle:
     runs-on: ubuntu-latest
@@ -83,7 +83,7 @@ jobs:
             pycodestyle
 
       - name: Run pycodestyle
-        run: pycodestyle --count --max-line-length=127 --statistics --ignore=E402,E501,W503 ./src ./test_tools ./tests ./migration_to_v2_0_tests
+        run: pycodestyle --count --max-line-length=127 --statistics --ignore=E402,E501,W503 ./src ./test_tools ./tests ./migration_to_v2_0_tests ./inspect_performance
 
   PyLint-soft:
     runs-on: ubuntu-latest
@@ -104,7 +104,7 @@ jobs:
         run: pylint --version
 
       - name: Run pylint
-        run: pylint -f colorized -r y --fail-under 8.9 ./src ./test_tools ./tests ./migration_to_v2_0_tests
+        run: pylint -f colorized -r y --fail-under 8.9 ./src ./test_tools ./tests ./migration_to_v2_0_tests ./inspect_performance
 
   PyLint-hard:
     runs-on: ubuntu-latest
@@ -125,7 +125,7 @@ jobs:
         run: pylint --version
 
       - name: Run pylint
-        run: pylint -f colorized -r y --disable=duplicate-except --disable=duplicate-code --disable=no-name-in-module --disable=too-many-lines --disable=line-too-long --disable=redefined-outer-name --disable=c-extension-no-member --disable=import-outside-toplevel --disable=too-many-locals --disable=redefined-builtin --disable=too-many-arguments --disable=wrong-import-position --disable=too-many-statements --disable=too-many-branches ./src ./test_tools ./tests ./migration_to_v2_0_tests
+        run: pylint -f colorized -r y --disable=duplicate-except --disable=duplicate-code --disable=no-name-in-module --disable=too-many-lines --disable=line-too-long --disable=redefined-outer-name --disable=c-extension-no-member --disable=import-outside-toplevel --disable=too-many-locals --disable=redefined-builtin --disable=too-many-arguments --disable=wrong-import-position --disable=too-many-statements --disable=too-many-branches ./src ./test_tools ./tests ./migration_to_v2_0_tests ./inspect_performance
 
   AutoPEP8:
     runs-on: ubuntu-latest
@@ -143,4 +143,4 @@ jobs:
             autopep8
 
       - name: Run autopep8
-        run: autopep8 --recursive --diff --aggressive --aggressive --exit-code --ignore=E402,E501,W503 ./src ./test_tools ./tests ./migration_to_v2_0_tests
+        run: autopep8 --recursive --diff --aggressive --aggressive --exit-code --ignore=E402,E501,W503 ./src ./test_tools ./tests ./migration_to_v2_0_tests ./inspect_performance

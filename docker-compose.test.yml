@@ -12,6 +12,7 @@ services:
         - CI=${CI}
         - PYTHONPATH=/code/src:/code
       volumes:
+        - ./inspect_performance:/code/inspect_performance
         - ./layman_data_test:/layman_data_test
         - ./migration_to_v2_0_tests:/code/migration_to_v2_0_tests
         - ./sample:/code/sample
