@@ -1,10 +1,11 @@
 import pytest
 
-from db import util as db_util
-import layman_settings as settings
 from tools.client import RestClient, LAYER_TYPE, MAP_TYPE
 from tools.oauth2_provider_mock import OAuth2ProviderMock
 from tools.test_data import import_publication_uuids, PUBLICATIONS, Publication
+
+from db import util as db_util
+import layman_settings as settings
 
 
 DB_URI = f"postgresql://{settings.LAYMAN_PG_USER}:{settings.LAYMAN_PG_PASSWORD}@localhost:25433/{settings.LAYMAN_PG_DBNAME}"
@@ -30,6 +31,7 @@ def client_fixture():
 def ids_fn(value):
     if isinstance(value, Publication):
         return f"{value.type.replace('layman.', '')}:{value.workspace}:{value.name}"
+    return None
 
 
 @pytest.mark.usefixtures("import_publication_uuids_fixture", "oauth2_provider_mock_fixture")

@@ -9,6 +9,9 @@ AUTHN_INTROSPECTION_URL = f"http://localhost:{PORT}/rest/test-oauth2/introspecti
 
 
 class OAuth2ProviderMock():
+    def __init__(self):
+        self.server = None
+
     def __enter__(self):
         self.server = Process(target=run, kwargs={
             'env_vars': {
