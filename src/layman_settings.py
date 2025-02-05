@@ -230,6 +230,10 @@ GRANT_PUBLISH_IN_PUBLIC_WORKSPACE = {
     name for name in os.environ['GRANT_PUBLISH_IN_PUBLIC_WORKSPACE'].split(',')
     if name
 }
+GRANT_DELETE_OTHER_USER = {
+    name for name in os.environ['GRANT_DELETE_OTHER_USER'].split(',')
+    if name
+}
 if RIGHTS_EVERYONE_ROLE not in GRANT_PUBLISH_IN_PUBLIC_WORKSPACE:
     assert not GRANT_CREATE_PUBLIC_WORKSPACE.difference(GRANT_PUBLISH_IN_PUBLIC_WORKSPACE)
 
