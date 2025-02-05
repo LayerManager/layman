@@ -197,15 +197,6 @@ def refresh_wfs(
                                          )
     wfs.clear_cache()
 
-    try:
-        wfs_info = wfs.get_layer_info_by_uuid(uuid=uuid)
-    except BaseException:
-        wfs_info = {}
-
-    if 'wfs' not in wfs_info:
-        wfs.delete_layer_by_uuid(uuid=uuid, db_schema=workspace)
-        raise LaymanError(53,)
-
     if self.is_aborted():
         wfs.delete_layer_by_uuid(uuid=uuid, db_schema=workspace)
         raise AbortedException
