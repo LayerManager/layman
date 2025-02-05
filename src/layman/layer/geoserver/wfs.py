@@ -29,7 +29,7 @@ def get_flask_proxy_key():
 
 def patch_layer_by_uuid(*, uuid, title, description, original_data_source, access_rights=None, layman_workspace):
     gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wfs
-    if not get_layer_info_by_uuid(uuid=uuid):
+    if not get_layer_info_by_uuid(uuid=uuid, layman_workspace=layman_workspace):
         return
     info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['geodata_type', ]})
     geodata_type = info['geodata_type']
@@ -151,22 +151,24 @@ def clear_cache():
 
 def get_layer_info(workspace, layername, *, x_forwarded_items=None):
     uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layername)
-    return get_layer_info_by_uuid(uuid=uuid, x_forwarded_items=x_forwarded_items)
+    return get_layer_info_by_uuid(uuid=uuid, x_forwarded_items=x_forwarded_items, layman_workspace=workspace)
 
 
-def get_layer_info_by_uuid(*, uuid, x_forwarded_items=None):
+def get_layer_info_by_uuid(*, uuid, layman_workspace, x_forwarded_items=None):
     gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wfs
-    wfs = get_wfs_proxy()
-    if wfs is None or uuid is None:
+    if uuid is None:
         return {}
     wfs_proxy_url = get_wfs_url(external_url=True, x_forwarded_items=x_forwarded_items)
 
-    wfs_layername = f"{gs_layername.workspace}:{gs_layername.name}"
-    if wfs_layername not in wfs.contents:
+    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['original_data_source']})
+    original_data_source = info['original_data_source']
+    data_store_name = get_external_db_store_name(uuid=uuid) if original_data_source == settings.EnumOriginalDataSource.TABLE.value else get_internal_db_store_name(db_schema=layman_workspace)
+    feature_type = gs_util.get_feature_type(gs_layername.workspace, data_store_name, gs_layername.name)
+    if not feature_type:
         return {}
     return {
-        'title': wfs.contents[wfs_layername].title,
-        'description': wfs.contents[wfs_layername].abstract,
+        'title': feature_type['title'],
+        'description': feature_type['abstract'] or None,
         'wfs': {
             'name': gs_layername.name,
             'url': wfs_proxy_url

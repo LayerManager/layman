@@ -1058,6 +1058,8 @@ def get_feature_type(
                             auth=GS_AUTH,
                             timeout=GS_REST_TIMEOUT,
                             )
+    if response.status_code == 404:
+        return None
     response.raise_for_status()
     return response.json()['featureType']
 
