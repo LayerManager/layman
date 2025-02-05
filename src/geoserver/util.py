@@ -800,6 +800,19 @@ def get_wms_layer(geoserver_workspace, layer, *, auth):
     return response.json()['wmsLayer']
 
 
+def get_layer(geoserver_workspace, layer, *, auth):
+    response = requests.get(urljoin(GS_REST_WORKSPACES,
+                            f'{geoserver_workspace}/layers/{layer}'),
+                            headers=headers_json,
+                            auth=auth,
+                            timeout=GS_REST_TIMEOUT,
+                            )
+    if response.status_code == 404:
+        return None
+    response.raise_for_status()
+    return response.json()['layer']
+
+
 def ensure_workspace(geoserver_workspace, auth=None):
     auth = auth or GS_AUTH
     all_workspaces = get_all_workspaces(auth)
@@ -1104,3 +1117,18 @@ def get_epsg_code(crs):
     authority, epsg_code = crs.split(':')
     assert authority == 'EPSG'
     return int(epsg_code)
+
+
+def get_image_mosaic_granules(workspace, coverage_store, coverage_name):
+    r_url = urljoin(GS_REST_WORKSPACES,
+                    f'{workspace}/coveragestores/{coverage_store}/coverages/{coverage_name}/index/granules.json')
+
+    response = requests.get(r_url,
+                            headers=headers_json,
+                            auth=GS_AUTH,
+                            timeout=GS_REST_TIMEOUT,
+                            )
+    if response.status_code == 404:
+        return None
+    response.raise_for_status()
+    return response.json()

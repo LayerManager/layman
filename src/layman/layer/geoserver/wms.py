@@ -14,7 +14,8 @@ from layman.layer.util import is_layer_chain_ready
 from layman.layer import LAYER_TYPE
 from layman.layer.filesystem import gdal
 import requests_util.retry
-from .util import get_gs_proxy_server_url, get_external_db_store_name, get_internal_db_store_name
+from .util import get_gs_proxy_server_url, get_external_db_store_name, get_internal_db_store_name, \
+    image_mosaic_granules_to_wms_time_key
 
 FLASK_PROXY_KEY = f'{__name__}:PROXY:{{workspace}}'
 DEFAULT_WMS_QGIS_STORE_PREFIX = 'qgis'
@@ -199,16 +200,26 @@ def get_layer_info(workspace, layername, *, x_forwarded_items=None):
 
 def get_layer_info_by_uuid(*, uuid, gdal_layername, gdal_workspace, x_forwarded_items=None):
     gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wms
-    wms = get_wms_proxy()
-    if wms is None or uuid is None:
+    if uuid is None:
         return {}
+    time_info = None
+    wms_layer = gs_util.get_layer(gs_layername.workspace, gs_layername.name, auth=settings.LAYMAN_GS_AUTH)
+    if not wms_layer:
+        return {}
+    if wms_layer['resource']['@class'] == 'coverage' \
+            and get_image_mosaic_store_name(uuid=uuid) in wms_layer['resource']['href']:
+        granules_json = gs_util.get_image_mosaic_granules(gs_layername.workspace,
+                                                          get_image_mosaic_store_name(uuid=uuid),
+                                                          gs_layername.name)
+        if granules_json:
+            time_info = {
+                **image_mosaic_granules_to_wms_time_key(granules_json),
+                **get_timeregex_props(gdal_workspace, gdal_layername),
+            }
+
     wms_proxy_url = get_wms_url(external_url=True, x_forwarded_items=x_forwarded_items)
 
-    if gs_layername.name not in wms.contents:
-        return {}
     result = {
-        'title': wms.contents[gs_layername.name].title,
-        'description': wms.contents[gs_layername.name].abstract,
         'wms': {
             'name': gs_layername.name,
             'url': wms_proxy_url,
@@ -218,11 +229,8 @@ def get_layer_info_by_uuid(*, uuid, gdal_layername, gdal_workspace, x_forwarded_
             'workspace': gs_layername.workspace,
         },
     }
-    if 'time' in wms.contents[gs_layername.name].dimensions:
-        result['wms']['time'] = {
-            **wms.contents[gs_layername.name].dimensions['time'],
-            **get_timeregex_props(gdal_workspace, gdal_layername),
-        }
+    if time_info:
+        result['wms']['time'] = time_info
     return result
 
 
