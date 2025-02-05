@@ -63,3 +63,12 @@ def get_external_db_store_name(*, uuid):
 
 def get_internal_db_store_name(*, db_schema):
     return f'{DEFAULT_INTERNAL_DB_STORE_PREFIX}_{db_schema}'
+
+
+def image_mosaic_granules_to_wms_time_key(granules_json):
+    values = sorted(set(feature['properties']['ingestion'] for feature in granules_json['features']))
+    return {
+        'units': 'ISO8601',
+        'values': values,
+        'default': max(values),
+    }
