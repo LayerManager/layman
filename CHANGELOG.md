@@ -36,6 +36,7 @@
   - key `data`.`layman`.`last-migration` was removed from [GET Version](doc/rest.md#get-version) response
   - body parameter `sld` was removed from [POST Workspace Publications](doc/rest.md#post-workspace-layers) and [PATCH Workspace Publication](doc/rest.md#patch-workspace-layer)
   - workspace-related endpoints which did not include `/workspaces` in their path were removed 
+- [#701](https://github.com/LayerManager/layman/pull/701) Check bounding bbox of normalized raster before posting to GeoServer. Stop checking that Layer is available in WMS/WFS GetCapabilities after publishing to GeoServer.
 - [#1028](https://github.com/LayerManager/layman/issues/1028) Upgrade Node.js of Laymen Test Client from v18 to v22 and dependencies:
   - eslint-config-next 13 -> 14
   - next 13 -> 14

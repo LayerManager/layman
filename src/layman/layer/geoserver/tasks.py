@@ -8,7 +8,6 @@ from layman.celery import AbortedException
 from layman import celery_app, settings, util as layman_util, names
 from layman.common import empty_method_returns_true, bbox as bbox_util
 from layman.common.micka import util as micka_util
-from layman.http import LaymanError
 from . import wms, wfs, sld, get_internal_db_store_name
 from .. import geoserver
 
@@ -121,18 +120,6 @@ def refresh_wms(
                                          )
 
     wms.clear_cache()
-
-    try:
-        wms_info = wms.get_layer_info_by_uuid(uuid=uuid,
-                                              gdal_layername=layername,
-                                              gdal_workspace=workspace,
-                                              )
-    except BaseException:
-        wms_info = {}
-
-    if 'wms' not in wms_info:
-        wms.delete_layer_by_uuid(uuid=uuid, db_schema=workspace)
-        raise LaymanError(53,)
 
     if self.is_aborted():
         wms.delete_layer_by_uuid(uuid=uuid, db_schema=workspace)
