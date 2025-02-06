@@ -73,8 +73,8 @@ UUID_FILE_PATH = 'tmp/migration_to_v2_0_tests/uuids.json'
 
 
 def import_publication_uuids():
-    with open(UUID_FILE_PATH) as f:
-        publ_uuids = json.load(f)
+    with open(UUID_FILE_PATH, encoding='utf-8') as uuid_file:
+        publ_uuids = json.load(uuid_file)
     assert len(publ_uuids) == len(PUBLICATIONS)
     for publ_type, workspace, name, publ_uuid in publ_uuids:
         publ = next(p for p in PUBLICATIONS if p.type == publ_type and p.workspace == workspace and p.name == name)

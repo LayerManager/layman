@@ -20,7 +20,9 @@ class OAuth2ProviderMock():
                 'SERVER_NAME': f"host.docker.internal:{PORT}",
                 'SESSION_COOKIE_DOMAIN': f"host.docker.internal:{PORT}",
                 'OAUTH2_USERS': {
-                    'test_migrate_2_user_1': None,
+                    'performance_user_1': None,
+                    'performance_user_2': None,
+                    'performance_user_3': None,
                 },
             },
             'host': '0.0.0.0',

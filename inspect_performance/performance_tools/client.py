@@ -11,6 +11,7 @@ from dataclasses import dataclass
 
 import requests
 import layman_settings as settings
+from geoserver.util import wms_direct
 from .http import LaymanError
 from .util import compress_files
 
@@ -353,3 +354,11 @@ class RestClient:
         response = requests.get(r_url, headers=headers, timeout=HTTP_TIMEOUT)
         raise_layman_error(response)
         return response.json()
+
+    def get_wms_capabilities(self, *, geoserver_workspace=None, actor_name=None):
+        ws_url_part = f"/{geoserver_workspace}" if geoserver_workspace else ""
+        headers = {}
+        if actor_name and actor_name != settings.ANONYM_USER:
+            headers.update(get_authz_headers(actor_name))
+        r_url = f"{self.base_url}/geoserver{ws_url_part}/wms"
+        return wms_direct(r_url, headers=headers)
