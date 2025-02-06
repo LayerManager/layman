@@ -83,6 +83,12 @@ def open_raster_file(filepath, mode=gdal.GA_ReadOnly):
     return dataset
 
 
+def check_bbox_and_extent(filepath):
+    stdout = subprocess.check_output(f"gdalinfo {filepath}", shell=True)
+    if "Invalid angle" in str(stdout):
+        raise LaymanError(53)
+
+
 def get_color_interpretations(filepath):
     dataset = open_raster_file(filepath)
     result = []

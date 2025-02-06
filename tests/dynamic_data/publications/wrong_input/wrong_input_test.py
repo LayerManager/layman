@@ -1085,12 +1085,12 @@ TESTCASES = {
             'crs': 'EPSG:4326'
         },
         Key.EXCEPTION: LaymanError,
-        Key.FAILED_INFO_KEY: 'wms',
+        Key.FAILED_INFO_KEY: 'file',
         Key.EXPECTED_EXCEPTION: {
             'http_code': 500,
             'sync': False,
             'code': 53,
-            'message': 'Error when publishing on GeoServer. It happens for example for raster files with wrong explicit CRS.',
+            'message': 'Wrong bounding box after raster normalization. It happens for example when wrong explicit CRS was set.',
         },
         Key.MANDATORY_CASES: frozenset([RestMethod.POST, WithChunksDomain.FALSE, CompressDomain.FALSE]),
         Key.RUN_ONLY_CASES: frozenset([RestMethod.POST, WithChunksDomain, CompressDomain]),

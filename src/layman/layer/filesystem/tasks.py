@@ -131,6 +131,7 @@ def refresh_gdal(self, workspace, layername,
         while process.poll() is None and not self.is_aborted():
             pass
         finish_gdal_process(process)
+        gdal.check_bbox_and_extent(tmp_vrt_file)
         nodata_value = gdal.get_nodata_value(vrt_file_path or input_path)
         gdal.correct_nodata_value_in_vrt(tmp_vrt_file, nodata_value=nodata_value)
 

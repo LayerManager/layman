@@ -53,7 +53,7 @@ ERROR_LIST = {
     50: (500, 'Error when normalizing raster file'),
     51: (500, 'Error when generating thumbnail'),
     52: (400, 'GeoServer HTTP or connection error'),
-    53: (500, 'Error when publishing on GeoServer. It happens for example for raster files with wrong explicit CRS.'),
+    53: (500, 'Wrong bounding box after raster normalization. It happens for example when wrong explicit CRS was set.'),
     54: (400, 'Wrong header value'),
     55: (400, 'Publication is not complete'),  # raised by process_client only
     56: (403, 'Username or workspace name is too long. Maximum is 59 characters.'),
