@@ -66,3 +66,6 @@ def test_deleted_incomplete_layers(client, layer):
     with pytest.raises(LaymanError) as exc_info:
         client.get_workspace_publication(layer.type, layer.workspace, layer.name, actor_name=layer.owner)
     assert exc_info.value.code == 15
+    rows = db_util.run_query(f"select * from {settings.LAYMAN_PRIME_SCHEMA}.publications where uuid = %s",
+                             data=(layer.uuid,), uri_str=DB_URI)
+    assert len(rows) == 0
