@@ -1,11 +1,19 @@
+import traceback
 from urllib.parse import urljoin
 import logging
 import requests
+import requests.exceptions
 
 from geoserver import util as gs_util, GS_REST, GS_REST_TIMEOUT
 from db import util as db_util
 from layman import settings
+from layman.authz import is_user
 from layman.common.prime_db_schema import users
+from layman.layer import LAYER_TYPE
+from layman.layer.micka import soap
+from layman.map import MAP_TYPE
+from layman.map.micka import soap as map_soap
+from layman.util import get_publication_info
 
 logger = logging.getLogger(__name__)
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
@@ -201,3 +209,61 @@ def remove_right_types_table():
 
     drop_table_statement = f"""drop table {settings.LAYMAN_PRIME_SCHEMA}.right_types"""
     db_util.run_statement(drop_table_statement)
+
+
+def ensure_metadata_records():
+    logger.info(f'    Ensure metadata records')
+
+    query = f'''select w.name, p.name
+    from {DB_SCHEMA}.publications p inner join
+         {DB_SCHEMA}.workspaces w on w.id = p.id_workspace
+    where p.type = %s
+    order by w.name, p.name
+    ;'''
+    maps = db_util.run_query(query, (MAP_TYPE,))
+    for workspace, mapname in maps:
+        publ_info = get_publication_info(workspace, MAP_TYPE, mapname,
+                                         context={'keys':['access_rights', 'metadata', 'native_crs']})
+        if not publ_info.get('native_crs'):
+            logger.info(f'    Map {workspace}.{mapname} has no native CRS, skipping.')
+            continue
+
+        if not publ_info.get('metadata'):
+            logger.info(f'    Recreate map {workspace}.{mapname}')
+        else:
+            logger.info(f'    Map {workspace}.{mapname} already has metadata record.')
+            continue
+
+        try:
+            actor_name = next((user_or_role for user_or_role in publ_info['access_rights']['write']
+                               if is_user(user_or_role)), settings.ANONYM_USER)
+            map_soap.soap_insert(workspace, mapname, access_rights=publ_info['access_rights'], actor_name=actor_name)
+        except requests.exceptions.ConnectionError:
+            print(traceback.format_exc())
+
+
+        logger.info(f'    Recreate map {workspace}.{mapname} DONE!')
+
+    query = f'''select w.name, p.name
+    from {DB_SCHEMA}.publications p inner join
+         {DB_SCHEMA}.workspaces w on w.id = p.id_workspace
+    where p.type = %s and p.wfs_wms_status = %s and p.geodata_type != 'unknown'
+    order by w.name, p.name
+    ;'''
+    layers = db_util.run_query(query, (LAYER_TYPE, settings.EnumWfsWmsStatus.AVAILABLE.value, ))
+    for workspace, layername in layers:
+        publ_info = get_publication_info(workspace, LAYER_TYPE, layername,
+                                         context={'keys':['access_rights', 'metadata']})
+
+        if not publ_info.get('metadata'):
+            logger.info(f'    Recreate layer {workspace}.{layername}')
+        else:
+            logger.info(f'    Layer {workspace}.{layername} already has metadata record.')
+            continue
+
+        try:
+            soap.soap_insert(workspace, layername, access_rights=publ_info['access_rights'])
+        except requests.exceptions.ConnectionError:
+            print(traceback.format_exc())
+
+        logger.info(f'    Recreate layer {workspace}.{layername} DONE!')

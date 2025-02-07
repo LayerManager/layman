@@ -75,6 +75,7 @@ MIGRATIONS = {
         ]),
         ((1, 23, 0), [
             upgrade_v1_23.delete_user_roles,
+            upgrade_v1_23.ensure_metadata_records,
         ]),
     ],
 }
