@@ -1,6 +1,6 @@
 import pytest
 
-from tools.client import RestClient, LAYER_TYPE, MAP_TYPE
+from tools.client import RestClient
 from tools.http import LaymanError
 from tools.oauth2_provider_mock import OAuth2ProviderMock
 from tools.test_data import import_publication_uuids, PUBLICATIONS_TO_MIGRATE, INCOMPLETE_LAYERS, Publication
@@ -48,12 +48,7 @@ def test_migrated_description(client, publication):
 
 
 @pytest.mark.usefixtures("import_publication_uuids_fixture", "oauth2_provider_mock_fixture")
-@pytest.mark.parametrize("publication", [
-    pytest.param(publ, marks=pytest.mark.xfail(reason="Geoserver provider is not yet migrated"))
-    for publ in PUBLICATIONS_TO_MIGRATE if publ.type == LAYER_TYPE
-] + [
-    publ for publ in PUBLICATIONS_TO_MIGRATE if publ.type == MAP_TYPE
-], ids=ids_fn)
+@pytest.mark.parametrize("publication", PUBLICATIONS_TO_MIGRATE, ids=ids_fn)
 def test_complete_status(client, publication):
     publ_detail = client.get_workspace_publication(publication.type, publication.workspace, publication.name,
                                                    actor_name=publication.owner)
