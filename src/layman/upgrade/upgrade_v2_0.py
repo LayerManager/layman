@@ -8,9 +8,14 @@ from db import util as db_util
 from geoserver import util as gs_util
 from layman import settings, names
 from layman.common.micka import util as micka_util, requests as micka_requests
-from layman.layer import LAYER_TYPE
+from layman.layer import LAYER_TYPE, STYLE_TYPES_DEF
+from layman.layer.geoserver import wfs, wms as gs_wms, sld
+from layman.layer.geoserver.tasks import refresh_wms, refresh_wfs, refresh_sld
+from layman.layer.geoserver.wms import get_timeregex_props
+from layman.layer.util import get_complete_layer_info
 from layman.map import MAP_TYPE
 from layman.map.filesystem import input_file
+from layman.upgrade import upgrade_v2_0_util as util
 from layman.util import get_publication_info
 
 logger = logging.getLogger(__name__)
@@ -92,27 +97,8 @@ def delete_layers_without_wfs_wms_available():
         muuid = micka_util.get_metadata_uuid(layer_uuid)
         micka_requests.csw_delete(muuid)
 
-        # geoserver sld
-        gs_wms_workspace = f"{workspace}_wms"
-        gs_util.delete_workspace_style(gs_wms_workspace, layername, auth=settings.LAYMAN_GS_AUTH)
-
-        # geoserver wms
-        gs_util.delete_feature_type(gs_wms_workspace, layername, settings.LAYMAN_GS_AUTH, store='postgresql')
-        gs_util.delete_feature_type(gs_wms_workspace, layername, settings.LAYMAN_GS_AUTH, store=f'external_db_{layername}')
-        gs_util.delete_wms_layer(gs_wms_workspace, layername, settings.LAYMAN_GS_AUTH)
-        gs_util.delete_wms_store(gs_wms_workspace, settings.LAYMAN_GS_AUTH, f"qgis_{layername}")
-        gs_util.delete_coverage_store(gs_wms_workspace, settings.LAYMAN_GS_AUTH, f"geotiff_{layername}")
-        gs_util.delete_coverage_store(gs_wms_workspace, settings.LAYMAN_GS_AUTH, f"image_mosaic_{layername}")
-        gs_util.delete_db_store(gs_wms_workspace, settings.LAYMAN_GS_AUTH, store_name=f"external_db_{layername}")
-        gs_util.delete_security_roles(f"{gs_wms_workspace}.{layername}.r", settings.LAYMAN_GS_AUTH)
-        gs_util.delete_security_roles(f"{gs_wms_workspace}.{layername}.w", settings.LAYMAN_GS_AUTH)
-
-        # geoserver wfs
-        gs_util.delete_feature_type(workspace, layername, settings.LAYMAN_GS_AUTH, store='postgresql')
-        gs_util.delete_feature_type(workspace, layername, settings.LAYMAN_GS_AUTH, store=f'external_db_{layername}')
-        gs_util.delete_db_store(workspace, settings.LAYMAN_GS_AUTH, store_name=f'external_db_{layername}')
-        gs_util.delete_security_roles(f"{workspace}.{layername}.r", settings.LAYMAN_GS_AUTH)
-        gs_util.delete_security_roles(f"{workspace}.{layername}.w", settings.LAYMAN_GS_AUTH)
+        # geoserver
+        util.delete_layer_from_geoserver_v1_23(layername, workspace)
 
         # qgis
         try:
@@ -170,3 +156,103 @@ def delete_layers_without_wfs_wms_available():
         assert not publ_info, f"{publ_info}"
 
         logger.info(f'    Deleting layer {workspace}.{layername} DONE!')
+
+
+def migrate_layers():
+    logger.info(f'    Migrate layers')
+
+    query = f'''
+    select w.name, p.name, p.uuid::varchar as uuid, p.style_type, p.title, p.description, p.image_mosaic,
+        PGP_SYM_DECRYPT(p.external_table_uri, p.uuid::text)::json as external_table_uri,
+       (select rtrim(concat(case when u.id is not null then w.name || ',' end,
+                            string_agg(COALESCE(w2.name, r.role_name), ',' ORDER BY COALESCE(w2.name, r.role_name)) || ',',
+                            case when p.everyone_can_read then 'EVERYONE' || ',' end
+                            ), ',')
+        from {DB_SCHEMA}.rights r left join
+             {DB_SCHEMA}.users u2 on r.id_user = u2.id left join
+             {DB_SCHEMA}.workspaces w2 on w2.id = u2.id_workspace
+        where r.id_publication = p.id
+          and r.type = 'read') read_users_roles,
+       (select rtrim(concat(case when u.id is not null then w.name || ',' end,
+                            string_agg(COALESCE(w2.name, r.role_name), ',' ORDER BY COALESCE(w2.name, r.role_name)) || ',',
+                            case when p.everyone_can_write then 'EVERYONE' || ',' end
+                            ), ',')
+        from {DB_SCHEMA}.rights r left join
+             {DB_SCHEMA}.users u2 on r.id_user = u2.id left join
+             {DB_SCHEMA}.workspaces w2 on w2.id = u2.id_workspace
+        where r.id_publication = p.id
+          and r.type = 'write') write_users_roles
+    from {DB_SCHEMA}.publications p inner join
+         {DB_SCHEMA}.workspaces w on w.id = p.id_workspace left join
+         {DB_SCHEMA}.users u on u.id_workspace = w.id
+    where p.type = %s
+    ;'''
+    layers = db_util.run_query(query, (LAYER_TYPE,))
+
+    for workspace, layername, layer_uuid, style_type_code, title, description, image_mosaic, external_table_uri, \
+            read_users_roles, write_users_roles in layers:
+
+        # check if publication is not yet migrated
+        publ_info = get_complete_layer_info(workspace, layername)
+        publ_status = publ_info['layman_metadata']['publication_status']
+        assert publ_status in ['COMPLETE', 'INCOMPLETE']
+        if publ_status == 'INCOMPLETE':
+            logger.info(f'    Migrate layer {workspace}.{layername}')
+        else:
+            logger.warning(f'    Layer {workspace}.{layername} seems already migrated!')
+            continue
+
+        # prepare task arguments
+        style_type = next(st for st in STYLE_TYPES_DEF if st.code == style_type_code)
+        original_data_source = settings.EnumOriginalDataSource.TABLE.value if external_table_uri else settings.EnumOriginalDataSource.FILE.value
+        access_rights = {
+            'read': read_users_roles.split(','),
+            'write': write_users_roles.split(','),
+        }
+        if image_mosaic:
+            time_regex_props = get_timeregex_props(workspace, layername)
+            slugified_time_regex = time_regex_props['regex']
+            slugified_time_regex_format = time_regex_props.get('regex_format')
+        else:
+            slugified_time_regex = None
+            slugified_time_regex_format = None
+        post_task_kwargs = {
+            'uuid': layer_uuid,
+            'title': title,
+            'description': description,
+            'access_rights': access_rights,
+            'original_data_source': original_data_source,
+            'store_in_geoserver': style_type.store_in_geoserver,
+            'image_mosaic': image_mosaic,
+            'slugified_time_regex': slugified_time_regex,
+            'slugified_time_regex_format': slugified_time_regex_format,
+        }
+
+        # delete layer from geoserver
+        util.delete_layer_from_geoserver_v1_23(layername, workspace)
+
+        # re-create layer on geoserver
+        if not wfs.get_layer_info_by_uuid(uuid=layer_uuid, layman_workspace=workspace):
+            logger.info("      re-creating geoserver.wfs")
+            util.run_task_sync(refresh_wfs, [workspace, layername], post_task_kwargs)
+        else:
+            logger.warning("      geoserver.wfs already exists!")
+
+        if not gs_wms.get_layer_info_by_uuid(uuid=layer_uuid, gdal_layername=layername, gdal_workspace=workspace):
+            logger.info("      re-creating geoserver.wms")
+            util.run_task_sync(refresh_wms, [workspace, layername], post_task_kwargs)
+        else:
+            logger.warning("      geoserver.wms already exists!")
+
+        if not sld.get_layer_info_by_uuid(workspace, uuid=layer_uuid, layername=layername):
+            logger.info("      re-creating geoserver.sld")
+            util.run_task_sync(refresh_sld, [workspace, layername], post_task_kwargs)
+        else:
+            logger.warning("      geoserver.sld already exists!")
+
+        # assert that layer is complete now
+        publ_info = get_complete_layer_info(workspace, layername)
+        publ_status = publ_info['layman_metadata']['publication_status']
+        assert publ_status == 'COMPLETE'
+
+        logger.info(f'    Migrate layer {workspace}.{layername} DONE')
