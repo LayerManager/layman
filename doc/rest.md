@@ -571,6 +571,8 @@ Body parameters:
    - layer is considered [internal](models.md#internal-map-layer) if
      - its URL points to the Layman instance (with or without client-proxy URL path prefix),
      - or its URL protocol and its URL host corresponds with [X-Forwarded headers](client-proxy.md#x-forwarded-http-headers) (with or without client-proxy URL path prefix)
+     - is named `l_<UUID>`
+     - is in GeoServer workspace `layman` or `layman_wms`
 - *name*, string
    - computer-friendly identifier of the map
    - must be unique among all maps of one workspace

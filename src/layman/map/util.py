@@ -9,13 +9,12 @@ from jsonschema import validate, Draft7Validator
 from flask import current_app, request
 
 import layman_settings
-from layman import LaymanError, util as layman_util, celery as celery_util, settings
+from layman import LaymanError, util as layman_util, celery as celery_util, settings, names
 from layman.authn.prime_db_schema import get_authn_info
 from layman.common.micka import util as micka_util
 from layman.common import redis as redis_util, tasks as tasks_util, metadata as metadata_common
 from layman.common.util import PUBLICATION_NAME_PATTERN, PUBLICATION_MAX_LENGTH, clear_publication_info as common_clear_publication_info
 from layman.layer.geoserver.util import get_gs_proxy_server_url
-from layman.layer.geoserver.wms import get_layman_workspace
 from layman.util import call_modules_fn, get_providers_from_source_names, get_internal_sources, \
     to_safe_name, url_for, WORKSPACE_NAME_PATTERN, XForwardedClass
 from . import get_map_sources, MAP_TYPE, get_map_type_def, get_map_info_keys
@@ -476,18 +475,17 @@ def get_layers_from_json(map_json, *, x_forwarded_items=None):
                 layername_parts = full_layername.split(':')
                 if len(layername_parts) != 2:
                     continue
-                layer_geoserver_workspace, layername = layername_parts
+                layer_geoserver_workspace, layer_geoserver_name = layername_parts
                 match = re.match(WORKSPACE_NAME_PATTERN, layer_geoserver_workspace)
                 if not match:
                     continue
             else:
                 layer_geoserver_workspace = url_geoserver_workspace
-                layername = full_layername
-            match = re.match(PUBLICATION_NAME_PATTERN, layername)
-            if not match:
-                continue
-            layer_workspace = get_layman_workspace(layer_geoserver_workspace)
-            layer_def = (layer_workspace, layername, layer_idx)
-            if layer_def not in found_layers:
-                found_layers.append(layer_def)
+                layer_geoserver_name = full_layername
+            layer_uuid = names.geoserver_layername_to_uuid(geoserver_workspace=layer_geoserver_workspace,
+                                                           geoserver_name=layer_geoserver_name)
+            if layer_uuid:
+                layer_def = (layer_uuid, layer_idx)
+                if layer_def not in found_layers:
+                    found_layers.append(layer_def)
     return found_layers
