@@ -65,6 +65,11 @@ def get_internal_db_store_name(*, db_schema):
     return f'{DEFAULT_INTERNAL_DB_STORE_PREFIX}_{db_schema}'
 
 
+def get_db_store_name(*, uuid, db_schema, original_data_source):
+    return get_external_db_store_name(uuid=uuid) if original_data_source == settings.EnumOriginalDataSource.TABLE.value \
+        else get_internal_db_store_name(db_schema=db_schema)
+
+
 def image_mosaic_granules_to_wms_time_key(granules_json):
     values = sorted(set(feature['properties']['ingestion'] for feature in granules_json['features']))
     return {

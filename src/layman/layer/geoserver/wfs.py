@@ -9,7 +9,7 @@ from layman.layer.util import is_layer_chain_ready
 from layman import util as layman_util
 from layman.layer import LAYER_TYPE
 import requests_util.retry
-from .util import get_gs_proxy_server_url, get_external_db_store_name, get_internal_db_store_name
+from .util import get_gs_proxy_server_url, get_external_db_store_name, get_internal_db_store_name, get_db_store_name
 from . import wms
 
 FLASK_PROXY_KEY = f'{__name__}:PROXY:{{workspace}}'
@@ -36,7 +36,7 @@ def patch_layer_by_uuid(*, uuid, title, description, original_data_source, acces
     if geodata_type != settings.GEODATA_TYPE_VECTOR:
         raise NotImplementedError(f"Unknown geodata type: {geodata_type}")
 
-    store_name = get_external_db_store_name(uuid=uuid) if original_data_source == settings.EnumOriginalDataSource.TABLE.value else get_internal_db_store_name(db_schema=layman_workspace)
+    store_name = get_db_store_name(uuid=uuid, db_schema=layman_workspace, original_data_source=original_data_source)
     gs_util.patch_feature_type(gs_layername.workspace, gs_layername.name, store_name=store_name, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
     clear_cache()
 
@@ -162,7 +162,7 @@ def get_layer_info_by_uuid(*, uuid, layman_workspace, x_forwarded_items=None):
 
     info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['original_data_source']})
     original_data_source = info['original_data_source']
-    data_store_name = get_external_db_store_name(uuid=uuid) if original_data_source == settings.EnumOriginalDataSource.TABLE.value else get_internal_db_store_name(db_schema=layman_workspace)
+    data_store_name = get_db_store_name(uuid=uuid, db_schema=layman_workspace, original_data_source=original_data_source)
     feature_type = gs_util.get_feature_type(gs_layername.workspace, data_store_name, gs_layername.name)
     if not feature_type:
         return {}
