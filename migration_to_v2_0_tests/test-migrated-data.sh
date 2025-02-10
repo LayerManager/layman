@@ -2,6 +2,8 @@
 
 set -exu
 
+rm -rf tmp/artifacts/migration_to_v2_0_tests
+
 # activate python virtual environment, set environment variables
 source .venv/bin/activate
 set -o allexport && source .env && set +o allexport
