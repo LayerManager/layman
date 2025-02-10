@@ -8,9 +8,11 @@ import tempfile
 import time
 from contextlib import ExitStack
 from dataclasses import dataclass
+from pathlib import Path
 
 import requests
 import layman_settings as settings
+from geoserver import util as gs_util
 from .http import LaymanError
 from .util import compress_files
 
@@ -353,3 +355,24 @@ class RestClient:
         response = requests.get(r_url, headers=headers, timeout=HTTP_TIMEOUT)
         raise_layman_error(response)
         return response.json()
+
+    def get_layer_thumbnail_by_wms(self, workspace, name, *, output_path, headers=None, actor_name=None):
+        headers = headers or {}
+        if actor_name:
+            assert TOKEN_HEADER not in headers
+        if actor_name and actor_name != settings.ANONYM_USER:
+            headers.update(get_authz_headers(actor_name))
+
+        layer_info = self.get_workspace_publication(LAYER_TYPE, workspace, name, headers=headers)
+        wms_url = layer_info['wms']['url']
+        gs_layername = layer_info['wms']['name']
+        tn_bbox = gs_util.get_square_bbox(layer_info['native_bounding_box'])
+
+        response = gs_util.get_layer_thumbnail(wms_url, gs_layername, tn_bbox, layer_info['native_crs'],
+                                               headers=headers, wms_version=gs_util.WMS_VERSION)
+        assert "png" in response.headers['content-type'].lower(), response.content
+        response.raise_for_status()
+
+        Path(os.path.dirname(output_path)).mkdir(parents=True, exist_ok=True)
+        with open(output_path, "wb") as out_file:
+            out_file.write(response.content)

@@ -3,8 +3,10 @@ import pytest
 from tools.client import RestClient
 from tools.http import LaymanError
 from tools.oauth2_provider_mock import OAuth2ProviderMock
-from tools.test_data import import_publication_uuids, PUBLICATIONS_TO_MIGRATE, INCOMPLETE_LAYERS, Publication
+from tools.test_data import import_publication_uuids, PUBLICATIONS_TO_MIGRATE, INCOMPLETE_LAYERS, Publication, \
+    LAYERS_TO_MIGRATE
 from tools.test_settings import DB_URI
+from tools.util import compare_images
 
 from db import util as db_util
 import layman_settings as settings
@@ -53,6 +55,18 @@ def test_complete_status(client, publication):
     publ_detail = client.get_workspace_publication(publication.type, publication.workspace, publication.name,
                                                    actor_name=publication.owner)
     assert publ_detail['layman_metadata']['publication_status'] == 'COMPLETE', f'rest_publication_detail={publ_detail}'
+
+
+@pytest.mark.usefixtures("import_publication_uuids_fixture")
+@pytest.mark.parametrize("layer", LAYERS_TO_MIGRATE, ids=ids_fn)
+def test_layer_thumbnails(client, layer):
+    assert layer.exp_thumbnail_path
+    img_path = f"tmp/artifacts/migration_to_v2_0_tests/layer_thumbnails/{layer.name}_v2_0.png"
+    client.get_layer_thumbnail_by_wms(layer.workspace, layer.name, actor_name=layer.owner, output_path=img_path)
+
+    exp_img_path = layer.exp_thumbnail_path
+    diff_pixels = compare_images(img_path, exp_img_path)
+    assert diff_pixels <= 10, f"diff_pixels={diff_pixels}\nimg_path={img_path}\nexp_img_path={exp_img_path}"
 
 
 @pytest.mark.usefixtures("import_publication_uuids_fixture")
