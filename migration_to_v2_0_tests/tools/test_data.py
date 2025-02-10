@@ -11,6 +11,8 @@ USERS = [
     USER_1,
 ]
 
+WORKSPACES = USERS
+
 
 @dataclass
 class Publication:

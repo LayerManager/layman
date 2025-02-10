@@ -834,6 +834,18 @@ def ensure_workspace(geoserver_workspace, auth=None):
     return False
 
 
+def get_workspace(geoserver_workspace, *, auth):
+    response = requests.get(urljoin(GS_REST_WORKSPACES, geoserver_workspace),
+                            headers=headers_json,
+                            auth=auth,
+                            timeout=GS_REST_TIMEOUT,
+                            )
+    if response.status_code == 404:
+        return None
+    response.raise_for_status()
+    return response.json()['workspace']
+
+
 def delete_workspace(geoserver_workspace, auth=None):
     auth = auth or GS_AUTH
     delete_security_roles(geoserver_workspace + '.*.r', auth)

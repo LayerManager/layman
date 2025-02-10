@@ -256,3 +256,25 @@ def migrate_layers():
         assert publ_status == 'COMPLETE'
 
         logger.info(f'    Migrate layer {workspace}.{layername} DONE')
+
+
+def delete_old_workspaces():
+    logger.info(f'    Delete old workspaces')
+
+    query = f"""
+    select w.name
+    from {DB_SCHEMA}.workspaces w
+    order by w.name asc
+    ;"""
+    rows = db_util.run_query(query)
+    workspaces = [r[0] for r in rows]
+
+    for workspace in workspaces:
+        logger.info(f'      Deleting old workspace {workspace}')
+
+        # geoserver
+        for gs_workspace in [workspace, f"{workspace}_wms"]:
+            gs_util.delete_db_store(gs_workspace, auth=settings.LAYMAN_GS_AUTH, store_name='postgresql')
+            gs_util.delete_workspace(gs_workspace, auth=settings.LAYMAN_GS_AUTH)
+
+    logger.info(f'    Delete old workspaces DONE!')
