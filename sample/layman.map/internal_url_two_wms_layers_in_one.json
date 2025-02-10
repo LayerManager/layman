@@ -24,9 +24,9 @@
       "title": "Hranice a místa",
       "className": "HSLayers.Layer.WMS",
       "singleTile": true,
-      "url": "http://localhost:8000/geoserver/testuser1_wms/ows",
+      "url": "http://localhost:8000/geoserver/layman_wms/ows",
       "params": {
-        "LAYERS": "hranice,mista",
+        "LAYERS": "l_1add245a-b6fb-4720-a46d-f7de1b9af5ab,l_0b1dc7ee-de7e-4bbc-942d-ee28f9571706",
         "FORMAT": "image\/png"
       }
     }

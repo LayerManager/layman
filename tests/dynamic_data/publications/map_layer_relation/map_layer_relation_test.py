@@ -18,9 +18,9 @@ DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 WORKSPACE = 'layer_map_relation_ws'
 PRIVATE_WORKSPACE = 'layer_map_relation_user'
 
-LAYER_HRANICE = Publication(WORKSPACE, process_client.LAYER_TYPE, 'hranice')
-LAYER_HRANICE_PRIVATE = Publication(PRIVATE_WORKSPACE, process_client.LAYER_TYPE, 'hranice_private')
-LAYER_MISTA_NON_EXISTENT = Publication(WORKSPACE, process_client.LAYER_TYPE, 'mista')
+LAYER_HRANICE = Publication(WORKSPACE, process_client.LAYER_TYPE, 'hranice', uuid='6fd2541e-7389-447d-933d-33b3d30ff3d0')
+LAYER_HRANICE_PRIVATE = Publication(PRIVATE_WORKSPACE, process_client.LAYER_TYPE, 'hranice_private', uuid='78d3a314-cc4b-4893-aebc-754c9458a9af')
+LAYER_MISTA_NON_EXISTENT = Publication(WORKSPACE, process_client.LAYER_TYPE, 'mista', uuid='f83004db-da3d-4de2-85a0-844a66ab222e')
 MAP_HRANICE = Publication(WORKSPACE, process_client.MAP_TYPE, 'map_hranice')
 MAP_HRANICE_OPERATES_ON = [LAYER_HRANICE]
 
@@ -122,7 +122,6 @@ TEST_CASES = {
 
 @pytest.mark.timeout(60)
 @pytest.mark.usefixtures('oauth2_provider_mock')
-@pytest.mark.xfail(reason='Map filesystem input_file in not yet ready for WMS layers named by UUID')
 class TestPublication(base_test.TestSingleRestPublication):
     workspace = WORKSPACE
     publication_type = process_client.MAP_TYPE
@@ -176,11 +175,11 @@ class TestPublication(base_test.TestSingleRestPublication):
             assert exp_operates_on is None
         else:
             found_map_layers = {
-                (ml['workspace'], ml['name'], ml['index'], ml['uuid'])
+                (ml['uuid'], ml['index'], ml['name'])
                 for ml in publ_info['_map_layers']
             }
             exp_map_layers = {
-                (layer.workspace, layer.name, layer_index, self.publ_uuids[layer] if exists else None)
+                (layer.uuid, layer_index, layer.name if exists else None)
                 for layer, layer_index, exists in exp_map_layers
             }
             assert found_map_layers == exp_map_layers

@@ -24,9 +24,9 @@
       "title": "Hranice",
       "className": "HSLayers.Layer.WMS",
       "singleTile": true,
-      "url": "http://localhost:8000/client-proxy/geoserver/testuser1_wms/ows",
+      "url": "http://localhost:8000/client-proxy/geoserver/layman_wms/ows",
       "params": {
-        "LAYERS": "hranice",
+        "LAYERS": "l_1add245a-b6fb-4720-a46d-f7de1b9af5ab",
         "FORMAT": "image\/png"
       }
     },
@@ -39,7 +39,7 @@
       "singleTile": true,
       "url": "https://laymanproxy.com/client-proxy/client-proxy-subdir/geoserver/ows",
       "params": {
-        "LAYERS": "testuser1_wms:mista",
+        "LAYERS": "layman_wms:l_0b1dc7ee-de7e-4bbc-942d-ee28f9571706",
         "FORMAT": "image\/png"
       }
     },
@@ -50,9 +50,9 @@
       "title": "Hranice",
       "className": "HSLayers.Layer.WMS",
       "singleTile": true,
-      "url": "https://anotherlayman.org/client-proxy/geoserver/testuser1_wms/ows",
+      "url": "https://anotherlayman.org/client-proxy/geoserver/layman_wms/ows",
       "params": {
-        "LAYERS": "hranice",
+        "LAYERS": "l_1add245a-b6fb-4720-a46d-f7de1b9af5ab",
         "FORMAT": "image\/png"
       }
     }
