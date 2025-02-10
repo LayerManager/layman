@@ -31,6 +31,21 @@ def adjust_db_for_description():
     db_util.run_statement(statement)
 
 
+def adjust_db_for_map_layer_relation():
+    logger.info(f'    Alter DB prime schema map_layer table for UUID')
+
+    statement = f'''
+    ALTER TABLE {DB_SCHEMA}.map_layer ADD COLUMN IF NOT EXISTS
+    layer_uuid  uuid default null;'''
+    db_util.run_statement(statement)
+    statement = f'''
+    ALTER TABLE {DB_SCHEMA}.map_layer ALTER COLUMN layer_workspace DROP NOT NULL;'''
+    db_util.run_statement(statement)
+    statement = f'''
+    ALTER TABLE {DB_SCHEMA}.map_layer ALTER COLUMN layer_name DROP NOT NULL;'''
+    db_util.run_statement(statement)
+
+
 def get_wms_capabilities(geoserver_workspace):
     headers = {
         settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE: settings.LAYMAN_GS_USER,
