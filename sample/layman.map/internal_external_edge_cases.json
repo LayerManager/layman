@@ -26,7 +26,7 @@
       "maxResolution": null,
       "metadata": {},
       "minResolution": 0,
-      "name": "testuser1:hranice",
+      "name": "layman:l_1add245a-b6fb-4720-a46d-f7de1b9af5ab",
       "opacity": 1,
       "path": "group2",
       "protocol": {
@@ -48,7 +48,7 @@
       "maxResolution": null,
       "metadata": {},
       "minResolution": 0,
-      "name": "test__user1:hranice",
+      "name": "layman__user1:l_1add245a-b6fb-4720-a46d-f7de1b9af5ab",
       "opacity": 1,
       "path": "group2",
       "protocol": {
@@ -68,9 +68,9 @@
       "title": "Layer pointing to the same Layman instance but layer name not matching regex",
       "className": "HSLayers.Layer.WMS",
       "singleTile": true,
-      "url": "http://localhost:8000/geoserver/testuser1_wms/ows",
+      "url": "http://localhost:8000/geoserver/layman_wms/ows",
       "params": {
-        "LAYERS": "mis-ta",
+        "LAYERS": "1add245a-b6fb-4720-a46d-f7de1b9af5ab",
         "FORMAT": "image\/png"
       }
     },
@@ -83,7 +83,7 @@
       "singleTile": true,
       "url": "http://localhost:8000/geoserver/ows",
       "params": {
-        "LAYERS": "mista",
+        "LAYERS": "l_0b1dc7ee-de7e-4bbc-942d-ee28f9571706",
         "FORMAT": "image\/png"
       }
     },
@@ -96,7 +96,7 @@
       "singleTile": true,
       "url": "http://localhost:8000/geoserver/ows",
       "params": {
-        "LAYERS": "part1:part2:mista",
+        "LAYERS": "part1:part2:l_0b1dc7ee-de7e-4bbc-942d-ee28f9571706",
         "FORMAT": "image\/png"
       }
     }

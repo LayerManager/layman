@@ -598,6 +598,7 @@ def test_map_composed_from_local_layers(client):
         rest_path = url_for('rest_workspace_layers.post', workspace=workspace)
 
         layername1 = 'mista'
+        layer1_uuid = '0b1dc7ee-de7e-4bbc-942d-ee28f9571706'
         relative_file_paths = [
             'tmp/naturalearth/110m/cultural/ne_110m_populated_places.cpg',
             'tmp/naturalearth/110m/cultural/ne_110m_populated_places.dbf',
@@ -613,6 +614,7 @@ def test_map_composed_from_local_layers(client):
             response = client.post(rest_path, data={
                 'file': files,
                 'name': layername1,
+                'uuid': layer1_uuid,
             })
         assert response.status_code == 200
         layer1uuid = response.get_json()[0]['uuid']
@@ -626,6 +628,7 @@ def test_map_composed_from_local_layers(client):
 
     with app.app_context():
         layername2 = 'hranice'
+        layer2_uuid = '1add245a-b6fb-4720-a46d-f7de1b9af5ab'
         pattern = os.path.join(os.getcwd(), 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.*')
         file_paths = glob.glob(pattern)
         assert len(file_paths) > 0
@@ -636,6 +639,7 @@ def test_map_composed_from_local_layers(client):
             response = client.post(rest_path, data={
                 'file': files,
                 'name': layername2,
+                'uuid': layer2_uuid,
             })
         assert response.status_code == 200
         layer2uuid = response.get_json()[0]['uuid']

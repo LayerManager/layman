@@ -14,7 +14,6 @@ DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
 WORKSPACE = 'map_file_workspace'
 
-LAYER_HRANICE = Publication(WORKSPACE, process_client.LAYER_TYPE, 'hranice')
 MAP = Publication(WORKSPACE, process_client.MAP_TYPE, 'map_hranice')
 MAP_FILE_PATH = os.path.join(DIRECTORY, 'internal_wms_and_wfs.json')
 
@@ -55,10 +54,10 @@ class TestPublication(base_test.TestSingleRestPublication):
 
         exp_adjusted_urls = [
             ('$.layers[1].url', '/geoserver/ows'),
-            ('$.layers[1].legends[0]', '/geoserver/ows?service=WMS&version=1.3.0&request=GetLegendGraphic&format=image%2Fpng&width=20&height=20&layer=map_file_workspace_wms%3Ahranice'),
-            ('$.layers[2].url', '/geoserver/map_file_workspace_wms/ows'),
+            ('$.layers[1].legends[0]', '/geoserver/ows?service=WMS&version=1.3.0&request=GetLegendGraphic&format=image%2Fpng&width=20&height=20&layer=layman_wms%3Al_88e2355e-ed85-4292-9c96-53cef4c21681'),
+            ('$.layers[2].url', '/geoserver/layman_wms/ows'),
             ('$.layers[2].style', '/rest/workspaces/map_file_workspace/layers/mista/style'),
-            ('$.layers[3].protocol.url', '/geoserver/map_file_workspace_workspace/wfs'),
+            ('$.layers[3].protocol.url', '/geoserver/layman/wfs'),
         ]
 
         for json_path_str, exp_url_postfix in exp_adjusted_urls:

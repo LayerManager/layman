@@ -24,9 +24,9 @@
       "title": "Hranice",
       "className": "HSLayers.Layer.WMS",
       "singleTile": true,
-      "url": "http://localhost:8000/geoserver/testuser1/ows",
+      "url": "http://localhost:8000/geoserver/layman/ows",
       "params": {
-        "LAYERS": "hranice",
+        "LAYERS": "l_1add245a-b6fb-4720-a46d-f7de1b9af5ab",
         "FORMAT": "image\/png"
       }
     }

@@ -26,7 +26,7 @@
       "singleTile": true,
       "url": "http://localhost:8000/geoserver/wms",
       "params": {
-        "LAYERS": "testuser1_wms:hranice,testuser2:mista",
+        "LAYERS": "layman_wms:l_1add245a-b6fb-4720-a46d-f7de1b9af5ab,layman:l_0b1dc7ee-de7e-4bbc-942d-ee28f9571706",
         "FORMAT": "image\/png"
       }
     }

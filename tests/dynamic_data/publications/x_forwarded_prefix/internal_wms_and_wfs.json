@@ -49,11 +49,11 @@
       "singleTile": true,
       "url": "http://localhost:8000/client-proxy-365/geoserver/ows",
       "params": {
-        "LAYERS": "map_file_workspace_wms:hranice",
+        "LAYERS": "layman_wms:l_88e2355e-ed85-4292-9c96-53cef4c21681",
         "FORMAT": "image\/png"
       },
       "legends": [
-        "http://localhost:8000/client-proxy-365/geoserver/ows?service=WMS&version=1.3.0&request=GetLegendGraphic&format=image%2Fpng&width=20&height=20&layer=map_file_workspace_wms%3Ahranice",
+        "http://localhost:8000/client-proxy-365/geoserver/ows?service=WMS&version=1.3.0&request=GetLegendGraphic&format=image%2Fpng&width=20&height=20&layer=layman_wms%3Al_88e2355e-ed85-4292-9c96-53cef4c21681",
         "https://example.com/legend.png"
       ],
       "style": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?> <StyledLayerDescriptor version=\"1.0.0\" xsi:schemaLocation=\"http://www.opengis.net/sld StyledLayerDescriptor.xsd\" xmlns=\"http://www.opengis.net/sld\" xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"> <NamedLayer> <Name>GeoServer SLD Cook Book: Simple point with stroke</Name> <UserStyle> <Name>GeoServer SLD Cook Book: Simple point with stroke</Name> <Title>GeoServer SLD Cook Book: Simple point with stroke</Title> <FeatureTypeStyle> <Rule> <Name/> <PointSymbolizer> <Graphic> <Mark> <WellKnownName>circle</WellKnownName> <Fill> <CssParameter name=\"fill\">#FF0000</CssParameter> </Fill> <Stroke> <CssParameter name=\"stroke\">#000000</CssParameter> <CssParameter name=\"stroke-width\">2</CssParameter> </Stroke> </Mark> <Size>18</Size> </Graphic> </PointSymbolizer> </Rule> </FeatureTypeStyle> </UserStyle> </NamedLayer> </StyledLayerDescriptor>"
@@ -65,9 +65,9 @@
       "title": "Mista",
       "className": "HSLayers.Layer.WMS",
       "singleTile": true,
-      "url": "http://localhost:8000/geoserver/map_file_workspace_wms/ows",
+      "url": "http://localhost:8000/geoserver/layman_wms/ows",
       "params": {
-        "LAYERS": "mista",
+        "LAYERS": "l_ba6cecf0-3ac1-46e3-8668-0a7a23e25f2a",
         "FORMAT": "image\/png"
       },
       "style": "http://localhost:8000/client-proxy-abcd/rest/workspaces/map_file_workspace/layers/mista/style"
@@ -81,11 +81,11 @@
       "maxResolution": null,
       "metadata": {},
       "minResolution": 0,
-      "name": "hranice",
+      "name": "l_88e2355e-ed85-4292-9c96-53cef4c21681",
       "opacity": 1,
       "protocol": {
         "format": "hs.format.WFS",
-        "url": "http://localhost:8000/geoserver/map_file_workspace_workspace/wfs"
+        "url": "http://localhost:8000/geoserver/layman/wfs"
       },
       "ratio": 1.5,
       "singleTile": true,
@@ -109,9 +109,9 @@
       "title": "Mista from another Layman instance",
       "className": "HSLayers.Layer.WMS",
       "singleTile": true,
-      "url": "http://anotherdomain/geoserver/map_file_workspace_wms/ows",
+      "url": "http://anotherdomain/geoserver/layman_wms/ows",
       "params": {
-        "LAYERS": "mista",
+        "LAYERS": "l_ba6cecf0-3ac1-46e3-8668-0a7a23e25f2a",
         "FORMAT": "image\/png"
       },
       "style": "http://anotherdomain/client-proxy-abcd/rest/workspaces/map_file_workspace/layers/mista/style"
