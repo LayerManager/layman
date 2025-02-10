@@ -1042,8 +1042,9 @@ class TestGet:
         with app.app_context():
             infos = prime_db_schema_publications.get_publication_infos_with_metainfo(**query_params)
         info_publications = list(infos['items'].keys())
-        assert set(info_publications) == set(exp_result['items'])
-        assert info_publications == exp_result['items']
+        exp_items = [(publication.workspace, publication.type, publication.name) for publication in exp_result['items']]
+        assert set(info_publications) == set(exp_items)
+        assert info_publications == exp_items
         assert infos['total_count'] == exp_result['total_count']
         assert infos['content_range'] == exp_result['content_range']
 

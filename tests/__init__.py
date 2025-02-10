@@ -10,7 +10,17 @@ READ_ONLY_USER = 'read_only_user'
 
 
 Action = namedtuple('ActionTypeDef', ['method', 'params', ])
-Publication = namedtuple('PublicationTypeDef', ['workspace', 'type', 'name'])
+
+
+@dataclass(frozen=True)
+class Publication:
+    workspace: str
+    type: str
+    name: str
+    uuid: Optional[str] = None
+
+    def __iter__(self):
+        return iter([self.workspace, self.type, self.name])
 
 
 @dataclass(frozen=True)
