@@ -3,6 +3,7 @@ import time
 from zipfile import ZipFile
 
 import requests
+from PIL import Image, ImageChops
 from requests.exceptions import ConnectionError
 
 
@@ -37,3 +38,35 @@ def compress_files(filepaths, *, compress_settings, output_dir):
             inner_path = os.path.join(inner_directory, final_filename) if inner_directory else final_filename
             zipfile.write(file, arcname=inner_path)
     return zip_file
+
+
+def compare_images(image1, image2):
+    expected_image = Image.open(image1)
+    current_image = Image.open(image2)
+
+    diff_image = ImageChops.difference(expected_image, current_image)
+
+    diffs = 0
+
+    for x_value in range(diff_image.width):
+        for y_value in range(diff_image.height):
+            pixel_diff = diff_image.getpixel((x_value, y_value))
+            # RGBA bands
+            if isinstance(pixel_diff, tuple):
+                if len(pixel_diff) == 4:
+                    if pixel_diff != (0, 0, 0, 0) and \
+                            (expected_image.getpixel((x_value, y_value))[3] > 0 or current_image.getpixel((x_value, y_value))[3] > 0):
+                        diffs += 1
+                elif len(pixel_diff) == 3:
+                    if pixel_diff != (0, 0, 0):
+                        diffs += 1
+                else:
+                    raise NotImplementedError(f"Unsupported number of bands: {len(pixel_diff)}")
+            # one band, e.g. 8-bit PNG
+            elif isinstance(pixel_diff, int):
+                if pixel_diff != 0:
+                    diffs += 1
+            else:
+                raise NotImplementedError(f"Unsupported type of value {type(pixel_diff)}")
+
+    return diffs
