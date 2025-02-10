@@ -24,6 +24,7 @@ MIGRATIONS = {
     consts.MIGRATION_TYPE_SCHEMA: [
         ((2, 0, 0), [
             upgrade_v2_0.adjust_db_for_description,
+            upgrade_v2_0.adjust_db_for_map_layer_relation,
         ]),
     ],
     consts.MIGRATION_TYPE_DATA: [
