@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 
+import layman_settings as settings
 from .client import LAYER_TYPE, MAP_TYPE
 
 USER_1 = 'test_migrate_2_user_1'
@@ -11,7 +12,13 @@ USERS = [
     USER_1,
 ]
 
-WORKSPACES = USERS
+WORKSPACE_BROWSER = 'test_migrate_2_browser'
+
+PUBLIC_WORKSPACES = [
+    WORKSPACE_BROWSER,
+]
+
+WORKSPACES = USERS + PUBLIC_WORKSPACES
 
 
 @dataclass
@@ -60,6 +67,21 @@ LAYER_RASTER_SLD = Publication(type=LAYER_TYPE,
                                exp_thumbnail_path='test_tools/data/thumbnail/raster_layer_tiff.png',
                                )
 
+LAYER_RASTER_TIMESERIES = Publication(type=LAYER_TYPE,
+                                      workspace=WORKSPACE_BROWSER,
+                                      name='test_raster_timeseries_layer',
+                                      owner=settings.ANONYM_USER,
+                                      rest_args={
+                                          'file_paths': [
+                                              'tests/dynamic_data/publications/layer_timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
+                                              'tests/dynamic_data/publications/layer_timeseries/timeseries_tif/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.TIF',
+                                          ],
+                                          'time_regex': r'[0-9]{8}',
+                                          'description': 'Description of test_raster_timeseries_layer',
+                                      },
+                                      exp_thumbnail_path='tests/dynamic_data/publications/layer_timeseries/thumbnail_timeseries.png',
+                                      )
+
 INCOMPLETE_LAYER_VECTOR_SLD = Publication(type=LAYER_TYPE,
                                           workspace=USER_1,
                                           name='incomplete_test_vector_layer_sld',
@@ -82,6 +104,7 @@ LAYERS_TO_MIGRATE = [
     LAYER_VECTOR_SLD,
     LAYER_VECTOR_QML,
     LAYER_RASTER_SLD,
+    LAYER_RASTER_TIMESERIES,
 ]
 
 MAPS_TO_MIGRATE = [
