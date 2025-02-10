@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 from dataclasses import dataclass
 
@@ -18,6 +20,7 @@ class Publication:
     owner: str
     rest_args: dict
     uuid = None
+    exp_thumbnail_path: str | None = None
 
 
 LAYER_VECTOR_SLD = Publication(type=LAYER_TYPE,
@@ -27,6 +30,7 @@ LAYER_VECTOR_SLD = Publication(type=LAYER_TYPE,
                                rest_args={
                                    'description': 'Description of test_vector_layer_sld',
                                },
+                               exp_thumbnail_path='sample/style/basic_sld.png',
                                )
 
 LAYER_VECTOR_QML = Publication(type=LAYER_TYPE,
@@ -37,6 +41,7 @@ LAYER_VECTOR_QML = Publication(type=LAYER_TYPE,
                                    'style_file': 'sample/style/small_layer.qml',
                                    'description': 'Description of test_vector_qml_layer',
                                },
+                               exp_thumbnail_path='sample/style/small_layer_qml.png',
                                )
 
 LAYER_RASTER_SLD = Publication(type=LAYER_TYPE,
@@ -50,6 +55,7 @@ LAYER_RASTER_SLD = Publication(type=LAYER_TYPE,
                                    ],
                                    'description': 'Description of test_raster_layer',
                                },
+                               exp_thumbnail_path='test_tools/data/thumbnail/raster_layer_tiff.png',
                                )
 
 INCOMPLETE_LAYER_VECTOR_SLD = Publication(type=LAYER_TYPE,
@@ -70,12 +76,17 @@ MAP_1 = Publication(type=MAP_TYPE,
                     },
                     )
 
-PUBLICATIONS_TO_MIGRATE = [
+LAYERS_TO_MIGRATE = [
     LAYER_VECTOR_SLD,
     LAYER_VECTOR_QML,
     LAYER_RASTER_SLD,
+]
+
+MAPS_TO_MIGRATE = [
     MAP_1,
 ]
+
+PUBLICATIONS_TO_MIGRATE = LAYERS_TO_MIGRATE + MAPS_TO_MIGRATE
 
 INCOMPLETE_LAYERS = [
     INCOMPLETE_LAYER_VECTOR_SLD,
