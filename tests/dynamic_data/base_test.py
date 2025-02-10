@@ -186,9 +186,13 @@ class TestSingleRestPublication:
             cls.publications_to_cleanup_on_class_end.add(publication)
         else:
             cls.publications_to_cleanup_on_function_end.add(publication)
+        final_args = {
+            'uuid': publication.uuid,
+            **args,
+        }
 
         resp = process_client.publish_workspace_publication(publication.type, publication.workspace, publication.name,
-                                                            **args)
+                                                            **final_args)
         if isinstance(resp, dict):
             maybe_uuid = resp.get('uuid', None)
             if maybe_uuid:
