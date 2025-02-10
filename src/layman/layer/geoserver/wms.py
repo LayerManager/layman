@@ -15,7 +15,7 @@ from layman.layer import LAYER_TYPE
 from layman.layer.filesystem import gdal
 import requests_util.retry
 from .util import get_gs_proxy_server_url, get_external_db_store_name, get_internal_db_store_name, \
-    image_mosaic_granules_to_wms_time_key
+    image_mosaic_granules_to_wms_time_key, get_db_store_name
 
 FLASK_PROXY_KEY = f'{__name__}:PROXY:{{workspace}}'
 DEFAULT_WMS_QGIS_STORE_PREFIX = 'qgis'
@@ -44,7 +44,7 @@ def patch_layer_by_uuid(*, uuid, gdal_layername, gdal_workspace, db_schema, orig
     geodata_type = info['geodata_type']
     if geodata_type == settings.GEODATA_TYPE_VECTOR:
         if info['_style_type'] == 'sld':
-            store_name = get_external_db_store_name(uuid=uuid) if original_data_source == settings.EnumOriginalDataSource.TABLE.value else get_internal_db_store_name(db_schema=db_schema)
+            store_name = get_db_store_name(uuid=uuid, db_schema=db_schema, original_data_source=original_data_source)
             gs_util.patch_feature_type(gs_layername.workspace, gs_layername.name, store_name=store_name, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
         if info['_style_type'] == 'qml':
             gs_util.patch_wms_layer(gs_layername.workspace, gs_layername.name, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
