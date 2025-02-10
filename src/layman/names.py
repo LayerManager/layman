@@ -6,6 +6,7 @@ from . import settings
 
 GEOSERVER_WFS_WORKSPACE = 'layman'
 GEOSERVER_WMS_WORKSPACE = f'{GEOSERVER_WFS_WORKSPACE}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}'
+GEOSERVER_NAME_PREFIX = 'l_'
 
 
 @dataclass(frozen=True)
@@ -24,8 +25,8 @@ class Names:
 def get_names_by_source(*, uuid, publication_type):
     assert publication_type == LAYER_TYPE
     return Names(
-        wfs=NameForSource(workspace=GEOSERVER_WFS_WORKSPACE, name=f'l_{uuid}'),
-        wms=NameForSource(workspace=GEOSERVER_WMS_WORKSPACE, name=f'l_{uuid}'),
+        wfs=NameForSource(workspace=GEOSERVER_WFS_WORKSPACE, name=f'{GEOSERVER_NAME_PREFIX}{uuid}'),
+        wms=NameForSource(workspace=GEOSERVER_WMS_WORKSPACE, name=f'{GEOSERVER_NAME_PREFIX}{uuid}'),
         sld=NameForSource(workspace=GEOSERVER_WMS_WORKSPACE, name=uuid),
     )
 
