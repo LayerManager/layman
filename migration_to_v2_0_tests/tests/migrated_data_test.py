@@ -4,11 +4,12 @@ from tools.client import RestClient
 from tools.http import LaymanError
 from tools.oauth2_provider_mock import OAuth2ProviderMock
 from tools.test_data import import_publication_uuids, PUBLICATIONS_TO_MIGRATE, INCOMPLETE_LAYERS, Publication, \
-    LAYERS_TO_MIGRATE
+    LAYERS_TO_MIGRATE, WORKSPACES
 from tools.test_settings import DB_URI
 from tools.util import compare_images
 
 from db import util as db_util
+from geoserver import util as gs_util
 import layman_settings as settings
 
 
@@ -32,6 +33,8 @@ def client_fixture():
 def ids_fn(value):
     if isinstance(value, Publication):
         return f"{value.type.replace('layman.', '')}:{value.workspace}:{value.name}"
+    if isinstance(value, str):
+        return value
     return None
 
 
@@ -78,3 +81,16 @@ def test_deleted_incomplete_layers(client, layer):
     rows = db_util.run_query(f"select * from {settings.LAYMAN_PRIME_SCHEMA}.publications where uuid = %s",
                              data=(layer.uuid,), uri_str=DB_URI)
     assert len(rows) == 0
+
+
+@pytest.mark.parametrize("geoserver_workspace", ["layman", "layman_wms"], ids=ids_fn)
+def test_workspaces_created(geoserver_workspace):
+    found_ws = gs_util.get_workspace(geoserver_workspace, auth=settings.LAYMAN_GS_AUTH)
+    assert found_ws is not None, f"GeoServer workspace {geoserver_workspace} should be created, but it is not."
+
+
+@pytest.mark.parametrize("layman_workspace", WORKSPACES, ids=ids_fn)
+def test_workspaces_deleted(layman_workspace):
+    for gs_workspace in [layman_workspace, f"{layman_workspace}_wms"]:
+        found_ws = gs_util.get_workspace(layman_workspace, auth=settings.LAYMAN_GS_AUTH)
+        assert found_ws is None, f"GeoServer workspace {gs_workspace} should be deleted, but it is not."
