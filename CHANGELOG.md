@@ -8,6 +8,10 @@
   ```
   LAYMAN_CLIENT_VERSION=9f20d0c2efb924334af373bfb90726db12285d71
   ```
+- In demo configuration, build QGIS v3.40.2 image using
+  ```
+  docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build
+  ```
 ### Migrations and checks
 #### Schema migrations
 - [#1009](https://github.com/LayerManager/layman/issues/1009) Add column `description` to table `publications` in prime DB schema.
