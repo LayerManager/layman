@@ -21,6 +21,9 @@ PUBLIC_WORKSPACES = [
 WORKSPACES = USERS + PUBLIC_WORKSPACES
 
 
+DEFAULT_THUMBNAIL_PIXEL_DIFF_LIMIT = 10
+
+
 @dataclass
 class Publication:
     type: str
