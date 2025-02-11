@@ -56,7 +56,8 @@ def get_map_with_internal_layers_json(layers, *, native_extent=None, native_crs=
     }
     gs_url = layer_gs_util.get_gs_proxy_server_url() + settings.LAYMAN_GS_PATH
     for workspace, layer in layers:
-        uuid = layman_util.get_publication_uuid(workspace, process_client.LAYER_TYPE, layer)
+        with app.app_context():
+            uuid = layman_util.get_publication_uuid(workspace, process_client.LAYER_TYPE, layer)
         wms_layer = names.get_layer_names_by_source(uuid=uuid).wms
         map_json['layers'].append({
             "metadata": {},
