@@ -108,10 +108,10 @@ Processing chain consists of few steps:
   - files with invalid byte sequence are first converted to GeoJSON, then cleaned with iconv, and finally imported to database.
 - for raster layers normalize and compress raster file to GeoTIFF with overviews (pyramids); NoData values are normalized as transparent
 - save bounding box into PostgreSQL
-- for vector layers publish the vector table as new layer (feature type) within appropriate WFS workspaces of GeoServer
+- for vector layers publish the vector table as new layer (feature type) within appropriate WFS workspace of GeoServer
 - for vector layers
   - for layers with SLD or none style:
-    - publish the table as new layer (feature type) within appropriate WMS workspaces of GeoServer
+    - publish the table as new layer (feature type) within appropriate WMS workspace of GeoServer
   - for layers with QML style:
     - create QGS file on QGIS server filesystem with appropriate style
     - publish the layer on GeoServer through WMS cascade from QGIS server
@@ -120,7 +120,7 @@ Processing chain consists of few steps:
 - publish metadata record to Micka (it's public if and only if read access is set to EVERYONE)
 - update thumbnail of each [map](models.md#map) that points to this layer
 
-If workspace directory, database schema, GeoServer's workspaces, or GeoServer's datastores does not exist yet, it is created on demand.
+If workspace directory, database schema, or GeoServer's datastores does not exist yet, they are created on demand.
 
 Response to this request may be returned sooner than the processing chain is finished to enable [asynchronous processing](async-tasks.md). Status of processing chain can be seen using [GET Workspace Layer](#get-workspace-layer) and **layman_metadata.publication_status** property or **status** properties of layer sources (wms, wfs, thumbnail, db_table, file, style, metadata) for higher granularity.
 
