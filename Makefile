@@ -379,8 +379,11 @@ qgis-bash:
 qgis-bash-exec:
 	docker compose -f docker-compose.deps.yml -f docker-compose.dev.yml exec qgis bash
 
-qgis-bash-exec-root :
+qgis-bash-exec-root:
 	docker compose -f docker-compose.deps.yml -f docker-compose.dev.yml exec -u root qgis bash
+
+qgis-version:
+	docker compose -f docker-compose.deps.yml -f docker-compose.dev.yml run --rm qgis apt-cache policy qgis-server
 
 stop-all-docker-containers:
 	docker stop $$(docker ps -q)
