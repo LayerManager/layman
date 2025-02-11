@@ -116,24 +116,10 @@ def delete_layers_without_wfs_wms_available():
         db_util.run_statement(query)
 
         # primedbschema
-        query = f"""with const as (select %s as name)
-        select w.id,
-               w.name
-        from {DB_SCHEMA}.workspaces w inner join
-             const c on (   c.name = w.name
-                         or c.name is null)
-        order by w.name asc
-        ;"""
-        values = db_util.run_query(query, (workspace,))
-        if len(values) > 0:
-            assert len(values) == 1
-            workspace_id = values[0][0]
-
-            query = f'''delete from {DB_SCHEMA}.rights where id_publication = %s;'''
-            db_util.run_statement(query, (layer_id,))
-
-            query = f"""delete from {DB_SCHEMA}.publications p where p.id_workspace = %s and p.name = %s and p.type = %s;"""
-            db_util.run_statement(query, (workspace_id, layername, LAYER_TYPE,))
+        query = f'''delete from {DB_SCHEMA}.rights where id_publication = %s;'''
+        db_util.run_statement(query, (layer_id,))
+        query = f"""delete from {DB_SCHEMA}.publications p where p.id = %s;"""
+        db_util.run_statement(query, (layer_id,))
 
         # filesystem.uuid (Redis)
         # In upgrade process, UUIDs are not imported to Redis, so no need to delete it. Plus Redis is not persistent.
