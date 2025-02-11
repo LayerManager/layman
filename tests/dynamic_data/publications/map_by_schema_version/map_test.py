@@ -1,6 +1,5 @@
 import json
 import os
-import pytest
 
 from layman import app
 from layman.util import get_publication_info
@@ -15,7 +14,7 @@ DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
 
 WORKSPACE = 'test_map_json_workspace'
-LAYER_HRANICE = Publication(WORKSPACE, process_client.LAYER_TYPE, 'hranice')
+LAYER_HRANICE = Publication(WORKSPACE, process_client.LAYER_TYPE, 'hranice', uuid='9e81f9e2-7f05-47d3-8328-46c770589e1e')
 
 
 TEST_CASES = {
@@ -32,7 +31,6 @@ TEST_CASES = {
 pytest_generate_tests = base_test.pytest_generate_tests
 
 
-@pytest.mark.xfail(reason='Map filesystem input_file in not yet ready for WMS layers named by UUID')
 class TestPublication(base_test.TestSingleRestPublication):
     workspace = WORKSPACE
     publication_type = process_client.MAP_TYPE
@@ -91,9 +89,9 @@ class TestPublication(base_test.TestSingleRestPublication):
              'uuid': self.publ_uuids[LAYER_HRANICE],
              'workspace': self.workspace},
             {'index': 2,
-             'name': 'mista',
-             'uuid': None,
-             'workspace': self.workspace},
+             'name': None,
+             'uuid': 'd70f69b5-4ea7-4bf9-b470-cbcdad048a9d',
+             'workspace': None},
         ]
 
         exp_thumbnail = os.path.join(DIRECTORY, 'exp_thumbnail.png')

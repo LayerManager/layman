@@ -47,9 +47,9 @@
       "title": "Hranice",
       "className": "HSLayers.Layer.WMS",
       "singleTile": true,
-      "url": "http://localhost:8000/some-client-proxy/geoserver/test_map_json_workspace_wms/ows",
+      "url": "http://localhost:8000/some-client-proxy/geoserver/layman_wms/ows",
       "params": {
-        "LAYERS": "hranice",
+        "LAYERS": "l_9e81f9e2-7f05-47d3-8328-46c770589e1e",
         "FORMAT": "image\/png"
       }
     },
@@ -62,11 +62,11 @@
       "maxResolution": null,
       "metadata": {},
       "minResolution": 0,
-      "name": "mista",
+      "name": "l_d70f69b5-4ea7-4bf9-b470-cbcdad048a9d",
       "opacity": 1,
       "protocol": {
         "format": "hs.format.WFS",
-        "url": "http://localhost:8000/some-other-client-proxy/geoserver/test_map_json_workspace/wfs"
+        "url": "http://localhost:8000/some-other-client-proxy/geoserver/layman/wfs"
       },
       "ratio": 1.5,
       "singleTile": true,
