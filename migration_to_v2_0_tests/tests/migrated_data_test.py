@@ -4,7 +4,7 @@ from tools.client import RestClient
 from tools.http import LaymanError
 from tools.oauth2_provider_mock import OAuth2ProviderMock
 from tools.test_data import import_publication_uuids, PUBLICATIONS_TO_MIGRATE, INCOMPLETE_LAYERS, Publication, \
-    LAYERS_TO_MIGRATE, WORKSPACES
+    LAYERS_TO_MIGRATE, WORKSPACES, DEFAULT_THUMBNAIL_PIXEL_DIFF_LIMIT
 from tools.test_settings import DB_URI
 from tools.util import compare_images
 
@@ -69,7 +69,7 @@ def test_layer_thumbnails(client, layer):
 
     exp_img_path = layer.exp_thumbnail_path
     diff_pixels = compare_images(img_path, exp_img_path)
-    assert diff_pixels <= 10, f"diff_pixels={diff_pixels}\nimg_path={img_path}\nexp_img_path={exp_img_path}"
+    assert diff_pixels <= DEFAULT_THUMBNAIL_PIXEL_DIFF_LIMIT, f"diff_pixels={diff_pixels}\nimg_path={img_path}\nexp_img_path={exp_img_path}"
 
 
 @pytest.mark.usefixtures("import_publication_uuids_fixture")
