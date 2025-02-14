@@ -19,12 +19,13 @@ There is also one internal authentication module:
 
 ## Authorization
 
-Authorization (**authz**) decides if authenticated [user](models.md#user) has permissions to perform the request to publication using [REST API](rest.md), [WMS](endpoints.md#web-map-service) and [WFS](endpoints.md#web-feature-service).
+Authorization (**authz**) decides if authenticated [user](models.md#user) has permissions to perform the request, e.g. request to [REST API](rest.md), [WMS](endpoints.md#web-map-service) or [WFS](endpoints.md#web-feature-service).
 
 Authorization of **REST API** is performed by Layman itself. When authentication is finished, authorization module either allows request to be processed, raises an exception, or denies presence of requested publication. The behaviour depends on
 - requested endpoint and action
 - authenticated user
-- [access rights of requested publication](#publication-access-rights)
+- [access rights of requested publication](#publication-access-rights) in case of request to REST API publication endpoints, WMS or WFS
+- [access rights of requested user](#access-rights-to-user-endpoints) in case of request to REST API user endpoints
 
 Authorization of **WMS** and **WFS** is performed by Layman and GeoServer. On Layman, there are two important mechanisms:
 - [synchronization of authorization-related data to GeoServer](data-storage.md#geoserver)
@@ -58,6 +59,7 @@ Access to these endpoints is completely controlled by [access rights](#publicati
 
 #### Access to multi-publication endpoints
 Multi-publication endpoints are:
+- [Publications](rest.md#overview) 
 - [Layers](rest.md#overview) 
 - [Maps](rest.md#overview) 
 
@@ -69,6 +71,15 @@ Access is treated by following rules:
 - Everyone can send [DELETE Workspace Layers](rest.md#delete-workspace-layers) request to any workspace, deleting only publications she has write access to.
 
 It's analogical for maps.
+
+### Access Rights to User Endpoints
+Everyone is allowed to request [GET Users](rest.md#get-users) and [GET Current User](rest.md#get-current-user).
+
+Any logged-in user is allowed to request [PATCH Current User](rest.md#patch-current-user) and [DELETE Current User](rest.md#delete-current-user).
+
+Any user with [username](models.md#username) is allowed to delete his own account by [DELETE User](rest.md#delete-user) request.
+
+Every user listed in [GRANT_DELETE_OTHER_USER](env-settings.md#grant_delete_other_user) (directly or through role) is allowed to delete other user account by [DELETE User](rest.md#delete-user) request.
 
 ### Role Service
 Despite of [usernames](models.md#username), [role names](models.md#role) are not controlled by Layman, but by **role service**.

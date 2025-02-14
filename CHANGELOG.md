@@ -8,6 +8,7 @@
   ```
   LAYMAN_CLIENT_VERSION=9f20d0c2efb924334af373bfb90726db12285d71
   ```
+- Set new environment variable [GRANT_DELETE_OTHER_USER](doc/env-settings.md#GRANT_DELETE_OTHER_USER)  
 - In demo configuration, build QGIS v3.40.2 image using
   ```
   docker compose -f docker-compose.deps.demo.yml build qgis
@@ -23,6 +24,8 @@
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Layers are re-created on GeoServer with new names derived from `uuid`.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Old GeoServer workspaces (`<layman_workspace_name>` and `<layman_workspace_name>_wms` per each [Layman workspace](doc/models.md#workspace)) are deleted.
 ### Changes
+- [#161](https://github.com/LayerManager/layman/issues/161) [DELETE User](doc/rest.md#delete-user) now grants deletion rights to users or roles defined in the [GRANT_DELETE_OTHER_USER](doc/env-settings.md#GRANT_DELETE_OTHER_USER) environment variable.
+- [#161](https://github.com/LayerManager/layman/issues/161) New method [DELETE User](doc/rest.md#delete-user) allows to delete user account.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Stop saving publication UUID to `uuid.txt` file.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) New keys `wfs`.`name` and `wms`.`name` were added to [GET Workspace Layer](doc/rest.md#get-workspace-layer) response.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Names of [Feature types, Coverages, Layers and Styles in GeoServer WFS and WMS workspaces](doc/data-storage.md#geoserver) are derived from layer`uuid`. All GeoServer entities are created in two global workspaces (`layman` for WFS layers and `layman_wms` for WMS layers), instead of separate workspaces for each Layman workspace. Separate PostgreSQL datastore is created for each Layman workspace.
