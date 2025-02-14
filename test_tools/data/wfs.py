@@ -1,9 +1,9 @@
-def get_wfs20_insert_points(workspace, layername):
+def get_wfs20_insert_points(geoserver_workspace, geoserver_layername):
     return f'''<?xml version="1.0"?>
         <wfs:Transaction
            version="2.0.0"
            service="WFS"
-           xmlns:{workspace}="http://{workspace}"
+           xmlns:{geoserver_workspace}="http://{geoserver_workspace}"
            xmlns:fes="http://www.opengis.net/fes/2.0"
            xmlns:gml="http://www.opengis.net/gml/3.2"
            xmlns:wfs="http://www.opengis.net/wfs/2.0"
@@ -13,23 +13,23 @@ def get_wfs20_insert_points(workspace, layername):
                                http://www.opengis.net/gml/3.2
                                http://schemas.opengis.net/gml/3.2.1/gml.xsd">
            <wfs:Insert>
-               <{workspace}:{layername}>
-                   <{workspace}:wkb_geometry>
+               <{geoserver_workspace}:{geoserver_layername}>
+                   <{geoserver_workspace}:wkb_geometry>
                        <gml:Point srsName="urn:ogc:def:crs:EPSG::3857" srsDimension="2">
                            <gml:pos>1571000 6268800</gml:pos>
                        </gml:Point>
-                   </{workspace}:wkb_geometry>
-               </{workspace}:{layername}>
+                   </{geoserver_workspace}:wkb_geometry>
+               </{geoserver_workspace}:{geoserver_layername}>
            </wfs:Insert>
         </wfs:Transaction>'''
 
 
-def get_wfs20_delete_point(workspace, layername):
+def get_wfs20_delete_point(geoserver_workspace, geoserver_layername):
     return f'''<?xml version="1.0"?>
         <wfs:Transaction
            version="2.0.0"
            service="WFS"
-           xmlns:{workspace}="http://{workspace}"
+           xmlns:{geoserver_workspace}="http://{geoserver_workspace}"
            xmlns:fes="http://www.opengis.net/fes/2.0"
            xmlns:gml="http://www.opengis.net/gml/3.2"
            xmlns:wfs="http://www.opengis.net/wfs/2.0"
@@ -38,9 +38,9 @@ def get_wfs20_delete_point(workspace, layername):
                                http://schemas.opengis.net/wfs/2.0/wfs.xsd
                                http://www.opengis.net/gml/3.2
                                http://schemas.opengis.net/gml/3.2.1/gml.xsd">
-           <wfs:Delete typeName="{workspace}:{layername}">
+           <wfs:Delete typeName="{geoserver_workspace}:{geoserver_layername}">
                 <fes:Intersects>
-                    <fes:ValueReference>{workspace}:wkb_geometry</fes:ValueReference>
+                    <fes:ValueReference>{geoserver_workspace}:wkb_geometry</fes:ValueReference>
                     <gml:Point srsName="urn:ogc:def:crs:EPSG::3857" srsDimension="2">
                         <gml:pos>1571000 6268800</gml:pos>
                     </gml:Point>
@@ -49,12 +49,12 @@ def get_wfs20_delete_point(workspace, layername):
         </wfs:Transaction>'''
 
 
-def get_wfs20_insert_lines(workspace, layername):
+def get_wfs20_insert_lines(geoserver_workspace, geoserver_layername):
     return f'''<?xml version="1.0"?>
     <wfs:Transaction
        version="2.0.0"
        service="WFS"
-       xmlns:{workspace}="http://{workspace}"
+       xmlns:{geoserver_workspace}="http://{geoserver_workspace}"
        xmlns:fes="http://www.opengis.net/fes/2.0"
        xmlns:gml="http://www.opengis.net/gml/3.2"
        xmlns:wfs="http://www.opengis.net/wfs/2.0"
@@ -64,8 +64,8 @@ def get_wfs20_insert_lines(workspace, layername):
                            http://www.opengis.net/gml/3.2
                            http://schemas.opengis.net/gml/3.2.1/gml.xsd">
        <wfs:Insert>
-           <{workspace}:{layername}>
-               <{workspace}:wkb_geometry>
+           <{geoserver_workspace}:{geoserver_layername}>
+               <{geoserver_workspace}:wkb_geometry>
                    <gml:MultiCurve srsName="urn:ogc:def:crs:EPSG::3857" srsDimension="2">
                        <gml:curveMember>
                            <gml:LineString>
@@ -75,22 +75,22 @@ def get_wfs20_insert_lines(workspace, layername):
                            </gml:LineString>
                        </gml:curveMember>
                    </gml:MultiCurve>
-               </{workspace}:wkb_geometry>
-           </{workspace}:{layername}>
+               </{geoserver_workspace}:wkb_geometry>
+           </{geoserver_workspace}:{geoserver_layername}>
        </wfs:Insert>
     </wfs:Transaction>'''
 
 
-def get_wfs20_insert_points_new_attr(workspace, layername, attr_names):
+def get_wfs20_insert_points_new_attr(geoserver_workspace, geoserver_layername, attr_names):
     attr_xml = ' '.join([
-        f"<{workspace}:{attr_name}>some value</{workspace}:{attr_name}>"
+        f"<{geoserver_workspace}:{attr_name}>some value</{geoserver_workspace}:{attr_name}>"
         for attr_name in attr_names
     ])
     return f'''<?xml version="1.0"?>
 <wfs:Transaction
    version="2.0.0"
    service="WFS"
-   xmlns:{workspace}="http://{workspace}"
+   xmlns:{geoserver_workspace}="http://{geoserver_workspace}"
    xmlns:fes="http://www.opengis.net/fes/2.0"
    xmlns:gml="http://www.opengis.net/gml/3.2"
    xmlns:wfs="http://www.opengis.net/wfs/2.0"
@@ -100,42 +100,42 @@ def get_wfs20_insert_points_new_attr(workspace, layername, attr_names):
                        http://www.opengis.net/gml/3.2
                        http://schemas.opengis.net/gml/3.2.1/gml.xsd">
    <wfs:Insert>
-       <{workspace}:{layername}>
-           <{workspace}:wkb_geometry>
+       <{geoserver_workspace}:{geoserver_layername}>
+           <{geoserver_workspace}:wkb_geometry>
                <gml:Point srsName="urn:ogc:def:crs:EPSG::3857" srsDimension="2">
                    <gml:pos>1.27108004304E7 2548415.5977</gml:pos>
                </gml:Point>
-           </{workspace}:wkb_geometry>
-           <{workspace}:name>New name</{workspace}:name>
-           <{workspace}:labelrank>3</{workspace}:labelrank>
+           </{geoserver_workspace}:wkb_geometry>
+           <{geoserver_workspace}:name>New name</{geoserver_workspace}:name>
+           <{geoserver_workspace}:labelrank>3</{geoserver_workspace}:labelrank>
            {attr_xml}
-       </{workspace}:{layername}>
+       </{geoserver_workspace}:{geoserver_layername}>
    </wfs:Insert>
    <wfs:Insert>
-       <{workspace}:{layername}>
-           <{workspace}:wkb_geometry>
+       <{geoserver_workspace}:{geoserver_layername}>
+           <{geoserver_workspace}:wkb_geometry>
                <gml:Point srsName="urn:ogc:def:crs:EPSG::3857" srsDimension="2">
                    <gml:pos>1.42108004308E7 2678415.5977</gml:pos>
                </gml:Point>
-           </{workspace}:wkb_geometry>
-           <{workspace}:name>New name2</{workspace}:name>
-           <{workspace}:labelrank>4</{workspace}:labelrank>
+           </{geoserver_workspace}:wkb_geometry>
+           <{geoserver_workspace}:name>New name2</{geoserver_workspace}:name>
+           <{geoserver_workspace}:labelrank>4</{geoserver_workspace}:labelrank>
            {attr_xml}
-       </{workspace}:{layername}>
+       </{geoserver_workspace}:{geoserver_layername}>
    </wfs:Insert>
 </wfs:Transaction>'''
 
 
-def get_wfs10_insert_points_new_attr(workspace, layername, attr_names):
+def get_wfs10_insert_points_new_attr(geoserver_workspace, geoserver_layername, attr_names):
     attr_xml = ' '.join([
-        f"<{workspace}:{attr_name}>some value</{workspace}:{attr_name}>"
+        f"<{geoserver_workspace}:{attr_name}>some value</{geoserver_workspace}:{attr_name}>"
         for attr_name in attr_names
     ])
     return f'''<?xml version="1.0"?>
 <wfs:Transaction
    version="1.0.0"
    service="WFS"
-   xmlns:{workspace}="http://{workspace}"
+   xmlns:{geoserver_workspace}="http://{geoserver_workspace}"
    xmlns:gml="http://www.opengis.net/gml/3.2"
    xmlns:wfs="http://www.opengis.net/wfs"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -144,30 +144,30 @@ def get_wfs10_insert_points_new_attr(workspace, layername, attr_names):
                        http://www.opengis.net/gml/3.2
                        http://schemas.opengis.net/gml/3.2.1/gml.xsd">
    <wfs:Insert>
-       <{workspace}:{layername}>
-           <{workspace}:wkb_geometry>
+       <{geoserver_workspace}:{geoserver_layername}>
+           <{geoserver_workspace}:wkb_geometry>
                <gml:Point srsName="urn:ogc:def:crs:EPSG::3857" srsDimension="2">
                    <gml:pos>1.27108004304E7 2548415.5977</gml:pos>
                </gml:Point>
-           </{workspace}:wkb_geometry>
-           <{workspace}:name>New name</{workspace}:name>
-           <{workspace}:labelrank>3</{workspace}:labelrank>
+           </{geoserver_workspace}:wkb_geometry>
+           <{geoserver_workspace}:name>New name</{geoserver_workspace}:name>
+           <{geoserver_workspace}:labelrank>3</{geoserver_workspace}:labelrank>
            {attr_xml}
-       </{workspace}:{layername}>
+       </{geoserver_workspace}:{geoserver_layername}>
    </wfs:Insert>
 </wfs:Transaction>'''
 
 
-def get_wfs11_insert_points_new_attr(workspace, layername, attr_names):
+def get_wfs11_insert_points_new_attr(geoserver_workspace, geoserver_layername, attr_names):
     attr_xml = ' '.join([
-        f"<{workspace}:{attr_name}>some value</{workspace}:{attr_name}>"
+        f"<{geoserver_workspace}:{attr_name}>some value</{geoserver_workspace}:{attr_name}>"
         for attr_name in attr_names
     ])
     return f'''<?xml version="1.0"?>
 <wfs:Transaction
    version="1.1.0"
    service="WFS"
-   xmlns:{workspace}="http://{workspace}"
+   xmlns:{geoserver_workspace}="http://{geoserver_workspace}"
    xmlns:gml="http://www.opengis.net/gml/3.2"
    xmlns:wfs="http://www.opengis.net/wfs"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -176,8 +176,8 @@ def get_wfs11_insert_points_new_attr(workspace, layername, attr_names):
                        http://www.opengis.net/gml/3.2
                        http://schemas.opengis.net/gml/3.2.1/gml.xsd">
    <wfs:Insert>
-       <{workspace}:{layername}>
-           <{workspace}:wkb_geometry>
+       <{geoserver_workspace}:{geoserver_layername}>
+           <{geoserver_workspace}:wkb_geometry>
            <gml:MultiLineString srsName="http://www.opengis.net/gml/srs/epsg.xml#3857">
                <gml:lineStringMember>
                    <gml:LineString>
@@ -187,16 +187,16 @@ def get_wfs11_insert_points_new_attr(workspace, layername, attr_names):
                    </gml:LineString>
                </gml:lineStringMember>
            </gml:MultiLineString>
-           </{workspace}:wkb_geometry>
-           <{workspace}:name>New name</{workspace}:name>
-           <{workspace}:labelrank>3</{workspace}:labelrank>
+           </{geoserver_workspace}:wkb_geometry>
+           <{geoserver_workspace}:name>New name</{geoserver_workspace}:name>
+           <{geoserver_workspace}:labelrank>3</{geoserver_workspace}:labelrank>
            {attr_xml}
-       </{workspace}:{layername}>
+       </{geoserver_workspace}:{geoserver_layername}>
    </wfs:Insert>
 </wfs:Transaction>'''
 
 
-def get_wfs11_insert_polygon_new_attr(workspace, layername, attr_names):
+def get_wfs11_insert_polygon_new_attr(geoserver_workspace, geoserver_layername, attr_names):
     attr_xml = ' '.join([
         f"<{attr_name}>some value</{attr_name}>"
         for attr_name in attr_names
@@ -213,7 +213,7 @@ def get_wfs11_insert_polygon_new_attr(workspace, layername, attr_names):
                        http://www.opengis.net/gml/3.2
                        http://schemas.opengis.net/gml/3.2.1/gml.xsd">
    <wfs:Insert>
-       <{layername} xmlns="http://{workspace}">
+       <{geoserver_layername} xmlns="http://{geoserver_workspace}">
            <wkb_geometry>
            <gml:MultiLineString srsName="http://www.opengis.net/gml/srs/epsg.xml#3857">
                <gml:lineStringMember>
@@ -228,19 +228,19 @@ def get_wfs11_insert_polygon_new_attr(workspace, layername, attr_names):
            <name>New name</name>
            <labelrank>3</labelrank>
            {attr_xml}
-       </{layername}>
+       </{geoserver_layername}>
    </wfs:Insert>
 </wfs:Transaction>'''
 
 
 def get_wfs20_update_points_new_attr(
-        workspace,
-        layername,
+        geoserver_workspace,
+        geoserver_layername,
         attr_names,
         with_attr_namespace=False,
         with_filter=False,
 ):
-    attr_prefix = f"{workspace}:" if with_attr_namespace else ''
+    attr_prefix = f"{geoserver_workspace}:" if with_attr_namespace else ''
     attr_xml = ' '.join([
         f"""<wfs:Property>
                <wfs:ValueReference>{attr_prefix}{attr_name}</wfs:ValueReference>
@@ -249,14 +249,14 @@ def get_wfs20_update_points_new_attr(
         for attr_name in attr_names
     ])
     filter_xml = f"""<fes:Filter>
-              <fes:ResourceId rid="{layername}.1"/>
+              <fes:ResourceId rid="{geoserver_layername}.1"/>
            </fes:Filter>
     """ if with_filter else ''
     return f'''<?xml version="1.0"?>
     <wfs:Transaction
        version="2.0.0"
        service="WFS"
-       xmlns:{workspace}="http://{workspace}"
+       xmlns:{geoserver_workspace}="http://{geoserver_workspace}"
        xmlns:fes="http://www.opengis.net/fes/2.0"
        xmlns:gml="http://www.opengis.net/gml/3.2"
        xmlns:wfs="http://www.opengis.net/wfs/2.0"
@@ -265,7 +265,7 @@ def get_wfs20_update_points_new_attr(
                            http://schemas.opengis.net/wfs/2.0/wfs.xsd
                            http://www.opengis.net/gml/3.2
                            http://schemas.opengis.net/gml/3.2.1/gml.xsd">
-       <wfs:Update typeName="{workspace}:{layername}">
+       <wfs:Update typeName="{geoserver_workspace}:{geoserver_layername}">
            {attr_xml}
            {filter_xml}
        </wfs:Update>
@@ -273,13 +273,13 @@ def get_wfs20_update_points_new_attr(
 
 
 def get_wfs10_update_points_new(
-        workspace,
-        layername,
+        geoserver_workspace,
+        geoserver_layername,
         attr_names,
         with_attr_namespace=False,
         with_filter=False,
 ):
-    attr_prefix = f"{workspace}:" if with_attr_namespace else ''
+    attr_prefix = f"{geoserver_workspace}:" if with_attr_namespace else ''
     attr_xml = ' '.join([
         f"""<wfs:Property>
                <wfs:Name>{attr_prefix}{attr_name}</wfs:Name>
@@ -288,14 +288,14 @@ def get_wfs10_update_points_new(
         for attr_name in attr_names
     ])
     filter_xml = f"""<ogc:Filter>
-              <ogc:GmlObjectId gml:id="{layername}.1"/>
+              <ogc:GmlObjectId gml:id="{geoserver_layername}.1"/>
            </ogc:Filter>
     """ if with_filter else ''
     return f'''<?xml version="1.0"?>
     <wfs:Transaction
        version="1.0.0"
        service="WFS"
-       xmlns:{workspace}="http://{workspace}"
+       xmlns:{geoserver_workspace}="http://{geoserver_workspace}"
        xmlns:gml="http://www.opengis.net/gml/3.2"
        xmlns:ogc="http://www.opengis.net/ogc"
        xmlns:wfs="http://www.opengis.net/wfs"
@@ -304,23 +304,23 @@ def get_wfs10_update_points_new(
                            http://schemas.opengis.net/wfs/1.0.0/wfs.xsd
                            http://www.opengis.net/gml/3.2
                            http://schemas.opengis.net/gml/3.2.1/gml.xsd">
-       <wfs:Update typeName="{workspace}:{layername}">
+       <wfs:Update typeName="{geoserver_workspace}:{geoserver_layername}">
            {attr_xml}
            {filter_xml}
        </wfs:Update>
     </wfs:Transaction>'''
 
 
-def get_wfs20_replace_points_new_attr(workspace, layername, attr_names):
+def get_wfs20_replace_points_new_attr(geoserver_workspace, geoserver_layername, attr_names):
     attr_xml = ' '.join([
-        f"<{workspace}:{attr_name}>some value</{workspace}:{attr_name}>"
+        f"<{geoserver_workspace}:{attr_name}>some value</{geoserver_workspace}:{attr_name}>"
         for attr_name in attr_names
     ])
     return f'''<?xml version="1.0"?>
 <wfs:Transaction
    version="2.0.0"
    service="WFS"
-   xmlns:{workspace}="http://{workspace}"
+   xmlns:{geoserver_workspace}="http://{geoserver_workspace}"
    xmlns:fes="http://www.opengis.net/fes/2.0"
    xmlns:gml="http://www.opengis.net/gml/3.2"
    xmlns:wfs="http://www.opengis.net/wfs/2.0"
@@ -330,55 +330,55 @@ def get_wfs20_replace_points_new_attr(workspace, layername, attr_names):
                        http://www.opengis.net/gml/3.2
                        http://schemas.opengis.net/gml/3.2.1/gml.xsd">
    <wfs:Replace>
-       <{workspace}:{layername}>
-           <{workspace}:wkb_geometry>
+       <{geoserver_workspace}:{geoserver_layername}>
+           <{geoserver_workspace}:wkb_geometry>
                <gml:Point srsName="urn:ogc:def:crs:EPSG::3857" srsDimension="2">
                    <gml:pos>1.27108004304E7 2548415.5977</gml:pos>
                </gml:Point>
-           </{workspace}:wkb_geometry>
-           <{workspace}:name>New name</{workspace}:name>
-           <{workspace}:labelrank>3</{workspace}:labelrank>
+           </{geoserver_workspace}:wkb_geometry>
+           <{geoserver_workspace}:name>New name</{geoserver_workspace}:name>
+           <{geoserver_workspace}:labelrank>3</{geoserver_workspace}:labelrank>
            {attr_xml}
-       </{workspace}:{layername}>
+       </{geoserver_workspace}:{geoserver_layername}>
        <fes:Filter>
-          <fes:ResourceId rid="{layername}.1"/>
+          <fes:ResourceId rid="{geoserver_layername}.1"/>
        </fes:Filter>
    </wfs:Replace>
    <wfs:Replace>
-       <{workspace}:{layername}>
-           <{workspace}:wkb_geometry>
+       <{geoserver_workspace}:{geoserver_layername}>
+           <{geoserver_workspace}:wkb_geometry>
                <gml:Point srsName="urn:ogc:def:crs:EPSG::3857" srsDimension="2">
                    <gml:pos>1.42108004308E7 2678415.5977</gml:pos>
                </gml:Point>
-           </{workspace}:wkb_geometry>
-           <{workspace}:name>New name2</{workspace}:name>
-           <{workspace}:labelrank>4</{workspace}:labelrank>
+           </{geoserver_workspace}:wkb_geometry>
+           <{geoserver_workspace}:name>New name2</{geoserver_workspace}:name>
+           <{geoserver_workspace}:labelrank>4</{geoserver_workspace}:labelrank>
            {attr_xml}
-       </{workspace}:{layername}>
+       </{geoserver_workspace}:{geoserver_layername}>
        <fes:Filter>
-          <fes:ResourceId rid="{layername}.2"/>
+          <fes:ResourceId rid="{geoserver_layername}.2"/>
        </fes:Filter>
    </wfs:Replace>
 </wfs:Transaction>'''
 
 
-def get_wfs20_complex_new_attr(workspace,
-                               layername1,
-                               layername2,
+def get_wfs20_complex_new_attr(geoserver_workspace,
+                               geoserver_layername1,
+                               geoserver_layername2,
                                attr_names_insert1,
                                attr_names_insert2,
                                attr_names_update,
                                attr_names_replace):
     with_attr_namespace = True
     attr_xml_insert1 = ' '.join([
-        f"<{workspace}:{attr_name}>some value</{workspace}:{attr_name}>"
+        f"<{geoserver_workspace}:{attr_name}>some value</{geoserver_workspace}:{attr_name}>"
         for attr_name in attr_names_insert1
     ])
     attr_xml_insert2 = ' '.join([
-        f"<{workspace}:{attr_name}>some value</{workspace}:{attr_name}>"
+        f"<{geoserver_workspace}:{attr_name}>some value</{geoserver_workspace}:{attr_name}>"
         for attr_name in attr_names_insert2
     ])
-    attr_prefix = f"{workspace}:" if with_attr_namespace else ''
+    attr_prefix = f"{geoserver_workspace}:" if with_attr_namespace else ''
     attr_xml_update = ' '.join([
         f"""<wfs:Property>
                <wfs:ValueReference>{attr_prefix}{attr_name}</wfs:ValueReference>
@@ -387,14 +387,14 @@ def get_wfs20_complex_new_attr(workspace,
         for attr_name in attr_names_update
     ])
     attr_xml_replace = ' '.join([
-        f"<{workspace}:{attr_name}>some value</{workspace}:{attr_name}>"
+        f"<{geoserver_workspace}:{attr_name}>some value</{geoserver_workspace}:{attr_name}>"
         for attr_name in attr_names_replace
     ])
     return f'''<?xml version="1.0"?>
 <wfs:Transaction
    version="2.0.0"
    service="WFS"
-   xmlns:{workspace}="http://{workspace}"
+   xmlns:{geoserver_workspace}="http://{geoserver_workspace}"
    xmlns:fes="http://www.opengis.net/fes/2.0"
    xmlns:gml="http://www.opengis.net/gml/3.2"
    xmlns:wfs="http://www.opengis.net/wfs/2.0"
@@ -404,43 +404,43 @@ def get_wfs20_complex_new_attr(workspace,
                        http://www.opengis.net/gml/3.2
                        http://schemas.opengis.net/gml/3.2.1/gml.xsd">
    <wfs:Insert>
-       <{workspace}:{layername1}>
-           <{workspace}:wkb_geometry>
+       <{geoserver_workspace}:{geoserver_layername1}>
+           <{geoserver_workspace}:wkb_geometry>
                <gml:Point srsName="urn:ogc:def:crs:EPSG::3857" srsDimension="2">
                    <gml:pos>1.27108004304E7 2548415.5977</gml:pos>
                </gml:Point>
-           </{workspace}:wkb_geometry>
-           <{workspace}:name>New name</{workspace}:name>
-           <{workspace}:labelrank>3</{workspace}:labelrank>
+           </{geoserver_workspace}:wkb_geometry>
+           <{geoserver_workspace}:name>New name</{geoserver_workspace}:name>
+           <{geoserver_workspace}:labelrank>3</{geoserver_workspace}:labelrank>
            {attr_xml_insert1}
-       </{workspace}:{layername1}>
-       <{workspace}:{layername2}>
-           <{workspace}:wkb_geometry>
+       </{geoserver_workspace}:{geoserver_layername1}>
+       <{geoserver_workspace}:{geoserver_layername2}>
+           <{geoserver_workspace}:wkb_geometry>
                <gml:Point srsName="urn:ogc:def:crs:EPSG::3857" srsDimension="2">
                    <gml:pos>1.42108004308E7 2678415.5977</gml:pos>
                </gml:Point>
-           </{workspace}:wkb_geometry>
-           <{workspace}:name>New name2</{workspace}:name>
-           <{workspace}:labelrank>4</{workspace}:labelrank>
+           </{geoserver_workspace}:wkb_geometry>
+           <{geoserver_workspace}:name>New name2</{geoserver_workspace}:name>
+           <{geoserver_workspace}:labelrank>4</{geoserver_workspace}:labelrank>
            {attr_xml_insert2}
-       </{workspace}:{layername2}>
+       </{geoserver_workspace}:{geoserver_layername2}>
    </wfs:Insert>
-   <wfs:Update typeName="{workspace}:{layername2}">
+   <wfs:Update typeName="{geoserver_workspace}:{geoserver_layername2}">
        {attr_xml_update}
    </wfs:Update>
    <wfs:Replace>
-       <{workspace}:{layername1}>
-           <{workspace}:wkb_geometry>
+       <{geoserver_workspace}:{geoserver_layername1}>
+           <{geoserver_workspace}:wkb_geometry>
                <gml:Point srsName="urn:ogc:def:crs:EPSG::3857" srsDimension="2">
                    <gml:pos>1.27108004304E7 2548415.5977</gml:pos>
                </gml:Point>
-           </{workspace}:wkb_geometry>
-           <{workspace}:name>New name</{workspace}:name>
-           <{workspace}:labelrank>3</{workspace}:labelrank>
+           </{geoserver_workspace}:wkb_geometry>
+           <{geoserver_workspace}:name>New name</{geoserver_workspace}:name>
+           <{geoserver_workspace}:labelrank>3</{geoserver_workspace}:labelrank>
            {attr_xml_replace}
-       </{workspace}:{layername1}>
+       </{geoserver_workspace}:{geoserver_layername1}>
        <fes:Filter>
-          <fes:ResourceId rid="{layername1}.1"/>
+          <fes:ResourceId rid="{geoserver_layername1}.1"/>
        </fes:Filter>
    </wfs:Replace>
 </wfs:Transaction>'''
