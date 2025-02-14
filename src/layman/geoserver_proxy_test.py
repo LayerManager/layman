@@ -22,38 +22,69 @@ from . import geoserver_proxy
         id='update',
     ),
 ])
-def test_extract_attributes_and_layers_from_wfs_t(wfst_data_method, hardcoded_attrs):
-    workspace = 'workspace_name'
-    layer = 'layer_name'
+@pytest.mark.parametrize('gs_workspace, gs_layername, exp_layername', [
+    pytest.param(
+        'layman',
+        'l_ae82a4d1-c915-46bb-89d5-4e3818b6df3f',
+        'ae82a4d1-c915-46bb-89d5-4e3818b6df3f',
+        id='layman-layer'
+    ),
+    pytest.param(
+        'layman_wms',
+        'l_ae82a4d1-c915-46bb-89d5-4e3818b6df3f',
+        'ae82a4d1-c915-46bb-89d5-4e3818b6df3f',
+        id='layman_wms-layer'
+    ),
+    pytest.param(
+        'other_workspace',
+        'l_ae82a4d1-c915-46bb-89d5-4e3818b6df3f',
+        None,
+        id='wrong_ws'
+    ),
+    pytest.param(
+        'layman',
+        'ae82a4d1-c915-46bb-89d5-4e3818b6df3f',
+        None,
+        id='layman-uuid'
+    ),
+    pytest.param(
+        'layman',
+        'layer_name',
+        None,
+        id='layman-layer_name'
+    ),
+])
+def test_extract_attributes_and_layers_from_wfs_t(wfst_data_method, hardcoded_attrs, gs_workspace, gs_layername, exp_layername):
     new_attrs = ['ok_attr', 'dangerous-attr-with-dashes']
-    data_xml = wfst_data_method(workspace, layer, new_attrs)
+    data_xml = wfst_data_method(gs_workspace, gs_layername, new_attrs)
     with app.app_context():
         extracted_attribs, extracted_layers = geoserver_proxy.extract_attributes_and_layers_from_wfs_t(data_xml)
 
-    exp_attrs = {*new_attrs, *hardcoded_attrs}
-    assert extracted_layers == {(workspace, layer)}
-    assert extracted_attribs == {(workspace, layer, attr) for attr in exp_attrs}
+    exp_attrs = {*new_attrs, *hardcoded_attrs} if exp_layername is not None else set()
+    exp_layers = {exp_layername} if exp_layername is not None else set()
+    assert extracted_layers == exp_layers
+    assert extracted_attribs == {(exp_layername, attr) for attr in exp_attrs}
 
 
 @pytest.mark.parametrize('wfst_data_method, exp_attributes_and_layers', [
     pytest.param(
         data_wfs.get_wfs11_implicit_ns_update,
-        ({('filip', 'poly', 'wkb_geometry')}, {('filip', 'poly')}),
+        ({('0795d7ba-adf9-4b8b-8438-32d8b2410d54', 'wkb_geometry')}, {('0795d7ba-adf9-4b8b-8438-32d8b2410d54')}),
         id='update_wfs1',
     ),
     pytest.param(
         data_wfs.get_wfs2_implicit_ns_update,
-        ({('filip', 'poly', 'wkb_geometry')}, {('filip', 'poly')}),
+        ({('0795d7ba-adf9-4b8b-8438-32d8b2410d54', 'wkb_geometry')}, {('0795d7ba-adf9-4b8b-8438-32d8b2410d54')}),
         id='update_wfs2',
     ),
     pytest.param(
         data_wfs.get_wfs1_implicit_ns_delete,
-        (set(), {('filip', 'europa_5514')}),
+        (set(), {('2c08994e-5014-463a-bfb2-46f980c9fc97')}),
         id='delete_wfs1',
     ),
     pytest.param(
         data_wfs.get_wfs1_implicit_ns_insert,
-        ({('filip', 'europa_5514', 'scalerank'), ('filip', 'europa_5514', 'featurecla'), ('filip', 'europa_5514', 'sovereignt'), ('filip', 'europa_5514', 'wkb_geometry'), ('filip', 'europa_5514', 'name'), ('filip', 'europa_5514', 'labelrank')}, {('filip', 'europa_5514')}),
+        ({('2c08994e-5014-463a-bfb2-46f980c9fc97', 'scalerank'), ('2c08994e-5014-463a-bfb2-46f980c9fc97', 'featurecla'), ('2c08994e-5014-463a-bfb2-46f980c9fc97', 'sovereignt'), ('2c08994e-5014-463a-bfb2-46f980c9fc97', 'wkb_geometry'), ('2c08994e-5014-463a-bfb2-46f980c9fc97', 'name'), ('2c08994e-5014-463a-bfb2-46f980c9fc97', 'labelrank')}, {('2c08994e-5014-463a-bfb2-46f980c9fc97')}),
         id='insert_wfs1',
     ),
 ])

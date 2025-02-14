@@ -11,9 +11,9 @@ from flask import Blueprint, g, current_app as app, request, Response
 
 import crs as crs_def
 from geoserver.util import reset as gs_reset
-from layman import authn, authz, settings, util as layman_util, LaymanError
+from layman import authn, authz, settings, util as layman_util, LaymanError, names
 from layman.authn import authenticate, is_user_with_name
-from layman.layer import db, LAYER_TYPE, LAYERNAME_PATTERN
+from layman.layer import db, LAYER_TYPE
 from layman.layer.geoserver import wms as gs_wms
 from layman.layer.qgis import wms as qgis_wms
 from layman.layer.util import patch_after_feature_change
@@ -35,7 +35,7 @@ def extract_attributes_and_layers_from_wfs_t(binary_data):
     service = xml_tree.get('service').upper()
     attribs = set()
     layers = set()
-    result = (attribs, layers)
+    result = (set(), set())
     if service != 'WFS':
         return result
     if version not in ["2.0.", "1.0.", "1.1."]:
@@ -59,7 +59,7 @@ def extract_attributes_and_layers_from_wfs_t(binary_data):
                 layers.add(layer)
 
     for attrib in attribs:
-        layers.add(attrib[:2])
+        layers.add(attrib[0])
 
     result = (attribs, layers)
     return result
@@ -114,13 +114,12 @@ def ensure_wfs_t_attributes(attribs):
 
 
 def extract_layer_from_wfs_t_delete(action):
-    _, ws_name, layer_name = extract_layer_info_from_wfs_t_update_delete(action)
-    result = (ws_name, layer_name) if layer_name and ws_name else None
-    return result
+    _, layer_uuid = extract_layer_info_from_wfs_t_update_delete(action)
+    return layer_uuid
 
 
 def extract_layer_info_from_wfs_t_update_delete(action):
-    result = (None, None, None)
+    result = (None, None)
     layer_qname = action.get('typeName').split(':')
     ws_namespace = layer_qname[0]
     ws_match = re.match(r"^(" + WORKSPACE_NAME_ONLY_PATTERN + ")$", ws_namespace)
@@ -131,19 +130,19 @@ def extract_layer_info_from_wfs_t_update_delete(action):
             app.logger.warning(
                 f"WFS Proxy: wrong namespace name. Namespace={ws_namespace}, action={ET.QName(action)}")
         return result
-    layer_name = layer_qname[1]
-    layer_match = re.match(LAYERNAME_PATTERN, layer_name)
-    if not layer_match:
-        app.logger.warning(f"WFS Proxy: wrong layer name. Layer name={layer_name}")
+    gs_layer_name = layer_qname[1]
+    layer_uuid = names.geoserver_layername_to_uuid(geoserver_workspace=ws_name, geoserver_name=gs_layer_name)
+    if not layer_uuid:
+        app.logger.warning(f"WFS Proxy: wrong layer name. Layer name={gs_layer_name}")
         return result
-    result = (ws_namespace, ws_name, layer_name)
+    result = (ws_namespace, layer_uuid)
     return result
 
 
 def extract_attributes_from_wfs_t_update(action, xml_tree, major_version="2"):
     attribs = set()
-    ws_namespace, ws_name, layer_name = extract_layer_info_from_wfs_t_update_delete(action)
-    if not (layer_name and ws_name):
+    ws_namespace, layer_uuid = extract_layer_info_from_wfs_t_update_delete(action)
+    if not layer_uuid:
         return attribs
     value_ref_string = "Name" if major_version == "1" else "ValueReference"
     namespaces = xml_tree.nsmap
@@ -165,8 +164,7 @@ def extract_attributes_from_wfs_t_update(action, xml_tree, major_version="2"):
                                    f"property namespace={split_text[0]}")
                 continue
             attrib_name = split_text[1]
-        attribs.add((ws_name,
-                     layer_name,
+        attribs.add((layer_uuid,
                      attrib_name))
     return attribs
 
@@ -183,10 +181,10 @@ def extract_attributes_from_wfs_t_insert_replace(action):
             if ws_namespace != 'http://www.opengis.net/ogc' and not ws_namespace.startswith('http://www.opengis.net/fes/'):
                 app.logger.warning(f"WFS Proxy: skipping due to wrong namespace name. Namespace={ws_namespace}, action={ET.QName(action)}")
             continue
-        layer_name = layer_qname.localname
-        layer_match = re.match(LAYERNAME_PATTERN, layer_name)
-        if not layer_match:
-            app.logger.warning(f"WFS Proxy: skipping due to wrong layer name. Layer name={layer_name}")
+        gs_layer_name = layer_qname.localname
+        layer_uuid = names.geoserver_layername_to_uuid(geoserver_workspace=ws_name, geoserver_name=gs_layer_name)
+        if not layer_uuid:
+            app.logger.warning(f"WFS Proxy: skipping due to wrong layer name. Layer name={gs_layer_name}")
             continue
         for attrib in layer:
             attrib_qname = ET.QName(attrib)
@@ -196,8 +194,7 @@ def extract_attributes_from_wfs_t_insert_replace(action):
                                    f"property namespace={attrib_qname.namespace}")
                 continue
             attrib_name = attrib_qname.localname
-            attribs.add((ws_name,
-                         layer_name,
+            attribs.add((layer_uuid,
                          attrib_name))
     return attribs
 
