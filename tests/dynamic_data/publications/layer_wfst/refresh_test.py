@@ -1,4 +1,5 @@
 import pytest
+from layman import names
 from test_tools import process_client, assert_util, external_db
 from test_tools.data import wfs as data_wfs, SMALL_LAYER_NATIVE_CRS, SMALL_LAYER_BBOX, SMALL_LAYER_NATIVE_BBOX
 from tests import Publication, EnumTestTypes
@@ -37,7 +38,6 @@ pytest_generate_tests = base_test.pytest_generate_tests
 
 
 @pytest.mark.usefixtures('ensure_external_db')
-@pytest.mark.xfail(reason='Geoserver proxy is not yet ready for WFS layers are by UUID so it do not refresh after WFS-T')
 class TestRefresh(base_test.TestSingleRestPublication):
 
     workspace = 'dynamic_test_workspace_wfst_refresh'
@@ -80,10 +80,11 @@ class TestRefresh(base_test.TestSingleRestPublication):
             (data_wfs.get_wfs20_insert_points, expected_bbox, exp_native_bbox, '_bigger'),
             (data_wfs.get_wfs20_delete_point, SMALL_LAYER_BBOX, SMALL_LAYER_NATIVE_BBOX, ''),
         ]
+        wfs_names = names.get_layer_names_by_source(uuid=layer_uuid).wfs
 
         for wfs_method, exp_bbox, exp_native_bbox, thumbnail_bbox_postfix in wfst_actions:
-            data_xml = wfs_method(layer.workspace, layer.name, )
-            process_client.post_wfst(data_xml, workspace=layer.workspace)
+            data_xml = wfs_method(wfs_names.workspace, wfs_names.name, )
+            process_client.post_wfst(data_xml, workspace=wfs_names.workspace)
             process_client.wait_for_publication_status(layer.workspace, process_client.LAYER_TYPE, layer.name)
             assert_publ_util.is_publication_valid_and_complete(layer)
 

@@ -67,15 +67,15 @@ def extract_attributes_and_layers_from_wfs_t(binary_data):
 
 def group_attributes_by_db(attribute_tuples):
     attrs_by_layer = defaultdict(list)
-    for workspace, layer, attr in attribute_tuples:
-        attrs_by_layer[(workspace, layer)].append(attr)
+    for layer_uuid, attr in attribute_tuples:
+        attrs_by_layer[layer_uuid].append(attr)
 
     attrs_by_db = defaultdict(list)
-    for (workspace, layer), attrs in attrs_by_layer.items():
-        publ_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['table_uri']})
+    for layer_uuid, attrs in attrs_by_layer.items():
+        publ_info = layman_util.get_publication_info_by_uuid(uuid=layer_uuid, context={'keys': ['table_uri']})
         table_uri = publ_info['_table_uri']
         attrs_by_db[table_uri.db_uri_str].extend([
-            (workspace, layer, attr, table_uri.schema, table_uri.table) for attr in attrs
+            (layer_uuid, attr, table_uri.schema, table_uri.table) for attr in attrs
         ])
 
     return attrs_by_db
@@ -85,8 +85,8 @@ def ensure_attributes_in_db(attributes_by_db):
     all_created_attr_tuples = set()
     for db_uri_str, attr_tuples in attributes_by_db.items():
         db_layman_attr_mapping = {
-            (schema, table, attr): (workspace, layer, attr)
-            for workspace, layer, attr, schema, table in attr_tuples
+            (schema, table, attr): (layer_uuid, attr)
+            for layer_uuid, attr, schema, table in attr_tuples
         }
         db_attr_tuples = list(db_layman_attr_mapping.keys())
         created_db_attr_tuples = db.ensure_attributes(db_attr_tuples, db_uri_str=db_uri_str)
@@ -102,14 +102,14 @@ def ensure_wfs_t_attributes(attribs):
     all_created_attributes = ensure_attributes_in_db(attrs_by_db)
 
     if all_created_attributes:
-        changed_layers = {(workspace, layer) for workspace, layer, _ in all_created_attributes}
+        changed_layers = {layer_uuid for layer_uuid, _ in all_created_attributes}
         qgis_changed_layers = {
-            (workspace, layer) for workspace, layer in changed_layers
-            if layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['style_type'], }
-                                                )['_style_type'] == 'qml'
+            layer_uuid for layer_uuid in changed_layers
+            if layman_util.get_publication_info_by_uuid(layer_uuid, context={'keys': ['style_type'], }
+                                                        )['_style_type'] == 'qml'
         }
-        for workspace, layer in qgis_changed_layers:
-            qgis_wms.save_qgs_file(workspace, layer)
+        for layer_uuid in qgis_changed_layers:
+            qgis_wms.save_qgs_file_by_uuid(layer_uuid=layer_uuid)
         gs_reset(settings.LAYMAN_GS_AUTH)
 
 
@@ -291,8 +291,10 @@ def proxy(subpath):
                                 )
 
     if response.status_code == 200:
-        for workspace, layername in wfs_t_layers:
-            geodata_type = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['geodata_type']})['geodata_type']
+        for layer_uuid in wfs_t_layers:
+            geodata_type = layman_util.get_publication_info_by_uuid(layer_uuid, context={'keys': ['geodata_type']})['geodata_type']
+            # pylint: disable=protected-access
+            workspace, _, layername = layman_util._get_publication_by_uuid(layer_uuid)
             if authz.can_i_edit(LAYER_TYPE, workspace, layername) and geodata_type == settings.GEODATA_TYPE_VECTOR:
                 patch_after_feature_change(workspace, layername)
 
