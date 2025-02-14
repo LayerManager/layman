@@ -450,7 +450,7 @@ def get_wfs11_implicit_ns_update():
     return '''<Transaction xmlns="http://www.opengis.net/wfs" service="WFS" version="1.1.0"
   xsi:schemaLocation="http://www.opengis.net/wfs http://schemas.opengis.net/wfs/1.1.0/wfs.xsd"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <Update typeName="filip:poly" xmlns:filip="http://filip">
+  <Update typeName="layman:l_0795d7ba-adf9-4b8b-8438-32d8b2410d54" xmlns:layman="http://layman">
     <Property>
       <Name>wkb_geometry</Name>
       <Value>
@@ -465,7 +465,7 @@ def get_wfs11_implicit_ns_update():
       </Value>
     </Property>
     <Filter xmlns="http://www.opengis.net/ogc">
-      <FeatureId fid="poly.1" />
+      <FeatureId fid="l_0795d7ba-adf9-4b8b-8438-32d8b2410d54.1" />
     </Filter>
   </Update>
 </Transaction>'''
@@ -475,7 +475,7 @@ def get_wfs2_implicit_ns_update():
     return '''<Transaction xmlns="http://www.opengis.net/wfs" service="WFS" version="2.0.0"
   xsi:schemaLocation="http://www.opengis.net/wfs http://schemas.opengis.net/wfs/1.1.0/wfs.xsd"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <Update typeName="filip:poly" xmlns:filip="http://filip">
+  <Update typeName="layman:l_0795d7ba-adf9-4b8b-8438-32d8b2410d54" xmlns:layman="http://layman">
     <Property>
       <ValueReference>wkb_geometry</ValueReference>
       <Value>
@@ -490,7 +490,7 @@ def get_wfs2_implicit_ns_update():
       </Value>
     </Property>
     <Filter xmlns="http://www.opengis.net/ogc">
-      <FeatureId fid="poly.1" />
+      <FeatureId fid="l_0795d7ba-adf9-4b8b-8438-32d8b2410d54.1" />
     </Filter>
   </Update>
 </Transaction>'''
@@ -499,10 +499,10 @@ def get_wfs2_implicit_ns_update():
 def get_wfs1_implicit_ns_delete():
     return '''<Transaction xmlns="http://www.opengis.net/wfs" service="WFS" version="1.1.0" xsi:schemaLocation="http://www.opengis.net/wfs http://schemas.opengis.net/wfs/1.1.0/wfs.xsd"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <Delete typeName="filip:europa_5514"
-        xmlns:filip="http://filip">
+    <Delete typeName="layman:l_2c08994e-5014-463a-bfb2-46f980c9fc97"
+        xmlns:layman="http://layman">
         <Filter xmlns="http://www.opengis.net/ogc">
-            <FeatureId fid="europa_5514.8"/>
+            <FeatureId fid="l_2c08994e-5014-463a-bfb2-46f980c9fc97.8"/>
         </Filter>
     </Delete>
 </Transaction>'''
@@ -512,7 +512,7 @@ def get_wfs1_implicit_ns_insert():
     return '''<Transaction xmlns="http://www.opengis.net/wfs" service="WFS" version="1.1.0" xsi:schemaLocation="http://www.opengis.net/wfs http://schemas.opengis.net/wfs/1.1.0/wfs.xsd"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Insert>
-        <europa_5514 xmlns="http://filip" fid="europa_5514.6">
+        <l_2c08994e-5014-463a-bfb2-46f980c9fc97 xmlns="http://layman" fid="l_2c08994e-5014-463a-bfb2-46f980c9fc97.6">
             <name>Poland</name>
             <featurecla>Admin-0 country</featurecla>
             <scalerank>1</scalerank>
@@ -527,6 +527,6 @@ def get_wfs1_implicit_ns_insert():
                     </exterior>
                 </Polygon>
             </wkb_geometry>
-        </europa_5514>
+        </l_2c08994e-5014-463a-bfb2-46f980c9fc97>
     </Insert>
 </Transaction>'''
