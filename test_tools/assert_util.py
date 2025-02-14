@@ -6,7 +6,6 @@ import crs as crs_def
 from layman import app, util as layman_util, settings, names
 from layman.common import bbox as bbox_util
 from layman.layer.geoserver import wfs, wms
-from layman.util import get_publication_uuid
 from .process_client import LAYER_TYPE, get_workspace_layer_metadata_comparison, get_source_key_from_metadata_comparison
 from .util import compare_images
 
@@ -62,25 +61,24 @@ def assert_wms_bbox(uuid, expected_bbox, *, expected_bbox_crs='EPSG:3857'):
         assert_same_bboxes(expected_bbox_4326, wgs84_bbox, 0.00001)
 
 
-def assert_all_sources_bbox(workspace, layer, expected_bbox_3857, *, expected_native_bbox=None, expected_native_crs=None):
+def assert_all_sources_bbox(workspace, layer, *, layer_uuid, expected_bbox_3857, expected_native_bbox=None, expected_native_crs=None):
     with app.app_context():
         info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer,
                                                 context={'key': ['bounding_box', 'native_bounding_box', 'native_crs']})
     bbox_3857 = tuple(info['bounding_box'])
     native_bbox = tuple(info['native_bounding_box'])
     native_crs = info['native_crs']
-    uuid = get_publication_uuid(workspace, LAYER_TYPE, layer)
 
     assert_same_bboxes(expected_bbox_3857, bbox_3857, 0.00001)
     if expected_native_bbox is not None:
         assert_same_bboxes(expected_native_bbox, native_bbox, 0)
         assert expected_native_crs == native_crs
 
-    assert_wfs_bbox(uuid, expected_bbox_3857)
-    assert_wms_bbox(uuid, expected_bbox_3857)
+    assert_wfs_bbox(layer_uuid, expected_bbox_3857)
+    assert_wms_bbox(layer_uuid, expected_bbox_3857)
     if expected_native_bbox is not None:
-        assert_wfs_bbox(uuid, expected_native_bbox, expected_bbox_crs=expected_native_crs)
-        assert_wms_bbox(uuid, expected_native_bbox, expected_bbox_crs=expected_native_crs)
+        assert_wfs_bbox(layer_uuid, expected_native_bbox, expected_bbox_crs=expected_native_crs)
+        assert_wms_bbox(layer_uuid, expected_native_bbox, expected_bbox_crs=expected_native_crs)
 
     with app.app_context():
         expected_bbox_4326 = bbox_util.transform(expected_bbox_3857, crs_from=crs_def.EPSG_3857, crs_to=crs_def.EPSG_4326, )

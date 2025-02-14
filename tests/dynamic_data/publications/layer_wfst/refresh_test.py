@@ -63,11 +63,14 @@ class TestRefresh(base_test.TestSingleRestPublication):
                                  ]
 
     def test_refresh(self, layer: Publication, rest_args, parametrization: base_test.Parametrization):
-        self.post_publication(layer, args=rest_args)
+        response = self.post_publication(layer, args=rest_args)
+        layer_uuid = response['uuid']
         thumbnail_style_postfix = parametrization.style_file.publ_name_part
 
         native_crs = SMALL_LAYER_NATIVE_CRS
-        assert_util.assert_all_sources_bbox(layer.workspace, layer.name, SMALL_LAYER_BBOX,
+        assert_util.assert_all_sources_bbox(layer.workspace, layer.name,
+                                            layer_uuid=layer_uuid,
+                                            expected_bbox_3857=SMALL_LAYER_BBOX,
                                             expected_native_bbox=SMALL_LAYER_NATIVE_BBOX,
                                             expected_native_crs=native_crs)
 
@@ -84,7 +87,9 @@ class TestRefresh(base_test.TestSingleRestPublication):
             process_client.wait_for_publication_status(layer.workspace, process_client.LAYER_TYPE, layer.name)
             assert_publ_util.is_publication_valid_and_complete(layer)
 
-            assert_util.assert_all_sources_bbox(layer.workspace, layer.name, exp_bbox,
+            assert_util.assert_all_sources_bbox(layer.workspace, layer.name,
+                                                layer_uuid=layer_uuid,
+                                                expected_bbox_3857=exp_bbox,
                                                 expected_native_bbox=exp_native_bbox,
                                                 expected_native_crs=native_crs)
 
