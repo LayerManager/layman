@@ -93,6 +93,9 @@ List of [users](models.md#user) and [roles](models.md#role) giving them permissi
 ### GRANT_PUBLISH_IN_PUBLIC_WORKSPACE
 List of [users](models.md#user) and [roles](models.md#role) giving them permission to publish new [publication](models.md#publication) in already created [public workspace](models.md#public-workspace).
 
+### GRANT_DELETE_OTHER_USER
+List of [users](models.md#user) and [roles](models.md#role) giving them permission to delete another user and all their data.
+
 ### LAYMAN_ROLE_SERVICE_URI
 URL of [Role Service](security.md#role-service) with DB schema in format `postgresql://<username>:<password>@<host>:<port>/<dbname>?schema=<schema_name>`. URL scheme must be `postgresql`. URL host must be mentioned explicitly, as well as DB schema in `schema` URL query parameter. If you want to use [internal role service schema](security.md#internal-role-service-schema) provided by Layman, set value to `postgresql://<LAYMAN_PG_USER>:<LAYMAN_PG_PASSWORD>@<LAYMAN_PG_HOST>:<LAYMAN_PG_PORT>/<LAYMAN_PG_DBNAME>?schema=_role_service` (replace variable names with their values).
 Password is stored as plaintext in GeoServer config file. One of solutions of this security issue is to create DB user exclusively for this purpose with read-only rights for role-service tables/views.

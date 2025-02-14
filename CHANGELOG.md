@@ -7,6 +7,7 @@
   ```
   LAYMAN_CLIENT_VERSION=9f20d0c2efb924334af373bfb90726db12285d71
   ```
+- Set new environment variable [GRANT_DELETE_OTHER_USER](doc/env-settings.md#GRANT_DELETE_OTHER_USER)  
 - In demo configuration, build QGIS v3.40.2 image using
   ```
   docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build
@@ -17,7 +18,8 @@
 #### Data migrations
 - [#1009](https://github.com/LayerManager/layman/issues/1009) Fill column `description` in `publications` table in prime DB schema. Value is taken from GeoServer for layers and from filesystem for maps.
 ### Changes
-- [#1064](https://github.com/LayerManager/layman/issues/1064) New method [DELETE User](doc/rest.md#delete-user) allows users to delete only their own account.
+- [#161](https://github.com/LayerManager/layman/issues/161) [DELETE User](doc/rest.md#delete-user) now grants deletion rights to users or roles defined in the [GRANT_DELETE_OTHER_USER](doc/env-settings.md#GRANT_DELETE_OTHER_USER) environment variable.
+- [#161](https://github.com/LayerManager/layman/issues/161) New method [DELETE User](doc/rest.md#delete-user) allows users to delete only their own account.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) POST Workspace [Layers](doc/rest.md#post-workspace-layers)/[Maps](doc/rest.md#post-workspace-maps) accepts new body parameter *uuid*.
 - [#942](https://github.com/LayerManager/layman/issues/942) New key `used_in_maps` was added to responses of requests [GET Publications](doc/rest.md#get-publications), [GET Layers](doc/rest.md#get-layers), [GET Workspace Layers](doc/rest.md#get-workspace-layers), and [GET Workspace Layer](doc/rest.md#get-workspace-layer).
 - [#909](https://github.com/LayerManager/layman/issues/909) Upgrade QGIS Server from v3.32.2 to v3.40.2. Also use docker hub repo [layermanager/qgis-server](https://hub.docker.com/r/layermanager/qgis-server) instead of jirikcz/qgis-server,
