@@ -813,4 +813,6 @@ def delete_user(username, *, actor_name):
     if actor_name and actor_name != settings.ANONYM_USER:
         headers.update(get_authz_headers(actor_name))
     response = requests.delete(url, headers=headers, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
+    if username != '':
+        raise_layman_error(response)
     return response

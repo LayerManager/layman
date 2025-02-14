@@ -161,3 +161,11 @@ def split_user_and_role_names(user_and_role_names):
     user_names = [name for name in user_and_role_names if is_user(name)]
     role_names = [name for name in user_and_role_names if name not in user_names]
     return user_names, role_names
+
+
+def is_allowed_to_delete_user(*, username, actor_name):
+    if not username:
+        return False
+    if actor_name == username:
+        return True
+    return is_user_in_access_rule(actor_name, settings.GRANT_DELETE_OTHER_USER)

@@ -223,6 +223,8 @@ def ensure_whole_user(username):
 
 
 def delete_whole_user(username):
+    from layman.authz.internal_role_service import delete_user_roles
+    delete_user_roles(username)
     providers = get_internal_providers()
     call_modules_fn(providers, 'delete_whole_user', [username])
 
@@ -524,11 +526,12 @@ def delete_publications(workspace,
                         url_path,
                         publ_param,
                         x_forwarded_items=None,
+                        actor_name=None,
                         ):
     from layman import authn
-    actor_name = authn.get_authn_username()
+    if not actor_name:
+        actor_name = authn.get_authn_username()
     whole_infos = get_publication_infos(workspace, publ_type, {'actor_name': actor_name, 'access_type': 'write'})
-
     for (_, _, publication) in whole_infos.keys():
         redis.create_lock(workspace, publ_type, publication, method)
         try:
