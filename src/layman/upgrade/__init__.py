@@ -32,6 +32,7 @@ MIGRATIONS = {
             upgrade_v2_0.adjust_publications_description,
             upgrade_v2_0.ensure_gs_workspaces,
             upgrade_v2_0.delete_layers_without_wfs_wms_available_or_with_unknown_geodata_type,
+            upgrade_v2_0.ensure_one_vector_main_file,
             upgrade_v2_0.migrate_layers,
             upgrade_v2_0.delete_old_workspaces,
         ]),
