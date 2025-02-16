@@ -1,7 +1,5 @@
-import glob
 import json
 import logging
-import os
 import shutil
 from urllib.parse import urljoin
 import requests
@@ -12,7 +10,6 @@ from geoserver import util as gs_util
 from layman import settings, names
 from layman.common.micka import util as micka_util, requests as micka_requests
 from layman.layer import LAYER_TYPE, STYLE_TYPES_DEF
-from layman.layer.filesystem import util as fs_util
 from layman.layer.geoserver import wfs, wms as gs_wms, sld
 from layman.layer.geoserver.tasks import refresh_wms, refresh_wfs, refresh_sld
 from layman.layer.geoserver.wms import get_timeregex_props
@@ -105,7 +102,7 @@ def delete_layers_without_wfs_wms_available_or_with_unknown_geodata_type():
     query = f'''select w.name, p.name, p.uuid::varchar as uuid, p.id
     from {DB_SCHEMA}.publications p inner join
          {DB_SCHEMA}.workspaces w on w.id = p.id_workspace
-    where p.type = %s and p.wfs_wms_status != %s
+    where p.type = %s and (p.wfs_wms_status != %s or p.geodata_type = 'unknown')
     ;'''
     layers = db_util.run_query(query, (LAYER_TYPE, settings.EnumWfsWmsStatus.AVAILABLE.value, ))
 
@@ -161,32 +158,6 @@ def delete_layers_without_wfs_wms_available_or_with_unknown_geodata_type():
         assert not publ_info, f"{publ_info}"
 
         logger.info(f'    Deleting layer {workspace}.{layername} DONE!')
-
-
-def ensure_one_vector_main_file():
-    logger.info(f'    Ensure vector layers have only one main file')
-
-    query = f'''select w.name, p.name
-    from {DB_SCHEMA}.publications p inner join
-         {DB_SCHEMA}.workspaces w on w.id = p.id_workspace
-    where p.type = %s and p.geodata_type = 'vector' and p.external_table_uri is null
-    ;'''
-    layers = db_util.run_query(query, (LAYER_TYPE,))
-
-    for workspace, layername in layers:
-        input_file_dir = f"{settings.LAYMAN_DATA_DIR}/workspaces/{workspace}/layers/{layername}/input_file"
-        pattern = os.path.join(input_file_dir, '*.*')
-        filepaths = sorted(glob.glob(pattern))
-        input_files = fs_util.InputFiles(saved_paths=filepaths)
-        if input_files.is_one_archive and len(input_files.archived_main_file_paths) > 1:
-            raise NotImplementedError(f"Fix of multiple main files in ZIP archive is not yet implemented.")
-        if len(input_files.raw_main_file_paths) > 1:
-            logger.info(f'      Fixing layer {workspace}.{layername}')
-            for file_path in input_files.raw_main_file_paths[1:]:
-                new_file_path = f"{file_path}.backup"
-                logger.info(f'        Renaming file {file_path} to {new_file_path}')
-                os.rename(file_path, new_file_path)
-            logger.info(f'      Fixing layer {workspace}.{layername} DONE')
 
 
 def migrate_layers():
