@@ -10,7 +10,7 @@
   ```
 - In demo configuration, build QGIS v3.40.2 image using
   ```
-  docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build
+  docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build qgis
   ```
 ### Migrations and checks
 #### Schema migrations

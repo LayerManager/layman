@@ -1,3 +1,4 @@
+import json
 import logging
 import shutil
 from urllib.parse import urljoin
@@ -95,13 +96,13 @@ def ensure_gs_workspaces():
     gs_util.ensure_workspace(names.GEOSERVER_WMS_WORKSPACE, auth=settings.LAYMAN_GS_AUTH)
 
 
-def delete_layers_without_wfs_wms_available():
-    logger.info(f'    Delete layers that do not have WFS/WMS available')
+def delete_layers_without_wfs_wms_available_or_with_unknown_geodata_type():
+    logger.info(f'    Delete layers that do not have WFS/WMS available or have unknown geodata type')
 
     query = f'''select w.name, p.name, p.uuid::varchar as uuid, p.id
     from {DB_SCHEMA}.publications p inner join
          {DB_SCHEMA}.workspaces w on w.id = p.id_workspace
-    where p.type = %s and p.wfs_wms_status != %s
+    where p.type = %s and (p.wfs_wms_status != %s or p.geodata_type = 'unknown')
     ;'''
     layers = db_util.run_query(query, (LAYER_TYPE, settings.EnumWfsWmsStatus.AVAILABLE.value, ))
 
@@ -187,6 +188,7 @@ def migrate_layers():
          {DB_SCHEMA}.workspaces w on w.id = p.id_workspace left join
          {DB_SCHEMA}.users u on u.id_workspace = w.id
     where p.type = %s
+    order by w.name, p.name
     ;'''
     layers = db_util.run_query(query, (LAYER_TYPE,))
 
@@ -251,10 +253,14 @@ def migrate_layers():
         else:
             logger.warning("      geoserver.sld already exists!")
 
-        # assert that layer is complete now
+        # assert that source keys up to geoserver are OK
         publ_info = get_complete_layer_info(workspace, layername)
-        publ_status = publ_info['layman_metadata']['publication_status']
-        assert publ_status == 'COMPLETE'
+        keys_to_check = ['wms', 'style']
+        if publ_info['geodata_type'] == 'vector':
+            keys_to_check += ['db', 'wfs']
+            if publ_info['original_data_source'] == 'file':
+                keys_to_check += ['file']
+        assert all('status' not in publ_info[key] for key in keys_to_check), json.dumps(publ_info, indent=2)
 
         logger.info(f'    Migrate layer {workspace}.{layername} DONE')
 
