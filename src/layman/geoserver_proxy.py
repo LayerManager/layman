@@ -96,7 +96,7 @@ def ensure_attributes_in_db(attributes_by_db):
 
 def ensure_wfs_t_attributes(attribs):
     app.logger.info(f"ensure_wfs_t_attributes attribs={attribs}")
-    editable_attribs = set(attr for attr in attribs if authz.can_i_edit(LAYER_TYPE, attr[0], attr[1]))
+    editable_attribs = set(attr for attr in attribs if authz.can_i_edit(uuid=attr[0]))
 
     attrs_by_db = group_attributes_by_db(editable_attribs)
     all_created_attributes = ensure_attributes_in_db(attrs_by_db)
@@ -295,7 +295,7 @@ def proxy(subpath):
             geodata_type = layman_util.get_publication_info_by_uuid(layer_uuid, context={'keys': ['geodata_type']})['geodata_type']
             # pylint: disable=protected-access
             workspace, _, layername = layman_util._get_publication_by_uuid(layer_uuid)
-            if authz.can_i_edit(LAYER_TYPE, workspace, layername) and geodata_type == settings.GEODATA_TYPE_VECTOR:
+            if authz.can_i_edit(uuid=layer_uuid) and geodata_type == settings.GEODATA_TYPE_VECTOR:
                 patch_after_feature_change(workspace, layername)
 
     excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
