@@ -2,7 +2,7 @@ import copy
 import pytest
 
 from geoserver.error import Error as GsError
-from layman import LaymanError
+from layman import LaymanError, names
 from test_tools import process_client, external_db
 from test_tools.data import wfs as wfs_data
 from test_tools.util import assert_error
@@ -67,7 +67,6 @@ pytest_generate_tests = base_test.pytest_generate_tests
 
 
 @pytest.mark.usefixtures('ensure_external_db')
-@pytest.mark.xfail(reason='Map filesystem input_file and GeoServer proxy are not yet ready for WMS and WFS layers named by UUID', strict=False)
 class TestWfst(base_test.TestSingleRestPublication):
 
     workspace = WORKSPACE
@@ -94,12 +93,14 @@ class TestWfst(base_test.TestSingleRestPublication):
         }, scope='class')
 
     def test_proxy_raises(self, layer: Publication, params):
-        data_xml = params['wfst_data_method'](layer.workspace, layer.name, *params['wfst_data_args'])
+        layer_uuid = self.publ_uuids[layer]
+        gs_layer_wfs = names.get_layer_names_by_source(uuid=layer_uuid, ).wfs
+        data_xml = params['wfst_data_method'](gs_layer_wfs.workspace, gs_layer_wfs.name, *params['wfst_data_args'])
 
         exp_exception = params['exp_exception']
         exception_class = exp_exception.pop('class')
         with pytest.raises(exception_class) as exc_info:
-            process_client.post_wfst(data_xml, workspace=layer.workspace)
+            process_client.post_wfst(data_xml, workspace=gs_layer_wfs.workspace)
 
         assert_error(exp_exception, exc_info)
 
