@@ -322,7 +322,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
             expected_detail.pop(key)
 
     if full_comparison:
-        for key in ('id', 'uuid', 'updated_at', ):
+        for key in ('id', 'uuid', 'updated_at', '_created_at'):
             pub_info.pop(key)
         for key in ('identifier', 'record_url', ):
             pub_info['metadata'].pop(key)

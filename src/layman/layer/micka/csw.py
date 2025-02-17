@@ -8,27 +8,25 @@ from lxml import etree as ET
 from flask import current_app
 
 import crs as crs_def
-from layman.common.filesystem.uuid import get_publication_uuid_file
 from layman.common.micka import util as common_util, requests as micka_requests
-from layman.common import language as common_language, empty_method, empty_method_returns_none, bbox as bbox_util
+from layman.common import language as common_language, empty_method, bbox as bbox_util
 from layman.layer.prime_db_schema import table as prime_db_table
 from layman.layer.filesystem import gdal
-from layman.layer.filesystem.uuid import get_layer_uuid
 from layman.layer import db
 from layman.layer.geoserver import wms
 from layman.layer.geoserver import wfs
 from layman.layer import LAYER_TYPE
 from layman import settings, patch_mode, LaymanError, common
 from layman.util import url_for, get_publication_info
+from layman import util as layman_util
 
 logger = logging.getLogger(__name__)
 PATCH_MODE = patch_mode.NO_DELETE
-get_publication_uuid = empty_method_returns_none
 post_layer = empty_method
 
 
 def get_layer_info(workspace, layername, *, x_forwarded_items=None):
-    uuid = get_layer_uuid(workspace, layername)
+    uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layername)
     try:
         csw = common_util.create_csw()
         if uuid is None or csw is None:
@@ -61,7 +59,7 @@ def patch_layer(workspace, layername, metadata_properties_to_refresh, _actor_nam
     # current_app.logger.info(f"patch_layer metadata_properties_to_refresh={metadata_properties_to_refresh}")
     if len(metadata_properties_to_refresh) == 0:
         return None
-    uuid = get_layer_uuid(workspace, layername)
+    uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layername)
     csw = common_util.create_csw()
     if uuid is None or csw is None:
         return None
@@ -92,7 +90,7 @@ def patch_layer(workspace, layername, metadata_properties_to_refresh, _actor_nam
 
 
 def delete_layer(workspace, layername, *, backup_uuid=None):
-    uuid = get_layer_uuid(workspace, layername) or backup_uuid
+    uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layername) or backup_uuid
     if backup_uuid and uuid:
         assert backup_uuid == uuid
     muuid = common_util.get_metadata_uuid(uuid)
@@ -114,7 +112,8 @@ def get_template_path_and_values(workspace, layername, http_method):
     logger.info(f'get_template_path_and_values start calculating data for {workspace}:{layername}')
     assert http_method in [common.REQUEST_METHOD_POST, common.REQUEST_METHOD_PATCH]
     publ_info = get_publication_info(workspace, LAYER_TYPE, layername, context={
-        'keys': ['title', 'native_bounding_box', 'native_crs', 'description', 'geodata_type', 'table_uri', 'wms'],
+        'keys': ['title', 'native_bounding_box', 'native_crs', 'description', 'geodata_type', 'table_uri', 'wms',
+                 'created_at', 'uuid'],
     })
     title = publ_info['title']
     abstract = publ_info.get('description')
@@ -124,8 +123,7 @@ def get_template_path_and_values(workspace, layername, http_method):
         native_bbox = crs_def.CRSDefinitions[crs].default_bbox
     extent = bbox_util.transform(native_bbox, crs_from=crs, crs_to=crs_def.EPSG_4326)
 
-    uuid_file_path = get_publication_uuid_file(LAYER_TYPE, workspace, layername)
-    publ_datetime = datetime.fromtimestamp(os.path.getmtime(uuid_file_path))
+    publ_datetime = publ_info['_created_at']
     revision_date = datetime.now()
     md_language = next(iter(common_language.get_languages_iso639_2(' '.join([
         title or '',
@@ -171,7 +169,7 @@ def get_template_path_and_values(workspace, layername, http_method):
     languages = languages or []
 
     prop_values = {
-        'md_file_identifier': common_util.get_metadata_uuid(get_layer_uuid(workspace, layername)),
+        'md_file_identifier': common_util.get_metadata_uuid(publ_info['uuid']),
         'md_language': md_language,
         'md_date_stamp': date.today().strftime('%Y-%m-%d'),
         'reference_system': settings.LAYMAN_OUTPUT_SRS_LIST,
@@ -346,7 +344,7 @@ METADATA_PROPERTIES = {
 
 
 def get_metadata_comparison(workspace, layername):
-    uuid = get_layer_uuid(workspace, layername)
+    uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layername)
     csw = common_util.create_csw()
     if uuid is None or csw is None:
         return {}

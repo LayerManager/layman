@@ -56,7 +56,6 @@ def get_layer_info(workspace, layer, *, extra_keys=None):
     return result
 
 
-get_publication_uuid = input_file.get_publication_uuid
 get_metadata_comparison = empty_method_returns_dict
 
 pre_publication_action_check = empty_method

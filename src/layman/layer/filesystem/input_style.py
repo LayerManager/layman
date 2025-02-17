@@ -33,7 +33,6 @@ def ensure_layer_input_style_dir(workspace, layername):
 
 
 get_layer_info = input_file.get_layer_info
-get_publication_uuid = input_file.get_publication_uuid
 
 
 def delete_layer(workspace, layername):

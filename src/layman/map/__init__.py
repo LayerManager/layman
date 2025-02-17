@@ -50,11 +50,10 @@ PUBLICATION_TYPES = {
         ],
         # see also .util.TASKS_TO_MAP_INFO_KEYS
         'internal_sources': OrderedDict([
-            ('layman.map.filesystem.uuid', InternalSourceTypeDef(info_items=[]),),
             ('layman.map.prime_db_schema.table', InternalSourceTypeDef(info_items=['access_rights', 'name', 'title', 'description', 'uuid',
                                                                                    'bounding_box', 'native_crs', 'native_bounding_box',
                                                                                    'updated_at', 'type', 'id', 'image_mosaic',
-                                                                                   'map_layers']),),
+                                                                                   'map_layers', 'created_at']),),
             ('layman.map.filesystem.input_file', InternalSourceTypeDef(info_items=['file']),),
             ('layman.map.prime_db_schema.file_data', InternalSourceTypeDef(info_items=[]),),
             ('layman.map.filesystem.thumbnail', InternalSourceTypeDef(info_items=['thumbnail', ]),),

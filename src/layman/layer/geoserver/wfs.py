@@ -4,7 +4,7 @@ from flask import current_app
 from geoserver import util as gs_util
 from layman import settings, patch_mode, names
 from layman.cache import mem_redis
-from layman.common import geoserver as gs_common, empty_method_returns_none, empty_method
+from layman.common import geoserver as gs_common, empty_method
 from layman.layer.util import is_layer_chain_ready
 from layman import util as layman_util
 from layman.layer import LAYER_TYPE
@@ -17,7 +17,6 @@ FLASK_PROXY_KEY = f'{__name__}:PROXY:{{workspace}}'
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 VERSION = gs_util.WFS_VERSION
 
-get_publication_uuid = empty_method_returns_none
 pre_publication_action_check = empty_method
 post_layer = empty_method
 

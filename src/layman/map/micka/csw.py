@@ -9,21 +9,18 @@ from flask import current_app
 
 import crs as crs_def
 from layman import common, settings, util as layman_util
-from layman.common import language as common_language, empty_method, empty_method_returns_none, bbox as bbox_util
-from layman.common.filesystem.uuid import get_publication_uuid_file
+from layman.common import language as common_language, empty_method, bbox as bbox_util
 from layman.common.micka import util as common_util, requests as micka_requests
 from layman.common.micka.util import get_metadata_uuid
 from layman.layer import LAYER_TYPE
 from layman.map import MAP_TYPE
-from layman.map.filesystem.uuid import get_map_uuid
 from layman.util import url_for, get_publication_info
 
-get_publication_uuid = empty_method_returns_none
 post_map = empty_method
 
 
 def get_map_info(workspace, mapname, *, x_forwarded_items=None):
-    uuid = get_map_uuid(workspace, mapname)
+    uuid = layman_util.get_publication_uuid(workspace, MAP_TYPE, mapname)
     try:
         csw = common_util.create_csw()
         if uuid is None or csw is None:
@@ -52,7 +49,7 @@ def get_map_info(workspace, mapname, *, x_forwarded_items=None):
 
 
 def delete_map(workspace, mapname):
-    uuid = get_map_uuid(workspace, mapname)
+    uuid = layman_util.get_publication_uuid(workspace, MAP_TYPE, mapname)
     muuid = common_util.get_metadata_uuid(uuid)
     if muuid is None:
         return
@@ -65,7 +62,7 @@ def patch_map(workspace, mapname, metadata_properties_to_refresh=None, actor_nam
     metadata_properties_to_refresh = metadata_properties_to_refresh or []
     if len(metadata_properties_to_refresh) == 0:
         return {}
-    uuid = get_map_uuid(workspace, mapname)
+    uuid = layman_util.get_publication_uuid(workspace, MAP_TYPE, mapname)
     csw = common_util.create_csw()
     if uuid is None or csw is None:
         return None
@@ -148,13 +145,12 @@ def map_to_operates_on(workspace, mapname, operates_on_muuids_filter=None, edito
 
 def get_template_path_and_values(workspace, mapname, *, http_method=None, actor_name):
     assert http_method in [common.REQUEST_METHOD_POST, common.REQUEST_METHOD_PATCH]
-    uuid_file_path = get_publication_uuid_file(MAP_TYPE, workspace, mapname)
-    publ_datetime = datetime.fromtimestamp(os.path.getmtime(uuid_file_path))
-    revision_date = datetime.now()
     operates_on = map_to_operates_on(workspace, mapname, editor=actor_name)
     publ_info = get_publication_info(workspace, MAP_TYPE, mapname, context={
-        'keys': ['title', 'native_bounding_box', 'description', 'native_crs'],
+        'keys': ['title', 'native_bounding_box', 'description', 'native_crs', 'created_at', 'uuid'],
     })
+    publ_datetime = publ_info['_created_at']
+    revision_date = datetime.now()
     native_bbox = publ_info.get('native_bounding_box')
     crs = publ_info.get('native_crs')
     if bbox_util.is_empty(native_bbox):
@@ -170,7 +166,7 @@ def get_template_path_and_values(workspace, mapname, *, http_method=None, actor_
     prop_values = _get_property_values(
         workspace=workspace,
         mapname=mapname,
-        uuid=get_map_uuid(workspace, mapname),
+        uuid=publ_info['uuid'],
         title=title,
         abstract=abstract or None,
         publication_date=publ_datetime.strftime('%Y-%m-%d'),
@@ -376,7 +372,7 @@ METADATA_PROPERTIES = {
 
 
 def get_metadata_comparison(workspace, mapname):
-    uuid = get_map_uuid(workspace, mapname)
+    uuid = layman_util.get_publication_uuid(workspace, MAP_TYPE, mapname)
     csw = common_util.create_csw()
     if uuid is None or csw is None:
         return {}

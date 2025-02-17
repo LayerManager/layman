@@ -3,10 +3,10 @@ import pathlib
 
 from geoserver import util as gs_util
 from layman import settings, LaymanError, patch_mode
-from layman.util import url_for, get_publication_info_by_uuid
+from layman.util import url_for, get_publication_info_by_uuid, get_publication_uuid
 from layman.common import empty_method, empty_method_returns_dict, bbox as bbox_util
 from layman.common.filesystem import util as common_util
-from . import util, input_file
+from . import util
 from .. import LAYER_TYPE
 
 LAYER_SUBDIR = __name__.rsplit('.', maxsplit=1)[-1]
@@ -46,9 +46,6 @@ def get_layer_info(workspace, layername, *, x_forwarded_items=None):
             },
         }
     return {}
-
-
-get_publication_uuid = input_file.get_publication_uuid
 
 
 def delete_layer(workspace, layername):

@@ -64,11 +64,6 @@ def get_map_info(workspace, mapname, *, x_forwarded_items=None):
     return result
 
 
-from . import uuid
-
-get_publication_uuid = uuid.get_publication_uuid
-
-
 def save_map_files(workspace, mapname, files):
     filenames = list(map(lambda f: f.filename, files))
     assert len(filenames) == 1

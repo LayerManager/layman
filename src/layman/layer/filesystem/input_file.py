@@ -84,11 +84,6 @@ def get_layer_info(workspace, layername):
     return result
 
 
-from . import uuid
-
-get_publication_uuid = uuid.get_publication_uuid
-
-
 def get_all_main_file_names(filenames):
     return [fn for fn in filenames if os.path.splitext(fn)[1].lower()
             in util.get_all_allowed_main_extensions()]
