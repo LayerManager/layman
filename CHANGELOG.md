@@ -15,6 +15,7 @@
 ### Migrations and checks
 #### Schema migrations
 - [#1009](https://github.com/LayerManager/layman/issues/1009) Add column `description` to table `publications` in prime DB schema.
+- [#1048](https://github.com/LayerManager/layman/issues/1048) Add column `created_at` to table `publications` in prime DB schema.
 #### Data migrations
 - [#1009](https://github.com/LayerManager/layman/issues/1009) Fill column `description` in `publications` table in prime DB schema. Value is taken from GeoServer for layers and from filesystem for maps.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) New workspaces ["layman" and "layman_wms"](doc/data-storage.md#geoserver) are created on GeoServer. 
