@@ -294,8 +294,8 @@ def proxy(subpath):
         for layer_uuid in wfs_t_layers:
             geodata_type = layman_util.get_publication_info_by_uuid(layer_uuid, context={'keys': ['geodata_type']})['geodata_type']
             # pylint: disable=protected-access
-            workspace, _, layername = layman_util._get_publication_by_uuid(layer_uuid)
             if authz.can_i_edit(uuid=layer_uuid) and geodata_type == settings.GEODATA_TYPE_VECTOR:
+                workspace, _, layername = layman_util._get_publication_by_uuid(layer_uuid)
                 patch_after_feature_change(workspace, layername)
 
     excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
