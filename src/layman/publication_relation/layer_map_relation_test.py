@@ -16,7 +16,6 @@ def assert_map_thumbnail(workspace, map, expected_thumbnail_path):
 
 @pytest.mark.usefixtures('ensure_layman')
 @pytest.mark.timeout(40)
-@pytest.mark.xfail(reason='Geoserver proxy is not yet ready for WFS layers are by UUID so they do not yet refresh after feature change')
 def test_map_refresh_after_layer_change():
     workspace = 'test_map_refresh_after_layer_change_workspace'
     layer = 'test_map_refresh_after_layer_change_layer'
