@@ -47,6 +47,12 @@ def adjust_db_for_map_layer_relation():
     db_util.run_statement(statement)
 
 
+def adjust_db_for_created_at():
+    logger.info(f'    Alter DB prime schema for storing created_at')
+    statement = f'ALTER TABLE {DB_SCHEMA}.publications ADD COLUMN IF NOT EXISTS created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP;'
+    db_util.run_statement(statement)
+
+
 def get_wms_capabilities(geoserver_workspace):
     headers = {
         settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE: settings.LAYMAN_GS_USER,
