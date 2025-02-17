@@ -14,7 +14,7 @@ from layman.authn import is_user_with_name
 from layman.common import empty_method, empty_method_returns_dict
 from layman.common.filesystem import util as common_util
 from layman.util import url_for, get_publication_info
-from . import util, input_file
+from . import util
 from .. import MAP_TYPE
 
 MAP_SUBDIR = __name__.rsplit('.', maxsplit=1)[-1]
@@ -54,9 +54,6 @@ def get_map_info(workspace, mapname, *, x_forwarded_items=None):
 def patch_map(workspace, mapname, file_changed=True):
     if file_changed or not get_map_info(workspace, mapname):
         post_map(workspace, mapname)
-
-
-get_publication_uuid = input_file.get_publication_uuid
 
 
 def delete_map(workspace, mapname):
