@@ -356,7 +356,6 @@ class TestAccessRights:
             rest_method(**rest_args)
         assert exc_info.value.args[0].startswith('Layer not found in Capabilities.')
 
-    @pytest.mark.xfail(reason='Geoserver proxy is not yet ready for WFS layers are by UUID so they do not yet refresh after feature change', strict=False)
     def test_wfst_positive(self, publication, rest_method, rest_args, params):
         attr_names = params.get('new_attributes', [])
         with app.app_context():
@@ -376,7 +375,6 @@ class TestAccessRights:
             assert attr_name in new_db_attributes, \
                 f"new_db_attributes={new_db_attributes}, attr_name={attr_name}"
 
-    @pytest.mark.xfail(reason='Geoserver proxy is not yet ready for WFS layers are by UUID so they do not yet refresh after feature change', strict=False)
     def test_wfst_negative(self, rest_method, rest_args, ):
         with pytest.raises(GS_Error) as exc_info:
             rest_method(**rest_args)
