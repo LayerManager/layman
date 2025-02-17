@@ -63,7 +63,6 @@ PUBLICATION_TYPES = {
         ],
         # see also .util.TASKS_TO_LAYER_INFO_KEYS
         'internal_sources': OrderedDict([  # internal sources to process when new source is published
-            ('layman.layer.filesystem.uuid', InternalSourceTypeDef(info_items=[]),),
             ('layman.layer.prime_db_schema.table', InternalSourceTypeDef(info_items=[
                 'access_rights', 'name', 'title', 'uuid', 'bounding_box', 'style_type', 'native_crs',
                 'native_bounding_box', 'geodata_type', 'updated_at', 'id', 'type', 'image_mosaic', 'table_uri',
