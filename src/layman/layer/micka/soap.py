@@ -9,7 +9,6 @@ pre_publication_action_check = empty_method
 post_layer = empty_method
 
 get_layer_info = csw.get_layer_info
-get_publication_uuid = csw.get_publication_uuid
 delete_layer = csw.delete_layer
 get_metadata_comparison = csw.get_metadata_comparison
 patch_layer = empty_method

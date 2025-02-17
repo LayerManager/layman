@@ -9,7 +9,7 @@ from flask import current_app
 from geoserver import util as gs_util
 from layman import settings, patch_mode, util as layman_util, names
 from layman.cache import mem_redis
-from layman.common import geoserver as gs_common, empty_method_returns_none, empty_method
+from layman.common import geoserver as gs_common, empty_method
 from layman.layer.util import is_layer_chain_ready
 from layman.layer import LAYER_TYPE
 from layman.layer.filesystem import gdal
@@ -28,7 +28,6 @@ logger = logging.getLogger(__name__)
 
 pre_publication_action_check = empty_method
 post_layer = empty_method
-get_publication_uuid = empty_method_returns_none
 
 
 def get_flask_proxy_key():

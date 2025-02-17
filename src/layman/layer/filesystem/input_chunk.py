@@ -40,9 +40,6 @@ def delete_layer(workspace, layername):
     settings.LAYMAN_REDIS.delete(chunk_key)
 
 
-get_publication_uuid = input_file.get_publication_uuid
-
-
 def save_layer_files_str(workspace, layername, input_files, check_crs, *, name_input_file_by_layer=True):
     input_file_dir = input_file.get_layer_input_file_dir(workspace, layername)
     if input_files.is_one_archive:

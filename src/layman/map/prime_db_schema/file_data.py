@@ -2,7 +2,6 @@ from layman.common import empty_method, empty_method_returns_dict
 from layman.common.prime_db_schema import publications
 from .. import MAP_TYPE
 
-get_publication_uuid = empty_method
 get_map_info = empty_method_returns_dict
 patch_map = empty_method
 pre_publication_action_check = empty_method

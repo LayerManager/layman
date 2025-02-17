@@ -9,7 +9,7 @@ from flask import current_app
 
 import crs as crs_def
 from layman.common.micka import util as common_util, requests as micka_requests
-from layman.common import language as common_language, empty_method, empty_method_returns_none, bbox as bbox_util
+from layman.common import language as common_language, empty_method, bbox as bbox_util
 from layman.layer.prime_db_schema import table as prime_db_table
 from layman.layer.filesystem import gdal
 from layman.layer import db
@@ -22,7 +22,6 @@ from layman import util as layman_util
 
 logger = logging.getLogger(__name__)
 PATCH_MODE = patch_mode.NO_DELETE
-get_publication_uuid = empty_method_returns_none
 post_layer = empty_method
 
 

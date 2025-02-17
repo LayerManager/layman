@@ -38,7 +38,6 @@ def assert_module_methods(module, methods):
 @pytest.mark.usefixtures('ensure_layman')
 def test_publication_interface_methods():
     publication_source_methods = {
-        'get_publication_uuid',
         'get_metadata_comparison',
         'pre_publication_action_check',
     }

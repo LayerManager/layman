@@ -6,11 +6,6 @@ from .. import MAP_TYPE
 get_metadata_comparison = empty_method_returns_dict
 
 
-def get_publication_uuid(workspace, publication_type, publication_name):
-    infos = pubs_util.get_publication_infos(workspace, publication_type)
-    return infos.get((workspace, publication_type, publication_name), {}).get("uuid")
-
-
 def get_map_info(workspace, mapname):
     maps = pubs_util.get_publication_infos(workspace, MAP_TYPE)
     info = maps.get((workspace, MAP_TYPE, mapname), {})
