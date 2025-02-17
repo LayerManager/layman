@@ -3,7 +3,7 @@ import os
 import pathlib
 from urllib.parse import unquote
 
-from layman.common import empty_method, empty_method_returns_dict
+from layman.common import empty_method, empty_method_returns_dict, empty_method_returns_none
 from layman.common.filesystem import util as common_util
 from layman.common.filesystem import input_file as common
 from layman.util import url_for
@@ -64,9 +64,7 @@ def get_map_info(workspace, mapname, *, x_forwarded_items=None):
     return result
 
 
-from . import uuid
-
-get_publication_uuid = uuid.get_publication_uuid
+get_publication_uuid = empty_method_returns_none
 
 
 def save_map_files(workspace, mapname, files):

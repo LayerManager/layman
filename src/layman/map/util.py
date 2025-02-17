@@ -16,11 +16,12 @@ from layman.common import redis as redis_util, tasks as tasks_util, metadata as 
 from layman.common.util import PUBLICATION_NAME_PATTERN, PUBLICATION_MAX_LENGTH, clear_publication_info as common_clear_publication_info
 from layman.layer.geoserver.util import get_gs_proxy_server_url
 from layman.util import call_modules_fn, get_providers_from_source_names, get_internal_sources, \
-    to_safe_name, url_for, WORKSPACE_NAME_PATTERN, XForwardedClass
+    to_safe_name, url_for, WORKSPACE_NAME_PATTERN, XForwardedClass, get_publication_uuid
 from . import get_map_sources, MAP_TYPE, get_map_type_def, get_map_info_keys
 from .filesystem import input_file
 from .micka import csw
 from .micka.csw import map_to_operates_on
+from ..uuid import delete_publication_uuid
 
 MAPNAME_PATTERN = PUBLICATION_NAME_PATTERN
 MAPNAME_MAX_LENGTH = PUBLICATION_MAX_LENGTH
@@ -123,8 +124,10 @@ def patch_map(workspace, mapname, task_options, start_at):
 
 
 def delete_map(workspace, mapname, kwargs=None):
+    publ_uuid = get_publication_uuid(workspace, MAP_TYPE, mapname)
     sources = get_sources()
     call_modules_fn(sources[::-1], 'delete_map', [workspace, mapname], kwargs=kwargs)
+    delete_publication_uuid(workspace, MAP_TYPE, mapname, publ_uuid)
     celery_util.delete_publication(workspace, MAP_TYPE, mapname)
 
 
