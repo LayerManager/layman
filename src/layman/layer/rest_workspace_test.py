@@ -16,14 +16,13 @@ del sys.modules['layman']
 from geoserver.util import get_feature_type
 from layman import app
 from layman import settings
-from layman.layer.filesystem import uuid as layer_uuid
 from layman.layer.filesystem.thumbnail import get_layer_thumbnail_path
 from layman import uuid, names
 from layman.layer import db
 from layman.layer.geoserver import wms as geoserver_wms, sld as geoserver_sld, get_internal_db_store_name
 from layman import celery as celery_util
 from layman.common.metadata import prop_equals_strict, PROPERTIES
-from layman.util import SimpleCounter
+from layman.util import SimpleCounter, get_publication_uuid
 from test_tools.data import wfs as data_wfs
 from test_tools.util import url_for, url_for_external
 from test_tools import flask_client, process_client
@@ -251,18 +250,8 @@ def test_post_layers_simple(client):
         wms = wms_proxy(wms_url)
         assert wms_layername.name in wms.contents
 
-        from layman.layer import get_layer_type_def
-        from layman.common.filesystem import uuid as common_uuid
-        uuid_filename = common_uuid.get_publication_uuid_file(
-            get_layer_type_def()['type'], workspace, layername)
-        assert os.path.isfile(uuid_filename)
-        uuid_str = None
-        with open(uuid_filename, "r", encoding="utf-8") as file:
-            uuid_str = file.read().strip()
-        assert uuid.is_valid_uuid(uuid_str)
-        assert uuid_str == layeruuid
-        assert settings.LAYMAN_REDIS.sismember(uuid.UUID_SET_KEY, uuid_str)
-        assert settings.LAYMAN_REDIS.exists(uuid.get_uuid_metadata_key(uuid_str))
+        assert settings.LAYMAN_REDIS.sismember(uuid.UUID_SET_KEY, layeruuid)
+        assert settings.LAYMAN_REDIS.exists(uuid.get_uuid_metadata_key(layeruuid))
         assert settings.LAYMAN_REDIS.hexists(
             uuid.get_workspace_type_names_key(workspace, '.'.join(__name__.split('.')[:-1])),
             layername
@@ -270,9 +259,9 @@ def test_post_layers_simple(client):
 
         layer_info = client.get(url_for('rest_workspace_layer.get', workspace=workspace, layername=layername)).get_json()
         assert set(layer_info['metadata'].keys()) == {'identifier', 'csw_url', 'record_url', 'comparison_url'}
-        assert layer_info['metadata']['identifier'] == f"m-{uuid_str}"
+        assert layer_info['metadata']['identifier'] == f"m-{layeruuid}"
         assert layer_info['metadata']['csw_url'] == settings.CSW_PROXY_URL
-        md_record_url = f"http://micka:80/record/basic/m-{uuid_str}"
+        md_record_url = f"http://micka:80/record/basic/m-{layeruuid}"
         assert layer_info['metadata']['record_url'].replace("http://localhost:3080", "http://micka:80") == md_record_url
         assert layer_info['metadata']['comparison_url'] == url_for_external('rest_workspace_layer_metadata_comparison.get',
                                                                             workspace=workspace, layername=layername)
@@ -851,8 +840,7 @@ def test_patch_layer_concurrent_and_delete_it(client):
         for file_path in file_paths:
             assert os.path.isfile(file_path)
 
-        uuid_str = layer_uuid.get_layer_uuid(workspace, layername)
-        assert uuid.is_valid_uuid(uuid_str)
+        uuid_str = get_publication_uuid(workspace, LAYER_TYPE, layername)
 
         with ExitStack() as stack:
             files = [(stack.enter_context(open(fp, 'rb')), os.path.basename(fp)) for fp in file_paths]
@@ -888,11 +876,6 @@ def test_patch_layer_concurrent_and_delete_it(client):
         response = client.delete(rest_path)
         assert response.status_code == 200
 
-        from layman.layer import get_layer_type_def
-        from layman.common.filesystem import uuid as common_uuid
-        uuid_filename = common_uuid.get_publication_uuid_file(
-            get_layer_type_def()['type'], workspace, layername)
-        assert not os.path.isfile(uuid_filename)
         assert not settings.LAYMAN_REDIS.sismember(uuid.UUID_SET_KEY, uuid_str)
         assert not settings.LAYMAN_REDIS.exists(uuid.get_uuid_metadata_key(uuid_str))
         assert not settings.LAYMAN_REDIS.hexists(
