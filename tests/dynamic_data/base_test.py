@@ -109,7 +109,7 @@ class TestSingleRestPublication:
                 specific_params_values = copy.deepcopy(specific_params.get(parametrization.values_set, {}))
                 params = recursive_dict_update(copy.deepcopy(input_test_case.params), specific_params_values)
 
-                input_publication, workspace, publication_type = cls._get_input_publication_workspace_and_type(
+                input_publication, workspace, publication_type, uuid = cls._get_input_publication_workspace_and_type(
                     input_test_case=input_test_case, params=params, publication_definition=publication_definition,
                     parametrization=parametrization,
                 )
@@ -135,7 +135,7 @@ class TestSingleRestPublication:
                     rest_args.update(copy.deepcopy(arg_value.other_rest_args))
 
                 test_case = TestCaseType(pytest_id=pytest_id,
-                                         publication=Publication(workspace, publication_type, name),
+                                         publication=Publication(workspace, publication_type, name, uuid=uuid),
                                          key=input_test_case.key,
                                          rest_method=rest_method,
                                          rest_args=rest_args,
@@ -172,11 +172,13 @@ class TestSingleRestPublication:
 
         workspace = cls.workspace
         publication_type = input_test_case.publication_type or cls.publication_type
+        uuid = None
 
         if input_publication:
             workspace = input_publication.workspace or workspace
             publication_type = input_publication.type or publication_type
-        return input_publication, workspace, publication_type
+            uuid = input_publication.uuid
+        return input_publication, workspace, publication_type, uuid
 
     @classmethod
     def post_publication(cls, publication, args=None, scope='function'):
@@ -269,9 +271,13 @@ class TestSingleRestPublication:
         if hasattr(request, 'param'):
             publication, method, post_before_test_args = request.param
             assert self.post_before_test_scope in {'function', 'class'}
+            print('#######################################################š')
+            print(f'{publication=}')
             if method.name != RestMethod.POST.name:
                 if self.post_before_test_scope == 'function':
+                    print(f'post_publication')
                     self.post_publication(publication, args=post_before_test_args)
                 else:
+                    print(f'ensure_publication')
                     self.ensure_publication(publication, args=post_before_test_args, scope='class')
         yield
