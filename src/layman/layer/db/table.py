@@ -4,7 +4,7 @@ from psycopg2 import sql
 import requests_util.url_util
 from db import util as db_util
 from layman import settings, patch_mode, util as layman_util
-from layman.common import empty_method, empty_method_returns_none, empty_method_returns_dict
+from layman.common import empty_method, empty_method_returns_dict
 from layman.http import LaymanError
 from . import get_internal_table_name
 from .. import LAYER_TYPE
@@ -17,7 +17,6 @@ pre_publication_action_check = empty_method
 post_layer = empty_method
 patch_layer = empty_method
 get_metadata_comparison = empty_method_returns_dict
-get_publication_uuid = empty_method_returns_none
 
 
 def get_layer_info(workspace, layername,):

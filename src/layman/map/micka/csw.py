@@ -9,14 +9,13 @@ from flask import current_app
 
 import crs as crs_def
 from layman import common, settings, util as layman_util
-from layman.common import language as common_language, empty_method, empty_method_returns_none, bbox as bbox_util
+from layman.common import language as common_language, empty_method, bbox as bbox_util
 from layman.common.micka import util as common_util, requests as micka_requests
 from layman.common.micka.util import get_metadata_uuid
 from layman.layer import LAYER_TYPE
 from layman.map import MAP_TYPE
 from layman.util import url_for, get_publication_info
 
-get_publication_uuid = empty_method_returns_none
 post_map = empty_method
 
 

@@ -1,7 +1,7 @@
 import os
 from geoserver import util as gs_util
 from layman import settings, patch_mode, util as layman_util, names
-from layman.common import empty_method, empty_method_returns_none, empty_method_returns_dict
+from layman.common import empty_method, empty_method_returns_dict
 from layman.common.db import launder_attribute_name
 from layman.layer.filesystem import input_style
 from . import wms
@@ -15,7 +15,6 @@ get_metadata_comparison = empty_method_returns_dict
 pre_publication_action_check = empty_method
 post_layer = empty_method
 patch_layer = empty_method
-get_publication_uuid = empty_method_returns_none
 
 
 def get_workspace_style_url(*, uuid):

@@ -2,7 +2,7 @@ import os
 from owslib.wms import WebMapService
 
 from layman import patch_mode, settings, util as layman_util
-from layman.common import bbox as bbox_util, empty_method, empty_method_returns_none, empty_method_returns_dict
+from layman.common import bbox as bbox_util, empty_method, empty_method_returns_dict
 from . import util, LAYER_TYPE
 from .. import db, qgis
 
@@ -13,7 +13,6 @@ get_metadata_comparison = empty_method_returns_dict
 pre_publication_action_check = empty_method
 post_layer = empty_method
 patch_layer = empty_method
-get_publication_uuid = empty_method_returns_none
 
 
 def get_layer_info(workspace, layername, *, x_forwarded_items=None):

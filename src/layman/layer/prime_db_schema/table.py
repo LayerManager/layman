@@ -8,11 +8,6 @@ PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 get_metadata_comparison = empty_method_returns_dict
 
 
-def get_publication_uuid(workspace, publication_type, publication_name):
-    infos = pubs_util.get_publication_infos(workspace, publication_type)
-    return infos.get((workspace, publication_type, publication_name), {}).get("uuid")
-
-
 def get_layer_info(workspace, layername):
     layers = pubs_util.get_publication_infos(workspace, LAYER_TYPE)
     info = layers.get((workspace, LAYER_TYPE, layername), {})
