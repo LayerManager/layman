@@ -24,9 +24,9 @@
       "title": "Small layer",
       "className": "HSLayers.Layer.WMS",
       "singleTile": true,
-      "url": "http://localhost:8000/geoserver/test_patch_after_feature_change_role_ws_wms/ows",
+      "url": "http://localhost:8000/geoserver/layman_wms/ows",
       "params": {
-        "LAYERS": "small_layer",
+        "LAYERS": "l_bf667aba-035a-4731-9516-0d0c22e9b236",
         "FORMAT": "image\/png"
       }
     }
