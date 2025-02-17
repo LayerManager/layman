@@ -62,6 +62,7 @@ def adjust_publications_description():
          {DB_SCHEMA}.workspaces w on w.id = p.id_workspace
     where p.type = %s
        or p.wfs_wms_status = %s
+    order by w.name, p.type, p.name
     ;'''
     publications = db_util.run_query(query, (MAP_TYPE, settings.EnumWfsWmsStatus.AVAILABLE.value, ))
 
@@ -103,6 +104,7 @@ def delete_layers_without_wfs_wms_available():
     from {DB_SCHEMA}.publications p inner join
          {DB_SCHEMA}.workspaces w on w.id = p.id_workspace
     where p.type = %s and p.wfs_wms_status != %s
+    order by w.name, p.name
     ;'''
     layers = db_util.run_query(query, (LAYER_TYPE, settings.EnumWfsWmsStatus.AVAILABLE.value, ))
 
@@ -188,6 +190,7 @@ def migrate_layers():
          {DB_SCHEMA}.workspaces w on w.id = p.id_workspace left join
          {DB_SCHEMA}.users u on u.id_workspace = w.id
     where p.type = %s
+    order by w.name, p.name
     ;'''
     layers = db_util.run_query(query, (LAYER_TYPE,))
 
