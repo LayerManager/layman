@@ -1,8 +1,5 @@
-from functools import partial
-
 from layman import patch_mode
-from layman.common import empty_method, empty_method_returns_dict
-from layman.common.filesystem import uuid as common_uuid
+from layman.common import empty_method, empty_method_returns_dict, empty_method_returns_none
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 
@@ -13,11 +10,6 @@ post_layer = empty_method
 patch_layer = empty_method
 get_metadata_comparison = empty_method_returns_dict
 
-get_layer_info = partial(common_uuid.get_publication_info, LAYER_TYPE)
-delete_layer = partial(common_uuid.delete_publication, LAYER_TYPE)
-get_publication_uuid = partial(common_uuid.get_publication_uuid, LAYER_TYPE)
-assign_layer_uuid = partial(common_uuid.assign_publication_uuid, LAYER_TYPE)
-
-
-def get_layer_uuid(workspace, layername):
-    return get_publication_uuid(workspace, LAYER_TYPE, layername)
+get_layer_info = empty_method_returns_dict
+delete_layer = empty_method
+get_publication_uuid = empty_method_returns_none

@@ -9,7 +9,7 @@ from osgeo import ogr
 
 from layman.http import LaymanError
 from layman import settings, patch_mode
-from layman.common import empty_method, empty_method_returns_dict
+from layman.common import empty_method, empty_method_returns_dict, empty_method_returns_none
 from layman.common.filesystem import util as common_util, input_file as common
 from . import util, gdal as fs_gdal
 
@@ -84,9 +84,7 @@ def get_layer_info(workspace, layername):
     return result
 
 
-from . import uuid
-
-get_publication_uuid = uuid.get_publication_uuid
+get_publication_uuid = empty_method_returns_none
 
 
 def get_all_main_file_names(filenames):

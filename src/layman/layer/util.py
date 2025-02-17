@@ -8,7 +8,7 @@ from flask import current_app, request
 from db import TableUri, util as db_util
 from layman import LaymanError, patch_mode, util as layman_util, settings
 from layman.util import call_modules_fn, get_providers_from_source_names, get_internal_sources, \
-    to_safe_name, url_for
+    to_safe_name, url_for, get_publication_uuid
 from layman import celery as celery_util, common
 from layman.common import redis as redis_util, tasks as tasks_util, metadata as metadata_common
 from layman.common.prime_db_schema import publications
@@ -16,6 +16,7 @@ from layman.common.util import clear_publication_info as common_clear_publicatio
 from . import get_layer_sources, LAYER_TYPE, get_layer_type_def, get_layer_info_keys, LAYERNAME_PATTERN, \
     LAYERNAME_MAX_LENGTH, SAFE_PG_IDENTIFIER_PATTERN
 from .db import get_all_table_column_names, get_table_crs
+from ..uuid import delete_publication_uuid
 
 FLASK_PROVIDERS_KEY = f'{__name__}:PROVIDERS'
 FLASK_SOURCES_KEY = f'{__name__}:SOURCES'
@@ -175,6 +176,7 @@ def patch_after_feature_change(workspace, layername, **kwargs):
 
 
 def delete_layer(workspace, layername, source=None, http_method='delete'):
+    publ_uuid = get_publication_uuid(workspace, LAYER_TYPE, layername)
     sources = get_sources()
     source_idx = next((
         idx for idx, m in enumerate(sources) if m.__name__ == source
@@ -193,6 +195,8 @@ def delete_layer(workspace, layername, source=None, http_method='delete'):
     for partial_result in results.values():
         if partial_result is not None:
             result.update(partial_result)
+    if source is None:
+        delete_publication_uuid(workspace, LAYER_TYPE, layername, publ_uuid)
     celery_util.delete_publication(workspace, LAYER_TYPE, layername)
     return result
 

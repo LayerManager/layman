@@ -14,12 +14,11 @@ del sys.modules['layman']
 from layman import app, settings, uuid, celery as celery_util, names
 from layman.common.micka import util as micka_common_util
 from layman.common.metadata import prop_equals_strict, PROPERTIES
-from layman.util import SimpleCounter
+from layman.util import SimpleCounter, get_publication_uuid
 from test_tools import flask_client
 from test_tools.util import url_for, url_for_external
 from . import util, MAP_TYPE
 from .micka import csw
-from .filesystem import uuid as map_uuid
 
 TODAY_DATE = date.today().strftime('%Y-%m-%d')
 
@@ -433,7 +432,7 @@ def test_patch_map(client):
     with app.app_context():
         workspace = 'testuser1'
         mapname = 'administrativni_cleneni_libereckeho_kraje'
-        uuid_str = map_uuid.get_map_uuid(workspace, mapname)
+        uuid_str = get_publication_uuid(workspace, MAP_TYPE, mapname)
         rest_path = url_for('rest_workspace_map.patch', workspace=workspace, mapname=mapname)
 
         file_paths = [
