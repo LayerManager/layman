@@ -8,7 +8,6 @@ from lxml import etree as ET
 from flask import current_app
 
 import crs as crs_def
-from layman.common.filesystem.uuid import get_publication_uuid_file
 from layman.common.micka import util as common_util, requests as micka_requests
 from layman.common import language as common_language, empty_method, empty_method_returns_none, bbox as bbox_util
 from layman.layer.prime_db_schema import table as prime_db_table
@@ -114,7 +113,8 @@ def get_template_path_and_values(workspace, layername, http_method):
     logger.info(f'get_template_path_and_values start calculating data for {workspace}:{layername}')
     assert http_method in [common.REQUEST_METHOD_POST, common.REQUEST_METHOD_PATCH]
     publ_info = get_publication_info(workspace, LAYER_TYPE, layername, context={
-        'keys': ['title', 'native_bounding_box', 'native_crs', 'description', 'geodata_type', 'table_uri', 'wms'],
+        'keys': ['title', 'native_bounding_box', 'native_crs', 'description', 'geodata_type', 'table_uri', 'wms',
+                 'created_at'],
     })
     title = publ_info['title']
     abstract = publ_info.get('description')
@@ -124,8 +124,7 @@ def get_template_path_and_values(workspace, layername, http_method):
         native_bbox = crs_def.CRSDefinitions[crs].default_bbox
     extent = bbox_util.transform(native_bbox, crs_from=crs, crs_to=crs_def.EPSG_4326)
 
-    uuid_file_path = get_publication_uuid_file(LAYER_TYPE, workspace, layername)
-    publ_datetime = datetime.fromtimestamp(os.path.getmtime(uuid_file_path))
+    publ_datetime = publ_info['_created_at']
     revision_date = datetime.now()
     md_language = next(iter(common_language.get_languages_iso639_2(' '.join([
         title or '',

@@ -10,7 +10,6 @@ from flask import current_app
 import crs as crs_def
 from layman import common, settings, util as layman_util
 from layman.common import language as common_language, empty_method, empty_method_returns_none, bbox as bbox_util
-from layman.common.filesystem.uuid import get_publication_uuid_file
 from layman.common.micka import util as common_util, requests as micka_requests
 from layman.common.micka.util import get_metadata_uuid
 from layman.layer import LAYER_TYPE
@@ -148,13 +147,12 @@ def map_to_operates_on(workspace, mapname, operates_on_muuids_filter=None, edito
 
 def get_template_path_and_values(workspace, mapname, *, http_method=None, actor_name):
     assert http_method in [common.REQUEST_METHOD_POST, common.REQUEST_METHOD_PATCH]
-    uuid_file_path = get_publication_uuid_file(MAP_TYPE, workspace, mapname)
-    publ_datetime = datetime.fromtimestamp(os.path.getmtime(uuid_file_path))
-    revision_date = datetime.now()
     operates_on = map_to_operates_on(workspace, mapname, editor=actor_name)
     publ_info = get_publication_info(workspace, MAP_TYPE, mapname, context={
-        'keys': ['title', 'native_bounding_box', 'description', 'native_crs'],
+        'keys': ['title', 'native_bounding_box', 'description', 'native_crs', 'created_at'],
     })
+    publ_datetime = publ_info['_created_at']
+    revision_date = datetime.now()
     native_bbox = publ_info.get('native_bounding_box')
     crs = publ_info.get('native_crs')
     if bbox_util.is_empty(native_bbox):
