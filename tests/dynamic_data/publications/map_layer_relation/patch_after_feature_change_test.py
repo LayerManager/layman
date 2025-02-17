@@ -13,13 +13,12 @@ DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 USER = 'test_patch_after_feature_change_role_user'
 WORKSPACE = 'test_patch_after_feature_change_role_ws'  # public workspace
 ROLE = 'TEST_PATCH_AFTER_FEATURE_CHANGE_ROLE_ROLE'
-LAYER_SMALL = Publication(WORKSPACE, process_client.LAYER_TYPE, 'small_layer')
+LAYER_SMALL = Publication(WORKSPACE, process_client.LAYER_TYPE, 'small_layer', uuid='bf667aba-035a-4731-9516-0d0c22e9b236')
 MAP = Publication(WORKSPACE, process_client.MAP_TYPE, 'map_hranice')
 
 
 @pytest.mark.timeout(60)
 @pytest.mark.usefixtures('oauth2_provider_mock')
-@pytest.mark.xfail(reason='Map filesystem input_file in not yet ready for WMS layers named by UUID')
 class TestPublication(base_test.TestSingleRestPublication):
     workspace = 'test_patch_after_feature_change_role'
     publication_type = process_client.LAYER_TYPE
@@ -29,7 +28,7 @@ class TestPublication(base_test.TestSingleRestPublication):
     usernames_to_reserve = [USER]
 
     test_cases = [base_test.TestCaseType(key='main',
-                                         publication=Publication(WORKSPACE, process_client.LAYER_TYPE, LAYER_SMALL.name),
+                                         publication=Publication(WORKSPACE, process_client.LAYER_TYPE, LAYER_SMALL.name, uuid=LAYER_SMALL.uuid),
                                          rest_method=base_test_classes.RestMethod.PATCH,
                                          rest_args={
                                              'file_paths': [

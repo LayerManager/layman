@@ -290,12 +290,17 @@ def proxy(subpath):
                                 timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
                                 )
 
+    print(f'***************************************************************')
     if response.status_code == 200:
+        print(f'{response.status_code=}')
+        print(f'{wfs_t_layers=}')
         for layer_uuid in wfs_t_layers:
+            print(f'{layer_uuid=}')
             geodata_type = layman_util.get_publication_info_by_uuid(layer_uuid, context={'keys': ['geodata_type']})['geodata_type']
             # pylint: disable=protected-access
-            workspace, _, layername = layman_util._get_publication_by_uuid(layer_uuid)
             if authz.can_i_edit(uuid=layer_uuid) and geodata_type == settings.GEODATA_TYPE_VECTOR:
+                workspace, _, layername = layman_util._get_publication_by_uuid(layer_uuid)
+                print(f'{layer_uuid=}, {workspace=}, {layername=}')
                 patch_after_feature_change(workspace, layername)
 
     excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
