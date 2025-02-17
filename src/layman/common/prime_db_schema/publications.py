@@ -158,6 +158,7 @@ select p.id as id_publication,
        p.style_type,
        p.image_mosaic,
        p.updated_at,
+       p.created_at,
        ST_XMIN(p.bbox) as xmin,
        ST_YMIN(p.bbox) as ymin,
        ST_XMAX(p.bbox) as xmax,
@@ -276,6 +277,7 @@ from {DB_SCHEMA}.workspaces w inner join
                                    '_style_type': style_type,
                                    'image_mosaic': image_mosaic,
                                    'updated_at': updated_at,
+                                   '_created_at': created_at,
                                    '_table_uri': TableUri(
                                        db_uri_str=external_table_uri['db_uri_str'],
                                        schema=external_table_uri['schema'],
@@ -292,7 +294,8 @@ from {DB_SCHEMA}.workspaces w inner join
                                    'used_in_maps': layer_maps or [],
                                    '_wfs_wms_status': settings.EnumWfsWmsStatus(wfs_wms_status) if wfs_wms_status else None,
                                    }
-             for id_publication, workspace_name, publication_type, publication_name, title, description, uuid, geodata_type, style_type, image_mosaic, updated_at, xmin, ymin, xmax, ymax,
+             for id_publication, workspace_name, publication_type, publication_name, title, description, uuid,
+             geodata_type, style_type, image_mosaic, updated_at, created_at, xmin, ymin, xmax, ymax,
              srid, external_table_uri, read_users_roles, write_users_roles, map_layers, layer_maps, wfs_wms_status, _
              in values}
 
