@@ -175,7 +175,6 @@ pytest_generate_tests = base_test.pytest_generate_tests
 
 @pytest.mark.usefixtures('ensure_external_db', 'oauth2_provider_mock')
 @pytest.mark.timeout(60)
-@pytest.mark.xfail(reason='Geoserver proxy is not yet ready for WFS layers are by UUID so it skip their attributes')
 class TestNewAttribute(base_test.TestSingleRestPublication):
     workspace = WORKSPACE
 
@@ -240,10 +239,11 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
         self.ensure_publication(layer2, args=rest_args2, scope='class')
 
         # prepare data for WFS-T request and tuples of new attributes
-        wfst_data, new_attributes = self.prepare_wfst_data_and_new_attributes(layer, layer2, params)
+        with app.app_context():
+            wfst_data, new_attributes = self.prepare_wfst_data_and_new_attributes(layer, layer2, params)
 
         style_type = parametrization.style_file.style_type
-        wfs_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/{workspace}/wfs"
+        wfs_url = f"http://{settings.LAYMAN_SERVER_NAME}/geoserver/layman/wfs"
         table_uris = {}
 
         # get current attributes and assert that new attributes are not yet present
@@ -262,7 +262,9 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
                     f"old_db_attributes={old_db_attributes[layer_name]}, attr_name={attr_name}"
 
             # assert that all attr_names are not yet presented in WFS feature type
-            gs_layer = names.get_layer_names_by_source(uuid=get_publication_uuid(*layer)).wfs
+            with app.app_context():
+                layer_uuid = get_publication_uuid(workspace, self.publication_type, layer_name)
+            gs_layer = names.get_layer_names_by_source(uuid=layer_uuid).wfs
             layer_schema = get_wfs_schema(wfs_url, typename=f"{gs_layer.workspace}:{gs_layer.name}",
                                           version=geoserver_wfs.VERSION, headers=AUTHN_HEADERS)
             old_wfs_properties[layer_name] = sorted(layer_schema['properties'].keys())
@@ -276,7 +278,7 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
                            for attr_name in attr_names), (attr_names, old_qgis_attributes)
 
         # make WFS-T request
-        process_client.post_wfst(wfst_data, headers=AUTHN_HEADERS, workspace=workspace)
+        process_client.post_wfst(wfst_data, headers=AUTHN_HEADERS, workspace=names.GEOSERVER_WFS_WORKSPACE)
         for layer_name, _ in new_attributes:
             process_client.wait_for_publication_status(workspace, self.publication_type, layer_name,
                                                        headers=AUTHN_HEADERS)
@@ -285,6 +287,9 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
         # assert that new attributes are present
         for layer_name, attr_names in new_attributes:
             # assert that exactly all attr_names were created in DB table
+            with app.app_context():
+                layer_uuid = get_publication_uuid(workspace, self.publication_type, layer_name)
+            gs_layer = names.get_layer_names_by_source(uuid=layer_uuid).wfs
             table_uri = table_uris[layer_name]
             db_attributes = db.get_all_table_column_names(table_uri.schema, table_uri.table, uri_str=table_uri.db_uri_str)
             for attr_name in attr_names:
@@ -292,7 +297,7 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
             assert set(attr_names).union(set(old_db_attributes[layer_name])) == set(db_attributes)
 
             # assert that exactly all attr_names are present also in WFS feature type
-            layer_schema = get_wfs_schema(wfs_url, typename=f"{workspace}:{layer_name}",
+            layer_schema = get_wfs_schema(wfs_url, typename=f"{gs_layer.workspace}:{gs_layer.name}",
                                           version=geoserver_wfs.VERSION, headers=AUTHN_HEADERS)
             wfs_properties = sorted(layer_schema['properties'].keys())
             for attr_name in attr_names:
@@ -326,9 +331,9 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
             attr_args_per_layer = params['attr_args_per_layer']
             assert len(attr_args_per_layer) == 2
             wfst_data = data_method(
-                workspace=gs_layer.workspace,
-                layername1=gs_layer.name,
-                layername2=gs_layer2.name,
+                geoserver_workspace=gs_layer.workspace,
+                geoserver_layername1=gs_layer.name,
+                geoserver_layername2=gs_layer2.name,
                 **attr_args_per_layer[0],
                 **attr_args_per_layer[1],
             )

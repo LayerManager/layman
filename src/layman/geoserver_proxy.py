@@ -11,9 +11,9 @@ from flask import Blueprint, g, current_app as app, request, Response
 
 import crs as crs_def
 from geoserver.util import reset as gs_reset
-from layman import authn, authz, settings, util as layman_util, LaymanError
+from layman import authn, authz, settings, util as layman_util, LaymanError, names
 from layman.authn import authenticate, is_user_with_name
-from layman.layer import db, LAYER_TYPE, LAYERNAME_PATTERN
+from layman.layer import db, LAYER_TYPE
 from layman.layer.geoserver import wms as gs_wms
 from layman.layer.qgis import wms as qgis_wms
 from layman.layer.util import patch_after_feature_change
@@ -35,7 +35,7 @@ def extract_attributes_and_layers_from_wfs_t(binary_data):
     service = xml_tree.get('service').upper()
     attribs = set()
     layers = set()
-    result = (attribs, layers)
+    result = (set(), set())
     if service != 'WFS':
         return result
     if version not in ["2.0.", "1.0.", "1.1."]:
@@ -59,7 +59,7 @@ def extract_attributes_and_layers_from_wfs_t(binary_data):
                 layers.add(layer)
 
     for attrib in attribs:
-        layers.add(attrib[:2])
+        layers.add(attrib[0])
 
     result = (attribs, layers)
     return result
@@ -67,15 +67,15 @@ def extract_attributes_and_layers_from_wfs_t(binary_data):
 
 def group_attributes_by_db(attribute_tuples):
     attrs_by_layer = defaultdict(list)
-    for workspace, layer, attr in attribute_tuples:
-        attrs_by_layer[(workspace, layer)].append(attr)
+    for layer_uuid, attr in attribute_tuples:
+        attrs_by_layer[layer_uuid].append(attr)
 
     attrs_by_db = defaultdict(list)
-    for (workspace, layer), attrs in attrs_by_layer.items():
-        publ_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['table_uri']})
+    for layer_uuid, attrs in attrs_by_layer.items():
+        publ_info = layman_util.get_publication_info_by_uuid(uuid=layer_uuid, context={'keys': ['table_uri']})
         table_uri = publ_info['_table_uri']
         attrs_by_db[table_uri.db_uri_str].extend([
-            (workspace, layer, attr, table_uri.schema, table_uri.table) for attr in attrs
+            (layer_uuid, attr, table_uri.schema, table_uri.table) for attr in attrs
         ])
 
     return attrs_by_db
@@ -85,8 +85,8 @@ def ensure_attributes_in_db(attributes_by_db):
     all_created_attr_tuples = set()
     for db_uri_str, attr_tuples in attributes_by_db.items():
         db_layman_attr_mapping = {
-            (schema, table, attr): (workspace, layer, attr)
-            for workspace, layer, attr, schema, table in attr_tuples
+            (schema, table, attr): (layer_uuid, attr)
+            for layer_uuid, attr, schema, table in attr_tuples
         }
         db_attr_tuples = list(db_layman_attr_mapping.keys())
         created_db_attr_tuples = db.ensure_attributes(db_attr_tuples, db_uri_str=db_uri_str)
@@ -96,31 +96,30 @@ def ensure_attributes_in_db(attributes_by_db):
 
 def ensure_wfs_t_attributes(attribs):
     app.logger.info(f"ensure_wfs_t_attributes attribs={attribs}")
-    editable_attribs = set(attr for attr in attribs if authz.can_i_edit(LAYER_TYPE, attr[0], attr[1]))
+    editable_attribs = set(attr for attr in attribs if authz.can_i_edit(uuid=attr[0]))
 
     attrs_by_db = group_attributes_by_db(editable_attribs)
     all_created_attributes = ensure_attributes_in_db(attrs_by_db)
 
     if all_created_attributes:
-        changed_layers = {(workspace, layer) for workspace, layer, _ in all_created_attributes}
+        changed_layers = {layer_uuid for layer_uuid, _ in all_created_attributes}
         qgis_changed_layers = {
-            (workspace, layer) for workspace, layer in changed_layers
-            if layman_util.get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['style_type'], }
-                                                )['_style_type'] == 'qml'
+            layer_uuid for layer_uuid in changed_layers
+            if layman_util.get_publication_info_by_uuid(layer_uuid, context={'keys': ['style_type'], }
+                                                        )['_style_type'] == 'qml'
         }
-        for workspace, layer in qgis_changed_layers:
-            qgis_wms.save_qgs_file(workspace, layer)
+        for layer_uuid in qgis_changed_layers:
+            qgis_wms.save_qgs_file_by_uuid(layer_uuid=layer_uuid)
         gs_reset(settings.LAYMAN_GS_AUTH)
 
 
 def extract_layer_from_wfs_t_delete(action):
-    _, ws_name, layer_name = extract_layer_info_from_wfs_t_update_delete(action)
-    result = (ws_name, layer_name) if layer_name and ws_name else None
-    return result
+    _, layer_uuid = extract_layer_info_from_wfs_t_update_delete(action)
+    return layer_uuid
 
 
 def extract_layer_info_from_wfs_t_update_delete(action):
-    result = (None, None, None)
+    result = (None, None)
     layer_qname = action.get('typeName').split(':')
     ws_namespace = layer_qname[0]
     ws_match = re.match(r"^(" + WORKSPACE_NAME_ONLY_PATTERN + ")$", ws_namespace)
@@ -131,19 +130,19 @@ def extract_layer_info_from_wfs_t_update_delete(action):
             app.logger.warning(
                 f"WFS Proxy: wrong namespace name. Namespace={ws_namespace}, action={ET.QName(action)}")
         return result
-    layer_name = layer_qname[1]
-    layer_match = re.match(LAYERNAME_PATTERN, layer_name)
-    if not layer_match:
-        app.logger.warning(f"WFS Proxy: wrong layer name. Layer name={layer_name}")
+    gs_layer_name = layer_qname[1]
+    layer_uuid = names.geoserver_layername_to_uuid(geoserver_workspace=ws_name, geoserver_name=gs_layer_name)
+    if not layer_uuid:
+        app.logger.warning(f"WFS Proxy: wrong layer name. Layer name={gs_layer_name}")
         return result
-    result = (ws_namespace, ws_name, layer_name)
+    result = (ws_namespace, layer_uuid)
     return result
 
 
 def extract_attributes_from_wfs_t_update(action, xml_tree, major_version="2"):
     attribs = set()
-    ws_namespace, ws_name, layer_name = extract_layer_info_from_wfs_t_update_delete(action)
-    if not (layer_name and ws_name):
+    ws_namespace, layer_uuid = extract_layer_info_from_wfs_t_update_delete(action)
+    if not layer_uuid:
         return attribs
     value_ref_string = "Name" if major_version == "1" else "ValueReference"
     namespaces = xml_tree.nsmap
@@ -165,8 +164,7 @@ def extract_attributes_from_wfs_t_update(action, xml_tree, major_version="2"):
                                    f"property namespace={split_text[0]}")
                 continue
             attrib_name = split_text[1]
-        attribs.add((ws_name,
-                     layer_name,
+        attribs.add((layer_uuid,
                      attrib_name))
     return attribs
 
@@ -183,10 +181,10 @@ def extract_attributes_from_wfs_t_insert_replace(action):
             if ws_namespace != 'http://www.opengis.net/ogc' and not ws_namespace.startswith('http://www.opengis.net/fes/'):
                 app.logger.warning(f"WFS Proxy: skipping due to wrong namespace name. Namespace={ws_namespace}, action={ET.QName(action)}")
             continue
-        layer_name = layer_qname.localname
-        layer_match = re.match(LAYERNAME_PATTERN, layer_name)
-        if not layer_match:
-            app.logger.warning(f"WFS Proxy: skipping due to wrong layer name. Layer name={layer_name}")
+        gs_layer_name = layer_qname.localname
+        layer_uuid = names.geoserver_layername_to_uuid(geoserver_workspace=ws_name, geoserver_name=gs_layer_name)
+        if not layer_uuid:
+            app.logger.warning(f"WFS Proxy: skipping due to wrong layer name. Layer name={gs_layer_name}")
             continue
         for attrib in layer:
             attrib_qname = ET.QName(attrib)
@@ -196,8 +194,7 @@ def extract_attributes_from_wfs_t_insert_replace(action):
                                    f"property namespace={attrib_qname.namespace}")
                 continue
             attrib_name = attrib_qname.localname
-            attribs.add((ws_name,
-                         layer_name,
+            attribs.add((layer_uuid,
                          attrib_name))
     return attribs
 
@@ -293,10 +290,17 @@ def proxy(subpath):
                                 timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
                                 )
 
+    print(f'***************************************************************')
     if response.status_code == 200:
-        for workspace, layername in wfs_t_layers:
-            geodata_type = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['geodata_type']})['geodata_type']
-            if authz.can_i_edit(LAYER_TYPE, workspace, layername) and geodata_type == settings.GEODATA_TYPE_VECTOR:
+        print(f'{response.status_code=}')
+        print(f'{wfs_t_layers=}')
+        for layer_uuid in wfs_t_layers:
+            print(f'{layer_uuid=}')
+            geodata_type = layman_util.get_publication_info_by_uuid(layer_uuid, context={'keys': ['geodata_type']})['geodata_type']
+            # pylint: disable=protected-access
+            if authz.can_i_edit(uuid=layer_uuid) and geodata_type == settings.GEODATA_TYPE_VECTOR:
+                workspace, _, layername = layman_util._get_publication_by_uuid(layer_uuid)
+                print(f'{layer_uuid=}, {workspace=}, {layername=}')
                 patch_after_feature_change(workspace, layername)
 
     excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']

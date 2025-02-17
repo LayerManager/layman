@@ -730,8 +730,8 @@ def post_wfst_with_xml_getter(workspace, layer, *, xml_getter, actor_name=None, 
         uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layer)
     gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wfs
 
-    xml = xml_getter(gs_layername.workspace, gs_layername.name, **xml_getter_params)
-    post_wfst(xml, headers=headers, workspace=workspace)
+    xml = xml_getter(geoserver_workspace=gs_layername.workspace, geoserver_layername=gs_layername.name, **xml_getter_params)
+    post_wfst(xml, headers=headers, workspace=gs_layername.workspace)
 
 
 def check_publication_status(response):
