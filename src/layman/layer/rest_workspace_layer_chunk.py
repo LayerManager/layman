@@ -1,11 +1,12 @@
 from flask import Blueprint, jsonify, request, current_app as app, g
 
 from layman import LaymanError
-from layman.util import check_workspace_name_decorator
+from layman.util import check_workspace_name_decorator, get_publication_uuid
 from layman.authn import authenticate
 from layman.authz import authorize_workspace_publications_decorator
 from . import util, LAYER_REST_PATH_NAME
 from .filesystem import input_chunk
+from .filesystem.util import LAYER_TYPE
 
 bp = Blueprint('rest_workspace_layer_chunk', __name__)
 
@@ -37,7 +38,8 @@ def post(workspace, layername):
                                       type=str)
     chunk = request.files['file']
 
-    input_chunk.save_layer_file_chunk(workspace, layername, parameter_name,
+    publ_uuid = get_publication_uuid(workspace, LAYER_TYPE, layername)
+    input_chunk.save_layer_file_chunk(publ_uuid, parameter_name,
                                       filename, chunk,
                                       chunk_number, total_chunks)
     # time.sleep(5)
@@ -58,8 +60,8 @@ def get(workspace, layername):
     parameter_name = request.args.get('layman_original_parameter', default='error',
                                       type=str)
 
-    chunk_exists = input_chunk.layer_file_chunk_exists(
-        workspace, layername, parameter_name, filename, chunk_number)
+    publ_uuid = get_publication_uuid(workspace, LAYER_TYPE, layername)
+    chunk_exists = input_chunk.layer_file_chunk_exists(publ_uuid, parameter_name, filename, chunk_number)
 
     if chunk_exists:
         result = jsonify({

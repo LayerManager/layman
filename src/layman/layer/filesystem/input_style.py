@@ -7,6 +7,8 @@ from werkzeug.datastructures import FileStorage
 
 from layman import patch_mode, LaymanError, layer
 from layman.common import empty_method, empty_method_returns_dict
+from layman.layer import LAYER_TYPE
+from layman.util import get_publication_uuid
 from . import util
 from . import input_file
 
@@ -20,14 +22,13 @@ patch_layer = empty_method
 get_metadata_comparison = empty_method_returns_dict
 
 
-def get_layer_input_style_dir(workspace, layername):
-    input_style_dir = os.path.join(util.get_layer_dir(workspace, layername),
-                                   LAYER_SUBDIR)
+def get_layer_input_style_dir(publ_uuid):
+    input_style_dir = os.path.join(util.get_layer_dir(publ_uuid), LAYER_SUBDIR)
     return input_style_dir
 
 
-def ensure_layer_input_style_dir(workspace, layername):
-    input_style_dir = get_layer_input_style_dir(workspace, layername)
+def ensure_layer_input_style_dir(publ_uuid):
+    input_style_dir = get_layer_input_style_dir(publ_uuid)
     pathlib.Path(input_style_dir).mkdir(parents=True, exist_ok=True)
     return input_style_dir
 
@@ -36,25 +37,31 @@ get_layer_info = input_file.get_layer_info
 
 
 def delete_layer(workspace, layername):
-    util.delete_layer_subdir(workspace, layername, LAYER_SUBDIR)
+    publ_uuid = get_publication_uuid(workspace, LAYER_TYPE, layername)
+    if publ_uuid:
+        delete_layer_by_uuid(publ_uuid)
 
 
-def get_file_path(workspace, layername, with_extension=True):
-    input_style_dir = get_layer_input_style_dir(workspace, layername)
-    style_files = glob.glob(os.path.join(input_style_dir, layername + '.*'))
+def delete_layer_by_uuid(publ_uuid):
+    util.delete_layer_subdir(publ_uuid, LAYER_SUBDIR)
+
+
+def get_file_path(publ_uuid, *, with_extension=True):
+    input_style_dir = get_layer_input_style_dir(publ_uuid)
+    style_files = glob.glob(os.path.join(input_style_dir, publ_uuid + '.*'))
     if with_extension:
         result = style_files[0] if style_files else None
     else:
-        result = os.path.join(input_style_dir, layername)
+        result = os.path.join(input_style_dir, publ_uuid)
     return result
 
 
-def save_layer_file(workspace, layername, style_file, style_type):
-    delete_layer(workspace, layername)
+def save_layer_file(publ_uuid, style_file, style_type):
+    delete_layer_by_uuid(publ_uuid)
     if style_file:
-        style_path_clear = get_file_path(workspace, layername, with_extension=False)
+        style_path_clear = get_file_path(publ_uuid, with_extension=False)
         style_path = style_path_clear + '.' + style_type.extension
-        ensure_layer_input_style_dir(workspace, layername)
+        ensure_layer_input_style_dir(publ_uuid)
         if isinstance(style_file, FileStorage):
             style_file.save(style_path)
         else:
@@ -62,8 +69,8 @@ def save_layer_file(workspace, layername, style_file, style_type):
                 out.write(style_file.read())
 
 
-def get_layer_file(workspace, layername):
-    style_path = get_file_path(workspace, layername)
+def get_layer_file(publ_uuid):
+    style_path = get_file_path(publ_uuid)
 
     if style_path and os.path.exists(style_path):
         return open(style_path, 'rb')

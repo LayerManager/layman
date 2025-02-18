@@ -5,7 +5,6 @@ from geoserver import util as gs_util
 from layman import settings, LaymanError, patch_mode
 from layman.util import url_for, get_publication_info_by_uuid, get_publication_uuid
 from layman.common import empty_method, empty_method_returns_dict, bbox as bbox_util
-from layman.common.filesystem import util as common_util
 from . import util
 from .. import LAYER_TYPE
 
@@ -19,27 +18,32 @@ post_layer = empty_method
 patch_layer = empty_method
 
 
-def get_layer_thumbnail_dir(workspace, layername):
-    thumbnail_dir = os.path.join(util.get_layer_dir(workspace, layername),
-                                 'thumbnail')
+def get_layer_thumbnail_dir(publ_uuid):
+    thumbnail_dir = os.path.join(util.get_layer_dir(publ_uuid), 'thumbnail')
     return thumbnail_dir
 
 
-def ensure_layer_thumbnail_dir(workspace, layername):
-    thumbnail_dir = get_layer_thumbnail_dir(workspace, layername)
+def ensure_layer_thumbnail_dir(publ_uuid):
+    thumbnail_dir = get_layer_thumbnail_dir(publ_uuid)
     pathlib.Path(thumbnail_dir).mkdir(parents=True, exist_ok=True)
     return thumbnail_dir
 
 
 def get_layer_info(workspace, layername, *, x_forwarded_items=None):
-    thumbnail_path = get_layer_thumbnail_path(workspace, layername)
+    publ_uuid = get_publication_uuid(workspace, LAYER_TYPE, layername)
+    return get_layer_info_by_uuid(publ_uuid, x_forwarded_items=x_forwarded_items, layername=layername,
+                                  workspace=workspace) if publ_uuid else {}
+
+
+def get_layer_info_by_uuid(publ_uuid, *, workspace, layername, x_forwarded_items=None):
+    thumbnail_path = get_layer_thumbnail_path(publ_uuid)
     if os.path.exists(thumbnail_path):
         return {
             'thumbnail': {
                 'url': url_for('rest_workspace_layer_thumbnail.get', workspace=workspace,
                                layername=layername,
                                x_forwarded_items=x_forwarded_items),
-                'path': os.path.relpath(thumbnail_path, common_util.get_workspace_dir(workspace))
+                'path': os.path.relpath(thumbnail_path, settings.LAYMAN_DATA_DIR)
             },
             '_thumbnail': {
                 'path': thumbnail_path,
@@ -49,28 +53,33 @@ def get_layer_info(workspace, layername, *, x_forwarded_items=None):
 
 
 def delete_layer(workspace, layername):
-    util.delete_layer_subdir(workspace, layername, LAYER_SUBDIR)
+    publ_uuid = get_publication_uuid(workspace, LAYER_TYPE, layername)
+    if publ_uuid:
+        delete_layer_by_uuid(publ_uuid)
 
 
-def get_layer_thumbnail_path(workspace, layername):
-    thumbnail_dir = get_layer_thumbnail_dir(workspace, layername)
-    return os.path.join(thumbnail_dir, layername + '.png')
+def delete_layer_by_uuid(publ_uuid):
+    util.delete_layer_subdir(publ_uuid, LAYER_SUBDIR)
 
 
-def generate_layer_thumbnail(workspace, layername, *, uuid=None):
-    uuid = uuid or get_publication_uuid(workspace, LAYER_TYPE, layername)
+def get_layer_thumbnail_path(publ_uuid):
+    thumbnail_dir = get_layer_thumbnail_dir(publ_uuid)
+    return os.path.join(thumbnail_dir, publ_uuid + '.png')
+
+
+def generate_layer_thumbnail(publ_uuid):
     headers = {
         settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE: settings.LAYMAN_GS_USER,
     }
-    layer_info = get_publication_info_by_uuid(uuid, context={'keys': ['wms', 'native_bounding_box', 'native_crs', ]})
+    layer_info = get_publication_info_by_uuid(publ_uuid, context={'keys': ['wms', 'native_bounding_box', 'native_crs', ]})
     wms_url = layer_info['_wms']['url']
     native_bbox = layer_info['native_bounding_box']
     native_crs = layer_info['native_crs']
     gs_layername = layer_info['wms']['name']
     bbox = bbox_util.get_bbox_to_publish(native_bbox, native_crs)
     tn_bbox = gs_util.get_square_bbox(bbox)
-    ensure_layer_thumbnail_dir(workspace, layername)
-    tn_path = get_layer_thumbnail_path(workspace, layername)
+    ensure_layer_thumbnail_dir(publ_uuid)
+    tn_path = get_layer_thumbnail_path(publ_uuid)
 
     from layman.layer.geoserver.wms import VERSION
     response = gs_util.get_layer_thumbnail(wms_url, gs_layername, tn_bbox, native_crs, headers=headers, wms_version=VERSION)

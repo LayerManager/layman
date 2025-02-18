@@ -23,7 +23,7 @@ refresh_gdal_needed = empty_method_returns_true
     bind=True,
     base=celery_app.AbortableTask
 )
-def refresh_input_chunk(self, workspace, layername, check_crs=True, overview_resampling='',
+def refresh_input_chunk(self, workspace, layername, *, uuid, check_crs=True, overview_resampling='',
                         enable_more_main_files=False, time_regex=None, slugified_time_regex=None,
                         name_input_file_by_layer=None):
     assert (time_regex is None) == (slugified_time_regex is None)
@@ -32,23 +32,23 @@ def refresh_input_chunk(self, workspace, layername, check_crs=True, overview_res
     last_change = time.time()
     num_files_saved = 0
     num_chunks_saved = 0
-    chunk_info = input_chunk.layer_file_chunk_info(workspace, layername)
+    chunk_info = input_chunk.layer_file_chunk_info(uuid)
 
     logger.debug(f'chunk_info {str(chunk_info)}')
     while not chunk_info[0]:
         if time.time() - last_change > settings.UPLOAD_MAX_INACTIVITY_TIME:
             logger.info(
                 f'UPLOAD_MAX_INACTIVITY_TIME reached {workspace}.{layername}')
-            input_file.delete_layer(workspace, layername)
+            input_file.delete_layer_by_uuid(uuid)
             raise LaymanError(22)
         time.sleep(0.5)
         if self.is_aborted():
             logger.info(f'Aborting for layer {workspace}.{layername}')
-            input_file.delete_layer(workspace, layername)
+            input_file.delete_layer_by_uuid(uuid)
             logger.info(f'Aborted for layer {workspace}.{layername}')
             raise AbortedException
 
-        chunk_info = input_chunk.layer_file_chunk_info(workspace, layername)
+        chunk_info = input_chunk.layer_file_chunk_info(uuid)
         logger.debug(f'chunk_info {str(chunk_info)}')
         if num_files_saved != chunk_info[1] \
                 or num_chunks_saved != chunk_info[2]:
@@ -57,9 +57,9 @@ def refresh_input_chunk(self, workspace, layername, check_crs=True, overview_res
             num_chunks_saved = chunk_info[2]
     logger.info(f'Layer chunks uploaded {workspace}.{layername}')
 
-    input_files = input_file.get_layer_input_files(workspace, layername)
+    input_files = input_file.get_layer_input_files(uuid)
     skip_timeseries_filename_checks = not input_files.is_one_archive
-    input_file.check_filenames(workspace, layername, input_files, check_crs, ignore_existing_files=True,
+    input_file.check_filenames(uuid, input_files, check_crs, ignore_existing_files=True,
                                enable_more_main_files=enable_more_main_files, time_regex=time_regex,
                                slugified_time_regex=slugified_time_regex,
                                name_input_file_by_layer=name_input_file_by_layer,
@@ -84,6 +84,7 @@ def refresh_input_chunk(self, workspace, layername, check_crs=True, overview_res
     base=celery_app.AbortableTask
 )
 def refresh_gdal(self, workspace, layername,
+                 uuid=None,
                  crs_id=None,
                  overview_resampling=None,
                  name_normalized_tif_by_layer=True,
@@ -119,7 +120,7 @@ def refresh_gdal(self, workspace, layername,
     input_paths = list(path['gdal'] for path in layer_info['_file']['paths'].values())
     if not name_normalized_tif_by_layer:
         timeseries_filename_mapping, _ = input_file.get_file_name_mappings(
-            input_paths, input_paths, layername, output_dir='', name_input_file_by_layer=False)
+            input_paths, input_paths, uuid, output_dir='', name_input_file_by_layer=False)
     else:
         assert len(input_paths) == 1
         timeseries_filename_mapping = None
@@ -169,11 +170,12 @@ def refresh_gdal(self, workspace, layername,
     bind=True,
     base=celery_app.AbortableTask
 )
+# pylint: disable=unused-argument
 def refresh_thumbnail(self, workspace, layername, *, uuid):
     if self.is_aborted():
         raise AbortedException
-    thumbnail.generate_layer_thumbnail(workspace, layername, uuid=uuid)
+    thumbnail.generate_layer_thumbnail(uuid)
 
     if self.is_aborted():
-        thumbnail.delete_layer(workspace, layername)
+        thumbnail.delete_layer_by_uuid(uuid)
         raise AbortedException

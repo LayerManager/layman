@@ -194,12 +194,13 @@ def refresh_wfs(
     bind=True,
     base=celery_app.AbortableTask
 )
+# pylint: disable=unused-argument
 def refresh_sld(self, workspace, layername, store_in_geoserver, *, uuid):
     if self.is_aborted():
         raise AbortedException
     if store_in_geoserver:
-        sld.ensure_custom_sld_file_if_needed(workspace, layername)
-        sld.create_layer_style(uuid=uuid, workspace=workspace, layername=layername)
+        sld.ensure_custom_sld_file_if_needed(uuid)
+        sld.create_layer_style(uuid=uuid)
 
     if self.is_aborted():
         sld.delete_layer_by_uuid(uuid=uuid)
