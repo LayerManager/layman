@@ -129,10 +129,13 @@ def post(workspace):
     name_input_file_by_layer = time_regex is None or input_files.is_one_archive
     enable_more_main_files = time_regex is not None
 
+    # register layer uuid
+    uuid_str = register_publication_uuid_to_redis(workspace, LAYER_TYPE, layername, input_uuid)
+
     # FILE NAMES
     use_chunk_upload = bool(input_files.sent_paths)
     if not (use_chunk_upload and input_files.is_one_archive) and input_files:
-        input_file.check_filenames(workspace, layername, input_files, check_crs,
+        input_file.check_filenames(uuid_str, input_files, check_crs,
                                    enable_more_main_files=enable_more_main_files, time_regex=time_regex,
                                    slugified_time_regex=slugified_time_regex,
                                    name_input_file_by_layer=name_input_file_by_layer)
@@ -167,6 +170,7 @@ def post(workspace):
     actor_name = authn.get_authn_username()
 
     task_options = {
+        'uuid': uuid_str,
         'crs_id': crs_id,
         'description': description,
         'title': title,
@@ -198,23 +202,17 @@ def post(workspace):
     layer_result = {
         'name': layername,
         'url': layerurl,
+        'uuid': uuid_str,
     }
 
     redis_util.create_lock(workspace, LAYER_TYPE, layername, request.method)
 
     try:
-        # register layer uuid
-        uuid_str = register_publication_uuid_to_redis(workspace, LAYER_TYPE, layername, input_uuid)
-        layer_result.update({
-            'uuid': uuid_str,
-        })
-        task_options.update({'uuid': uuid_str, })
-
         # save files
-        input_style.save_layer_file(workspace, layername, style_file, style_type)
+        input_style.save_layer_file(uuid_str, style_file, style_type)
         if use_chunk_upload:
             files_to_upload = input_chunk.save_layer_files_str(
-                workspace, layername, input_files, check_crs, name_input_file_by_layer=name_input_file_by_layer)
+                uuid_str, input_files, check_crs, name_input_file_by_layer=name_input_file_by_layer)
             layer_result.update({
                 'files_to_upload': files_to_upload,
             })
@@ -223,10 +221,10 @@ def post(workspace):
             })
         elif input_files:
             try:
-                input_file.save_layer_files(workspace, layername, input_files, check_crs, overview_resampling, name_input_file_by_layer=name_input_file_by_layer)
+                input_file.save_layer_files(uuid_str, input_files, check_crs, overview_resampling, name_input_file_by_layer=name_input_file_by_layer)
             except BaseException as exc:
                 delete_publication_uuid_from_redis(workspace, LAYER_TYPE, layername, uuid_str)
-                input_file.delete_layer(workspace, layername)
+                input_file.delete_layer_by_uuid(uuid_str)
                 raise exc
 
         util.post_layer(

@@ -16,18 +16,20 @@ refresh_wms_needed = empty_method_returns_true
     bind=True,
     base=celery_app.AbortableTask
 )
+# pylint: disable=unused-argument
 def refresh_wms(
         self,
         workspace,
         layername,
-        store_in_geoserver
+        store_in_geoserver,
+        uuid,
 ):
     if self.is_aborted():
         raise AbortedException
 
     if not store_in_geoserver:
-        wms.save_qgs_file(workspace, layername)
+        wms.save_qgs_file(uuid)
 
     if self.is_aborted():
-        wms.delete_layer(workspace, layername)
+        wms.delete_layer_by_uuid(uuid)
         raise AbortedException

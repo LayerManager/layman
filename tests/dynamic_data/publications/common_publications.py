@@ -7,7 +7,9 @@ from ... import PublicationValues, dynamic_data as consts, Action
 
 SMALL_LAYER = PublicationValues(
     type=process_client.LAYER_TYPE,
-    definition={},
+    definition={
+        'file_paths': ['sample/layman.layer/small_layer.geojson'],
+    },
     info_values={
         'exp_publication_detail': {
             'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196, 6269876.335616991],
@@ -38,7 +40,8 @@ SMALL_LAYER_ZIP = PublicationValues(
 SMALL_LAYER_QML = PublicationValues(
     type=process_client.LAYER_TYPE,
     definition={
-        'style_file': 'sample/style/small_layer.qml'
+        'file_paths': ['sample/layman.layer/small_layer.geojson'],
+        'style_file': 'sample/style/small_layer.qml',
     },
     info_values={
         **SMALL_LAYER.info_values,
