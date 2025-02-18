@@ -1,8 +1,5 @@
-import os
-
 from flask import Blueprint, send_file, current_app as app, g
 
-from layman.common.filesystem.util import get_workspace_dir
 from layman import LaymanError
 from layman.util import check_workspace_name_decorator
 from layman.authn import authenticate
@@ -28,9 +25,7 @@ def get(workspace, layername):
 
     thumbnail_info = thumbnail.get_layer_info(workspace, layername)
     if thumbnail_info:
-        workspace_dir = get_workspace_dir(workspace)
-        thumbnail_path = thumbnail_info['thumbnail']['path']
-        thumbnail_path = os.path.join(workspace_dir, thumbnail_path)
+        thumbnail_path = thumbnail_info['_thumbnail']['path']
         return send_file(thumbnail_path, mimetype='image/png')
 
     raise LaymanError(16, {'layername': layername})
