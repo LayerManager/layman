@@ -166,14 +166,14 @@ def patch(workspace, layername):
     use_chunk_upload = bool(input_files.sent_paths)
     if delete_from == 'layman.layer.filesystem.input_file' and input_files:
         if not (use_chunk_upload and input_files.is_one_archive):
-            input_file.check_filenames(workspace, layername, input_files,
+            input_file.check_filenames(info['uuid'], input_files,
                                        check_crs, ignore_existing_files=True, enable_more_main_files=enable_more_main_files,
                                        time_regex=time_regex, slugified_time_regex=slugified_time_regex,
                                        name_input_file_by_layer=name_input_file_by_layer)
         # file checks
         if not use_chunk_upload:
             temp_dir = tempfile.mkdtemp(prefix="layman_")
-            input_file.save_layer_files(workspace, layername, input_files, check_crs, overview_resampling, output_dir=temp_dir, name_input_file_by_layer=name_input_file_by_layer)
+            input_file.save_layer_files(info['uuid'], input_files, check_crs, overview_resampling, output_dir=temp_dir, name_input_file_by_layer=name_input_file_by_layer)
 
     if input_files.raw_paths:
         geodata_type = input_file.get_file_type(input_files.raw_or_archived_main_file_path)
@@ -225,7 +225,7 @@ def patch(workspace, layername):
         kwargs['style_type'] = style_type
         kwargs['store_in_geoserver'] = style_type.store_in_geoserver
         if style_file:
-            input_style.save_layer_file(workspace, layername, style_file, style_type, )
+            input_style.save_layer_file(info['uuid'], style_file, style_type, )
 
         kwargs.update({
             'crs_id': crs_id,
@@ -235,7 +235,7 @@ def patch(workspace, layername):
 
             if use_chunk_upload:
                 files_to_upload = input_chunk.save_layer_files_str(
-                    workspace, layername, input_files, check_crs, name_input_file_by_layer=name_input_file_by_layer)
+                    info['uuid'], input_files, check_crs, name_input_file_by_layer=name_input_file_by_layer)
                 layer_result.update({
                     'files_to_upload': files_to_upload,
                 })
@@ -243,7 +243,7 @@ def patch(workspace, layername):
                     'check_crs': check_crs,
                 })
             elif input_files:
-                shutil.move(temp_dir, input_file.get_layer_input_file_dir(workspace, layername))
+                shutil.move(temp_dir, input_file.get_layer_input_file_dir(info['uuid']))
         publications.set_wfs_wms_status(workspace, LAYER_TYPE, layername, settings.EnumWfsWmsStatus.PREPARING)
     else:
         delete_from = 'layman.layer.micka.soap'
