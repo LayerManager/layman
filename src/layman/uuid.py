@@ -19,9 +19,9 @@ def import_uuids_to_redis():
 
     infos = layman_util.get_publication_infos()
     for (workspace, publication_type, publication_name), info in infos.items():
-        register_publication_uuid(workspace, publication_type,
-                                  publication_name, info["uuid"],
-                                  ignore_duplicate=True)
+        register_publication_uuid_to_redis(workspace, publication_type,
+                                           publication_name, info["uuid"],
+                                           ignore_duplicate=True)
 
         current_app.logger.info(
             f'Import publication into redis: workspace {workspace}, type {publication_type}, name {publication_name}, uuid {info["uuid"]}')
@@ -31,7 +31,7 @@ def generate_uuid():
     return str(uuid4())
 
 
-def register_publication_uuid(workspace, publication_type, publication_name, uuid_str=None, ignore_duplicate=False):
+def register_publication_uuid_to_redis(workspace, publication_type, publication_name, uuid_str=None, ignore_duplicate=False):
     if uuid_str is None:
         uuid_str = generate_uuid()
 
@@ -77,7 +77,7 @@ def register_publication_uuid(workspace, publication_type, publication_name, uui
     return uuid_str
 
 
-def delete_publication_uuid(workspace, publication_type, publication_name, uuid_str):
+def delete_publication_uuid_from_redis(workspace, publication_type, publication_name, uuid_str):
     workspace_type_names_key = get_workspace_type_names_key(workspace, publication_type)
     uuid_metadata_key = get_uuid_metadata_key(uuid_str)
 

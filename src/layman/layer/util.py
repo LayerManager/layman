@@ -16,7 +16,7 @@ from layman.common.util import clear_publication_info as common_clear_publicatio
 from . import get_layer_sources, LAYER_TYPE, get_layer_type_def, get_layer_info_keys, LAYERNAME_PATTERN, \
     LAYERNAME_MAX_LENGTH, SAFE_PG_IDENTIFIER_PATTERN
 from .db import get_all_table_column_names, get_table_crs
-from ..uuid import delete_publication_uuid
+from ..uuid import delete_publication_uuid_from_redis
 
 FLASK_PROVIDERS_KEY = f'{__name__}:PROVIDERS'
 FLASK_SOURCES_KEY = f'{__name__}:SOURCES'
@@ -196,7 +196,7 @@ def delete_layer(workspace, layername, source=None, http_method='delete'):
         if partial_result is not None:
             result.update(partial_result)
     if source is None:
-        delete_publication_uuid(workspace, LAYER_TYPE, layername, publ_uuid)
+        delete_publication_uuid_from_redis(workspace, LAYER_TYPE, layername, publ_uuid)
     celery_util.delete_publication(workspace, LAYER_TYPE, layername)
     return result
 

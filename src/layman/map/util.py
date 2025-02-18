@@ -21,7 +21,7 @@ from . import get_map_sources, MAP_TYPE, get_map_type_def, get_map_info_keys
 from .filesystem import input_file
 from .micka import csw
 from .micka.csw import map_to_operates_on
-from ..uuid import delete_publication_uuid
+from ..uuid import delete_publication_uuid_from_redis
 
 MAPNAME_PATTERN = PUBLICATION_NAME_PATTERN
 MAPNAME_MAX_LENGTH = PUBLICATION_MAX_LENGTH
@@ -127,7 +127,7 @@ def delete_map(workspace, mapname, kwargs=None):
     publ_uuid = get_publication_uuid(workspace, MAP_TYPE, mapname)
     sources = get_sources()
     call_modules_fn(sources[::-1], 'delete_map', [workspace, mapname], kwargs=kwargs)
-    delete_publication_uuid(workspace, MAP_TYPE, mapname, publ_uuid)
+    delete_publication_uuid_from_redis(workspace, MAP_TYPE, mapname, publ_uuid)
     celery_util.delete_publication(workspace, MAP_TYPE, mapname)
 
 
