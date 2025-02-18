@@ -12,7 +12,7 @@ from layman.authz import authorize_workspace_publications_decorator
 from layman.common import redis as redis_util, rest as rest_common
 from . import util, MAP_TYPE, MAP_REST_PATH_NAME
 from .filesystem import input_file
-from ..uuid import register_publication_uuid
+from ..uuid import register_publication_uuid_to_redis
 
 bp = Blueprint('rest_workspace_maps', __name__)
 
@@ -100,7 +100,7 @@ def post(workspace):
                                           kwargs,
                                           )
         # register map uuid
-        uuid_str = register_publication_uuid(workspace, MAP_TYPE, mapname, input_uuid)
+        uuid_str = register_publication_uuid_to_redis(workspace, MAP_TYPE, mapname, input_uuid)
         kwargs['uuid'] = uuid_str
 
         map_result.update({

@@ -7,7 +7,7 @@ from layman import settings, authn, util as layman_util, uuid
 from layman.authn import authenticate, get_authn_username
 from layman.authz import authorize_workspace_publications_decorator
 from layman.common import redis as redis_util, rest as rest_common
-from layman.uuid import register_publication_uuid, delete_publication_uuid
+from layman.uuid import register_publication_uuid_to_redis, delete_publication_uuid_from_redis
 from . import util, LAYER_TYPE, LAYER_REST_PATH_NAME
 from .filesystem import input_file, input_style, input_chunk, util as fs_util
 
@@ -204,7 +204,7 @@ def post(workspace):
 
     try:
         # register layer uuid
-        uuid_str = register_publication_uuid(workspace, LAYER_TYPE, layername, input_uuid)
+        uuid_str = register_publication_uuid_to_redis(workspace, LAYER_TYPE, layername, input_uuid)
         layer_result.update({
             'uuid': uuid_str,
         })
@@ -225,7 +225,7 @@ def post(workspace):
             try:
                 input_file.save_layer_files(workspace, layername, input_files, check_crs, overview_resampling, name_input_file_by_layer=name_input_file_by_layer)
             except BaseException as exc:
-                delete_publication_uuid(workspace, LAYER_TYPE, layername, uuid_str)
+                delete_publication_uuid_from_redis(workspace, LAYER_TYPE, layername, uuid_str)
                 input_file.delete_layer(workspace, layername)
                 raise exc
 
