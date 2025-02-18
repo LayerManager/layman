@@ -129,92 +129,94 @@ def post(workspace):
     name_input_file_by_layer = time_regex is None or input_files.is_one_archive
     enable_more_main_files = time_regex is not None
 
-    # FILE NAMES
-    use_chunk_upload = bool(input_files.sent_paths)
-    if not (use_chunk_upload and input_files.is_one_archive) and input_files:
-        input_file.check_filenames(workspace, layername, input_files, check_crs,
-                                   enable_more_main_files=enable_more_main_files, time_regex=time_regex,
-                                   slugified_time_regex=slugified_time_regex,
-                                   name_input_file_by_layer=name_input_file_by_layer)
-    geodata_type = input_file.get_file_type(input_files.raw_or_archived_main_file_path) if not external_table_uri else settings.GEODATA_TYPE_VECTOR
+    # register layer uuid
+    uuid_str = register_publication_uuid_to_redis(workspace, LAYER_TYPE, layername, input_uuid)
 
-    # TITLE
-    if len(request.form.get('title', '')) > 0:
-        title = request.form['title']
-    else:
-        title = layername
+    try:
+        # FILE NAMES
+        use_chunk_upload = bool(input_files.sent_paths)
+        if not (use_chunk_upload and input_files.is_one_archive) and input_files:
+            input_file.check_filenames(uuid_str, input_files, check_crs,
+                                       enable_more_main_files=enable_more_main_files, time_regex=time_regex,
+                                       slugified_time_regex=slugified_time_regex,
+                                       name_input_file_by_layer=name_input_file_by_layer)
+        geodata_type = input_file.get_file_type(input_files.raw_or_archived_main_file_path) if not external_table_uri else settings.GEODATA_TYPE_VECTOR
 
-    # DESCRIPTION
-    description = request.form.get('description')
+        # TITLE
+        if len(request.form.get('title', '')) > 0:
+            title = request.form['title']
+        else:
+            title = layername
 
-    # Style
-    style_file = None
-    if 'style' in request.files and not request.files['style'].filename == '':
-        style_file = request.files['style']
-    style_type = input_style.get_style_type_from_file_storage(style_file)
+        # DESCRIPTION
+        description = request.form.get('description')
 
-    if geodata_type == settings.GEODATA_TYPE_RASTER and style_type.code == 'qml':
-        raise LaymanError(48, f'Raster layers are not allowed to have QML style.')
+        # Style
+        style_file = None
+        if 'style' in request.files and not request.files['style'].filename == '':
+            style_file = request.files['style']
+        style_type = input_style.get_style_type_from_file_storage(style_file)
 
-    # Overview resampling
-    overview_resampling = request.form.get('overview_resampling', '')
-    if overview_resampling and overview_resampling not in settings.OVERVIEW_RESAMPLING_METHOD_LIST:
-        raise LaymanError(2, {'expected': 'Resampling method for gdaladdo utility, https://gdal.org/en/stable/programs/gdaladdo.html',
-                              'parameter': 'overview_resampling',
-                              'detail': {'found': 'no_overview_resampling',
-                                         'supported_values': settings.OVERVIEW_RESAMPLING_METHOD_LIST}, })
+        if geodata_type == settings.GEODATA_TYPE_RASTER and style_type.code == 'qml':
+            raise LaymanError(48, f'Raster layers are not allowed to have QML style.')
 
-    actor_name = authn.get_authn_username()
+        # Overview resampling
+        overview_resampling = request.form.get('overview_resampling', '')
+        if overview_resampling and overview_resampling not in settings.OVERVIEW_RESAMPLING_METHOD_LIST:
+            raise LaymanError(2, {'expected': 'Resampling method for gdaladdo utility, https://gdal.org/en/stable/programs/gdaladdo.html',
+                                  'parameter': 'overview_resampling',
+                                  'detail': {'found': 'no_overview_resampling',
+                                             'supported_values': settings.OVERVIEW_RESAMPLING_METHOD_LIST}, })
 
-    task_options = {
-        'crs_id': crs_id,
-        'description': description,
-        'title': title,
-        'check_crs': False,
-        'actor_name': actor_name,
-        'style_type': style_type,
-        'store_in_geoserver': style_type.store_in_geoserver,
-        'overview_resampling': overview_resampling,
-        'geodata_type': geodata_type,
-        'time_regex': time_regex,
-        'slugified_time_regex': slugified_time_regex,
-        'slugified_time_regex_format': slugified_time_regex_format,
-        'image_mosaic': time_regex is not None,
-        'name_normalized_tif_by_layer': name_normalized_tif_by_layer,
-        'name_input_file_by_layer': name_input_file_by_layer,
-        'enable_more_main_files': enable_more_main_files,
-        'external_table_uri': external_table_uri,
-        'original_data_source': settings.EnumOriginalDataSource.TABLE.value if external_table_uri else settings.EnumOriginalDataSource.FILE.value,
-    }
+        actor_name = authn.get_authn_username()
 
-    rest_common.setup_post_access_rights(request.form, task_options, actor_name)
-    util.pre_publication_action_check(workspace,
-                                      layername,
-                                      task_options,
-                                      )
+        task_options = {
+            'uuid': uuid_str,
+            'crs_id': crs_id,
+            'description': description,
+            'title': title,
+            'check_crs': False,
+            'actor_name': actor_name,
+            'style_type': style_type,
+            'store_in_geoserver': style_type.store_in_geoserver,
+            'overview_resampling': overview_resampling,
+            'geodata_type': geodata_type,
+            'time_regex': time_regex,
+            'slugified_time_regex': slugified_time_regex,
+            'slugified_time_regex_format': slugified_time_regex_format,
+            'image_mosaic': time_regex is not None,
+            'name_normalized_tif_by_layer': name_normalized_tif_by_layer,
+            'name_input_file_by_layer': name_input_file_by_layer,
+            'enable_more_main_files': enable_more_main_files,
+            'external_table_uri': external_table_uri,
+            'original_data_source': settings.EnumOriginalDataSource.TABLE.value if external_table_uri else settings.EnumOriginalDataSource.FILE.value,
+        }
+
+        rest_common.setup_post_access_rights(request.form, task_options, actor_name)
+        util.pre_publication_action_check(workspace,
+                                          layername,
+                                          task_options,
+                                          )
+    except BaseException as exc:
+        delete_publication_uuid_from_redis(workspace, LAYER_TYPE, layername, uuid_str)
+        raise exc
 
     layerurl = url_for('rest_workspace_layer.get', layername=layername, workspace=workspace, x_forwarded_items=x_forwarded_items)
 
     layer_result = {
         'name': layername,
         'url': layerurl,
+        'uuid': uuid_str,
     }
 
     redis_util.create_lock(workspace, LAYER_TYPE, layername, request.method)
 
     try:
-        # register layer uuid
-        uuid_str = register_publication_uuid_to_redis(workspace, LAYER_TYPE, layername, input_uuid)
-        layer_result.update({
-            'uuid': uuid_str,
-        })
-        task_options.update({'uuid': uuid_str, })
-
         # save files
-        input_style.save_layer_file(workspace, layername, style_file, style_type)
+        input_style.save_layer_file(uuid_str, style_file, style_type)
         if use_chunk_upload:
             files_to_upload = input_chunk.save_layer_files_str(
-                workspace, layername, input_files, check_crs, name_input_file_by_layer=name_input_file_by_layer)
+                uuid_str, input_files, check_crs, name_input_file_by_layer=name_input_file_by_layer)
             layer_result.update({
                 'files_to_upload': files_to_upload,
             })
@@ -223,10 +225,10 @@ def post(workspace):
             })
         elif input_files:
             try:
-                input_file.save_layer_files(workspace, layername, input_files, check_crs, overview_resampling, name_input_file_by_layer=name_input_file_by_layer)
+                input_file.save_layer_files(uuid_str, input_files, check_crs, overview_resampling, name_input_file_by_layer=name_input_file_by_layer)
             except BaseException as exc:
                 delete_publication_uuid_from_redis(workspace, LAYER_TYPE, layername, uuid_str)
-                input_file.delete_layer(workspace, layername)
+                input_file.delete_layer_by_uuid(uuid_str)
                 raise exc
 
         util.post_layer(

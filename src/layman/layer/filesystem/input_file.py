@@ -10,8 +10,10 @@ from osgeo import ogr
 from layman.http import LaymanError
 from layman import settings, patch_mode
 from layman.common import empty_method, empty_method_returns_dict
-from layman.common.filesystem import util as common_util, input_file as common
+from layman.common.filesystem import input_file as common
 from . import util, gdal as fs_gdal
+from .. import LAYER_TYPE
+from ...util import get_publication_uuid
 
 LAYER_SUBDIR = __name__.rsplit('.', maxsplit=1)[-1]
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
@@ -25,20 +27,25 @@ patch_layer = empty_method
 get_metadata_comparison = empty_method_returns_dict
 
 
-def get_layer_input_file_dir(workspace, layername):
-    resumable_dir = os.path.join(util.get_layer_dir(workspace, layername),
-                                 LAYER_SUBDIR)
+def get_layer_input_file_dir(publ_uuid):
+    resumable_dir = os.path.join(util.get_layer_dir(publ_uuid), LAYER_SUBDIR)
     return resumable_dir
 
 
-def ensure_layer_input_file_dir(workspace, layername):
-    input_file_dir = get_layer_input_file_dir(workspace, layername)
+def ensure_layer_input_file_dir(publ_uuid):
+    input_file_dir = get_layer_input_file_dir(publ_uuid)
     pathlib.Path(input_file_dir).mkdir(parents=True, exist_ok=True)
     return input_file_dir
 
 
 def delete_layer(workspace, layername):
-    util.delete_layer_subdir(workspace, layername, LAYER_SUBDIR)
+    publ_uuid = get_publication_uuid(workspace, LAYER_TYPE, layername)
+    if publ_uuid:
+        delete_layer_by_uuid(publ_uuid)
+
+
+def delete_layer_by_uuid(publ_uuid):
+    util.delete_layer_subdir(publ_uuid, LAYER_SUBDIR)
 
 
 def get_compressed_main_file_extension(filepath):
@@ -46,30 +53,35 @@ def get_compressed_main_file_extension(filepath):
     return file_ext if file_ext in settings.COMPRESSED_FILE_EXTENSIONS else None
 
 
-def get_layer_input_files(workspace, layername):
-    input_file_dir = get_layer_input_file_dir(workspace, layername)
+def get_layer_input_files(publ_uuid):
+    input_file_dir = get_layer_input_file_dir(publ_uuid)
     pattern = os.path.join(input_file_dir, '*.*')
     filepaths = sorted(glob.glob(pattern))
     return util.InputFiles(saved_paths=filepaths)
 
 
 def get_layer_info(workspace, layername):
-    input_files = get_layer_input_files(workspace, layername, )
+    publ_uuid = get_publication_uuid(workspace, LAYER_TYPE, layername)
+    return get_layer_info_by_uuid(publ_uuid) if publ_uuid else {}
+
+
+def get_layer_info_by_uuid(publ_uuid):
+    input_files = get_layer_input_files(publ_uuid)
 
     if input_files.saved_paths:
         # input_files.raw_or_archived_main_file_path is None if user sent ZIP file by chunks without main file inside
         main_file_path = input_files.raw_or_archived_main_file_path or input_files.saved_paths[0]
-        rel_main_filepath = os.path.relpath(main_file_path, common_util.get_workspace_dir(workspace))
+        rel_main_filepath = os.path.relpath(main_file_path, settings.LAYMAN_DATA_DIR)
         main_files = input_files.raw_or_archived_main_file_paths or input_files.saved_paths
         file_type = get_file_type(rel_main_filepath)
         result = {
             'file': {
-                'paths': [os.path.relpath(filepath, common_util.get_workspace_dir(workspace)) for filepath in main_files],
+                'paths': [os.path.relpath(filepath, settings.LAYMAN_DATA_DIR) for filepath in main_files],
             },
             '_file': {
                 'file_type': file_type,
                 'paths': {
-                    slugify_timeseries_filename(os.path.splitext(os.path.basename(main_file))[0]) if len(main_files) > 1 else layername:
+                    slugify_timeseries_filename(os.path.splitext(os.path.basename(main_file))[0]) if len(main_files) > 1 else publ_uuid:
                     {
                         'absolute': main_file,
                         'gdal': main_file if input_files.archive_type is None
@@ -229,7 +241,7 @@ def check_duplicate_mapped_filenames(filenames_mapping):
                           )
 
 
-def check_filenames(workspace, layername, input_files, check_crs, *, ignore_existing_files=False,
+def check_filenames(publ_uuid, input_files, check_crs, *, ignore_existing_files=False,
                     enable_more_main_files=False, time_regex=None, slugified_time_regex=None,
                     name_input_file_by_layer=None, skip_timeseries_filename_checks=False):
     assert name_input_file_by_layer is not None
@@ -316,10 +328,10 @@ def check_filenames(workspace, layername, input_files, check_crs, *, ignore_exis
                 detail['suggestion'] = 'Missing .prj file can be fixed also ' \
                                        'by setting "crs" parameter.'
             raise LaymanError(18, detail)
-    input_file_dir = get_layer_input_file_dir(workspace, layername)
+    input_file_dir = get_layer_input_file_dir(publ_uuid)
     main_files_or_zip_list = main_filenames if not input_files.is_one_archive else input_files.raw_paths_to_archives
     raw_filename_mapping, _ = get_file_name_mappings(
-        input_files.raw_paths, main_files_or_zip_list, layername, input_file_dir,
+        input_files.raw_paths, main_files_or_zip_list, publ_uuid, input_file_dir,
         name_input_file_by_layer=name_input_file_by_layer
     )
 
@@ -328,7 +340,7 @@ def check_filenames(workspace, layername, input_files, check_crs, *, ignore_exis
         # timeseries files are in one ZIP file, so check main file names inside ZIP file instead of raw file names
         # we can check only main files, because other files are not extracted
         archived_main_filename_mapping, _ = get_file_name_mappings(
-            input_files.archived_main_file_paths, input_files.archived_main_file_paths, layername, input_file_dir,
+            input_files.archived_main_file_paths, input_files.archived_main_file_paths, publ_uuid, input_file_dir,
             name_input_file_by_layer=False)
         filenames_to_check = {
             (os.path.relpath(k, input_file_dir) if k.startswith(input_file_dir) else k): v
@@ -404,14 +416,14 @@ def check_filenames(workspace, layername, input_files, check_crs, *, ignore_exis
             raise LaymanError(3, conflict_paths)
 
 
-def save_layer_files(workspace, layername, input_files, check_crs, overview_resampling, *, output_dir=None, name_input_file_by_layer=True):
+def save_layer_files(publ_uuid, input_files, check_crs, overview_resampling, *, output_dir=None, name_input_file_by_layer=True):
     if input_files.is_one_archive:
         main_filenames = input_files.raw_paths_to_archives
     else:
         main_filenames = input_files.raw_or_archived_main_file_paths
-    output_dir = output_dir or ensure_layer_input_file_dir(workspace, layername)
+    output_dir = output_dir or ensure_layer_input_file_dir(publ_uuid)
     _, filepath_mapping = get_file_name_mappings(
-        input_files.raw_paths, main_filenames, layername, output_dir, name_input_file_by_layer=name_input_file_by_layer
+        input_files.raw_paths, main_filenames, publ_uuid, output_dir, name_input_file_by_layer=name_input_file_by_layer
     )
 
     common.save_files(input_files.sent_streams, filepath_mapping)
@@ -445,7 +457,7 @@ def get_unsafe_layername(input_files):
     return unsafe_layername
 
 
-def get_file_name_mappings(file_names, main_file_names, layer_name, output_dir, *, name_input_file_by_layer=True):
+def get_file_name_mappings(file_names, main_file_names, publ_uuid, output_dir, *, name_input_file_by_layer=True):
     main_file_names = [os.path.splitext(main_file_name)[0] for main_file_name in main_file_names]
     filename_mapping = {}
     filepath_mapping = {}
@@ -453,7 +465,7 @@ def get_file_name_mappings(file_names, main_file_names, layer_name, output_dir, 
         main_file_name = next(iter(main_file_name for main_file_name in main_file_names if file_name.startswith(main_file_name + '.')), None)
         if main_file_name:
             if name_input_file_by_layer:
-                new_filename = layer_name + file_name[len(main_file_name):].lower()
+                new_filename = publ_uuid + file_name[len(main_file_name):].lower()
             else:
                 new_filename = slugify_timeseries_filename(os.path.basename(file_name))
             filepath_mapping[file_name] = os.path.join(output_dir, new_filename)
