@@ -34,19 +34,19 @@ def extent_to_xml_string(extent):
     ])
 
 
-def get_original_style_path(workspace, layer):
-    return input_style.get_file_path(workspace, layer)
+def get_original_style_path(publ_uuid):
+    return input_style.get_file_path(publ_uuid)
 
 
-def get_original_style_xml(workspace, layer):
-    style_path = get_original_style_path(workspace, layer)
+def get_original_style_xml(publ_uuid):
+    style_path = get_original_style_path(publ_uuid)
     parser = ET.XMLParser(remove_blank_text=True)
     qml_xml = ET.parse(style_path, parser=parser)
     return qml_xml
 
 
-def get_layer_original_style_stream(workspace, layer):
-    style_path = get_original_style_path(workspace, layer)
+def get_layer_original_style_stream(publ_uuid):
+    style_path = get_original_style_path(publ_uuid)
     if style_path and os.path.exists(style_path):
         with open(style_path, 'r', encoding="utf-8") as style_file:
             style = style_file.read()
@@ -149,8 +149,8 @@ def fill_project_template(layer, layer_uuid, layer_qml, crs, epsg_codes, extent,
     )
 
 
-def get_layer_wms_crs_list_values(workspace, layer):
-    file_path = wms.get_layer_file_path(workspace, layer)
+def get_layer_wms_crs_list_values(publ_uuid):
+    file_path = wms.get_layer_file_path(publ_uuid)
     tree = ET.parse(file_path)
     crs_elements = tree.xpath("/qgis/properties/WMSCrsList")
     assert len(crs_elements) == 1
@@ -318,8 +318,8 @@ def get_attribute_names_from_qgs(qgs):
     return result
 
 
-def get_layer_attribute_names(workspace, layer):
-    qgs_path = wms.get_layer_file_path(workspace, layer)
+def get_layer_attribute_names(publ_uuid):
+    qgs_path = wms.get_layer_file_path(publ_uuid)
     parser = ET.XMLParser(remove_blank_text=True)
     qgs_xml = ET.parse(qgs_path, parser=parser)
     return get_attribute_names_from_qgs(qgs_xml)

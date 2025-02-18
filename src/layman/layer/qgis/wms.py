@@ -3,6 +3,7 @@ from owslib.wms import WebMapService
 
 from layman import patch_mode, settings, util as layman_util
 from layman.common import bbox as bbox_util, empty_method, empty_method_returns_dict
+from layman.util import get_publication_uuid, _get_publication_by_uuid
 from . import util, LAYER_TYPE
 from .. import db, qgis
 
@@ -16,7 +17,13 @@ patch_layer = empty_method
 
 
 def get_layer_info(workspace, layername, *, x_forwarded_items=None):
-    input_file_dir = qgis.get_layer_dir(workspace, layername)
+    publ_uuid = get_publication_uuid(workspace, LAYER_TYPE, layername)
+    return get_layer_info_by_uuid(publ_uuid, x_forwarded_items=x_forwarded_items, layername=layername,
+                                  workspace=workspace) if publ_uuid else {}
+
+
+def get_layer_info_by_uuid(publ_uuid, *, workspace, layername, x_forwarded_items=None):
+    input_file_dir = qgis.get_layer_dir(publ_uuid)
     result = {}
     if os.path.exists(input_file_dir):
         url = layman_util.url_for('rest_workspace_layer_style.get', workspace=workspace, layername=layername, x_forwarded_items=x_forwarded_items)
@@ -27,14 +34,20 @@ def get_layer_info(workspace, layername, *, x_forwarded_items=None):
                 'type': 'qml',
             },
             '_wms': {
-                'qgis_capabilities_url': get_layer_capabilities_url(workspace, layername),
+                'qgis_capabilities_url': get_layer_capabilities_url(publ_uuid),
             }
         }
     return result
 
 
 def delete_layer(workspace, layername):
-    style_stream = util.get_layer_original_style_stream(workspace, layername)
+    publ_uuid = get_publication_uuid(workspace, LAYER_TYPE, layername)
+    if publ_uuid:
+        delete_layer_by_uuid(publ_uuid)
+
+
+def delete_layer_by_uuid(publ_uuid):
+    style_stream = util.get_layer_original_style_stream(publ_uuid)
     if style_stream:
         result = {
             'style': {
@@ -43,37 +56,30 @@ def delete_layer(workspace, layername):
         }
     else:
         result = {}
-    qgis.delete_layer_dir(workspace, layername)
+    qgis.delete_layer_dir(publ_uuid)
     return result
 
 
-def get_layer_capabilities_url(workspace, layer):
-    url = f'{settings.LAYMAN_QGIS_URL}?SERVICE=WMS&REQUEST=GetCapabilities&VERSION={VERSION}&map={get_layer_file_path(workspace, layer)}'
+def get_layer_capabilities_url(publ_uuid):
+    url = f'{settings.LAYMAN_QGIS_URL}?SERVICE=WMS&REQUEST=GetCapabilities&VERSION={VERSION}&map={get_layer_file_path(publ_uuid)}'
     return url
 
 
-def get_layer_file_path(workspace, layer):
-    return os.path.join(qgis.get_layer_dir(workspace, layer), f'{layer}.qgis')
+def get_layer_file_path(publ_uuid):
+    return os.path.join(qgis.get_layer_dir(publ_uuid), f'{publ_uuid}.qgis')
 
 
-def save_qgs_file(workspace, layer):
-    layer_uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layer)
-    save_qgs_file_by_uuid(layer_uuid=layer_uuid)
-
-
-def save_qgs_file_by_uuid(*, layer_uuid):
-    info = layman_util.get_publication_info_by_uuid(layer_uuid, {'keys': ['native_bounding_box', 'table_uri']})
-
-    # pylint: disable=protected-access
-    workspace, _, layer = layman_util._get_publication_by_uuid(layer_uuid)
-    qgis.ensure_layer_dir(workspace, layer)
+def save_qgs_file(publ_uuid):
+    info = layman_util.get_publication_info_by_uuid(publ_uuid, {'keys': ['native_bounding_box', 'table_uri']})
+    _, _, layer = _get_publication_by_uuid(publ_uuid)
+    qgis.ensure_layer_dir(publ_uuid)
     real_bbox = info['native_bounding_box']
     crs = info['native_crs']
     table_uri = info['_table_uri']
     table_name = table_uri.table
     db_schema = table_uri.schema
     layer_bbox = bbox_util.get_bbox_to_publish(real_bbox, crs)
-    qml = util.get_original_style_xml(workspace, layer)
+    qml = util.get_original_style_xml(publ_uuid)
     db_types = db.get_geometry_types(db_schema, table_name, column_name=table_uri.geo_column, uri_str=table_uri.db_uri_str)
     qml_geometry = util.get_geometry_from_qml_and_db_types(qml, db_types)
     db_cols = [
@@ -82,19 +88,19 @@ def save_qgs_file_by_uuid(*, layer_uuid):
     ]
     source_type = util.get_source_type(db_types, qml_geometry)
     column_srid = db.get_column_srid(db_schema, table_name, table_uri.geo_column, uri_str=table_uri.db_uri_str)
-    layer_qml = util.fill_layer_template(layer, layer_uuid, layer_bbox, crs, qml, source_type, db_cols, table_uri,
+    layer_qml = util.fill_layer_template(layer, publ_uuid, layer_bbox, crs, qml, source_type, db_cols, table_uri,
                                          column_srid, db_types)
-    qgs_str = util.fill_project_template(layer, layer_uuid, layer_qml, crs, settings.LAYMAN_OUTPUT_SRS_LIST,
+    qgs_str = util.fill_project_template(layer, publ_uuid, layer_qml, crs, settings.LAYMAN_OUTPUT_SRS_LIST,
                                          layer_bbox, source_type, table_uri, column_srid)
-    with open(get_layer_file_path(workspace, layer), "w", encoding="utf-8") as qgs_file:
+    with open(get_layer_file_path(publ_uuid), "w", encoding="utf-8") as qgs_file:
         print(qgs_str, file=qgs_file)
 
 
-def get_style_qml(workspace, layer):
+def get_style_qml(publ_uuid):
     style_template_file = util.get_style_template_path()
     layer_template_file = util.get_layer_template_path()
-    layer_project_file = get_layer_file_path(workspace, layer)
-    original_qml = util.get_original_style_path(workspace, layer)
+    layer_project_file = get_layer_file_path(publ_uuid)
+    original_qml = util.get_original_style_path(publ_uuid)
     return util.get_current_style_xml(style_template_file, layer_template_file, layer_project_file, original_qml)
 
 
@@ -104,6 +110,6 @@ def wms_direct(wms_url, xml=None, version=None, headers=None):
     return result_wms
 
 
-def get_wms_capabilities(workspace=None, layer=None, headers=None):
-    wms_url = get_layer_capabilities_url(workspace, layer)
+def get_wms_capabilities(publ_uuid, headers=None):
+    wms_url = get_layer_capabilities_url(publ_uuid)
     return wms_direct(wms_url, headers=headers)

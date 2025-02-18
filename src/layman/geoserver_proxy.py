@@ -108,7 +108,7 @@ def ensure_wfs_t_attributes(attribs):
                                                         )['_style_type'] == 'qml'
         }
         for layer_uuid in qgis_changed_layers:
-            qgis_wms.save_qgs_file_by_uuid(layer_uuid=layer_uuid)
+            qgis_wms.save_qgs_file(layer_uuid)
         gs_reset(settings.LAYMAN_GS_AUTH)
 
 
