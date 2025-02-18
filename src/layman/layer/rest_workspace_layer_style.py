@@ -39,8 +39,6 @@ def get(workspace, layername):
                                   headers)
         result = final_response
     elif style_type == 'qml':
-        response_qml = qgis_wms.get_style_qml(workspace,
-                                              layername,
-                                              )
+        response_qml = qgis_wms.get_style_qml(uuid)
         result = Response(response_qml, mimetype='application/x-qgis-layer-settings')
     return result
