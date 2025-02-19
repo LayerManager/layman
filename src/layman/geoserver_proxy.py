@@ -13,8 +13,7 @@ import crs as crs_def
 from geoserver.util import reset as gs_reset
 from layman import authn, authz, settings, util as layman_util, LaymanError, names
 from layman.authn import authenticate, is_user_with_name
-from layman.layer import db, LAYER_TYPE
-from layman.layer.geoserver import wms as gs_wms
+from layman.layer import db
 from layman.layer.qgis import wms as qgis_wms
 from layman.layer.util import patch_after_feature_change
 from layman.util import WORKSPACE_NAME_ONLY_PATTERN
@@ -258,9 +257,9 @@ def proxy(subpath):
         layers = [layer if len(layer) == 2 else [url_workspace] + layer for layer in layers]
         fix_params = False
         for geoserver_workspace, layer in layers:
-            workspace = gs_wms.get_layman_workspace(geoserver_workspace)
-            publ_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, {'keys': ['native_crs',
-                                                                                                 'style_type']})
+            uuid = names.geoserver_layername_to_uuid(geoserver_workspace=geoserver_workspace, geoserver_name=layer)
+            publ_info = layman_util.get_publication_info_by_uuid(uuid=uuid, context={'keys': ['native_crs',
+                                                                                              'style_type']})
             if publ_info and publ_info.get('native_crs') == crs_def.EPSG_5514 and publ_info.get('_style_type') == 'sld':
                 fix_params = True
                 break
