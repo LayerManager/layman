@@ -35,9 +35,9 @@ def get_flask_proxy_key():
     return FLASK_PROXY_KEY.format(workspace=workspace)
 
 
-def patch_layer_by_uuid(*, uuid, gdal_layername, gdal_workspace, db_schema, original_data_source, title, description, access_rights=None):
+def patch_layer_by_uuid(*, uuid, db_schema, original_data_source, title, description, access_rights=None):
     gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wms
-    if not get_layer_info_by_uuid(uuid=uuid, gdal_layername=gdal_layername, gdal_workspace=gdal_workspace,):
+    if not get_layer_info_by_uuid(uuid=uuid):
         return
     info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['style_type', 'geodata_type', 'image_mosaic'], })
     geodata_type = info['geodata_type']
@@ -70,8 +70,6 @@ def patch_layer_by_uuid(*, uuid, gdal_layername, gdal_workspace, db_schema, orig
 # pylint: disable=unused-argument
 def patch_layer(workspace, layername, *, uuid, title, description, original_data_source, access_rights=None):
     patch_layer_by_uuid(uuid=uuid,
-                        gdal_layername=layername,
-                        gdal_workspace=workspace,
                         db_schema=workspace,
                         title=title,
                         description=description,
@@ -193,10 +191,10 @@ def get_timeregex_props(layer_dir):
 
 def get_layer_info(workspace, layername, *, x_forwarded_items=None):
     uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layername)
-    return get_layer_info_by_uuid(uuid=uuid, gdal_layername=layername, gdal_workspace=workspace, x_forwarded_items=x_forwarded_items)
+    return get_layer_info_by_uuid(uuid=uuid, x_forwarded_items=x_forwarded_items)
 
 
-def get_layer_info_by_uuid(*, uuid, gdal_layername, gdal_workspace, x_forwarded_items=None):
+def get_layer_info_by_uuid(*, uuid, x_forwarded_items=None):
     gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wms
     if uuid is None:
         return {}
@@ -210,7 +208,7 @@ def get_layer_info_by_uuid(*, uuid, gdal_layername, gdal_workspace, x_forwarded_
                                                           get_image_mosaic_store_name(uuid=uuid),
                                                           gs_layername.name)
         if granules_json:
-            gdal_layer_dir = gdal.get_normalized_raster_layer_dir(gdal_workspace, gdal_layername)
+            gdal_layer_dir = gdal.get_normalized_raster_layer_dir(uuid)
             time_info = {
                 **image_mosaic_granules_to_wms_time_key(granules_json),
                 **get_timeregex_props(gdal_layer_dir),

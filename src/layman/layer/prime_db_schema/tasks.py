@@ -24,6 +24,7 @@ def refresh_file_data(
         self,
         username,
         layername,
+        uuid,
 ):
     if self.is_aborted():
         raise AbortedException
@@ -45,8 +46,8 @@ def refresh_file_data(
         bbox = db_get_bbox(table_uri.schema, table_uri.table, uri_str=table_uri.db_uri_str, column=table_uri.geo_column)
         crs = get_table_crs(table_uri.schema, table_uri.table, uri_str=table_uri.db_uri_str, column=table_uri.geo_column, use_internal_srid=True)
     elif geodata_type == settings.GEODATA_TYPE_RASTER:
-        bbox = gdal_get_bbox(username, layername)
-        crs = gdal_get_crs(username, layername)
+        bbox = gdal_get_bbox(uuid)
+        crs = gdal_get_crs(uuid)
     else:
         raise NotImplementedError(f"Unknown geodata type: {geodata_type}")
 

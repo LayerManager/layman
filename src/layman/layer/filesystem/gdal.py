@@ -7,23 +7,29 @@ from lxml import etree as ET
 from osgeo import gdal, gdalconst, osr
 from layman import patch_mode, settings, LaymanError
 from layman.common import empty_method, empty_method_returns_dict
+from layman.layer import LAYER_TYPE
+from layman.util import get_publication_uuid
 from . import input_file, util
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 logger = logging.getLogger(__name__)
 
 
-def get_layer_info(workspace, layer, *, extra_keys=None):
+def get_layer_info(workspace, layername, *, extra_keys=None):
+    publ_uuid = get_publication_uuid(workspace, LAYER_TYPE, layername)
+    return get_layer_info_by_uuid(publ_uuid, extra_keys=extra_keys) if publ_uuid else {}
+
+
+def get_layer_info_by_uuid(publ_uuid, *, extra_keys=None):
     extra_keys = extra_keys or []
-    gdal_paths = get_normalized_raster_layer_main_filepaths(workspace, layer)
-    gs_directory = get_normalized_raster_layer_dir(workspace, layer, geoserver=True)
+    gdal_paths = get_normalized_raster_layer_main_filepaths(publ_uuid)
+    gs_directory = get_normalized_raster_layer_dir(publ_uuid, geoserver=True)
     result = {}
     if len(gdal_paths) > 0:
         result = {
-            'name': layer,
             '_file': {
                 'paths': {
-                    os.path.splitext(os.path.basename(gdal_path))[0] if len(gdal_paths) > 1 else layer:
+                    os.path.splitext(os.path.basename(gdal_path))[0] if len(gdal_paths) > 1 else publ_uuid:
                     {
                         'normalized_absolute': gdal_path,
                         'normalized_geoserver': os.path.join(gs_directory, os.path.basename(gdal_path)),
@@ -33,7 +39,7 @@ def get_layer_info(workspace, layer, *, extra_keys=None):
             }
         }
         file_dict = result['_file']
-        input_file_gdal_path = next(iter(input_file.get_layer_info(workspace, layer)['_file']['paths'].values()))['gdal']
+        input_file_gdal_path = next(iter(input_file.get_layer_info_by_uuid(publ_uuid)['_file']['paths'].values()))['gdal']
         if '_file.color_interpretations' in extra_keys:
             file_dict['color_interpretations'] = get_color_interpretations(input_file_gdal_path)
         if '_file.mask_flags' in extra_keys:
@@ -64,8 +70,14 @@ patch_layer = empty_method
 
 
 def delete_layer(workspace, layername):
+    publ_uuid = get_publication_uuid(workspace, LAYER_TYPE, layername)
+    if publ_uuid:
+        delete_layer_by_uuid(publ_uuid)
+
+
+def delete_layer_by_uuid(publ_uuid):
     try:
-        shutil.rmtree(get_normalized_raster_layer_dir(workspace, layername))
+        shutil.rmtree(get_normalized_raster_layer_dir(publ_uuid))
     except FileNotFoundError:
         pass
 
@@ -404,39 +416,28 @@ def add_overview_async(*, filepath, overview_resampling,):
     return process
 
 
-def get_normalized_raster_workspace_dir(workspace, *, geoserver=False):
+def get_normalized_raster_layer_dir(publ_uuid, *, geoserver=False):
     base_path = settings.LAYMAN_NORMALIZED_RASTER_DATA_DIR if not geoserver else settings.LAYMAN_NORMALIZED_RASTER_DATA_DIR_NAME
-    return os.path.join(base_path, 'workspaces', workspace)
+    return os.path.join(base_path, 'layers', publ_uuid)
 
 
-def get_normalized_raster_layer_dir(workspace, layer, *, geoserver=False):
-    return os.path.join(get_normalized_raster_workspace_dir(workspace, geoserver=geoserver), 'layers', layer)
-
-
-def get_normalized_raster_layer_main_filepaths(workspace, layer, *, geoserver=False):
-    dir_path = get_normalized_raster_layer_dir(workspace, layer, geoserver=geoserver)
+def get_normalized_raster_layer_main_filepaths(publ_uuid, *, geoserver=False):
+    dir_path = get_normalized_raster_layer_dir(publ_uuid, geoserver=geoserver)
     pattern = os.path.join(dir_path, '*.tif')
     filepaths = sorted(glob.glob(pattern))
     return filepaths
 
 
-def get_normalized_raster_layer_main_filepath(workspace, layer, *, source_file):
-    dir_path = get_normalized_raster_layer_dir(workspace, layer, )
+def get_normalized_raster_layer_main_filepath(publ_uuid, *, source_file):
+    dir_path = get_normalized_raster_layer_dir(publ_uuid)
     basename = os.path.basename(source_file)
     file_name = os.path.splitext(basename)
     return os.path.join(dir_path, file_name[0] + '.tif')
 
 
-def ensure_normalized_raster_layer_dir(workspace, layer):
-    gdal_dir = get_normalized_raster_layer_dir(workspace, layer)
+def ensure_normalized_raster_layer_dir(publ_uuid):
+    gdal_dir = get_normalized_raster_layer_dir(publ_uuid)
     os.makedirs(gdal_dir, exist_ok=True)
-
-
-def delete_normalized_raster_workspace(workspace):
-    try:
-        os.rmdir(get_normalized_raster_workspace_dir(workspace))
-    except FileNotFoundError:
-        pass
 
 
 def get_bbox_from_file(filepath):
@@ -461,14 +462,14 @@ def get_bbox_from_files(filepaths):
     return result
 
 
-def get_bbox(workspace, layer):
-    filepaths = get_normalized_raster_layer_main_filepaths(workspace, layer)
+def get_bbox(publ_uuid):
+    filepaths = get_normalized_raster_layer_main_filepaths(publ_uuid)
     result = get_bbox_from_files(filepaths)
     return result
 
 
-def get_crs(workspace, layer):
-    filepath = get_normalized_raster_layer_main_filepaths(workspace, layer)[0]
+def get_crs(publ_uuid):
+    filepath = get_normalized_raster_layer_main_filepaths(publ_uuid)[0]
     data = open_raster_file(filepath, gdalconst.GA_ReadOnly)
     spatial_reference = osr.SpatialReference(wkt=data.GetProjection())
     auth_name = spatial_reference.GetAttrValue('AUTHORITY')
@@ -477,8 +478,8 @@ def get_crs(workspace, layer):
     return crs
 
 
-def get_normalized_ground_sample_distance_in_m(workspace, layer, *, bbox_size):
-    filepath = get_normalized_raster_layer_main_filepaths(workspace, layer)[0]
+def get_normalized_ground_sample_distance_in_m(publ_uuid, *, bbox_size):
+    filepath = get_normalized_raster_layer_main_filepaths(publ_uuid)[0]
     raster_size = get_raster_size(filepath)
     pixel_size = [bbox_size / raster_size[idx] for (idx, bbox_size) in enumerate(bbox_size)]
     distance_value = sum(pixel_size) / len(pixel_size)
