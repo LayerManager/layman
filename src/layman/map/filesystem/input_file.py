@@ -4,9 +4,10 @@ import pathlib
 from urllib.parse import unquote
 
 from layman.common import empty_method, empty_method_returns_dict
-from layman.common.filesystem import util as common_util
 from layman.common.filesystem import input_file as common
-from layman.util import url_for
+from layman.map import MAP_TYPE
+from layman.util import url_for, get_publication_uuid
+from layman import settings
 from . import util
 
 MAP_SUBDIR = __name__.rsplit('.', maxsplit=1)[-1]
@@ -14,35 +15,47 @@ pre_publication_action_check = empty_method
 get_metadata_comparison = empty_method_returns_dict
 
 
-def get_map_input_file_dir(workspace, mapname):
-    resumable_dir = os.path.join(util.get_map_dir(workspace, mapname),
+def get_map_input_file_dir(publ_uuid):
+    resumable_dir = os.path.join(util.get_map_dir(publ_uuid),
                                  MAP_SUBDIR)
     return resumable_dir
 
 
-def ensure_map_input_file_dir(workspace, mapname):
-    input_file_dir = get_map_input_file_dir(workspace, mapname)
+def ensure_map_input_file_dir(publ_uuid):
+    input_file_dir = get_map_input_file_dir(publ_uuid)
     pathlib.Path(input_file_dir).mkdir(parents=True, exist_ok=True)
     return input_file_dir
 
 
 def delete_map(workspace, mapname):
-    util.delete_map_subdir(workspace, mapname, MAP_SUBDIR)
+    publ_uuid = get_publication_uuid(workspace, MAP_TYPE, mapname)
+    if publ_uuid:
+        delete_map_by_uuid(publ_uuid)
 
 
-def get_map_file(workspace, mapname):
-    input_file_dir = get_map_input_file_dir(workspace, mapname)
-    mapfile_path = os.path.join(input_file_dir, mapname + '.json')
+def delete_map_by_uuid(publ_uuid):
+    util.delete_map_subdir(publ_uuid, MAP_SUBDIR)
+
+
+def get_map_file(publ_uuid):
+    input_file_dir = get_map_input_file_dir(publ_uuid)
+    mapfile_path = os.path.join(input_file_dir, publ_uuid + '.json')
     return mapfile_path
 
 
 def get_map_info(workspace, mapname, *, x_forwarded_items=None):
-    map_file_path_absolute = get_map_file(workspace, mapname)
+    publ_uuid = get_publication_uuid(workspace, MAP_TYPE, mapname)
+    return get_map_info_by_uuid(publ_uuid, workspace=workspace, mapname=mapname, x_forwarded_items=x_forwarded_items) \
+        if publ_uuid else {}
+
+
+def get_map_info_by_uuid(publ_uuid, *, workspace, mapname, x_forwarded_items=None):
+    map_file_path_absolute = get_map_file(publ_uuid)
     result = {}
     if os.path.exists(map_file_path_absolute):
         with open(map_file_path_absolute, 'r', encoding="utf-8") as map_file:
             map_json = json.load(map_file)
-        map_file_path = os.path.relpath(map_file_path_absolute, common_util.get_workspace_dir(workspace))
+        map_file_path = os.path.relpath(map_file_path_absolute, settings.LAYMAN_DATA_DIR)
         result = {
             'file': {
                 'path': map_file_path,
@@ -57,19 +70,19 @@ def get_map_info(workspace, mapname, *, x_forwarded_items=None):
             'title': map_json['title'] or '',
             'description': map_json['abstract'] or '',
         }
-    elif os.path.exists(util.get_map_dir(workspace, mapname)):
+    elif os.path.exists(util.get_map_dir(publ_uuid)):
         result = {
             'name': mapname
         }
     return result
 
 
-def save_map_files(workspace, mapname, files):
+def save_map_files(publ_uuid, files):
     filenames = list(map(lambda f: f.filename, files))
     assert len(filenames) == 1
-    input_file_dir = ensure_map_input_file_dir(workspace, mapname)
+    input_file_dir = ensure_map_input_file_dir(publ_uuid)
     filepath_mapping = {
-        f'{fn}': os.path.join(input_file_dir, f'{mapname}.json')
+        f'{fn}': os.path.join(input_file_dir, f'{publ_uuid}.json')
         for fn in filenames
     }
     # print('filepath_mapping', filepath_mapping)
@@ -86,23 +99,8 @@ def get_unsafe_mapname(map_json):
     return unsafe_name
 
 
-def get_file_name_mappings(file_names, main_file_name, map_name, output_dir):
-    main_file_name = os.path.splitext(main_file_name)[0]
-    filename_mapping = {}
-    filepath_mapping = {}
-    for file_name in file_names:
-        if file_name.startswith(main_file_name + '.'):
-            new_fn = map_name + file_name[len(main_file_name):]
-            filepath_mapping[file_name] = os.path.join(output_dir, new_fn)
-            filename_mapping[file_name] = new_fn
-        else:
-            filename_mapping[file_name] = None
-            filepath_mapping[file_name] = None
-    return (filename_mapping, filepath_mapping)
-
-
-def get_map_json(workspace, mapname):
-    map_file_path = get_map_file(workspace, mapname)
+def get_map_json(publ_uuid):
+    map_file_path = get_map_file(publ_uuid)
     try:
         with open(map_file_path, 'r', encoding="utf-8") as map_file:
             map_json = json.load(map_file)
@@ -122,8 +120,9 @@ def unquote_urls(map_json):
     return map_json
 
 
-def post_map(workspace, mapname, description, title):
-    map_file_path = get_map_file(workspace, mapname)
+# pylint: disable=unused-argument
+def post_map(workspace, mapname, uuid, description, title):
+    map_file_path = get_map_file(uuid)
     with open(map_file_path, 'r', encoding="utf-8") as map_file:
         map_json = json.load(map_file)
     map_json['name'] = mapname

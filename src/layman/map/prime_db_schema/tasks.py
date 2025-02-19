@@ -24,11 +24,12 @@ def refresh_file_data(
         workspace,
         mapname,
         x_forwarded_headers,
+        uuid,
 ):
     if self.is_aborted():
         raise AbortedException
 
-    mapjson = util.get_map_file_json(workspace, mapname, adjust_urls=False)
+    mapjson = util.get_map_file_json(uuid, workspace=workspace, adjust_urls=False)
     native_bbox = util.get_native_bbox_from_json(mapjson)
     crs = util.get_crs_from_json(mapjson)
     set_bbox(workspace, MAP_TYPE, mapname, native_bbox, crs, )

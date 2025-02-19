@@ -14,11 +14,12 @@ refresh_thumbnail_needed = empty_method_returns_true
     bind=True,
     base=celery_app.AbortableTask
 )
-def refresh_thumbnail(self, workspace, mapname, actor_name=None):
+# pylint: disable=unused-argument
+def refresh_thumbnail(self, workspace, mapname, uuid, actor_name=None):
     if self.is_aborted():
         raise AbortedException
-    thumbnail.generate_map_thumbnail(workspace, mapname, actor_name)
+    thumbnail.generate_map_thumbnail(uuid, editor=actor_name)
 
     if self.is_aborted():
-        thumbnail.delete_map(workspace, mapname)
+        thumbnail.delete_map_by_uuid(uuid)
         raise AbortedException

@@ -12,8 +12,7 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from layman import settings, LaymanError
 from layman.authn import is_user_with_name
 from layman.common import empty_method, empty_method_returns_dict
-from layman.common.filesystem import util as common_util
-from layman.util import url_for, get_publication_info
+from layman.util import url_for, get_publication_uuid, get_publication_info_by_uuid
 from . import util
 from .. import MAP_TYPE
 
@@ -23,26 +22,31 @@ pre_publication_action_check = empty_method
 post_map = empty_method
 
 
-def get_map_thumbnail_dir(workspace, mapname):
-    thumbnail_dir = os.path.join(util.get_map_dir(workspace, mapname),
-                                 'thumbnail')
+def get_map_thumbnail_dir(publ_uuid):
+    thumbnail_dir = os.path.join(util.get_map_dir(publ_uuid), 'thumbnail')
     return thumbnail_dir
 
 
-def ensure_map_thumbnail_dir(workspace, mapname):
-    thumbnail_dir = get_map_thumbnail_dir(workspace, mapname)
+def ensure_map_thumbnail_dir(publ_uuid):
+    thumbnail_dir = get_map_thumbnail_dir(publ_uuid)
     pathlib.Path(thumbnail_dir).mkdir(parents=True, exist_ok=True)
     return thumbnail_dir
 
 
 def get_map_info(workspace, mapname, *, x_forwarded_items=None):
-    thumbnail_path = get_map_thumbnail_path(workspace, mapname)
+    publ_uuid = get_publication_uuid(workspace, MAP_TYPE, mapname)
+    return get_map_info_by_uuid(publ_uuid, workspace=workspace, mapname=mapname, x_forwarded_items=x_forwarded_items) \
+        if publ_uuid else {}
+
+
+def get_map_info_by_uuid(publ_uuid, *, workspace, mapname, x_forwarded_items=None):
+    thumbnail_path = get_map_thumbnail_path(publ_uuid)
     if os.path.exists(thumbnail_path):
         return {
             'thumbnail': {
                 'url': url_for('rest_workspace_map_thumbnail.get', workspace=workspace,
                                mapname=mapname, x_forwarded_items=x_forwarded_items),
-                'path': os.path.relpath(thumbnail_path, common_util.get_workspace_dir(workspace))
+                'path': os.path.relpath(thumbnail_path, settings.LAYMAN_DATA_DIR)
             },
             '_thumbnail': {
                 'path': thumbnail_path,
@@ -51,22 +55,28 @@ def get_map_info(workspace, mapname, *, x_forwarded_items=None):
     return {}
 
 
-def patch_map(workspace, mapname, file_changed=True):
-    if file_changed or not get_map_info(workspace, mapname):
+def patch_map(workspace, mapname, *, uuid, file_changed=True):
+    if file_changed or not get_map_info_by_uuid(uuid, workspace=workspace, mapname=mapname):
         post_map(workspace, mapname)
 
 
 def delete_map(workspace, mapname):
-    util.delete_map_subdir(workspace, mapname, MAP_SUBDIR)
+    publ_uuid = get_publication_uuid(workspace, MAP_TYPE, mapname)
+    if publ_uuid:
+        delete_map_by_uuid(publ_uuid)
 
 
-def get_map_thumbnail_path(workspace, mapname):
-    thumbnail_dir = get_map_thumbnail_dir(workspace, mapname)
-    return os.path.join(thumbnail_dir, mapname + '.png')
+def delete_map_by_uuid(publ_uuid):
+    util.delete_map_subdir(publ_uuid, MAP_SUBDIR)
 
 
-def generate_map_thumbnail(workspace, mapname, editor):
-    map_info = get_publication_info(workspace, MAP_TYPE, mapname, context={'keys': ['file']})
+def get_map_thumbnail_path(publ_uuid):
+    thumbnail_dir = get_map_thumbnail_dir(publ_uuid)
+    return os.path.join(thumbnail_dir, publ_uuid + '.png')
+
+
+def generate_map_thumbnail(publ_uuid, *, editor):
+    map_info = get_publication_info_by_uuid(publ_uuid, context={'keys': ['file']})
     map_file_get_url = map_info['_file']['url']
 
     params = urlencode({
@@ -127,7 +137,7 @@ def generate_map_thumbnail(workspace, mapname, editor):
 
     if attempts >= max_attempts:
         current_app.logger.info(f"max attempts reach")
-        current_app.logger.info(f"Map thumbnail: {workspace, mapname}, editor={editor}")
+        current_app.logger.info(f"Map thumbnail: {publ_uuid}, editor={editor}")
         raise LaymanError(51, data="Max attempts reached when generating thumbnail")
 
     match = re.match(r'^data:image/png;base64,(.+)$', data_url)
@@ -136,8 +146,8 @@ def generate_map_thumbnail(workspace, mapname, editor):
     # current_app.logger.info(f"data_url {data_url}")
     # current_app.logger.info(f"len(data_url) {len(data_url)}")
 
-    ensure_map_thumbnail_dir(workspace, mapname)
-    file_path = get_map_thumbnail_path(workspace, mapname)
+    ensure_map_thumbnail_dir(publ_uuid)
+    file_path = get_map_thumbnail_path(publ_uuid)
     try:
         os.remove(file_path)
     except OSError:

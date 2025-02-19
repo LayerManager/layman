@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import shutil
 from urllib.parse import urljoin
 import requests
@@ -15,7 +16,6 @@ from layman.layer.geoserver.tasks import refresh_wms, refresh_wfs, refresh_sld
 from layman.layer.geoserver.wms import get_timeregex_props
 from layman.layer.util import get_complete_layer_info
 from layman.map import MAP_TYPE
-from layman.map.filesystem import input_file
 from layman.upgrade import upgrade_v2_0_util as util
 from layman.util import get_publication_info
 
@@ -79,7 +79,12 @@ def adjust_publications_description():
                 wms = get_wms_capabilities(geoserver_workspace=f'{workspace}_wms')
                 description = wms.contents[publication].abstract
             else:
-                description = input_file.get_map_info(workspace, publication)['description']
+                description = ''
+                map_json_path = f"{settings.LAYMAN_DATA_DIR}/workspaces/{workspace}/maps/{publication}/input_file/{publication}.json"
+                if os.path.exists(map_json_path):
+                    with open(map_json_path, 'r', encoding="utf-8") as map_file:
+                        map_json = json.load(map_file)
+                    description = map_json['abstract'] or ''
         except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout, requests.exceptions.HTTPError):
             description = None
 
