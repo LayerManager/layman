@@ -191,7 +191,10 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
             publication=lambda cls, parametrization: Publication(
                 workspace=cls.workspace,
                 type=cls.publication_type,
-                name=f"lr_{'_'.join(v.publ_name_part for v in parametrization.values_list)}"),
+                name=f"lr_{'_'.join(v.publ_name_part for v in parametrization.values_list)}",
+                uuid='0367efa3-0992-4035-bb23-628475edde14',
+                # Fails for some UUIDs, see tests/dynamic_data/publications/issues/gs_wfst_update_replace.py
+            ),
             type=EnumTestTypes.OPTIONAL,
             specific_types={
                 frozenset([StyleFileDomain.QML, LayerByTableLocation.EXTERNAL]): EnumTestTypes.IGNORE,
@@ -231,7 +234,7 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
 
         # ensure layers
         self.ensure_publication(layer, args=rest_args, scope='class')
-        layer2 = Publication(name=f"{layer.name}_2", workspace=workspace, type=layer.type)
+        layer2 = Publication(name=f"{layer.name}_2", workspace=workspace, type=layer.type, uuid='d7247e9f-8f86-4438-82da-3f53e48df95f')
         rest_args2 = rest_args if 'external_table_uri' not in rest_args else {
             **rest_args,
             'external_table_uri': f"{external_db.URI_STR}?schema={EXTERNAL_DB_SCHEMA}&table={EXTERNAL_DB_TABLE_2}&geo_column=wkb_geometry",
