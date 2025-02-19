@@ -221,7 +221,8 @@ def migrate_layers():
             'write': write_users_roles.split(','),
         }
         if image_mosaic:
-            time_regex_props = get_timeregex_props(workspace, layername)
+            layer_dir = f"{settings.LAYMAN_NORMALIZED_RASTER_DATA_DIR}/workspaces/{workspace}/layers/{layername}"
+            time_regex_props = get_timeregex_props(layer_dir)
             slugified_time_regex = time_regex_props['regex']
             slugified_time_regex_format = time_regex_props.get('regex_format')
         else:
