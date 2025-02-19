@@ -191,7 +191,8 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
             publication=lambda cls, parametrization: Publication(
                 workspace=cls.workspace,
                 type=cls.publication_type,
-                name=f"lr_{'_'.join(v.publ_name_part for v in parametrization.values_list)}"),
+                name=f"lr_{'_'.join(v.publ_name_part for v in parametrization.values_list)}",
+            ),
             type=EnumTestTypes.OPTIONAL,
             specific_types={
                 frozenset([StyleFileDomain.QML, LayerByTableLocation.EXTERNAL]): EnumTestTypes.IGNORE,
@@ -205,6 +206,21 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
                 },
             },
             params=copy.deepcopy(params),
+            specific_params=copy.deepcopy({
+                # wfs20_complex_points fails for some UUIDs, see tests/dynamic_data/publications/issues/gs_wfst_update_replace.py
+                frozenset([StyleFileDomain.SLD, LayerByTableLocation.INTERNAL, ]): {
+                    'uuid': 'e6d24656-6d84-4015-89c9-b30d079af496',
+                    'uuid2': '6e3647eb-cd63-4bc6-b21d-18a4161c6e68',
+                },
+                frozenset([StyleFileDomain.QML, LayerByTableLocation.INTERNAL, ]): {
+                    'uuid': '5b6b83d4-714b-4f0e-ba50-225d9d2017f9',
+                    'uuid2': 'd7247e9f-8f86-4438-82da-3f53e48df95f',
+                },
+                frozenset([StyleFileDomain.SLD, LayerByTableLocation.EXTERNAL, ]): {
+                    'uuid': '0d8109ad-ef83-4a55-92c8-63d789755abd',
+                    'uuid2': '377fff27-6c26-41d1-9d3d-1f96489b576f',
+                },
+            }, ),
             rest_args={
                 'headers': AUTHN_HEADERS,
             }
@@ -230,9 +246,13 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
         workspace = self.workspace
 
         # ensure layers
-        self.ensure_publication(layer, args=rest_args, scope='class')
-        layer2 = Publication(name=f"{layer.name}_2", workspace=workspace, type=layer.type)
-        rest_args2 = rest_args if 'external_table_uri' not in rest_args else {
+        rest_args1 = {
+            **rest_args,
+            'uuid': params['uuid'],
+        }
+        self.ensure_publication(layer, args=rest_args1, scope='class')
+        layer2 = Publication(name=f"{layer.name}_2", workspace=workspace, type=layer.type, uuid=params['uuid2'])
+        rest_args2 = copy.deepcopy(rest_args) if 'external_table_uri' not in rest_args else {
             **rest_args,
             'external_table_uri': f"{external_db.URI_STR}?schema={EXTERNAL_DB_SCHEMA}&table={EXTERNAL_DB_TABLE_2}&geo_column=wkb_geometry",
         }
