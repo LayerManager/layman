@@ -95,7 +95,7 @@ def refresh_gdal(self, workspace, layername,
             logger.info(f'terminating GDAL process workspace.layer={workspace}.{layername}')
             process.terminate()
             logger.info(f'terminated GDAL process workspace.layer={workspace}.{layername}')
-            gdal.delete_layer(workspace, layername)
+            gdal.delete_layer_by_uuid(uuid)
             raise AbortedException
         return_code = process.poll()
         if return_code != 0:
@@ -112,7 +112,7 @@ def refresh_gdal(self, workspace, layername,
     if file_type != settings.GEODATA_TYPE_RASTER:
         return
 
-    gdal.ensure_normalized_raster_layer_dir(workspace, layername)
+    gdal.ensure_normalized_raster_layer_dir(uuid)
 
     if self.is_aborted():
         raise AbortedException
@@ -136,8 +136,8 @@ def refresh_gdal(self, workspace, layername,
         nodata_value = gdal.get_nodata_value(vrt_file_path or input_path)
         gdal.correct_nodata_value_in_vrt(tmp_vrt_file, nodata_value=nodata_value)
 
-        source_file = f'{layername}.tif' if name_normalized_tif_by_layer else timeseries_filename_mapping[input_path]
-        normalize_file_path = gdal.get_normalized_raster_layer_main_filepath(workspace, layername, source_file=source_file, )
+        source_file = f'{uuid}.tif' if name_normalized_tif_by_layer else timeseries_filename_mapping[input_path]
+        normalize_file_path = gdal.get_normalized_raster_layer_main_filepath(uuid, source_file=source_file, )
         color_interpretations = gdal.get_color_interpretations(vrt_file_path or input_path)
         data_type_name = gdal.get_data_type_name(tmp_vrt_file)
         process = gdal.compress_and_mask_raster_file_async(input_file_path=tmp_vrt_file,

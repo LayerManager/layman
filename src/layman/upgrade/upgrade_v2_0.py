@@ -250,7 +250,7 @@ def migrate_layers():
         else:
             logger.warning("      geoserver.wfs already exists!")
 
-        if not gs_wms.get_layer_info_by_uuid(uuid=layer_uuid, gdal_layername=layername, gdal_workspace=workspace):
+        if not gs_wms.get_layer_info_by_uuid(uuid=layer_uuid):
             logger.info("      re-creating geoserver.wms")
             util.run_task_sync(refresh_wms, [workspace, layername], post_task_kwargs)
         else:

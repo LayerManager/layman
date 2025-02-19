@@ -152,8 +152,7 @@ def get_template_path_and_values(workspace, layername, http_method):
     elif geodata_type == settings.GEODATA_TYPE_RASTER:
         languages = []
         bbox_sphere_size = prime_db_table.get_bbox_sphere_size(workspace, layername)
-        distance_value = gdal.get_normalized_ground_sample_distance_in_m(workspace, layername,
-                                                                         bbox_size=bbox_sphere_size)
+        distance_value = gdal.get_normalized_ground_sample_distance_in_m(publ_info['uuid'], bbox_size=bbox_sphere_size)
         spatial_resolution = {
             'ground_sample_distance': {
                 'value': distance_value,
