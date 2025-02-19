@@ -171,8 +171,7 @@ def clear_cache():
     mem_redis.delete(key)
 
 
-def get_timeregex_props(workspace, layername):
-    layer_dir = gdal.get_normalized_raster_layer_dir(workspace, layername)
+def get_timeregex_props(layer_dir):
     props_path = os.path.join(layer_dir, 'timeregex.properties')
     props_config = configparser.ConfigParser()
     section_name = 'global'
@@ -211,9 +210,10 @@ def get_layer_info_by_uuid(*, uuid, gdal_layername, gdal_workspace, x_forwarded_
                                                           get_image_mosaic_store_name(uuid=uuid),
                                                           gs_layername.name)
         if granules_json:
+            gdal_layer_dir = gdal.get_normalized_raster_layer_dir(gdal_workspace, gdal_layername)
             time_info = {
                 **image_mosaic_granules_to_wms_time_key(granules_json),
-                **get_timeregex_props(gdal_workspace, gdal_layername),
+                **get_timeregex_props(gdal_layer_dir),
             }
 
     wms_proxy_url = get_wms_url(external_url=True, x_forwarded_items=x_forwarded_items)
