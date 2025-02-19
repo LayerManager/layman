@@ -95,16 +95,14 @@ def can_user_read_publication(username, workspace, publication_type, publication
     return publ_info and is_user_in_access_rule(username, publ_info['access_rights']['read'])
 
 
-def can_user_write_publication(username, workspace, publication_type, publication_name):
-    publ_info = layman_util.get_publication_infos(workspace=workspace, publ_type=publication_type).get(
-        (workspace, publication_type, publication_name)
-    )
+def can_user_write_publication(*, username, uuid):
+    publ_info = layman_util.get_publication_info_by_uuid(uuid=uuid, context={'keys': ['access_rights']})
     return publ_info and is_user_in_access_rule(username, publ_info['access_rights']['write'])
 
 
-def can_i_edit(publ_type, workspace, publication_name):
+def can_i_edit(*, uuid):
     actor_name = authn.get_authn_username()
-    return can_user_write_publication(actor_name, workspace, publ_type, publication_name)
+    return can_user_write_publication(username=actor_name, uuid=uuid)
 
 
 def authorize_workspace_publications_decorator(func):

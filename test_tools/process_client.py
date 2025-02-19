@@ -714,7 +714,7 @@ def post_wfst(xml, *, headers=None, url=None, workspace=None):
         raise_layman_error(response)
     if response.status_code != 200:
         logger.info(f"GeoServer error response:\n{response.text}")
-        raise gs_error.Error(code_or_message='WFS-T error', data={'status_code': response.status_code})
+        raise gs_error.Error(code_or_message='WFS-T error', data={'status_code': response.status_code, 'response.text': response.text})
 
 
 def post_wfst_with_xml_getter(workspace, layer, *, xml_getter, actor_name=None, xml_getter_params=None):
@@ -730,8 +730,8 @@ def post_wfst_with_xml_getter(workspace, layer, *, xml_getter, actor_name=None, 
         uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layer)
     gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wfs
 
-    xml = xml_getter(gs_layername.workspace, gs_layername.name, **xml_getter_params)
-    post_wfst(xml, headers=headers, workspace=workspace)
+    xml = xml_getter(geoserver_workspace=gs_layername.workspace, geoserver_layername=gs_layername.name, **xml_getter_params)
+    post_wfst(xml, headers=headers, workspace=gs_layername.workspace)
 
 
 def check_publication_status(response):

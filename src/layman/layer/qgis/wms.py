@@ -57,9 +57,15 @@ def get_layer_file_path(workspace, layer):
 
 
 def save_qgs_file(workspace, layer):
-    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer, {'keys': ['uuid', 'native_bounding_box',
-                                                                                    'table_uri']})
-    uuid = info['uuid']
+    layer_uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layer)
+    save_qgs_file_by_uuid(layer_uuid=layer_uuid)
+
+
+def save_qgs_file_by_uuid(*, layer_uuid):
+    info = layman_util.get_publication_info_by_uuid(layer_uuid, {'keys': ['native_bounding_box', 'table_uri']})
+
+    # pylint: disable=protected-access
+    workspace, _, layer = layman_util._get_publication_by_uuid(layer_uuid)
     qgis.ensure_layer_dir(workspace, layer)
     real_bbox = info['native_bounding_box']
     crs = info['native_crs']
@@ -76,9 +82,9 @@ def save_qgs_file(workspace, layer):
     ]
     source_type = util.get_source_type(db_types, qml_geometry)
     column_srid = db.get_column_srid(db_schema, table_name, table_uri.geo_column, uri_str=table_uri.db_uri_str)
-    layer_qml = util.fill_layer_template(layer, uuid, layer_bbox, crs, qml, source_type, db_cols, table_uri,
+    layer_qml = util.fill_layer_template(layer, layer_uuid, layer_bbox, crs, qml, source_type, db_cols, table_uri,
                                          column_srid, db_types)
-    qgs_str = util.fill_project_template(layer, uuid, layer_qml, crs, settings.LAYMAN_OUTPUT_SRS_LIST,
+    qgs_str = util.fill_project_template(layer, layer_uuid, layer_qml, crs, settings.LAYMAN_OUTPUT_SRS_LIST,
                                          layer_bbox, source_type, table_uri, column_srid)
     with open(get_layer_file_path(workspace, layer), "w", encoding="utf-8") as qgs_file:
         print(qgs_str, file=qgs_file)
