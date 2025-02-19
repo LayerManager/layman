@@ -63,7 +63,7 @@ def wms_spatial_precision(workspace, publ_type, name, *, crs, extent, img_size, 
             bbox = [extent[1], extent[0], extent[3], extent[2]]
             gs_query_params['BBOX'] = ",".join((str(c) for c in bbox))
 
-    geoserver_url = f'{settings.LAYMAN_GS_URL}/{wms_layername.workspace}/wms?{parse.urlencode(gs_query_params)}'
+    geoserver_url = f'{settings.LAYMAN_GS_URL}{wms_layername.workspace}/wms?{parse.urlencode(gs_query_params)}'
     layman_without_workspace_url = f'http://{settings.LAYMAN_SERVER_NAME}/geoserver/wms?{parse.urlencode(query_params)}'
     query_params['LAYERS'] = wms_layername.name
     layman_with_workspace_url = f'http://{settings.LAYMAN_SERVER_NAME}/geoserver/{wms_layername.workspace}/wms?{parse.urlencode(query_params)}'
