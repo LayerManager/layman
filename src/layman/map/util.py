@@ -321,6 +321,7 @@ def map_file_to_metadata_properties(workspace, mapname, map_json, operates_on_mu
 
 def get_metadata_comparison(workspace, mapname):
     layman_info = get_complete_map_info(workspace, mapname)
+    publ_uuid = layman_info['uuid']
     layman_props = map_info_to_metadata_properties(layman_info)
     all_props = {
         f"{layman_props['map_endpoint']}": layman_props,
@@ -330,7 +331,7 @@ def get_metadata_comparison(workspace, mapname):
     for partial_info in partial_infos.values():
         if partial_info is not None:
             all_props.update(partial_info)
-    map_json = get_map_file_json(workspace, mapname)
+    map_json = get_map_file_json(publ_uuid, workspace=workspace)
     if map_json:
         soap_operates_on = next(iter(partial_infos[csw].values()))['operates_on'] if partial_infos[csw] else []
         operates_on_muuids_filter = micka_util.operates_on_values_to_muuids(soap_operates_on)
@@ -373,13 +374,13 @@ def _adjust_url(*, url_obj=None, url_key=None, url_list=None, url_idx=None, prox
     return found_original_base_url
 
 
-def get_map_file_json(workspace, mapname, *, adjust_urls=True, x_forwarded_items=None):
+def get_map_file_json(publ_uuid, *, workspace, adjust_urls=True, x_forwarded_items=None):
     x_forwarded_items = x_forwarded_items or XForwardedClass()
-    map_json = input_file.get_map_json(workspace, mapname)
+    map_json = input_file.get_map_json(publ_uuid)
 
     if adjust_urls:
         input_file.unquote_urls(map_json)
-        map_layers = layman_util.get_publication_info(workspace, MAP_TYPE, mapname, context={'keys': ['map_layers']})['_map_layers']
+        map_layers = layman_util.get_publication_info_by_uuid(publ_uuid, context={'keys': ['map_layers']})['_map_layers']
         ml_indices = {ml['index'] for ml in map_layers}
 
         for ml_idx in ml_indices:

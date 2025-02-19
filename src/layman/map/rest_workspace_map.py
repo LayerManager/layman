@@ -78,6 +78,7 @@ def patch(workspace, mapname):
         'metadata_properties_to_refresh': metadata_properties_to_refresh,
         'actor_name': authn.get_authn_username(),
         'x_forwarded_headers': x_forwarded_items.headers,
+        'uuid': info['uuid'],
     }
 
     rest_util.setup_patch_access_rights(request.form, kwargs)
@@ -87,13 +88,12 @@ def patch(workspace, mapname):
                                       )
 
     if file is not None:
-        thumbnail.delete_map(workspace, mapname)
+        thumbnail.delete_map_by_uuid(info['uuid'])
         file = FileStorage(
             io.BytesIO(json.dumps(file_json).encode()),
             file.filename
         )
-        input_file.save_map_files(
-            workspace, mapname, [file])
+        input_file.save_map_files(info['uuid'], [file])
 
     util.patch_map(
         workspace,

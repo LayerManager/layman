@@ -111,8 +111,7 @@ def post(workspace):
             io.BytesIO(json.dumps(file_json).encode()),
             file.filename
         )
-        input_file.save_map_files(
-            workspace, mapname, [file])
+        input_file.save_map_files(uuid_str, [file])
 
         util.post_map(
             workspace,
