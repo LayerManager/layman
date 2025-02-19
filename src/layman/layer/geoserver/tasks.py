@@ -9,7 +9,7 @@ from layman import celery_app, settings, util as layman_util, names
 from layman.common import empty_method_returns_true, bbox as bbox_util
 from layman.common.micka import util as micka_util
 from . import wms, wfs, sld, get_internal_db_store_name
-from .. import geoserver
+from .. import geoserver, layer_class
 
 logger = get_task_logger(__name__)
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
@@ -40,12 +40,9 @@ def refresh_wms(
         slugified_time_regex_format=None,
         original_data_source=settings.EnumOriginalDataSource.FILE.value,
 ):
-    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wms
-    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': [
-        'file', 'geodata_type', 'native_bounding_box', 'native_crs', 'table_uri'
-    ]})
-    geodata_type = info['geodata_type']
-    crs = info['native_crs']
+    layer = layer_class.LaymanLayer(uuid=uuid)
+    gs_layername = layer.gs_names.wms
+    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['file']})
 
     assert title is not None
     geoserver.ensure_workspace(workspace)
@@ -54,14 +51,13 @@ def refresh_wms(
     if self.is_aborted():
         raise AbortedException
 
-    if geodata_type == settings.GEODATA_TYPE_VECTOR:
+    if layer.geodata_type == settings.GEODATA_TYPE_VECTOR:
         if store_in_geoserver:
-            table_uri = info['_table_uri']
-            table_name = table_uri.table
+            table_name = layer.table_uri.table
             if original_data_source == settings.EnumOriginalDataSource.TABLE.value:
                 store_name = geoserver.create_external_db_store(workspace=gs_layername.workspace,
                                                                 uuid=uuid,
-                                                                table_uri=table_uri,
+                                                                table_uri=layer.table_uri,
                                                                 )
             else:
                 store_name = get_internal_db_store_name(db_schema=workspace, )
@@ -70,7 +66,7 @@ def refresh_wms(
                                                     geoserver_workspace=gs_layername.workspace,
                                                     description=description,
                                                     title=title,
-                                                    crs=crs,
+                                                    crs=layer.native_crs,
                                                     table_name=table_name,
                                                     metadata_url=metadata_url,
                                                     store_name=store_name)
@@ -83,12 +79,11 @@ def refresh_wms(
                                               title=title,
                                               metadata_url=metadata_url,
                                               )
-    elif geodata_type == settings.GEODATA_TYPE_RASTER:
+    elif layer.geodata_type == settings.GEODATA_TYPE_RASTER:
         file_paths = next(iter(info['_file']['paths'].values()))
         gs_file_path = file_paths['normalized_geoserver']
-        real_bbox = info['native_bounding_box']
-        bbox = bbox_util.get_bbox_to_publish(real_bbox, crs)
-        lat_lon_bbox = bbox_util.transform(bbox, crs, crs_def.EPSG_4326)
+        bbox = bbox_util.get_bbox_to_publish(layer.native_bounding_box, layer.native_crs)
+        lat_lon_bbox = bbox_util.transform(bbox, layer.native_crs, crs_def.EPSG_4326)
         if not image_mosaic:
             coverage_store_name = wms.get_geotiff_store_name(uuid=uuid)
             coverage_type = gs_util.COVERAGESTORE_GEOTIFF
@@ -108,9 +103,9 @@ def refresh_wms(
             enable_time_dimension = True
         gs_util.create_coverage_store(gs_layername.workspace, settings.LAYMAN_GS_AUTH, coverage_store_name, source_file_or_dir, coverage_type=coverage_type)
         gs_util.publish_coverage(gs_layername.workspace, settings.LAYMAN_GS_AUTH, coverage_store_name, gs_layername.name, title,
-                                 description, bbox, crs, lat_lon_bbox=lat_lon_bbox, metadata_url=metadata_url, enable_time_dimension=enable_time_dimension)
+                                 description, bbox, layer.native_crs, lat_lon_bbox=lat_lon_bbox, metadata_url=metadata_url, enable_time_dimension=enable_time_dimension)
     else:
-        raise NotImplementedError(f"Unknown geodata type: {geodata_type}")
+        raise NotImplementedError(f"Unknown geodata type: {layer.geodata_type}")
 
     geoserver.set_security_rules_by_uuid(uuid=uuid,
                                          geoserver_workspace=gs_layername.workspace,
