@@ -5,7 +5,7 @@ from celery.utils.log import get_task_logger
 import crs as crs_def
 from geoserver import util as gs_util
 from layman.celery import AbortedException
-from layman import celery_app, settings, util as layman_util, names
+from layman import celery_app, settings, util as layman_util
 from layman.common import empty_method_returns_true, bbox as bbox_util
 from layman.common.micka import util as micka_util
 from . import wms, wfs, sld, get_internal_db_store_name
@@ -40,13 +40,14 @@ def refresh_wms(
         slugified_time_regex_format=None,
         original_data_source=settings.EnumOriginalDataSource.FILE.value,
 ):
+    # pylint: disable=unused-argument
     layer = layer_class.LaymanLayer(uuid=uuid)
     gs_layername = layer.gs_names.wms
     info = layman_util.get_publication_info_by_publication(layer, context={'keys': ['file']})
 
     assert title is not None
-    geoserver.ensure_workspace(workspace)
-    metadata_url = micka_util.get_metadata_url(uuid, url_type=micka_util.RecordUrlType.XML)
+    geoserver.ensure_workspace(layer.workspace)
+    metadata_url = micka_util.get_metadata_url(layer.uuid, url_type=micka_util.RecordUrlType.XML)
 
     if self.is_aborted():
         raise AbortedException
@@ -60,7 +61,7 @@ def refresh_wms(
                                                                 table_uri=layer.table_uri,
                                                                 )
             else:
-                store_name = get_internal_db_store_name(db_schema=workspace, )
+                store_name = get_internal_db_store_name(db_schema=layer.workspace, )
             geoserver.publish_layer_from_db_by_uuid(uuid=uuid,
                                                     gs_layername=gs_layername.name,
                                                     geoserver_workspace=gs_layername.workspace,
@@ -74,7 +75,7 @@ def refresh_wms(
             geoserver.publish_layer_from_qgis(uuid=uuid,
                                               gs_layername=gs_layername.name,
                                               geoserver_workspace=gs_layername.workspace,
-                                              qgis_layername=layername,
+                                              qgis_layername=layer.name,
                                               description=description,
                                               title=title,
                                               metadata_url=metadata_url,
@@ -117,7 +118,7 @@ def refresh_wms(
     wms.clear_cache()
 
     if self.is_aborted():
-        wms.delete_layer_by_uuid(uuid=uuid, db_schema=workspace)
+        wms.delete_layer_by_uuid(uuid=uuid, db_schema=layer.workspace)
         raise AbortedException
 
 
@@ -138,36 +139,33 @@ def refresh_wfs(
         original_data_source=settings.EnumOriginalDataSource.FILE.value,
 ):
     # pylint: disable=unused-argument
-    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wfs
-    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['geodata_type', 'native_crs', 'table_uri']})
-    geodata_type = info['geodata_type']
-    if geodata_type == settings.GEODATA_TYPE_RASTER:
+    layer = layer_class.LaymanLayer(uuid=uuid)
+    gs_layername = layer.gs_names.wfs
+    if layer.geodata_type == settings.GEODATA_TYPE_RASTER:
         return
-    if geodata_type != settings.GEODATA_TYPE_VECTOR:
-        raise NotImplementedError(f"Unknown geodata type: {geodata_type}")
+    if layer.geodata_type != settings.GEODATA_TYPE_VECTOR:
+        raise NotImplementedError(f"Unknown geodata type: {layer.geodata_type}")
 
     assert title is not None
-    geoserver.ensure_workspace(workspace)
+    geoserver.ensure_workspace(layer.workspace)
 
     if self.is_aborted():
         raise AbortedException
-    crs = info['native_crs']
-    table_name = info['_table_uri'].table
+    table_name = layer.table_uri.table
     if original_data_source == settings.EnumOriginalDataSource.TABLE.value:
-        table_uri = info['_table_uri']
         store_name = geoserver.create_external_db_store(workspace=gs_layername.workspace,
                                                         uuid=uuid,
-                                                        table_uri=table_uri,
+                                                        table_uri=layer.table_uri,
                                                         )
     else:
-        store_name = get_internal_db_store_name(db_schema=workspace, )
+        store_name = get_internal_db_store_name(db_schema=layer.workspace, )
     metadata_url = micka_util.get_metadata_url(uuid, url_type=micka_util.RecordUrlType.XML)
     geoserver.publish_layer_from_db_by_uuid(uuid=uuid,
                                             gs_layername=gs_layername.name,
                                             geoserver_workspace=gs_layername.workspace,
                                             description=description,
                                             title=title,
-                                            crs=crs,
+                                            crs=layer.native_crs,
                                             table_name=table_name,
                                             metadata_url=metadata_url,
                                             store_name=store_name)
@@ -180,7 +178,7 @@ def refresh_wfs(
     wfs.clear_cache()
 
     if self.is_aborted():
-        wfs.delete_layer_by_uuid(uuid=uuid, db_schema=workspace)
+        wfs.delete_layer_by_uuid(uuid=uuid, db_schema=layer.workspace)
         raise AbortedException
 
 
