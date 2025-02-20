@@ -85,7 +85,7 @@ def test_info(workspace, publ_type, publication):
 
         geodata_type = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('geodata_type')
         if geodata_type == settings.GEODATA_TYPE_RASTER:
-            native_bbox = gdal.get_bbox(workspace, publication)
+            native_bbox = gdal.get_bbox(info['uuid'])
             with app.app_context():
                 bbox_3857 = bbox_util.transform(native_bbox, info['native_crs'], crs_def.EPSG_3857)
             assert_util.assert_same_bboxes(bbox_3857, exp_bbox, 0.01)

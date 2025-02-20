@@ -141,24 +141,24 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, name)
     publ_type_dir = util.get_directory_name_from_publ_type(publ_type)
+    uuid = pub_info["uuid"]
     expected_detail = {
         'name': name,
         'title': name,
         'type': publ_type,
         'thumbnail': {
             'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/{publ_type_dir}/{name}/thumbnail',
-            'path': f'{publ_type_dir}/{name}/thumbnail/{name}.png'
+            'path': f'{publ_type_dir}/{uuid}/thumbnail/{uuid}.png'
         },
         'metadata': {
             'comparison_url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/{publ_type_dir}/{name}/metadata-comparison',
             'csw_url': 'http://localhost:3080/csw',
         },
-        '_thumbnail': {'path': f'/layman_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/thumbnail/{name}.png'},
+        '_thumbnail': {'path': f'/layman_data_test/{publ_type_dir}/{uuid}/thumbnail/{uuid}.png'},
         'access_rights': {'read': ['EVERYONE'], 'write': ['EVERYONE']},
         'image_mosaic': False,
     }
     if publ_type == process_client.LAYER_TYPE:
-        uuid = pub_info["uuid"]
         geodata_type = publ_type_detail[0]
         util.recursive_dict_update(expected_detail,
                                    {
@@ -183,34 +183,34 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                        {
                                            '_file': {
                                                'paths': {
-                                                   name:
+                                                   uuid:
                                                    {
-                                                       'absolute': f'/layman_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/input_file/{name}.{file_extension}',
-                                                       'gdal': f'{gdal_prefix}/layman_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/input_file/{name}.{file_extension}',
+                                                       'absolute': f'/layman_data_test/{publ_type_dir}/{uuid}/input_file/{uuid}.{file_extension}',
+                                                       'gdal': f'{gdal_prefix}/layman_data_test/{publ_type_dir}/{uuid}/input_file/{uuid}.{file_extension}',
                                                    }
                                                },
                                            },
                                            'file': {
-                                               'paths': [f'{publ_type_dir}/{name}/input_file/{name}.{file_extension}'],
+                                               'paths': [f'{publ_type_dir}/{uuid}/input_file/{uuid}.{file_extension}'],
                                            },
                                        })
         elif filenames:
-            archive_path = f"{name}.{archive_extension}/" if archive_extension else ''
+            archive_path = f"{uuid}.{archive_extension}/" if archive_extension else ''
             util.recursive_dict_update(expected_detail,
                                        {
                                            '_file': {
                                                'paths': {
-                                                   input_file.slugify_timeseries_filename(os.path.splitext(os.path.basename(filename))[0]) if len(filenames) > 1 else name:
+                                                   input_file.slugify_timeseries_filename(os.path.splitext(os.path.basename(filename))[0]) if len(filenames) > 1 else uuid:
                                                    {
-                                                       'absolute': f'/layman_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/input_file/{archive_path}{filename}',
-                                                       'gdal': f'{gdal_prefix}/layman_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/input_file/{archive_path}{filename}',
+                                                       'absolute': f'/layman_data_test/{publ_type_dir}/{uuid}/input_file/{archive_path}{filename}',
+                                                       'gdal': f'{gdal_prefix}/layman_data_test/{publ_type_dir}/{uuid}/input_file/{archive_path}{filename}',
                                                    }
                                                    for filename in filenames
                                                }
                                            },
                                            'file': {
                                                'paths': [
-                                                   f'{publ_type_dir}/{name}/input_file/{archive_path}{filename}'
+                                                   f'{publ_type_dir}/{uuid}/input_file/{archive_path}{filename}'
                                                    for filename in filenames
                                                ],
                                            },
@@ -261,10 +261,10 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                            {
                                                '_file': {
                                                    'paths': {
-                                                       name:
+                                                       uuid:
                                                        {
-                                                           'normalized_absolute': f'/geoserver/data_dir/normalized_raster_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/{name}.tif',
-                                                           'normalized_geoserver': f'normalized_raster_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/{name}.tif',
+                                                           'normalized_absolute': f'/geoserver/data_dir/normalized_raster_data_test/{publ_type_dir}/{uuid}/{uuid}.tif',
+                                                           'normalized_geoserver': f'normalized_raster_data_test/{publ_type_dir}/{uuid}/{uuid}.tif',
                                                        }
                                                    },
                                                },
@@ -274,10 +274,10 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                            {
                                                '_file': {
                                                    'paths': {
-                                                       input_file.slugify_timeseries_filename(os.path.splitext(os.path.basename(filename))[0]) if len(filenames) > 1 else name:
+                                                       input_file.slugify_timeseries_filename(os.path.splitext(os.path.basename(filename))[0]) if len(filenames) > 1 else uuid:
                                                        {
-                                                           'normalized_absolute': f'/geoserver/data_dir/normalized_raster_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/{input_file.slugify_timeseries_filename(os.path.splitext(os.path.basename(filename))[0])}.tif',
-                                                           'normalized_geoserver': f'normalized_raster_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/{input_file.slugify_timeseries_filename(os.path.splitext(os.path.basename(filename))[0])}.tif',
+                                                           'normalized_absolute': f'/geoserver/data_dir/normalized_raster_data_test/{publ_type_dir}/{uuid}/{input_file.slugify_timeseries_filename(os.path.splitext(os.path.basename(filename))[0])}.tif',
+                                                           'normalized_geoserver': f'normalized_raster_data_test/{publ_type_dir}/{uuid}/{input_file.slugify_timeseries_filename(os.path.splitext(os.path.basename(filename))[0])}.tif',
                                                        }
                                                        for filename in filenames
                                                    },
@@ -296,7 +296,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
             if style_type == 'qml':
                 util.recursive_dict_update(expected_detail,
                                            {
-                                               '_wms': {'qgis_capabilities_url': f'{settings.LAYMAN_QGIS_URL}?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.1.1&map={settings.LAYMAN_QGIS_DATA_DIR}/workspaces/{workspace}/{publ_type_dir}/{name}/{name}.qgis'},
+                                               '_wms': {'qgis_capabilities_url': f'{settings.LAYMAN_QGIS_URL}?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.1.1&map={settings.LAYMAN_QGIS_DATA_DIR}/{publ_type_dir}/{uuid}/{uuid}.qgis'},
                                            })
 
     if publ_type == process_client.MAP_TYPE:
@@ -305,11 +305,11 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                        '_file': {
                                            'url': f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/{workspace}/{publ_type_dir}/{name}/file',
                                            'paths': {
-                                               'absolute': [f'/layman_data_test/workspaces/{workspace}/{publ_type_dir}/{name}/input_file/{name}.json']
+                                               'absolute': [f'/layman_data_test/{publ_type_dir}/{uuid}/input_file/{uuid}.json']
                                            },
                                        },
                                        'file': {
-                                           'path': f'{publ_type_dir}/{name}/input_file/{name}.json',
+                                           'path': f'{publ_type_dir}/{uuid}/input_file/{uuid}.json',
                                            'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/{publ_type_dir}/{name}/file'},
                                        '_style_type': None,
                                        '_map_layers': [],
