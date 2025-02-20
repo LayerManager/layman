@@ -5,6 +5,7 @@ from layman import app, settings
 from layman.layer import qgis
 from layman.layer.qgis import wms
 from layman.layer.filesystem import gdal, input_file
+from layman.util import get_publication_uuid
 from test_tools.util import url_for
 from ...asserts.final.publication import internal as asserts_internal
 from ... import static_data as data
@@ -16,12 +17,13 @@ from ..data import ensure_publication
 def test_raster_files(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
     with app.app_context():
-        directory_path = input_file.get_layer_input_file_dir(workspace, publication)
+        layer_uuid = get_publication_uuid(workspace, publ_type, publication)
+        directory_path = input_file.get_layer_input_file_dir(layer_uuid)
     publ_test_data = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA]
     for ext in publ_test_data['file_extensions']:
         file_path = os.path.join(directory_path, publication + ext)
         assert os.path.exists(file_path), file_path
-    norm_file_path = gdal.get_normalized_raster_layer_main_filepaths(workspace, publication)[0]
+    norm_file_path = gdal.get_normalized_raster_layer_main_filepaths(layer_uuid)[0]
     assert os.path.exists(norm_file_path), norm_file_path
     normalized_color_interp = publ_test_data['normalized_color_interp']
     assert normalized_color_interp == gdal.get_color_interpretations(norm_file_path)

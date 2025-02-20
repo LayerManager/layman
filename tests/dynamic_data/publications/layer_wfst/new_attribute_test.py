@@ -293,7 +293,7 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
                 # assert that all attr_names are not yet presented in QML
                 with app.app_context():
                     assert qgis_wms.get_layer_info(workspace, layer_name)
-                    old_qgis_attributes = qgis_util.get_layer_attribute_names(workspace, layer_name)
+                    old_qgis_attributes = qgis_util.get_layer_attribute_names(layer_uuid)
                 assert all(attr_name not in old_qgis_attributes
                            for attr_name in attr_names), (attr_names, old_qgis_attributes)
 
@@ -329,7 +329,7 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
                 # assert that exactly all attr_names are present also in QML
                 with app.app_context():
                     assert qgis_wms.get_layer_info(workspace, layer_name)
-                    new_qgis_attributes = qgis_util.get_layer_attribute_names(workspace, layer_name)
+                    new_qgis_attributes = qgis_util.get_layer_attribute_names(layer_uuid)
                 assert all(attr_name in new_qgis_attributes for attr_name in attr_names), \
                     (attr_names, new_qgis_attributes)
             else:

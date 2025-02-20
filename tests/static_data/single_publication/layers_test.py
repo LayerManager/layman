@@ -208,7 +208,7 @@ def test_fill_project_template(workspace, publ_type, publication):
         layer_crs = layer_db.get_table_crs(workspace, table_name, use_internal_srid=True)
     layer_bbox = bbox_util.get_bbox_to_publish(real_bbox, layer_crs)
     with app.app_context():
-        qml_path = qgis_util.get_original_style_path(workspace, publication)
+        qml_path = qgis_util.get_original_style_path(layer_uuid)
     parser = ET.XMLParser(remove_blank_text=True)
     qml_xml = ET.parse(qml_path, parser=parser)
     exp_min_scale = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('min_scale')
