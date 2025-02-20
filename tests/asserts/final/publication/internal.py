@@ -459,10 +459,10 @@ def wfs_wms_status_available(workspace, publ_type, name):
     assert wfs_wms_status == settings.EnumWfsWmsStatus.AVAILABLE
 
 
-def consistent_internal_map_layers(workspace, publ_type, name):
+def consistent_internal_map_layers(workspace, publ_type, name, publ_uuid):
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['map_layers']})
-        map_json = map_input_file.get_map_json(workspace, name)
+        map_json = map_input_file.get_map_json(publ_uuid)
     layers_from_file = map_util.get_layers_from_json(map_json)
     layers_from_info = [(ml['uuid'], ml['index']) for ml in pub_info['_map_layers']]
     assert layers_from_file == layers_from_info
