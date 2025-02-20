@@ -1,8 +1,9 @@
 import crs as crs_def
 from geoserver import util as gs_util
-from layman import celery_app, settings, util as layman_util, names
+from layman import celery_app, settings
 from layman.common import bbox as bbox_util
 from layman.celery import AbortedException
+from layman.layer.layer_class import LaymanLayer
 from . import wms
 from .util import get_db_store_name
 from .. import geoserver, LAYER_TYPE
@@ -23,27 +24,21 @@ def patch_after_feature_change(
     if self.is_aborted():
         raise AbortedException
 
-    publ_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer,
-                                                 context={'keys': ['geodata_type', 'original_data_source', 'uuid', ]})
-    geodata_type = publ_info['geodata_type']
-    if geodata_type == settings.GEODATA_TYPE_VECTOR:
-        uuid = publ_info['uuid']
-        bbox = geoserver.get_layer_bbox_by_uuid(uuid=uuid)
-        wms_layername = names.get_layer_names_by_source(uuid=uuid).wms
-        info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['style_type', 'native_crs', ], })
-        style_type = info['_style_type']
-        crs = info['native_crs']
-        lat_lon_bbox = bbox_util.transform(bbox, crs, crs_def.EPSG_4326)
-        if style_type == 'sld':
-            original_data_source = info['original_data_source']
-            store_name = get_db_store_name(uuid=uuid, db_schema=workspace, original_data_source=original_data_source)
-            gs_util.patch_feature_type(wms_layername.workspace, wms_layername.name, auth=settings.LAYMAN_GS_AUTH, bbox=bbox, crs=crs,
+    layer_data = LaymanLayer(publ_tuple=(workspace, LAYER_TYPE, layer))
+
+    if layer_data.geodata_type == settings.GEODATA_TYPE_VECTOR:
+        bbox = geoserver.get_layer_bbox_by_layer(layer=layer_data)
+        wms_layername = layer_data.gs_names.wms
+        lat_lon_bbox = bbox_util.transform(bbox, layer_data.native_crs, crs_def.EPSG_4326)
+        if layer_data.style_type == 'sld':
+            store_name = get_db_store_name(uuid=layer_data.uuid, db_schema=workspace, original_data_source=layer_data.original_data_source)
+            gs_util.patch_feature_type(wms_layername.workspace, wms_layername.name, auth=settings.LAYMAN_GS_AUTH, bbox=bbox, crs=layer_data.native_crs,
                                        lat_lon_bbox=lat_lon_bbox, store_name=store_name)
-        elif style_type == 'qml':
-            gs_util.patch_wms_layer(wms_layername.workspace, wms_layername.name, auth=settings.LAYMAN_GS_AUTH, bbox=bbox, crs=crs, lat_lon_bbox=lat_lon_bbox)
+        elif layer_data.style_type == 'qml':
+            gs_util.patch_wms_layer(wms_layername.workspace, wms_layername.name, auth=settings.LAYMAN_GS_AUTH, bbox=bbox, crs=layer_data.native_crs, lat_lon_bbox=lat_lon_bbox)
         wms.clear_cache()
-    elif geodata_type != settings.GEODATA_TYPE_RASTER:
-        raise NotImplementedError(f"Unknown geodata type: {geodata_type}")
+    elif layer_data.style_type != settings.GEODATA_TYPE_RASTER:
+        raise NotImplementedError(f"Unknown geodata type: {layer_data.geodata_type}")
 
     if self.is_aborted():
         raise AbortedException

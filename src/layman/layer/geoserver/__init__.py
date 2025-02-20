@@ -104,16 +104,13 @@ def set_security_rules(workspace, layer, access_rights, auth, geoserver_workspac
 
 
 def get_layer_bbox(workspace, layer):
-    uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layer)
-    return get_layer_bbox_by_uuid(uuid=uuid)
+    layer_data = layer_class.LaymanLayer(publ_tuple=(workspace, LAYER_TYPE, layer))
+    return get_layer_bbox_by_layer(layer=layer_data)
 
 
-def get_layer_bbox_by_uuid(*, uuid):
-    layer_info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['native_bounding_box', 'native_crs', ]})
-    db_bbox = layer_info['native_bounding_box']
-    crs = layer_info['native_crs']
+def get_layer_bbox_by_layer(*, layer: layer_class.LaymanLayer):
     # GeoServer is not working good with degradeted bbox
-    result = bbox_util.get_bbox_to_publish(db_bbox, crs)
+    result = bbox_util.get_bbox_to_publish(layer.native_bounding_box, layer.native_crs)
     return result
 
 
@@ -124,23 +121,23 @@ def get_layer_native_bbox(workspace, layer):
 
 
 def publish_layer_from_db(*, layer: layer_class.LaymanLayer, gs_layername, geoserver_workspace, description, title, crs, table_name, metadata_url, store_name=None):
-    bbox = get_layer_bbox_by_uuid(uuid=layer.uuid)
+    bbox = get_layer_bbox_by_layer(layer=layer)
     lat_lon_bbox = bbox_util.transform(bbox, crs, crs_def.EPSG_4326)
     gs_util.post_feature_type(geoserver_workspace, gs_layername, description, title, bbox, crs, settings.LAYMAN_GS_AUTH, lat_lon_bbox=lat_lon_bbox, table_name=table_name, metadata_url=metadata_url, store_name=store_name)
 
 
 def publish_layer_from_qgis(*, uuid, gs_layername, geoserver_workspace, qgis_layername, description, title, metadata_url, ):
+    layer = layer_class.LaymanLayer(uuid=uuid)
     store_name = wms.get_qgis_store_name(uuid=uuid)
-    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['wms', 'native_crs', ]})
+    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['wms', ]})
     layer_capabilities_url = info['_wms']['qgis_capabilities_url']
-    crs = info['native_crs']
     gs_util.create_wms_store(geoserver_workspace,
                              settings.LAYMAN_GS_AUTH,
                              store_name,
                              layer_capabilities_url)
-    bbox = get_layer_bbox_by_uuid(uuid=uuid)
-    lat_lon_bbox = bbox_util.transform(bbox, crs, crs_def.EPSG_4326)
-    gs_util.post_wms_layer(geoserver_workspace, gs_layername, qgis_layername, store_name, title, description, bbox, crs, settings.LAYMAN_GS_AUTH,
+    bbox = get_layer_bbox_by_layer(layer=layer)
+    lat_lon_bbox = bbox_util.transform(bbox, layer.native_crs, crs_def.EPSG_4326)
+    gs_util.post_wms_layer(geoserver_workspace, gs_layername, qgis_layername, store_name, title, description, bbox, layer.native_crs, settings.LAYMAN_GS_AUTH,
                            lat_lon_bbox=lat_lon_bbox, metadata_url=metadata_url)
 
 
