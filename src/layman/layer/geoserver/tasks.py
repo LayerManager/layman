@@ -72,7 +72,7 @@ def refresh_wms(
                                             metadata_url=metadata_url,
                                             store_name=store_name)
         else:
-            geoserver.publish_layer_from_qgis(uuid=uuid,
+            geoserver.publish_layer_from_qgis(layer=layer,
                                               gs_layername=gs_layername.name,
                                               geoserver_workspace=gs_layername.workspace,
                                               qgis_layername=layer.name,
@@ -86,12 +86,12 @@ def refresh_wms(
         bbox = bbox_util.get_bbox_to_publish(layer.native_bounding_box, layer.native_crs)
         lat_lon_bbox = bbox_util.transform(bbox, layer.native_crs, crs_def.EPSG_4326)
         if not image_mosaic:
-            coverage_store_name = wms.get_geotiff_store_name(uuid=uuid)
+            coverage_store_name = wms.get_geotiff_store_name(uuid=layer.uuid)
             coverage_type = gs_util.COVERAGESTORE_GEOTIFF
             enable_time_dimension = False
             source_file_or_dir = gs_file_path
         else:
-            coverage_store_name = wms.get_image_mosaic_store_name(uuid=uuid)
+            coverage_store_name = wms.get_image_mosaic_store_name(uuid=layer.uuid)
             source_file_or_dir = os.path.dirname(gs_file_path)
             file_path = file_paths['normalized_absolute']
             dir_path = os.path.dirname(file_path)

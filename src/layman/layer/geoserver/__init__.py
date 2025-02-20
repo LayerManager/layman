@@ -126,10 +126,9 @@ def publish_layer_from_db(*, layer: layer_class.LaymanLayer, gs_layername, geose
     gs_util.post_feature_type(geoserver_workspace, gs_layername, description, title, bbox, crs, settings.LAYMAN_GS_AUTH, lat_lon_bbox=lat_lon_bbox, table_name=table_name, metadata_url=metadata_url, store_name=store_name)
 
 
-def publish_layer_from_qgis(*, uuid, gs_layername, geoserver_workspace, qgis_layername, description, title, metadata_url, ):
-    layer = layer_class.LaymanLayer(uuid=uuid)
-    store_name = wms.get_qgis_store_name(uuid=uuid)
-    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['wms', ]})
+def publish_layer_from_qgis(*, layer: layer_class.LaymanLayer, gs_layername, geoserver_workspace, qgis_layername, description, title, metadata_url, ):
+    store_name = wms.get_qgis_store_name(uuid=layer.uuid)
+    info = layman_util.get_publication_info_by_publication(layer, context={'keys': ['wms', ]})
     layer_capabilities_url = info['_wms']['qgis_capabilities_url']
     gs_util.create_wms_store(geoserver_workspace,
                              settings.LAYMAN_GS_AUTH,
