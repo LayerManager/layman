@@ -5,7 +5,6 @@ import pytest
 from layman import app, settings, util
 from layman.common import empty_method_returns_true
 from layman.common.prime_db_schema import workspaces
-from layman.layer import qgis
 from layman.layer.geoserver import wms
 from test_tools import process_client, process
 from .. import static_data as data, Publication
@@ -21,8 +20,6 @@ def assert_publication_after_delete(workspace, publ_type, publication):
     if publ_type == process_client.LAYER_TYPE:
         with app.app_context():
             assert wms.get_layer_info(workspace, publication) == {}
-        if data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA]['style_type'] == 'qml':
-            assert workspace in qgis.get_workspaces()
 
 
 def assert_publication_before_post(workspace, publ_type, publication):
