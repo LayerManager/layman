@@ -6,7 +6,7 @@ from geoserver import util as gs_util
 from layman.http import LaymanError
 from layman import settings, util as layman_util, names
 from layman.common import bbox as bbox_util, geoserver as gs_common
-from layman.layer import LAYER_TYPE
+from layman.layer import LAYER_TYPE, layer_class
 from . import wms
 from .util import get_external_db_store_name, get_internal_db_store_name
 
@@ -123,8 +123,8 @@ def get_layer_native_bbox(workspace, layer):
     return gs_util.bbox_to_dict(bbox, crs)
 
 
-def publish_layer_from_db_by_uuid(*, uuid, gs_layername, geoserver_workspace, description, title, crs, table_name, metadata_url, store_name=None):
-    bbox = get_layer_bbox_by_uuid(uuid=uuid)
+def publish_layer_from_db(*, layer: layer_class.LaymanLayer, gs_layername, geoserver_workspace, description, title, crs, table_name, metadata_url, store_name=None):
+    bbox = get_layer_bbox_by_uuid(uuid=layer.uuid)
     lat_lon_bbox = bbox_util.transform(bbox, crs, crs_def.EPSG_4326)
     gs_util.post_feature_type(geoserver_workspace, gs_layername, description, title, bbox, crs, settings.LAYMAN_GS_AUTH, lat_lon_bbox=lat_lon_bbox, table_name=table_name, metadata_url=metadata_url, store_name=store_name)
 
