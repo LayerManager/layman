@@ -552,12 +552,14 @@ def test_uppercase_attr(client):
         sld_path = 'sample/data/upper_attr.sld'
         assert os.path.isfile(sld_path)
         layername = 'upper_attr'
+        publ_uuid = '18007abf-e7e8-4895-9c87-1a646a8771fe'
         with ExitStack() as stack, open(sld_path, 'rb') as sld_file:
             files = [(stack.enter_context(open(fp, 'rb')), os.path.basename(fp)) for fp in file_paths]
             response = client.post(rest_path, data={
                 'file': files,
                 'name': layername,
                 'style': (sld_file, os.path.basename(sld_path)),
+                'uuid': publ_uuid,
             })
         assert response.status_code == 200
         resp_json = response.get_json()
@@ -598,7 +600,7 @@ def test_uppercase_attr(client):
                 a for a in attributes if a['name'] == attr_name
             ), None) is not None
 
-        th_path = get_layer_thumbnail_path(workspace, layername)
+        th_path = get_layer_thumbnail_path(publ_uuid)
         assert os.path.getsize(th_path) > 5000
 
     with app.app_context():

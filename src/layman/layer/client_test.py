@@ -15,6 +15,7 @@ from test_tools import process_client
 
 WORKSPACE = 'test_layer_client_test_workspace'
 LAYERNAME = 'country_chunks'
+PUBL_UUID = '70d6967a-07ce-4aa5-ab44-adaf12bbc50c'
 
 
 @pytest.fixture(scope="module")
@@ -77,6 +78,12 @@ def test_post_layers_chunk(browser):
     layername_input.clear()
     layername_input.send_keys(LAYERNAME)
 
+    uuid_input = browser.find_elements(By.NAME, 'uuid')
+    assert len(uuid_input) == 1
+    uuid_input = uuid_input[0]
+    uuid_input.clear()
+    uuid_input.send_keys(PUBL_UUID)
+
     file_input = browser.find_elements(By.NAME, 'file')
     assert len(file_input) == 1
     file_input = file_input[0]
@@ -110,7 +117,7 @@ def test_post_layers_chunk(browser):
     resp_json = json.loads(resp_msg_div[0].text)
     assert resp_json[0]['name'] == LAYERNAME
 
-    total_chunks_key = input_chunk.get_layer_redis_total_chunks_key(WORKSPACE, LAYERNAME)
+    total_chunks_key = input_chunk.get_layer_redis_total_chunks_key(PUBL_UUID)
     assert not settings.LAYMAN_REDIS.exists(total_chunks_key)
 
 
@@ -189,5 +196,5 @@ def test_patch_layer_chunk(browser):
     resp_json = json.loads(resp_msg_div[0].text)
     assert resp_json['name'] == LAYERNAME
 
-    total_chunks_key = input_chunk.get_layer_redis_total_chunks_key(WORKSPACE, LAYERNAME)
+    total_chunks_key = input_chunk.get_layer_redis_total_chunks_key(PUBL_UUID)
     assert not settings.LAYMAN_REDIS.exists(total_chunks_key)

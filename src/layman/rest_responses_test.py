@@ -60,13 +60,15 @@ class TestResponsesClass:
     workspace = 'test_responses_workspace'
     publication = 'test_responses_publication'
     description = 'Toto je popisek.'
-    uuid = '97776002-efde-43f1-8618-26c0d69e4bf9'
+    layer_uuid = '97776002-efde-43f1-8618-26c0d69e4bf9'
+    map_uuid = 'd2884b49-04a8-406a-940d-9dc2f5b2c8fa'
     common_params = {
         process_client.LAYER_TYPE: {
-            'uuid': uuid,
+            'uuid': layer_uuid,
             'description': description,
         },
         process_client.MAP_TYPE: {
+            'uuid': map_uuid,
             'description': description,
         }}
 
@@ -113,24 +115,24 @@ class TestResponsesClass:
         'native_crs': 'EPSG:4326',
         'native_bounding_box': list(test_data.SMALL_LAYER_NATIVE_BBOX),
         'db': {'schema': workspace,
-               'table': None,
+               'table': f"layer_{layer_uuid.replace('-', '_')}",
                'geo_column': 'wkb_geometry',
                },
         'geodata_type': 'vector',
-        'file': {'paths': [f'layers/{publication}/input_file/{publication}.geojson'],
+        'file': {'paths': [f'layers/{layer_uuid}/input_file/{layer_uuid}.geojson'],
                  },
         'metadata': {'comparison_url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}/'
                                        f'metadata-comparison',
                      'csw_url': f'{settings.CSW_PROXY_URL}',
-                     'identifier': None,
+                     'identifier': f"m-{layer_uuid}",
                      'record_url': None},
         'style': {'type': 'sld',
                   'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}/style'},
-        'thumbnail': {'path': f'layers/{publication}/thumbnail/{publication}.png',
+        'thumbnail': {'path': f'layers/{layer_uuid}/thumbnail/{layer_uuid}.png',
                       'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}/thumbnail'},
         'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}',
-        'wfs': {'name': f'l_{uuid}', 'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{names.GEOSERVER_WFS_WORKSPACE}/wfs'},
-        'wms': {'name': f'l_{uuid}', 'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{names.GEOSERVER_WMS_WORKSPACE}/ows'},
+        'wfs': {'name': f'l_{layer_uuid}', 'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{names.GEOSERVER_WFS_WORKSPACE}/wfs'},
+        'wms': {'name': f'l_{layer_uuid}', 'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{names.GEOSERVER_WMS_WORKSPACE}/ows'},
         'original_data_source': 'file',
         'used_in_maps': [],
     }
@@ -139,15 +141,15 @@ class TestResponsesClass:
         'bounding_box': list(test_data.SMALL_MAP_BBOX),
         'native_crs': 'EPSG:3857',
         'native_bounding_box': list(test_data.SMALL_MAP_BBOX),
-        'file': {'path': f'maps/{publication}/input_file/{publication}.json',
+        'file': {'path': f'maps/{map_uuid}/input_file/{map_uuid}.json',
                  'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/maps/{publication}/file'},
         'metadata': {
             'comparison_url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/maps/{publication}/'
                               f'metadata-comparison',
             'csw_url': f'{settings.CSW_PROXY_URL}',
-            'identifier': None,
+            'identifier': f"m-{map_uuid}",
             'record_url': None},
-        'thumbnail': {'path': f'maps/{publication}/thumbnail/{publication}.png',
+        'thumbnail': {'path': f'maps/{map_uuid}/thumbnail/{map_uuid}.png',
                       'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/maps/{publication}/thumbnail'},
         'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/maps/{publication}',
         'uuid': None,

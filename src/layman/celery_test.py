@@ -38,17 +38,19 @@ def test_single_abortable_task():
         ) for taskname in task_names
     ]
     check_crs = False
+    publ_uuid = '956fc92b-4247-4ea9-a014-59d8b09acd0a'
     task_options = {
         'crs_id': 'EPSG:4326',
         'description': 'bla',
         'title': 'bla',
         'check_crs': check_crs,
+        'uuid': publ_uuid,
     }
     filenames = fs_util.InputFiles(sent_paths=['abc.geojson'])
     workspace = 'test_abort_workspace'
     layername = 'test_abort_layer'
     with app.app_context():
-        input_chunk.save_layer_files_str(workspace, layername, filenames, check_crs)
+        input_chunk.save_layer_files_str(publ_uuid, filenames, check_crs)
     task_chain = chain(*[
         tasks_util.get_task_signature(workspace, layername, t, task_options, 'layername')
         for t in tasks
@@ -73,7 +75,7 @@ def test_single_abortable_task():
     # first one is failure, because it throws AbortedException
     assert results[0].state == results_copy[0].state == 'FAILURE'
     with app.app_context():
-        input_chunk.delete_layer(workspace, layername)
+        input_chunk.delete_layer_by_uuid(publ_uuid)
 
 
 @pytest.mark.usefixtures('client')
@@ -90,17 +92,19 @@ def test_abortable_task_chain():
         ) for taskname in task_names
     ]
     check_crs = False
+    publ_uuid = '6658cfe1-4090-4f0a-949b-a0891bec2ef4'
     task_options = {
         'crs_id': 'EPSG:4326',
         'description': 'bla',
         'title': 'bla',
         'check_crs': check_crs,
+        'uuid': publ_uuid,
     }
     filenames = fs_util.InputFiles(sent_paths=['abc.geojson'])
     workspace = 'test_abort_workspace'
     layername = 'test_abort_layer2'
     with app.app_context():
-        input_chunk.save_layer_files_str(workspace, layername, filenames, check_crs)
+        input_chunk.save_layer_files_str(publ_uuid, filenames, check_crs)
     task_chain = chain(*[
         tasks_util.get_task_signature(workspace, layername, t, task_options, 'layername')
         for t in tasks
@@ -133,4 +137,4 @@ def test_abortable_task_chain():
     assert results[1].state == results_copy[1].state == 'FAILURE'
     assert results[2].state == results_copy[2].state == 'FAILURE'
     with app.app_context():
-        input_chunk.delete_layer(workspace, layername)
+        input_chunk.delete_layer_by_uuid(publ_uuid)
