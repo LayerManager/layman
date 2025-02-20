@@ -62,15 +62,15 @@ def refresh_wms(
                                                                 )
             else:
                 store_name = get_internal_db_store_name(db_schema=layer.workspace, )
-            geoserver.publish_layer_from_db_by_uuid(uuid=uuid,
-                                                    gs_layername=gs_layername.name,
-                                                    geoserver_workspace=gs_layername.workspace,
-                                                    description=description,
-                                                    title=title,
-                                                    crs=layer.native_crs,
-                                                    table_name=table_name,
-                                                    metadata_url=metadata_url,
-                                                    store_name=store_name)
+            geoserver.publish_layer_from_db(layer=layer,
+                                            gs_layername=gs_layername.name,
+                                            geoserver_workspace=gs_layername.workspace,
+                                            description=description,
+                                            title=title,
+                                            crs=layer.native_crs,
+                                            table_name=table_name,
+                                            metadata_url=metadata_url,
+                                            store_name=store_name)
         else:
             geoserver.publish_layer_from_qgis(uuid=uuid,
                                               gs_layername=gs_layername.name,
@@ -160,15 +160,15 @@ def refresh_wfs(
     else:
         store_name = get_internal_db_store_name(db_schema=layer.workspace, )
     metadata_url = micka_util.get_metadata_url(uuid, url_type=micka_util.RecordUrlType.XML)
-    geoserver.publish_layer_from_db_by_uuid(uuid=uuid,
-                                            gs_layername=gs_layername.name,
-                                            geoserver_workspace=gs_layername.workspace,
-                                            description=description,
-                                            title=title,
-                                            crs=layer.native_crs,
-                                            table_name=table_name,
-                                            metadata_url=metadata_url,
-                                            store_name=store_name)
+    geoserver.publish_layer_from_db(layer=layer,
+                                    gs_layername=gs_layername.name,
+                                    geoserver_workspace=gs_layername.workspace,
+                                    description=description,
+                                    title=title,
+                                    crs=layer.native_crs,
+                                    table_name=table_name,
+                                    metadata_url=metadata_url,
+                                    store_name=store_name)
     geoserver.set_security_rules_by_uuid(uuid=uuid,
                                          geoserver_workspace=gs_layername.workspace,
                                          geoserver_layername=gs_layername.name,
