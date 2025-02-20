@@ -42,7 +42,7 @@ def refresh_wms(
 ):
     layer = layer_class.LaymanLayer(uuid=uuid)
     gs_layername = layer.gs_names.wms
-    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['file']})
+    info = layman_util.get_publication_info_by_publication(layer, context={'keys': ['file']})
 
     assert title is not None
     geoserver.ensure_workspace(workspace)
