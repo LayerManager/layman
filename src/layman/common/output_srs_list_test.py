@@ -38,6 +38,7 @@ def ensure_layer(delete_layer_after_test):
     yield ensure_layer_internal
 
 
+@pytest.mark.timeout(40)
 def test_custom_srs_list(ensure_layer):
     workspace = 'test_custom_srs_list_workspace'
     layer_sld1 = 'test_custom_srs_list_sld_layer1'
