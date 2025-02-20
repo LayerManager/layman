@@ -118,7 +118,7 @@ def refresh_wms(
     wms.clear_cache()
 
     if self.is_aborted():
-        wms.delete_layer_by_uuid(uuid=uuid, db_schema=layer.workspace)
+        wms.delete_layer_by_layer(layer=layer, db_schema=layer.workspace)
         raise AbortedException
 
 

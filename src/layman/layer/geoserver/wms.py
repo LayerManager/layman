@@ -13,6 +13,7 @@ from layman.common import geoserver as gs_common, empty_method
 from layman.layer.util import is_layer_chain_ready
 from layman.layer import LAYER_TYPE
 from layman.layer.filesystem import gdal
+from layman.layer.layer_class import LaymanLayer
 import requests_util.retry
 from .util import get_gs_proxy_server_url, get_external_db_store_name, get_internal_db_store_name, \
     image_mosaic_granules_to_wms_time_key, get_db_store_name
@@ -78,16 +79,16 @@ def patch_layer(workspace, layername, *, uuid, title, description, original_data
                         )
 
 
-def delete_layer_by_uuid(*, uuid, db_schema):
+def delete_layer_by_layer(*, layer: LaymanLayer, db_schema):
     db_store_name = get_internal_db_store_name(db_schema=db_schema)
-    gs_layername = names.get_names_by_source(uuid=uuid, publication_type=LAYER_TYPE).wms
+    gs_layername = layer.gs_names.wms
     gs_util.delete_feature_type(gs_layername.workspace, gs_layername.name, settings.LAYMAN_GS_AUTH, store=db_store_name)
-    gs_util.delete_feature_type(gs_layername.workspace, gs_layername.name, settings.LAYMAN_GS_AUTH, store=get_external_db_store_name(uuid=uuid))
+    gs_util.delete_feature_type(gs_layername.workspace, gs_layername.name, settings.LAYMAN_GS_AUTH, store=get_external_db_store_name(uuid=layer.uuid))
     gs_util.delete_wms_layer(gs_layername.workspace, gs_layername.name, settings.LAYMAN_GS_AUTH)
-    gs_util.delete_wms_store(gs_layername.workspace, settings.LAYMAN_GS_AUTH, get_qgis_store_name(uuid=uuid))
-    gs_util.delete_coverage_store(gs_layername.workspace, settings.LAYMAN_GS_AUTH, get_geotiff_store_name(uuid=uuid))
-    gs_util.delete_coverage_store(gs_layername.workspace, settings.LAYMAN_GS_AUTH, get_image_mosaic_store_name(uuid=uuid))
-    gs_util.delete_db_store(gs_layername.workspace, settings.LAYMAN_GS_AUTH, store_name=get_external_db_store_name(uuid=uuid))
+    gs_util.delete_wms_store(gs_layername.workspace, settings.LAYMAN_GS_AUTH, get_qgis_store_name(uuid=layer.uuid))
+    gs_util.delete_coverage_store(gs_layername.workspace, settings.LAYMAN_GS_AUTH, get_geotiff_store_name(uuid=layer.uuid))
+    gs_util.delete_coverage_store(gs_layername.workspace, settings.LAYMAN_GS_AUTH, get_image_mosaic_store_name(uuid=layer.uuid))
+    gs_util.delete_db_store(gs_layername.workspace, settings.LAYMAN_GS_AUTH, store_name=get_external_db_store_name(uuid=layer.uuid))
     clear_cache()
 
     gs_util.delete_security_roles(f"{gs_layername.workspace}.{gs_layername.name}.r", settings.LAYMAN_GS_AUTH)
@@ -96,8 +97,8 @@ def delete_layer_by_uuid(*, uuid, db_schema):
 
 
 def delete_layer(workspace, layername):
-    uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layername)
-    return delete_layer_by_uuid(uuid=uuid, db_schema=workspace)
+    layer = LaymanLayer(publ_tuple=(workspace, LAYER_TYPE, layername))
+    return delete_layer_by_layer(layer=layer, db_schema=workspace)
 
 
 def get_wms_url(external_url=False, *, x_forwarded_items=None):
