@@ -6,7 +6,7 @@
 - Only versions 1.23.2 and newer can be upgraded to this version. For older versions, please upgrade to last 1.23.x first.
 - Change environment variable [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION):
   ```
-  LAYMAN_CLIENT_VERSION=9f20d0c2efb924334af373bfb90726db12285d71
+  LAYMAN_CLIENT_VERSION=f6f79822de28f69dfe5c40e99e8b0fd603de9e78
   ```
 - Set new environment variable [GRANT_DELETE_OTHER_USER](doc/env-settings.md#GRANT_DELETE_OTHER_USER)  
 - In demo configuration, build QGIS v3.40.2 image using
