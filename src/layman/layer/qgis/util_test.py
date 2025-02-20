@@ -47,7 +47,9 @@ from ..filesystem import thumbnail
 @pytest.mark.usefixtures('ensure_layman')
 def test_geometry_types(layer, exp_db_types, qml_geometry_dict, qml_version):
     workspace = 'test_geometry_types_workspace'
-    process_client.publish_workspace_layer(workspace, layer, file_paths=[f'/code/sample/data/geometry-types/{layer}.geojson'], )
+    publ_uuid = process_client.publish_workspace_layer(
+        workspace, layer, file_paths=[f'/code/sample/data/geometry-types/{layer}.geojson']
+    )['uuid']
     with app.app_context():
         table_name = db.get_internal_table_name(workspace, layer)
         db_types = db.get_geometry_types(workspace, table_name)
@@ -69,7 +71,7 @@ def test_geometry_types(layer, exp_db_types, qml_geometry_dict, qml_version):
             style_file_path = f'/code/sample/data/geometry-types/{qml_style_name}-v{qml_version}.qml'
             process_client.patch_workspace_layer(workspace, layer, style_file=style_file_path)
             with app.app_context():
-                qml = util.get_original_style_xml(workspace, layer)
+                qml = util.get_original_style_xml(publ_uuid)
             found_qml_geometry = util.get_geometry_from_qml_and_db_types(qml, db_types=[])
             assert found_qml_geometry == qml_geometry
             exp_file_path = f'/code/sample/data/geometry-types/{qml_style_name}.png'
@@ -79,7 +81,7 @@ def test_geometry_types(layer, exp_db_types, qml_geometry_dict, qml_version):
                 'polygon': 110,
             }[qml_style_name]
             with app.app_context():
-                thumbnail_path = thumbnail.get_layer_thumbnail_path(workspace, layer)
+                thumbnail_path = thumbnail.get_layer_thumbnail_path(publ_uuid)
             diff_pixels = test_util.compare_images(thumbnail_path, exp_file_path)
             assert diff_pixels < diff_pixels_limit, f"thumbnail_path={thumbnail_path}, exp_file_path={exp_file_path}"
 

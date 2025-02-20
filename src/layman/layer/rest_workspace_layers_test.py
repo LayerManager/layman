@@ -38,21 +38,19 @@ def test_get_layer_title():
         process_client.delete_workspace_layer(workspace, name)
 
 
-def assert_style_file(workspace,
-                      layer,
-                      expected_style_file):
+def assert_style_file(publ_uuid, expected_style_file):
     with app.app_context():
-        style_file_path = input_style.get_file_path(workspace, layer)
-        layer_style_file = input_style.get_layer_file(workspace, layer)
+        style_file_path = input_style.get_file_path(publ_uuid)
+        layer_style_file = input_style.get_layer_file(publ_uuid)
     assert style_file_path == expected_style_file or all(v is None for v in [style_file_path, expected_style_file])
     assert all(v is not None for v in [layer_style_file, expected_style_file])\
         or all(v is None for v in [layer_style_file, expected_style_file])
 
 
 @pytest.mark.parametrize('source_style_file_path, layer_suffix, expected_style_file_template, expected_style_type', [
-    ('sample/style/generic-blue_sld.xml', '_sld', '/layman_data_test/workspaces/{workspace}/layers/{layer}/input_style/{layer}.sld', 'sld'),
-    ('sample/style/sld_1_1_0.xml', '_sld11', '/layman_data_test/workspaces/{workspace}/layers/{layer}/input_style/{layer}.sld', 'sld'),
-    ('sample/style/small_layer.qml', '_qml', '/layman_data_test/workspaces/{workspace}/layers/{layer}/input_style/{layer}.qml', 'qml'),
+    ('sample/style/generic-blue_sld.xml', '_sld', '/layman_data_test/layers/{publ_uuid}/input_style/{publ_uuid}.sld', 'sld'),
+    ('sample/style/sld_1_1_0.xml', '_sld11', '/layman_data_test/layers/{publ_uuid}/input_style/{publ_uuid}.sld', 'sld'),
+    ('sample/style/small_layer.qml', '_qml', '/layman_data_test/layers/{publ_uuid}/input_style/{publ_uuid}.qml', 'qml'),
     ('', '_no_style', None, 'sld'),
 ])
 @pytest.mark.usefixtures('ensure_layman')
@@ -62,17 +60,18 @@ def test_style_correctly_saved(source_style_file_path,
                                expected_style_type):
     workspace = 'test_style_correctly_saved_workspace'
     layer = 'test_style_correctly_saved_layer' + layer_suffix
-    expected_style_file = expected_style_file_template.format(workspace=workspace, layer=layer) if expected_style_file_template else None
-    process_client.publish_workspace_layer(workspace,
-                                           layer,
-                                           style_file=source_style_file_path)
-    assert_style_file(workspace, layer, expected_style_file)
+    publ_uuid = process_client.publish_workspace_layer(workspace,
+                                                       layer,
+                                                       style_file=source_style_file_path)['uuid']
+    expected_style_file = expected_style_file_template.format(publ_uuid=publ_uuid) if expected_style_file_template else None
+    assert_style_file(publ_uuid, expected_style_file)
     with app.app_context():
         info = layman_util.get_publication_info(workspace, process_client.LAYER_TYPE, layer, context={'keys': ['style_type', 'style'], })
     assert info['_style_type'] == expected_style_type
 
     process_client.delete_workspace_layer(workspace, layer)
-    process_client.publish_workspace_layer(workspace, layer)
+    publ_uuid = process_client.publish_workspace_layer(workspace, layer)['uuid']
+    expected_style_file = expected_style_file_template.format(publ_uuid=publ_uuid) if expected_style_file_template else None
 
     with app.app_context():
         info = layer_util.get_layer_info(workspace, layer)
@@ -80,12 +79,12 @@ def test_style_correctly_saved(source_style_file_path,
     assert info['style']['type'] == 'sld', info.get('style')
     assert info['style']['url'], info.get('style')
 
-    assert_style_file(workspace, layer, None)
+    assert_style_file(publ_uuid, None)
 
     process_client.patch_workspace_layer(workspace,
                                          layer,
                                          style_file=source_style_file_path)
-    assert_style_file(workspace, layer, expected_style_file)
+    assert_style_file(publ_uuid, expected_style_file)
     with app.app_context():
         info = layer_util.get_layer_info(workspace, layer)
     assert info['_style_type'] == expected_style_type

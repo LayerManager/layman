@@ -2,6 +2,8 @@ import os
 import shutil
 import time
 import sys
+import uuid
+
 import pytest
 
 del sys.modules['layman']
@@ -21,13 +23,15 @@ WORKSPACE = 'db_testuser'
 
 
 def post_layer(workspace, layer, file_path):
+    publ_uuid = str(uuid.uuid4())
     with layman.app_context():
         db.ensure_workspace(workspace)
         prime_db_schema_client.post_workspace_publication(LAYER_TYPE, workspace, layer,
                                                           geodata_type=settings.GEODATA_TYPE_VECTOR,
                                                           wfs_wms_status=settings.EnumWfsWmsStatus.AVAILABLE.value,
+                                                          publ_uuid=publ_uuid,
                                                           )
-        ensure_layer_input_file_dir(workspace, layer)
+        ensure_layer_input_file_dir(publ_uuid)
         db.import_layer_vector_file_to_internal_table(workspace, layer, file_path, None)
     yield workspace, layer
     with layman.app_context():
@@ -133,8 +137,9 @@ def test_abort_import_layer_vector_file():
     workspace = 'testuser1'
     layername = 'ne_10m_admin_0_countries'
     src_dir = 'tmp/naturalearth/10m/cultural'
+    publ_uuid = '685c32c9-e4f6-4bdc-b220-042b3e3b971e'
     with layman.app_context():
-        input_file_dir = ensure_layer_input_file_dir(workspace, layername)
+        input_file_dir = ensure_layer_input_file_dir(publ_uuid)
     filename = layername + '.geojson'
     main_filepath = os.path.join(input_file_dir, filename)
 
@@ -148,6 +153,7 @@ def test_abort_import_layer_vector_file():
         prime_db_schema_client.post_workspace_publication(LAYER_TYPE, workspace, layername,
                                                           geodata_type=settings.GEODATA_TYPE_VECTOR,
                                                           wfs_wms_status=settings.EnumWfsWmsStatus.AVAILABLE.value,
+                                                          publ_uuid=publ_uuid,
                                                           )
         with layman.app_context():
             table_name = db.get_internal_table_name(workspace, layername)
@@ -167,7 +173,7 @@ def test_abort_import_layer_vector_file():
     assert return_code != 0
     with layman.app_context():
         publications.delete_publication(workspace, LAYER_TYPE, layername)
-        layerdir = get_layer_dir(workspace, layername)
+        layerdir = get_layer_dir(publ_uuid)
     shutil.rmtree(layerdir)
 
 

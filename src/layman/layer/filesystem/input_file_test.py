@@ -84,7 +84,7 @@ def test_get_main_file_name_shp():
             'tmp/countries.VERSION.txt',
         ],
         'main_file_names': ['tmp/countries.shp'],
-        'layer_name': 'cntr',
+        'publ_uuid': 'cntr',
         'output_dir': '/data',
     }, {
         'tmp/countries.cpg': '/data/cntr.cpg',
@@ -119,7 +119,7 @@ def test_get_main_file_name_shp():
             'compressed.zip/tmp/countries.ěščřžýáíéĚŠČŘŽÝÁÍÉ',
         ],
         'main_file_names': ['compressed.zip/tmp/countries.tif', 'compressed.zip/tmp/countries2.tif'],
-        'layer_name': 'cntr',
+        'publ_uuid': 'cntr',
         'output_dir': '/data',
         'name_input_file_by_layer': False,
     }, {
