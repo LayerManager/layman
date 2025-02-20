@@ -105,16 +105,13 @@ def test_wms_layer(workspace, publ_type, publication):
 
     style = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA]['style_type']
     style_file_type = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('style_file_type')
-    expected_style_file = f'/layman_data_test/workspaces/{workspace}/layers/{publication}/input_style/{publication}'
-    expected_qgis_file = f'/qgis/data/test/workspaces/{workspace}/layers/{publication}/{publication}.qgis'
     with app.app_context():
         uuid = layman_util.get_publication_uuid(workspace, process_client.LAYER_TYPE, publication)
+    expected_style_file = f'/layman_data_test/layers/{uuid}/input_style/{uuid}'
+    expected_qgis_file = f'/qgis/data/test/layers/{uuid}/{uuid}.qgis'
     wms_layername = names.get_layer_names_by_source(uuid=uuid, ).wms
     wms_stores_url = urljoin(GS_REST_WORKSPACES, f'{wms_layername.workspace}/wmsstores/')
     wms_layers_url = urljoin(GS_REST_WORKSPACES, f'{wms_layername.workspace}/wmslayers/')
-
-    with app.app_context():
-        uuid = layman_util.get_publication_uuid(workspace, publ_type, publication)
 
     if style_file_type:
         assert (os.path.exists(expected_style_file + '.qml')) == (style_file_type == 'qml')
