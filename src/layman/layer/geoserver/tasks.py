@@ -191,10 +191,11 @@ def refresh_wfs(
 def refresh_sld(self, workspace, layername, store_in_geoserver, *, uuid):
     if self.is_aborted():
         raise AbortedException
+    layer = layer_class.LaymanLayer(uuid=uuid)
     if store_in_geoserver:
-        sld.ensure_custom_sld_file_if_needed(uuid)
-        sld.create_layer_style(uuid=uuid)
+        sld.ensure_custom_sld_file_if_needed(layer=layer)
+        sld.create_layer_style(layer=layer)
 
     if self.is_aborted():
-        sld.delete_layer_by_uuid(uuid=uuid)
+        sld.delete_layer_by_layer(layer=layer)
         raise AbortedException
