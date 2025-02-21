@@ -81,19 +81,13 @@ Redis is used as temporary data store. When Layman stops, data persists in Redis
 ### Filesystem
 Data is saved to LAYMAN_DATA_DIR directory, LAYMAN_QGIS_DATA_DIR directory, and GeoServer data directory.
 
-**Workspace directory** is created in LAYMAN_DATA_DIR directory for every created [workspace](models.md#workspace). Name of the workspace directory is the same as workspace name.
+**Publication directory** is created inside LAYMAN_DATA_DIR directory for each publication (e.g. map or layer) the user published. Name of the publication directory is UUID of the publication. Publication-related information is saved in publication directory.
 
-**Publication directory** is created inside workspace directory for each publication (e.g. map or layer) the user published. Name of the publication directory is the same as name of the publication (e.g. layername or mapname). Publication-related information is saved in publication directory.
-
-**QGIS workspace directory** is created in LAYMAN_QGIS_DATA_DIR directory for every created [workspace](models.md#workspace). Name of the workspace directory is the same as workspace name.
-
-**QGIS layer directory** is created inside QGIS workspace directory for each layer with QGIS style the user published. Name of the publication directory is the same as name of the layer. QGS project with style definition is stored in this directory for WMS purpose.
+**QGIS layer directory** is created in LAYMAN_QGIS_DATA_DIR directory for each layer with QGIS style the user published. Name of the publication directory is UUID of the layer. QGS project with style definition is stored in this directory for WMS purpose.
 
 **Normalized raster directory** named `normalized_raster_data` is created in GeoServer data directory.
 
-**Normalized raster workspace directory** is created in Normalized raster directory for every [workspace](models.md#workspace) with at least one raster layer. Name of the workspace directory is the same as workspace name.
-
-**Normalized raster layer directory** is created inside Normalized raster workspace directory for every raster layer. Name of the publication directory is the same as name of the layer. Normalized raster is stored in this directory for WMS purpose. In case of [timeseries](models.md#timeseries) layer, additional files holding e.g. [time_regex](rest.md#post-workspace-layers) are created too.
+**Normalized raster layer directory** is created inside Normalized raster directory for every raster layer. Name of the publication directory is UUID of the layer. Normalized raster is stored in this directory for WMS purpose. In case of [timeseries](models.md#timeseries) layer, additional files holding e.g. [time_regex](rest.md#post-workspace-layers) are created too.
 
 Filesystem is used as persistent data store, so data survives Layman restart.
  
