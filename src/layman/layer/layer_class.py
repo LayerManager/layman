@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
 from db import TableUri
 from layman import names, settings
@@ -17,6 +17,7 @@ class LaymanLayer(LaymanPublication):
     native_crs: str
     original_data_source: settings.EnumOriginalDataSource
     table_uri: TableUri
+    access_rights: Dict[str, List[str]]
 
     def __init__(self, *, uuid: str = None, layer_tuple: Tuple[str, str] = None):
         publ_tuple = (layer_tuple[0], LAYER_TYPE, layer_tuple[1]) if layer_tuple else None
@@ -28,6 +29,7 @@ class LaymanLayer(LaymanPublication):
         object.__setattr__(self, 'native_crs', info['native_crs'])
         object.__setattr__(self, 'original_data_source', info['original_data_source'])
         object.__setattr__(self, 'table_uri', info['_table_uri'])
+        object.__setattr__(self, 'access_rights', info['access_rights'])
 
     @property
     def gs_names(self):

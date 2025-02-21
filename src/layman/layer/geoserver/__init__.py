@@ -78,29 +78,15 @@ def check_workspace_name(workspace):
         raise LaymanError(35, {'reserved_by': __name__, 'role': rolename})
 
 
-def set_security_rules_by_uuid(*, uuid, geoserver_workspace, geoserver_layername, access_rights, auth, ):
-    layer_info = None
-    if not access_rights or not access_rights.get('read') or not access_rights.get('write'):
-        layer_info = layman_util.get_publication_info_by_uuid(uuid,
-                                                              context={'keys': ['access_rights', ]})
-    read_roles = access_rights.get('read') if access_rights and access_rights.get('read') else layer_info['access_rights']['read']
-    write_roles = access_rights.get('write') if access_rights and access_rights.get('write') else layer_info['access_rights']['write']
+def set_security_rules(*, layer: layer_class.LaymanLayer, geoserver_workspace, geoserver_layername, access_rights, auth, ):
+    read_roles = access_rights.get('read') if access_rights and access_rights.get('read') else layer.access_rights['read']
+    write_roles = access_rights.get('write') if access_rights and access_rights.get('write') else layer.access_rights['write']
 
     security_read_roles = gs_common.layman_users_and_roles_to_geoserver_roles(read_roles)
     gs_util.ensure_layer_security_roles(geoserver_workspace, geoserver_layername, security_read_roles, 'r', auth)
 
     security_write_roles = gs_common.layman_users_and_roles_to_geoserver_roles(write_roles)
     gs_util.ensure_layer_security_roles(geoserver_workspace, geoserver_layername, security_write_roles, 'w', auth)
-
-
-def set_security_rules(workspace, layer, access_rights, auth, geoserver_workspace):
-    uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layer)
-    set_security_rules_by_uuid(uuid=uuid,
-                               geoserver_workspace=geoserver_workspace,
-                               geoserver_layername=layer,
-                               access_rights=access_rights,
-                               auth=auth,
-                               )
 
 
 def get_layer_bbox(workspace, layer):
