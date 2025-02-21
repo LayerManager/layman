@@ -4,7 +4,7 @@ from layman.celery import AbortedException
 from layman.layer.layer_class import LaymanLayer
 from . import wfs
 from .util import get_db_store_name
-from .. import geoserver, LAYER_TYPE
+from .. import geoserver
 
 headers_json = gs_util.headers_json
 
@@ -22,7 +22,7 @@ def patch_after_feature_change(
     if self.is_aborted():
         raise AbortedException
 
-    layer_data = LaymanLayer(publ_tuple=(workspace, LAYER_TYPE, layer))
+    layer_data = LaymanLayer(layer_tuple=(workspace, layer))
 
     if layer_data.geodata_type == settings.GEODATA_TYPE_RASTER:
         return

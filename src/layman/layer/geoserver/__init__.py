@@ -104,7 +104,7 @@ def set_security_rules(workspace, layer, access_rights, auth, geoserver_workspac
 
 
 def get_layer_bbox(workspace, layer):
-    layer_data = layer_class.LaymanLayer(publ_tuple=(workspace, LAYER_TYPE, layer))
+    layer_data = layer_class.LaymanLayer(layer_tuple=(workspace, layer))
     return get_layer_bbox_by_layer(layer=layer_data)
 
 

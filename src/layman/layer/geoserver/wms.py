@@ -97,7 +97,7 @@ def delete_layer_by_layer(*, layer: LaymanLayer, db_schema):
 
 
 def delete_layer(workspace, layername):
-    layer = LaymanLayer(publ_tuple=(workspace, LAYER_TYPE, layername))
+    layer = LaymanLayer(layer_tuple=(workspace, layername))
     return delete_layer_by_layer(layer=layer, db_schema=workspace)
 
 
