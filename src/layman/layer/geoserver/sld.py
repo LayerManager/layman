@@ -3,8 +3,9 @@ from geoserver import util as gs_util
 from layman import settings, patch_mode, util as layman_util, names
 from layman.common import empty_method, empty_method_returns_dict
 from layman.common.db import launder_attribute_name
+from layman.layer.layer_class import LaymanLayer
 from layman.layer.filesystem import input_style
-from layman.util import url_for, get_publication_info_by_uuid
+from layman.util import url_for, get_publication_info_by_publication
 from . import wms
 from .. import LAYER_TYPE
 
@@ -23,14 +24,14 @@ def get_workspace_style_url(*, uuid):
 
 
 def delete_layer(workspace, layername):
-    uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layername)
-    return delete_layer_by_uuid(uuid=uuid, )
+    layer = LaymanLayer(layer_tuple=(workspace, layername))
+    return delete_layer_by_layer(layer=layer, )
 
 
-def delete_layer_by_uuid(*, uuid):
-    gs_style_name = names.get_layer_names_by_source(uuid=uuid).sld
+def delete_layer_by_layer(*, layer: LaymanLayer):
+    gs_style_name = layer.gs_names.sld
     sld_stream = gs_util.delete_workspace_style(gs_style_name.workspace, gs_style_name.name, auth=settings.LAYMAN_GS_AUTH) \
-        if uuid else None
+        if layer else None
     wms.clear_cache()
     if sld_stream:
         result = {
@@ -64,16 +65,13 @@ def get_layer_info_by_uuid(workspace, *, uuid, layername, x_forwarded_items=None
     return info
 
 
-def ensure_custom_sld_file_if_needed(publ_uuid):
+def ensure_custom_sld_file_if_needed(layer: LaymanLayer):
     # if style already exists, don't use customized SLD style
-    if input_style.get_layer_file(publ_uuid):
+    if input_style.get_layer_file(layer.uuid):
         return
-    info = get_publication_info_by_uuid(publ_uuid, context={'keys': ['geodata_type', 'style_type']})
-    geodata_type = info['geodata_type']
-    style_type = info['_style_type']
-    if geodata_type != settings.GEODATA_TYPE_RASTER or style_type != 'sld':
+    if layer.geodata_type != settings.GEODATA_TYPE_RASTER or layer.style_type != 'sld':
         return
-    info = get_publication_info_by_uuid(publ_uuid, {
+    info = get_publication_info_by_publication(layer, {
         'keys': ['file'],
         'extra_keys': [
             '_file.normalized_file.stats',
@@ -89,8 +87,8 @@ def ensure_custom_sld_file_if_needed(publ_uuid):
 
     # if it is grayscale raster (with or without alpha band)
     if input_color_interpretations[0] == 'Gray':
-        input_style.ensure_layer_input_style_dir(publ_uuid)
-        style_file_path = input_style.get_file_path(publ_uuid, with_extension=False) + '.sld'
+        input_style.ensure_layer_input_style_dir(layer.uuid)
+        style_file_path = input_style.get_file_path(layer.uuid, with_extension=False) + '.sld'
         create_customized_grayscale_sld(file_path=style_file_path, min_value=norm_stats[0][0],
                                         max_value=norm_stats[0][1], nodata_value=norm_nodata_value)
 
@@ -109,10 +107,14 @@ def create_customized_grayscale_sld(*, file_path, min_value, max_value, nodata_v
         file.write(xml_str)
 
 
-def create_layer_style(*, uuid):
-    all_names = names.get_layer_names_by_source(uuid=uuid)
-    style_file = input_style.get_layer_file(uuid)
-    gs_util.post_workspace_sld_style(all_names.sld.workspace, all_names.wms.name, all_names.sld.name, style_file, launder_attribute_name)
+def create_layer_style(*, layer: LaymanLayer):
+    style_file = input_style.get_layer_file(layer.uuid)
+    gs_util.post_workspace_sld_style(layer.gs_names.sld.workspace,
+                                     layer.gs_names.wms.name,
+                                     layer.gs_names.sld.name,
+                                     style_file,
+                                     launder_attribute_name,
+                                     )
     wms.clear_cache()
 
 
