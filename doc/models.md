@@ -15,12 +15,12 @@
 - Layer-related data is named and structured 
   - either by [workspace](#workspace) name and layername
       - [REST API](rest.md): `/rest/workspaces/<workspace_name>/layers/<layername>` 
-      - [filesystem](data-storage.md#filesystem): `/path/to/LAYMAN_DATA_DIR/workspaces/<workspace_name>/layers/<layername>` 
-      - [GeoServer WFS](data-storage.md#geoserver): `/geoserver/layman/ows, layer=<layername>`
-      - [GeoServer WMS](data-storage.md#geoserver): `/geoserver/layman_wms/ows, layer=<layername>, style=<layername>`
   - or by UUID:
+      - [filesystem](data-storage.md#filesystem): `/path/to/LAYMAN_DATA_DIR/layers/<UUID>` 
       - [PostgreSQL](data-storage.md#postgresql): `db=LAYMAN_PG_DBNAME, schema=<workspace_name>, table=layer_<UUID>` 
-      - Micka: `/record/basic/m-<uuid>`
+      - [GeoServer WFS](data-storage.md#geoserver): `/geoserver/layman/ows, layer=l_<UUID>`
+      - [GeoServer WMS](data-storage.md#geoserver): `/geoserver/layman_wms/ows, layer=l_<UUID>, style=<UUID>`
+      - Micka: `/record/basic/m-<UUID>`
 - Simple rules
   - one DB table per input file (vector layers only)
   - one WFS feature type per DB table (vector layers only)
@@ -48,8 +48,8 @@
 - Map-related data is named and structured
   - either by [workspace](#workspace) and layername
       - [REST API](rest.md): `/rest/workspaces/<workspace_name>/maps/<mapname>` 
-      - file system: `/path/to/LAYMAN_DATA_DIR/workspaces/<workspace_name>/maps/<mapname>` 
   - or by UUID:
+      - [filesystem](data-storage.md#filesystem): `/path/to/LAYMAN_DATA_DIR/maps/<UUID>` 
       - Micka: `/record/basic/m-<uuid>`
 - Simple rules
   - one map file per map

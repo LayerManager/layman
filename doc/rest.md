@@ -307,11 +307,12 @@ JSON object with following structure:
   - *error*: If status is FAILURE, this may contain error object.
 - **thumbnail**
   - *url*: String. URL of layer thumbnail. It points to [GET Workspace Layer Thumbnail](#get-workspace-layer-thumbnail).
+  - *path*: String. Path to layer thumbnail. Path is relative to [LAYMAN_DATA_DIR](env-settings.md#LAYMAN_DATA_DIR).
   - *status*: Status information about generating and availability of thumbnail. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **file**
-  - *paths*: List of strings. Paths to all main input data files. Path is relative to workspace directory.  
-  If data file was sent in ZIP archive to the server, path includes also path to the main file inside ZIP file. E.g. `layers/zipped_shapefile/input_file/zipped_shapefile.zip/layer_main_file.shp`
+  - *paths*: List of strings. Paths to all main input data files. Path is relative to [LAYMAN_DATA_DIR](env-settings.md#LAYMAN_DATA_DIR).  
+  If data file was sent in ZIP archive to the server, path includes also path to the main file inside ZIP file. E.g. `layers/b8a6c133-3363-4343-8a25-978d0df52c11/input_file/b8a6c133-3363-4343-8a25-978d0df52c11.zip/layer_main_file.shp`
   - *status*: Status information about saving and availability of files. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - *db*, available only for vector layers
@@ -651,11 +652,12 @@ JSON object with following structure:
 - **updated_at**: String. Date and time of last POST/PATCH of the publication. Format is [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601), more specifically `YYYY-MM-DDThh:mm:ss.sss±hh:mm`, always in UTC. Sample value: `"2021-03-18T09:29:53.769233+00:00"`
 - **file**
   - *url*: String. URL of map-composition JSON file. It points to [GET Workspace Map File](#get-workspace-map-file).
-  - *path*: String. Path to map-composition JSON file, relative to workspace directory.
+  - *path*: String. Path to map-composition JSON file, relative to [LAYMAN_DATA_DIR](env-settings.md#LAYMAN_DATA_DIR).
   - *status*: Status information about availability of file. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **thumbnail**
   - *url*: String. URL of map thumbnail. It points to [GET Workspace Map Thumbnail](#get-workspace-map-thumbnail).
+  - *path*: String. Path to map thumbnail. Path is relative to [LAYMAN_DATA_DIR](env-settings.md#LAYMAN_DATA_DIR).
   - *status*: Status information about generating and availability of thumbnail. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - *metadata*

@@ -28,6 +28,8 @@
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Names of [Feature types, Coverages, Layers and Styles in GeoServer WFS and WMS workspaces](doc/data-storage.md#geoserver) are derived from layer`uuid`. All GeoServer entities are created in two global workspaces (`layman` for WFS layers and `layman_wms` for WMS layers), instead of separate workspaces for each Layman workspace. Separate PostgreSQL datastore is created for each Layman workspace.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) POST Workspace [Layers](doc/rest.md#post-workspace-layers)/[Maps](doc/rest.md#post-workspace-maps) accepts new body parameter *uuid*.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Names of all GeoServer stores are derived from layer's `uuid` (previously were derived from layer's `name`). 
+- [#1048](https://github.com/LayerManager/layman/issues/1048) Names of [files and directories](doc/data-storage.md#filesystem) are derived from publication`uuid`. Workspace directories are not used anymore.
+- [#1048](https://github.com/LayerManager/layman/issues/1048) Keys `file.paths`, `file.path` and `thumbnail.path` of GET Workspace [Layer](doc/rest.md#get-workspace-layer)/[Map](doc/rest.md#get-workspace-map) are relative to [LAYMAN_DATA_DIR](doc/env-settings.md#layman_data_dir) instead of workspace directory.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Information about layer WMS (e.g. key `wms` in [GET Workspace Layer](doc/rest.md#get-workspace-layer)) is obtained from GeoServer REST API instead of WMS GetCapabilities to improve speed.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Information about layer WFS (e.g. key `wfs` in [GET Workspace Layer](doc/rest.md#get-workspace-layer)) is obtained from GeoServer REST API instead of WFS GetCapabilities to improve speed.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Layer in map JSON file is considered [internal](doc/models.md#internal-map-layer) if named `l_<UUID>` and is in GeoServer workspace `layman` or `layman_wms`. 
@@ -47,6 +49,7 @@
   - body parameter `sld` was removed from [POST Workspace Publications](doc/rest.md#post-workspace-layers) and [PATCH Workspace Publication](doc/rest.md#patch-workspace-layer)
   - workspace-related endpoints which did not include `/workspaces` in their path were removed 
 - [#701](https://github.com/LayerManager/layman/pull/701) Check bounding bbox of normalized raster before posting to GeoServer. Stop checking that Layer is available in WMS/WFS GetCapabilities after publishing to GeoServer.
+- Add forgotten `thumbnail.path` attributes to documentation of GET Workspace [Layer](doc/rest.md#get-workspace-layer)/[Map](doc/rest.md#get-workspace-map) responses.
 - [#1028](https://github.com/LayerManager/layman/issues/1028) Upgrade Node.js of Laymen Test Client from v18 to v22 and dependencies:
   - eslint-config-next 13 -> 14
   - next 13 -> 14
