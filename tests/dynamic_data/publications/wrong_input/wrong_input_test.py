@@ -199,6 +199,7 @@ TESTCASES = {
         Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
         Key.REST_ARGS: {
             'file_paths': [f'{DIRECTORY}/non_readable_raster.tif'],
+            'uuid': 'bdf3bacd-a982-4495-96f6-921e16eb1b25',
         },
         Key.EXCEPTION: LaymanError,
         Key.FAILED_INFO_KEY: 'file',
@@ -210,7 +211,7 @@ TESTCASES = {
             'data': {'parameter': 'file',
                      'message': 'Unable to open raster file.',
                      'expected': 'At least one file with any of extensions: .geojson, .shp, .tiff, .tif, .jp2, .png, .jpg, .jpeg; or one of them in single .zip file.',
-                     'file': '/layman_data_test/workspaces/{workspace}/layers/{publication_name}/input_file/{publication_name}.tif',
+                     'file': '/layman_data_test/layers/bdf3bacd-a982-4495-96f6-921e16eb1b25/input_file/bdf3bacd-a982-4495-96f6-921e16eb1b25.tif',
                      },
         },
         Key.MANDATORY_CASES: frozenset([RestMethod.POST, WithChunksDomain.FALSE, CompressDomain.FALSE]),
@@ -219,7 +220,7 @@ TESTCASES = {
             frozenset([RestMethod.POST, WithChunksDomain.FALSE, CompressDomain.TRUE]): {
                 Key.EXPECTED_EXCEPTION: {
                     'data': {
-                        'file': '/vsizip//layman_data_test/workspaces/{workspace}/layers/{publication_name}/input_file/{publication_name}.zip/non_readable_raster.tif',
+                        'file': '/vsizip//layman_data_test/layers/bdf3bacd-a982-4495-96f6-921e16eb1b25/input_file/bdf3bacd-a982-4495-96f6-921e16eb1b25.zip/non_readable_raster.tif',
                     }
                 },
             },
@@ -227,7 +228,7 @@ TESTCASES = {
                 Key.EXPECTED_EXCEPTION: {
                     'sync': False,
                     'data': {
-                        'file': '/layman_data_test/workspaces/{workspace}/layers/{publication_name}/input_file/{publication_name}.tif'
+                        'file': '/layman_data_test/layers/bdf3bacd-a982-4495-96f6-921e16eb1b25/input_file/bdf3bacd-a982-4495-96f6-921e16eb1b25.tif'
                     }
                 },
             },
@@ -235,7 +236,7 @@ TESTCASES = {
                 Key.EXPECTED_EXCEPTION: {
                     'sync': False,
                     'data': {
-                        'file': '/vsizip//layman_data_test/workspaces/{workspace}/layers/{publication_name}/input_file/{publication_name}.zip/non_readable_raster.tif',
+                        'file': '/vsizip//layman_data_test/layers/bdf3bacd-a982-4495-96f6-921e16eb1b25/input_file/bdf3bacd-a982-4495-96f6-921e16eb1b25.zip/non_readable_raster.tif',
                     }
                 },
             },
@@ -987,6 +988,10 @@ TESTCASES = {
             'file_paths': [
                 f'{DIRECTORY}/211_too_long_name_20220319_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.zip',
             ],
+            'uuid': 'a0a16dcb-7446-4274-a343-25cf2abbd6d0',
+        },
+        Key.POST_BEFORE_TEST_ARGS: {
+            'uuid': 'a0a16dcb-7446-4274-a343-25cf2abbd6d0',
         },
         Key.EXCEPTION: LaymanError,
         Key.FAILED_INFO_KEY: 'file',
@@ -1009,7 +1014,7 @@ TESTCASES = {
                 Key.EXPECTED_EXCEPTION: {
                     'sync': False,
                     'data': {'too_long_filenames': [
-                        '{publication_name}.zip/211_too_long_name_20220319_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.tif']}
+                        'a0a16dcb-7446-4274-a343-25cf2abbd6d0.zip/211_too_long_name_20220319_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.tif']}
                 },
             },
         },
@@ -1104,6 +1109,10 @@ TESTCASES = {
                 f'{DIRECTORY}/small_layer.README.txt',
                 f'{DIRECTORY}/small_layer.readme.txt',
             ],
+            'uuid': 'adce668b-f295-4dbe-b8d9-7d5aa06a50f9',
+        },
+        Key.POST_BEFORE_TEST_ARGS: {
+            'uuid': 'adce668b-f295-4dbe-b8d9-7d5aa06a50f9',
         },
         Key.EXCEPTION: LaymanError,
         Key.FAILED_INFO_KEY: 'file',
@@ -1117,8 +1126,8 @@ TESTCASES = {
                 'message': 'Two or more input file names map to the same name.',
                 'expected': 'Input file names that differ at least in one letter (ignoring case and diacritics) or number.',
                 'similar_filenames_mapping': {
-                    'small_layer.README.txt': '{publication_name}.readme.txt',
-                    'small_layer.readme.txt': '{publication_name}.readme.txt',
+                    'small_layer.README.txt': 'adce668b-f295-4dbe-b8d9-7d5aa06a50f9.readme.txt',
+                    'small_layer.readme.txt': 'adce668b-f295-4dbe-b8d9-7d5aa06a50f9.readme.txt',
                 },
             },
         },
@@ -1535,6 +1544,8 @@ class TestPublication(base_test.TestSingleRestPublication):
             file_path = publ_info['_file']['paths']['absolute'][0] if 'absolute' in publ_info['_file']['paths'] else None
             pre_stamp = os.stat(file_path).st_mtime if file_path else None
 
+        if rest_method.enum_item == RestMethod.PATCH:
+            rest_args.pop('uuid', None)
         with exception as exception_info:
             response = rest_method.fn(publication, args=rest_args)
         if is_sync:
