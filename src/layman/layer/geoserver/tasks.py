@@ -25,6 +25,7 @@ refresh_sld_needed = empty_method_returns_true
     bind=True,
     base=celery_app.AbortableTask
 )
+# pylint: disable=unused-argument
 def refresh_wms(
         self,
         workspace,
@@ -40,7 +41,6 @@ def refresh_wms(
         slugified_time_regex_format=None,
         original_data_source=settings.EnumOriginalDataSource.FILE.value,
 ):
-    # pylint: disable=unused-argument
     layer = layer_class.LaymanLayer(uuid=uuid)
     gs_layername = layer.gs_names.wms
     info = layman_util.get_publication_info_by_publication(layer, context={'keys': ['file']})
@@ -127,6 +127,7 @@ def refresh_wms(
     bind=True,
     base=celery_app.AbortableTask
 )
+# pylint: disable=unused-argument
 def refresh_wfs(
         self,
         workspace,
@@ -138,7 +139,6 @@ def refresh_wfs(
         access_rights=None,
         original_data_source=settings.EnumOriginalDataSource.FILE.value,
 ):
-    # pylint: disable=unused-argument
     layer = layer_class.LaymanLayer(uuid=uuid)
     gs_layername = layer.gs_names.wfs
     if layer.geodata_type == settings.GEODATA_TYPE_RASTER:
@@ -178,7 +178,7 @@ def refresh_wfs(
     wfs.clear_cache()
 
     if self.is_aborted():
-        wfs.delete_layer_by_uuid(uuid=uuid, db_schema=layer.workspace)
+        wfs.delete_layer_by_layer(layer=layer, db_schema=layer.workspace)
         raise AbortedException
 
 

@@ -8,6 +8,7 @@ from layman.common import geoserver as gs_common, empty_method
 from layman.layer.util import is_layer_chain_ready
 from layman import util as layman_util
 from layman.layer import LAYER_TYPE
+from layman.layer.layer_class import LaymanLayer
 import requests_util.retry
 from .util import get_gs_proxy_server_url, get_external_db_store_name, get_internal_db_store_name, get_db_store_name
 from . import wms
@@ -59,12 +60,12 @@ def patch_layer(workspace, layername, *, uuid, title, description, original_data
                         )
 
 
-def delete_layer_by_uuid(*, uuid, db_schema):
+def delete_layer_by_layer(*, layer: LaymanLayer, db_schema):
     db_store_name = get_internal_db_store_name(db_schema=db_schema)
-    gs_layername = names.get_names_by_source(uuid=uuid, publication_type=LAYER_TYPE).wfs
+    gs_layername = layer.gs_names.wfs
     gs_util.delete_feature_type(gs_layername.workspace, gs_layername.name, settings.LAYMAN_GS_AUTH, store=db_store_name)
-    gs_util.delete_feature_type(gs_layername.workspace, gs_layername.name, settings.LAYMAN_GS_AUTH, store=get_external_db_store_name(uuid=uuid))
-    gs_util.delete_db_store(gs_layername.workspace, settings.LAYMAN_GS_AUTH, store_name=get_external_db_store_name(uuid=uuid))
+    gs_util.delete_feature_type(gs_layername.workspace, gs_layername.name, settings.LAYMAN_GS_AUTH, store=get_external_db_store_name(uuid=layer.uuid))
+    gs_util.delete_db_store(gs_layername.workspace, settings.LAYMAN_GS_AUTH, store_name=get_external_db_store_name(uuid=layer.uuid))
     clear_cache()
 
     gs_util.delete_security_roles(f"{gs_layername.workspace}.{gs_layername.name}.r", settings.LAYMAN_GS_AUTH)
@@ -73,8 +74,8 @@ def delete_layer_by_uuid(*, uuid, db_schema):
 
 
 def delete_layer(workspace, layername):
-    uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layername)
-    return delete_layer_by_uuid(uuid=uuid, db_schema=workspace)
+    layer = LaymanLayer(layer_tuple=(workspace, layername))
+    return delete_layer_by_layer(layer=layer, db_schema=workspace)
 
 
 def get_wfs_url(external_url=False, *, x_forwarded_items=None):
