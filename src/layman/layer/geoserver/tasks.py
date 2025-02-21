@@ -108,12 +108,12 @@ def refresh_wms(
     else:
         raise NotImplementedError(f"Unknown geodata type: {layer.geodata_type}")
 
-    geoserver.set_security_rules_by_uuid(uuid=uuid,
-                                         geoserver_workspace=gs_layername.workspace,
-                                         geoserver_layername=gs_layername.name,
-                                         access_rights=access_rights,
-                                         auth=settings.LAYMAN_GS_AUTH,
-                                         )
+    geoserver.set_security_rules(layer=layer,
+                                 geoserver_workspace=gs_layername.workspace,
+                                 geoserver_layername=gs_layername.name,
+                                 access_rights=access_rights,
+                                 auth=settings.LAYMAN_GS_AUTH,
+                                 )
 
     wms.clear_cache()
 
@@ -169,12 +169,12 @@ def refresh_wfs(
                                     table_name=table_name,
                                     metadata_url=metadata_url,
                                     store_name=store_name)
-    geoserver.set_security_rules_by_uuid(uuid=uuid,
-                                         geoserver_workspace=gs_layername.workspace,
-                                         geoserver_layername=gs_layername.name,
-                                         access_rights=access_rights,
-                                         auth=settings.LAYMAN_GS_AUTH,
-                                         )
+    geoserver.set_security_rules(layer=layer,
+                                 geoserver_workspace=gs_layername.workspace,
+                                 geoserver_layername=gs_layername.name,
+                                 access_rights=access_rights,
+                                 auth=settings.LAYMAN_GS_AUTH,
+                                 )
     wfs.clear_cache()
 
     if self.is_aborted():
