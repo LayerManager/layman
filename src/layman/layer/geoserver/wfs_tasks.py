@@ -1,7 +1,7 @@
 from geoserver import util as gs_util
 from layman import celery_app, settings
 from layman.celery import AbortedException
-from layman.layer.layer_class import LaymanLayer
+from layman.layer.layer_class import Layer
 from . import wfs
 from .util import get_db_store_name
 from .. import geoserver
@@ -22,7 +22,7 @@ def patch_after_feature_change(
     if self.is_aborted():
         raise AbortedException
 
-    layer_data = LaymanLayer(layer_tuple=(workspace, layer))
+    layer_data = Layer(layer_tuple=(workspace, layer))
 
     if layer_data.geodata_type == settings.GEODATA_TYPE_RASTER:
         return

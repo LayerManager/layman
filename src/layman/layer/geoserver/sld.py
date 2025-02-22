@@ -3,7 +3,7 @@ from geoserver import util as gs_util
 from layman import settings, patch_mode, util as layman_util, names
 from layman.common import empty_method, empty_method_returns_dict
 from layman.common.db import launder_attribute_name
-from layman.layer.layer_class import LaymanLayer
+from layman.layer.layer_class import Layer
 from layman.layer.filesystem import input_style
 from layman.util import url_for, get_publication_info_by_publication
 from . import wms
@@ -24,11 +24,11 @@ def get_workspace_style_url(*, uuid):
 
 
 def delete_layer(workspace, layername):
-    layer = LaymanLayer(layer_tuple=(workspace, layername))
+    layer = Layer(layer_tuple=(workspace, layername))
     return delete_layer_by_layer(layer=layer, )
 
 
-def delete_layer_by_layer(*, layer: LaymanLayer):
+def delete_layer_by_layer(*, layer: Layer):
     gs_style_name = layer.gs_names.sld
     sld_stream = gs_util.delete_workspace_style(gs_style_name.workspace, gs_style_name.name, auth=settings.LAYMAN_GS_AUTH) \
         if layer else None
@@ -65,7 +65,7 @@ def get_layer_info_by_uuid(workspace, *, uuid, layername, x_forwarded_items=None
     return info
 
 
-def ensure_custom_sld_file_if_needed(layer: LaymanLayer):
+def ensure_custom_sld_file_if_needed(layer: Layer):
     # if style already exists, don't use customized SLD style
     if input_style.get_layer_file(layer.uuid):
         return
@@ -107,7 +107,7 @@ def create_customized_grayscale_sld(*, file_path, min_value, max_value, nodata_v
         file.write(xml_str)
 
 
-def create_layer_style(*, layer: LaymanLayer):
+def create_layer_style(*, layer: Layer):
     style_file = input_style.get_layer_file(layer.uuid)
     gs_util.post_workspace_sld_style(layer.gs_names.sld.workspace,
                                      layer.gs_names.wms.name,

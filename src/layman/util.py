@@ -18,7 +18,7 @@ from unidecode import unidecode
 from layman import settings, celery as celery_util, common
 from layman.common import tasks as tasks_util, redis
 from layman.http import LaymanError
-from layman.publication_class import LaymanPublication
+from layman.publication_class import Publication
 
 logger = logging.getLogger(__name__)
 
@@ -411,7 +411,7 @@ def get_publication_info_by_uuid(uuid, context=None):
     return get_publication_info(workspace=workspace, publ_type=publ_type, publ_name=name, context=context)
 
 
-def get_publication_info_by_publication(publication: LaymanPublication, context=None):
+def get_publication_info_by_publication(publication: Publication, context=None):
     return get_publication_info(workspace=publication.workspace, publ_type=publication.type, publ_name=publication.name, context=context)
 
 

@@ -41,7 +41,7 @@ def refresh_wms(
         slugified_time_regex_format=None,
         original_data_source=settings.EnumOriginalDataSource.FILE.value,
 ):
-    layer = layer_class.LaymanLayer(uuid=uuid)
+    layer = layer_class.Layer(uuid=uuid)
     gs_layername = layer.gs_names.wms
     info = layman_util.get_publication_info_by_publication(layer, context={'keys': ['file']})
 
@@ -139,7 +139,7 @@ def refresh_wfs(
         access_rights=None,
         original_data_source=settings.EnumOriginalDataSource.FILE.value,
 ):
-    layer = layer_class.LaymanLayer(uuid=uuid)
+    layer = layer_class.Layer(uuid=uuid)
     gs_layername = layer.gs_names.wfs
     if layer.geodata_type == settings.GEODATA_TYPE_RASTER:
         return
@@ -191,7 +191,7 @@ def refresh_wfs(
 def refresh_sld(self, workspace, layername, store_in_geoserver, *, uuid):
     if self.is_aborted():
         raise AbortedException
-    layer = layer_class.LaymanLayer(uuid=uuid)
+    layer = layer_class.Layer(uuid=uuid)
     if store_in_geoserver:
         sld.ensure_custom_sld_file_if_needed(layer=layer)
         sld.create_layer_style(layer=layer)

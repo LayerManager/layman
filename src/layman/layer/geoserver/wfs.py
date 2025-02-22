@@ -8,7 +8,7 @@ from layman.common import geoserver as gs_common, empty_method
 from layman.layer.util import is_layer_chain_ready
 from layman import util as layman_util
 from layman.layer import LAYER_TYPE
-from layman.layer.layer_class import LaymanLayer
+from layman.layer.layer_class import Layer
 import requests_util.retry
 from .util import get_gs_proxy_server_url, get_external_db_store_name, get_internal_db_store_name, get_db_store_name
 from . import wms
@@ -60,7 +60,7 @@ def patch_layer(workspace, layername, *, uuid, title, description, original_data
                         )
 
 
-def delete_layer_by_layer(*, layer: LaymanLayer, db_schema):
+def delete_layer_by_layer(*, layer: Layer, db_schema):
     db_store_name = get_internal_db_store_name(db_schema=db_schema)
     gs_layername = layer.gs_names.wfs
     gs_util.delete_feature_type(gs_layername.workspace, gs_layername.name, settings.LAYMAN_GS_AUTH, store=db_store_name)
@@ -74,7 +74,7 @@ def delete_layer_by_layer(*, layer: LaymanLayer, db_schema):
 
 
 def delete_layer(workspace, layername):
-    layer = LaymanLayer(layer_tuple=(workspace, layername))
+    layer = Layer(layer_tuple=(workspace, layername))
     return delete_layer_by_layer(layer=layer, db_schema=workspace)
 
 
