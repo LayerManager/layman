@@ -1,8 +1,9 @@
 import pytest
 
-from layman import settings, app, names
+from layman import settings, app
 from layman.layer.qgis import util as qgis_util, wms as qgis_wms
 from test_tools import process, process_client, geoserver_client
+from test_tools.mock.layman_classes import LayerMock
 
 
 LAYERS_TO_DELETE_AFTER_TEST = []
@@ -41,51 +42,56 @@ def ensure_layer(delete_layer_after_test):
 @pytest.mark.timeout(40)
 def test_custom_srs_list(ensure_layer):
     workspace = 'test_custom_srs_list_workspace'
-    layer_sld1 = 'test_custom_srs_list_sld_layer1'
-    layer_sld2 = 'test_custom_srs_list_sld_layer2'
-    layer_qgis1 = 'test_custom_srs_list_qgis_layer1'
-    layer_qgis2 = 'test_custom_srs_list_qgis_layer2'
+    name_sld1 = 'test_custom_srs_list_sld_layer1'
+    name_sld2 = 'test_custom_srs_list_sld_layer2'
+    name_qgis1 = 'test_custom_srs_list_qgis_layer1'
+    name_qgis2 = 'test_custom_srs_list_qgis_layer2'
     source_style_file_path = 'sample/style/small_layer.qml'
     output_crs_list = {f'EPSG:{srid}' for srid in OUTPUT_SRS_LIST}
     assert settings.LAYMAN_OUTPUT_SRS_LIST != output_crs_list
 
     process.ensure_layman_function(process.LAYMAN_DEFAULT_SETTINGS)
-    uuid_sld1 = ensure_layer(workspace, layer_sld1)['uuid']
-    uuid_qgis1 = ensure_layer(workspace, layer_qgis1, style_file=source_style_file_path)['uuid']
+    uuid_sld1 = ensure_layer(workspace, name_sld1)['uuid']
+    uuid_qgis1 = ensure_layer(workspace, name_qgis1, style_file=source_style_file_path)['uuid']
 
-    wfs_name_sld1 = names.get_layer_names_by_source(uuid=uuid_sld1, ).wfs
-    wfs_name_qgis1 = names.get_layer_names_by_source(uuid=uuid_qgis1, ).wfs
+    sld1_layer = LayerMock(uuid=uuid_sld1, layer_tuple=(workspace, name_sld1))
+    qgis1_layer = LayerMock(uuid=uuid_qgis1, layer_tuple=(workspace, name_qgis1))
+
+    wfs_name_sld1 = sld1_layer.gs_names.wfs
+    wfs_name_qgis1 = qgis1_layer.gs_names.wfs
 
     with app.app_context():
         init_output_epsg_codes_set = {crs.replace(':', '::') for crs in settings.LAYMAN_OUTPUT_SRS_LIST}
         assert_gs_wms_output_srs_list(wfs_name_sld1.workspace, wfs_name_sld1.name, settings.LAYMAN_OUTPUT_SRS_LIST)
         assert_wfs_output_srs_list(wfs_name_sld1.workspace, wfs_name_sld1.name, init_output_epsg_codes_set)
-        assert not qgis_wms.get_layer_info(workspace, layer_sld1)
+        assert not qgis_wms.get_layer_info(workspace, name_sld1)
 
         assert_gs_wms_output_srs_list(wfs_name_qgis1.workspace, wfs_name_qgis1.name, settings.LAYMAN_OUTPUT_SRS_LIST)
         assert_wfs_output_srs_list(wfs_name_qgis1.workspace, wfs_name_qgis1.name, init_output_epsg_codes_set)
         assert_qgis_output_srs_list(uuid_qgis1, settings.LAYMAN_OUTPUT_SRS_LIST)
-        assert_qgis_wms_output_srs_list(layer_qgis1, uuid_qgis1, settings.LAYMAN_OUTPUT_SRS_LIST)
+        assert_qgis_wms_output_srs_list(name_qgis1, uuid_qgis1, settings.LAYMAN_OUTPUT_SRS_LIST)
 
     process.ensure_layman_function({
         'LAYMAN_OUTPUT_SRS_LIST': ','.join([str(code) for code in OUTPUT_SRS_LIST])
     })
-    uuid_sld2 = ensure_layer(workspace, layer_sld2)['uuid']
-    wfs_name_qgis2 = ensure_layer(workspace, layer_qgis2, style_file=source_style_file_path)['uuid']
+    uuid_sld2 = ensure_layer(workspace, name_sld2)['uuid']
+    sld2_layer = LayerMock(uuid=uuid_sld2, layer_tuple=(workspace, name_sld2))
+    uuid_qgis2 = ensure_layer(workspace, name_qgis2, style_file=source_style_file_path)['uuid']
+    qgis2_layer = LayerMock(uuid=uuid_qgis2, layer_tuple=(workspace, name_qgis2))
 
     output_epsg_codes_set = {crs.replace(':', '::') for crs in output_crs_list}
     with app.app_context():
-        for layer, uuid in [(layer_sld1, uuid_sld1), (layer_sld2, uuid_sld2), ]:
-            wfs_name_sld = names.get_layer_names_by_source(uuid=uuid, ).wfs
+        for sld_layer in [sld1_layer, sld2_layer, ]:
+            wfs_name_sld = sld_layer.gs_names.wfs
             assert_gs_wms_output_srs_list(wfs_name_sld.workspace, wfs_name_sld.name, output_crs_list)
             assert_wfs_output_srs_list(wfs_name_sld.workspace, wfs_name_sld.name, output_epsg_codes_set)
-            assert not qgis_wms.get_layer_info(workspace, layer)
-        for layer, uuid in [(layer_qgis1, uuid_qgis1), (layer_qgis2, wfs_name_qgis2), ]:
-            wfs_name_qgis = names.get_layer_names_by_source(uuid=uuid, ).wfs
+            assert not qgis_wms.get_layer_info(workspace, sld_layer.name)
+        for qgis2_layer in [qgis1_layer, qgis2_layer, ]:
+            wfs_name_qgis = qgis2_layer.gs_names.wfs
             assert_gs_wms_output_srs_list(wfs_name_qgis.workspace, wfs_name_qgis.name, output_crs_list)
             assert_wfs_output_srs_list(wfs_name_qgis.workspace, wfs_name_qgis.name, output_epsg_codes_set)
             assert_qgis_output_srs_list(uuid_qgis1, output_crs_list)
-            assert_qgis_wms_output_srs_list(layer_qgis1, uuid_qgis1, output_crs_list)
+            assert_qgis_wms_output_srs_list(name_qgis1, uuid_qgis1, output_crs_list)
 
 
 def assert_gs_wms_output_srs_list(workspace, layername, expected_output_crs_list):
