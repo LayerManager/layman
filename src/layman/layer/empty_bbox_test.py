@@ -2,10 +2,10 @@ import os
 from owslib.wms import WebMapService
 import pytest
 
-from layman import names
 from layman.layer.geoserver import wms as gs_wms
 from test_tools import process_client
 from test_tools.data import wfs as wfs_data_util
+from test_tools.mock.layman_classes import LayerMock
 
 
 def get_shp_file_paths(shp_file_path):
@@ -21,7 +21,8 @@ def assert_non_empty_bbox(bbox):
 
 
 def assert_wms_layer(uuid, exp_title):
-    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wms
+    layer = LayerMock(uuid=uuid, layer_tuple=None)
+    gs_layername = layer.gs_names.wms
     wms = WebMapService(gs_wms.get_wms_url(), gs_wms.VERSION)
     assert gs_layername.name in wms.contents
     wms_layer = wms[gs_layername.name]
@@ -32,7 +33,8 @@ def assert_wms_layer(uuid, exp_title):
 
 
 def wfs_t_insert_point(*, uuid):
-    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wfs
+    layer = LayerMock(uuid=uuid, layer_tuple=None)
+    gs_layername = layer.gs_names.wfs
     wfs_t_data = wfs_data_util.get_wfs20_insert_points(gs_layername.workspace, gs_layername.name)
     process_client.post_wfst(wfs_t_data, workspace=gs_layername.workspace)
 
