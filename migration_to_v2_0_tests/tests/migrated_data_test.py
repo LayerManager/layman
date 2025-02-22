@@ -3,7 +3,7 @@ import pytest
 from tools.client import RestClient
 from tools.http import LaymanError
 from tools.oauth2_provider_mock import OAuth2ProviderMock
-from tools.test_data import import_publication_uuids, PUBLICATIONS_TO_MIGRATE, INCOMPLETE_LAYERS, Publication, \
+from tools.test_data import import_publication_uuids, PUBLICATIONS_TO_MIGRATE, INCOMPLETE_LAYERS, Publication4Test, \
     LAYERS_TO_MIGRATE, WORKSPACES, DEFAULT_THUMBNAIL_PIXEL_DIFF_LIMIT
 from tools.test_settings import DB_URI
 from tools.util import compare_images
@@ -31,7 +31,7 @@ def client_fixture():
 
 
 def ids_fn(value):
-    if isinstance(value, Publication):
+    if isinstance(value, Publication4Test):
         return f"{value.type.replace('layman.', '')}:{value.workspace}:{value.name}"
     if isinstance(value, str):
         return value

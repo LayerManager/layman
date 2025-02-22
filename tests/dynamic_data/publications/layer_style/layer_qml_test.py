@@ -2,7 +2,7 @@ import os
 import pytest
 
 from test_tools import process_client
-from tests import EnumTestTypes, Publication
+from tests import EnumTestTypes, Publication4Test
 from tests.asserts.final.publication import util as assert_util
 from tests.dynamic_data import base_test
 
@@ -52,7 +52,7 @@ class TestLayer(base_test.TestSingleRestPublication):
                                          ) for key, value in TEST_CASES.items()]
 
     @staticmethod
-    def test_qml_style(layer: Publication, rest_args, rest_method):
+    def test_qml_style(layer: Publication4Test, rest_args, rest_method):
         """Parametrized using pytest_generate_tests"""
         rest_method.fn(layer, args=rest_args)
 

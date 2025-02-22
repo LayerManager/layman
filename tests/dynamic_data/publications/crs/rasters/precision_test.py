@@ -4,7 +4,7 @@ import crs as crs_def
 from test_tools import process_client
 from tests.dynamic_data import base_test
 from tests.dynamic_data.base_test_classes import Parametrization, RestArgs, RestMethod, WithChunksDomain, CompressDomain
-from tests import EnumTestTypes, Publication
+from tests import EnumTestTypes, Publication4Test
 from tests.asserts.final.publication import util as assert_util
 from tests.asserts.final.publication.geoserver import wms_spatial_precision, wms_geographic_bbox, wms_bbox
 from tests.asserts.final.publication.internal import correct_values_in_detail, thumbnail_equals, \
@@ -166,7 +166,7 @@ class TestLayer(base_test.TestSingleRestPublication):
     ) for key, value in TEST_CASES.items()]
 
     @staticmethod
-    def test_precision(key: str, layer: Publication, params, rest_method, rest_args, parametrization: Parametrization):
+    def test_precision(key: str, layer: Publication4Test, params, rest_method, rest_args, parametrization: Parametrization):
         """Parametrized using pytest_generate_tests"""
         crs_id = key
         epsg_code = crs_id.split(':')[1]

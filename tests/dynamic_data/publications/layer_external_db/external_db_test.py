@@ -7,7 +7,7 @@ from layman import app, settings
 from layman.map.prime_db_schema import get_workspaces
 from layman.util import get_publication_info
 from test_tools import process_client, external_db
-from tests import EnumTestTypes, Publication
+from tests import EnumTestTypes, Publication4Test
 from tests.asserts.final import publication as asserts_publ
 from tests.asserts.final.publication import util as assert_util, geoserver as gs_asserts
 from tests.dynamic_data import base_test
@@ -205,7 +205,7 @@ class TestLayer(base_test.TestSingleRestPublication):
         },
     ) for key, value in TEST_CASES.items()]
 
-    def test_layer(self, layer: Publication, rest_method, rest_args, params):
+    def test_layer(self, layer: Publication4Test, rest_method, rest_args, params):
         """Parametrized using pytest_generate_tests"""
         schema = params['schema_name']
         table = params['table_name']

@@ -1,5 +1,5 @@
 from layman.util import XForwardedClass
-from tests import EnumTestTypes, Publication
+from tests import EnumTestTypes, Publication4Test
 from tests.asserts.final.publication import rest as assert_rest
 from tests.dynamic_data import base_test, base_test_classes
 from tests.dynamic_data.publications import common_publications
@@ -23,9 +23,9 @@ class TestPublication(base_test.TestSingleRestPublication):
     ]
 
     test_cases = [base_test.TestCaseType(key='proxy_test',
-                                         publication=lambda publ_def, cls: Publication(cls.workspace,
-                                                                                       publ_def.type,
-                                                                                       None),
+                                         publication=lambda publ_def, cls: Publication4Test(cls.workspace,
+                                                                                            publ_def.type,
+                                                                                            None),
                                          type=EnumTestTypes.OPTIONAL,
                                          specific_types={
                                              (base_test_classes.RestMethodAll.POST, PublicationTypes.LAYER): EnumTestTypes.MANDATORY

@@ -4,7 +4,7 @@ import os
 from layman import app
 from layman.util import get_publication_info
 from test_tools import process_client
-from tests import EnumTestTypes, Publication
+from tests import EnumTestTypes, Publication4Test
 from tests.asserts.final import publication as asserts_publ
 from tests.asserts.final.publication import util as assert_util
 from tests.dynamic_data import base_test, base_test_classes
@@ -14,7 +14,7 @@ DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
 
 WORKSPACE = 'test_map_json_workspace'
-LAYER_HRANICE = Publication(WORKSPACE, process_client.LAYER_TYPE, 'hranice', uuid='9e81f9e2-7f05-47d3-8328-46c770589e1e')
+LAYER_HRANICE = Publication4Test(WORKSPACE, process_client.LAYER_TYPE, 'hranice', uuid='9e81f9e2-7f05-47d3-8328-46c770589e1e')
 
 
 TEST_CASES = {

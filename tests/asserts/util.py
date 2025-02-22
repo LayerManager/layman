@@ -1,7 +1,7 @@
 import inspect
 from layman import util as layman_util, settings, app
 from test_tools import process_client
-from .. import Action, Publication
+from .. import Action, Publication4Test
 
 
 KEY_REPLACE = '__replace__'
@@ -58,7 +58,7 @@ def recursive_dict_update(base, updater, *, keep_replace_key=False):
 
 def run_action(publication, action, *, cache=None):
     cache = cache or {}
-    publication = Publication(
+    publication = Publication4Test(
         action.params.get('workspace', publication.workspace),
         action.params.get('publ_type', publication.type),
         action.params.get('name', publication.name),

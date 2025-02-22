@@ -5,7 +5,7 @@ import pytest
 from db import TableUri
 from layman import settings
 from test_tools import process_client, external_db
-from tests import Publication, EnumTestTypes, EnumTestKeys
+from tests import Publication4Test, EnumTestTypes, EnumTestKeys
 from tests.asserts.final import publication as asserts_publ
 from tests.asserts.final.publication import util as assert_util, geoserver as gs_asserts
 from tests.dynamic_data import base_test, base_test_classes
@@ -87,7 +87,7 @@ class TestLayer(base_test.TestSingleRestPublication):
                                                                     db_table=TABLE_PATCH,),
                                  ]
 
-    def test_layer(self, layer: Publication, rest_args, params):
+    def test_layer(self, layer: Publication4Test, rest_args, params):
         """Parametrized using pytest_generate_tests"""
         external_table_uri = f"{external_db.URI_STR}?schema={quote(DB_SCHEMA)}&table={quote(TABLE_POST)}&geo_column={GEO_COLUMN}"
         response = self.post_publication(publication=layer,

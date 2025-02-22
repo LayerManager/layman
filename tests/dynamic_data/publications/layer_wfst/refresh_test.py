@@ -2,7 +2,7 @@ import pytest
 from layman import names
 from test_tools import process_client, assert_util, external_db
 from test_tools.data import wfs as data_wfs, SMALL_LAYER_NATIVE_CRS, SMALL_LAYER_BBOX, SMALL_LAYER_NATIVE_BBOX
-from tests import Publication, EnumTestTypes
+from tests import Publication4Test, EnumTestTypes
 from tests.asserts.final import publication as asserts_publ
 from tests.asserts.final.publication import util as assert_publ_util
 from tests.dynamic_data import base_test, base_test_classes
@@ -62,7 +62,7 @@ class TestRefresh(base_test.TestSingleRestPublication):
                                                                     args={'geometry_type': 'GEOMETRY'},),
                                  ]
 
-    def test_refresh(self, layer: Publication, rest_args, parametrization: base_test.Parametrization):
+    def test_refresh(self, layer: Publication4Test, rest_args, parametrization: base_test.Parametrization):
         response = self.post_publication(layer, args=rest_args)
         layer_uuid = response['uuid']
         thumbnail_style_postfix = parametrization.style_file.publ_name_part

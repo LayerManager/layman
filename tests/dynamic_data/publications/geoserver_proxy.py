@@ -4,7 +4,7 @@ from tests.asserts.final import publication
 from tests.asserts import processing
 from test_tools import process_client, wfs_client
 from . import common_publications as publications
-from ... import Action, Publication, dynamic_data as consts
+from ... import Action, Publication4Test, dynamic_data as consts
 
 
 def wfst_insert_action(*,
@@ -46,7 +46,7 @@ def generate(workspace):
     username = workspace + '_user'
     username_2 = workspace + '_user_2'
     return {
-        Publication(workspace, consts.LAYER_TYPE, 'layer_wfs_proxy'): [
+        Publication4Test(workspace, consts.LAYER_TYPE, 'layer_wfs_proxy'): [
             {
                 consts.KEY_ACTION: {
                     consts.KEY_CALL: Action(process_client.publish_workspace_publication, publications.SMALL_LAYER.definition),
@@ -65,7 +65,7 @@ def generate(workspace):
             wfst_insert_action(workspace=names.GEOSERVER_WFS_WORKSPACE),
             wfst_insert_action(),
         ],
-        Publication(workspace, consts.LAYER_TYPE, 'layer_wfs_proxy_authz'): [
+        Publication4Test(workspace, consts.LAYER_TYPE, 'layer_wfs_proxy_authz'): [
             {
                 consts.KEY_ACTION: {
                     consts.KEY_CALL: Action(process_client.ensure_reserved_username, {

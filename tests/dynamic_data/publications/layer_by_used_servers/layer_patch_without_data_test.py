@@ -8,7 +8,7 @@ from test_tools import process_client
 from tests import EnumTestTypes
 from tests.asserts.final.publication import util as assert_util
 from tests.dynamic_data import base_test, base_test_classes
-from .. import Publication
+from .. import Publication4Test
 
 
 @unique
@@ -40,10 +40,10 @@ def generate_test_cases():
             post_args = {**layer_by_server.publication_definition.definition, **{'headers': AUTHN_HEADERS, }}
             rest_args = {**all_params[Key.REST_ARGS], **{'headers': AUTHN_HEADERS, }}
             test_case = base_test.TestCaseType(key=key,
-                                               publication=Publication(workspace=WORKSPACE,
-                                                                       type=process_client.LAYER_TYPE,
-                                                                       name=layer_by_server.publ_name_part,
-                                                                       ),
+                                               publication=Publication4Test(workspace=WORKSPACE,
+                                                                            type=process_client.LAYER_TYPE,
+                                                                            name=layer_by_server.publ_name_part,
+                                                                            ),
                                                type=EnumTestTypes.OPTIONAL,
                                                post_before_test_args=post_args,
                                                rest_method=base_test.RestMethod.PATCH,

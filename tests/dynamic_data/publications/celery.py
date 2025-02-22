@@ -2,12 +2,12 @@ from layman.common import empty_method_returns_true
 from tests.asserts.final.publication import internal
 from tests.asserts import processing
 from test_tools import process_client, util
-from ... import Action, Publication, dynamic_data as consts
+from ... import Action, Publication4Test, dynamic_data as consts
 
 
 def generate(workspace):
     return {
-        Publication(workspace, consts.LAYER_TYPE, 'task_abortion'): [
+        Publication4Test(workspace, consts.LAYER_TYPE, 'task_abortion'): [
             {
                 consts.KEY_ACTION: {
                     consts.KEY_CALL: Action(process_client.publish_workspace_publication, {

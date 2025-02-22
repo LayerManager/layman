@@ -3,11 +3,11 @@ from tests.asserts import processing
 from test_tools import process_client
 from . import wrong_input, edge_cases, celery, common_publications as publications, geoserver_proxy
 from .. import predefined_actions
-from ... import Action, Publication, dynamic_data as consts
+from ... import Action, Publication4Test, dynamic_data as consts
 
 
 PUBLICATIONS = {
-    Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'basic_sld'): [
+    Publication4Test(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'basic_sld'): [
         {
             consts.KEY_ACTION: {
                 consts.KEY_CALL: Action(process_client.publish_workspace_publication, publications.SMALL_LAYER.definition),
@@ -24,7 +24,7 @@ PUBLICATIONS = {
             ],
         },
     ],
-    Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_sld'): [
+    Publication4Test(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_sld'): [
         {
             consts.KEY_ACTION: {
                 consts.KEY_CALL: Action(process_client.publish_workspace_publication, publications.SMALL_LAYER_ZIP.definition),
@@ -41,7 +41,7 @@ PUBLICATIONS = {
             ],
         },
     ],
-    Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_shp_sld'): [
+    Publication4Test(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_shp_sld'): [
         {
             consts.KEY_ACTION: {
                 consts.KEY_CALL: Action(process_client.publish_workspace_publication, publications.NE_110M_ADMIN_0_BOUNDARY_LINES_LAND_ZIP.definition),
@@ -58,7 +58,7 @@ PUBLICATIONS = {
             ],
         },
     ],
-    Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_tif_tfw_rgba_opaque'): [
+    Publication4Test(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_tif_tfw_rgba_opaque'): [
         {
             consts.KEY_ACTION: {
                 consts.KEY_CALL: Action(process_client.publish_workspace_publication, publications.SAMPLE_TIF_TFW_RGBA_OPAQUE_ZIP.definition),
@@ -141,7 +141,7 @@ PUBLICATIONS = {
             ],
         },
     ],
-    Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_tif_colortable_nodata_opaque'): [
+    Publication4Test(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_tif_colortable_nodata_opaque'): [
         {
             consts.KEY_ACTION: {
                 consts.KEY_CALL: Action(process_client.publish_workspace_publication, publications.SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE_ZIP.definition),
@@ -158,7 +158,7 @@ PUBLICATIONS = {
             ],
         },
     ],
-    Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_chunks_sld'): [
+    Publication4Test(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_chunks_sld'): [
         {
             consts.KEY_ACTION: {
                 consts.KEY_CALL: Action(process_client.publish_workspace_publication, {
@@ -196,7 +196,7 @@ PUBLICATIONS = {
             ],
         },
     ],
-    Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_chunks_shp_sld'): [
+    Publication4Test(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_chunks_shp_sld'): [
         {
             consts.KEY_ACTION: {
                 consts.KEY_CALL: Action(process_client.publish_workspace_publication, {
@@ -234,7 +234,7 @@ PUBLICATIONS = {
             ],
         },
     ],
-    Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_chunks_tif_tfw_rgba_opaque'): [
+    Publication4Test(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_chunks_tif_tfw_rgba_opaque'): [
         {
             consts.KEY_ACTION: {
                 consts.KEY_CALL: Action(process_client.publish_workspace_publication, {
@@ -272,7 +272,7 @@ PUBLICATIONS = {
             ],
         },
     ],
-    Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_chunks_tif_colortable_nodata_opaque'): [
+    Publication4Test(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_chunks_tif_colortable_nodata_opaque'): [
         {
             consts.KEY_ACTION: {
                 consts.KEY_CALL: Action(process_client.publish_workspace_publication, {
@@ -310,7 +310,7 @@ PUBLICATIONS = {
             ],
         },
     ],
-    Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_shp_without_prj'): [
+    Publication4Test(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_shp_without_prj'): [
         {
             consts.KEY_ACTION: predefined_actions.POST_ZIP_SHP_WITHOUT_PRJ_WITH_CRS,
             consts.KEY_FINAL_ASSERTS: [
@@ -325,7 +325,7 @@ PUBLICATIONS = {
             ],
         },
     ],
-    Publication(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_zip_and_main_file'): [
+    Publication4Test(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_zip_and_main_file'): [
         {
             consts.KEY_ACTION: {
                 consts.KEY_CALL: Action(process_client.publish_workspace_publication, {

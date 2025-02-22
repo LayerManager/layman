@@ -5,7 +5,7 @@ import pytest
 import crs as crs_def
 from layman import common
 from test_tools import process_client
-from tests import EnumTestTypes, Publication, EnumTestKeys
+from tests import EnumTestTypes, Publication4Test, EnumTestKeys
 from tests.asserts.final import publication as asserts_publ
 from tests.asserts.final.publication import util as asserts_util
 from tests.dynamic_data import base_test
@@ -333,7 +333,7 @@ class TestLayer(base_test.TestSingleRestPublication):
     test_cases = generate_test_cases()
 
     @pytest.mark.timeout(60)
-    def test_timeseries_layer(self, layer: Publication, params, rest_method, rest_args):
+    def test_timeseries_layer(self, layer: Publication4Test, params, rest_method, rest_args):
         """Parametrized using pytest_generate_tests"""
         rest_method.fn(layer, args=rest_args)
 

@@ -10,7 +10,7 @@ from .base_test_classes import WithChunksDomain, CompressDomainBase, CompressDom
     LayerByUsedServers, PublicationByUsedServers, TestCaseType, Parametrization, StyleFileDomainBase, RestMethodParam  # pylint: disable=unused-import
 from . import base_test_util as util
 from .base_test_classes import ExternalTableDef
-from .. import Publication, EnumTestTypes, EnumTestKeys, PublicationValues
+from .. import Publication4Test, EnumTestTypes, EnumTestKeys, TestPublicationValues
 
 
 def pytest_generate_tests(metafunc):
@@ -135,7 +135,7 @@ class TestSingleRestPublication:
                     rest_args.update(copy.deepcopy(arg_value.other_rest_args))
 
                 test_case = TestCaseType(pytest_id=pytest_id,
-                                         publication=Publication(workspace, publication_type, name, uuid=uuid),
+                                         publication=Publication4Test(workspace, publication_type, name, uuid=uuid),
                                          key=input_test_case.key,
                                          rest_method=rest_method,
                                          rest_args=rest_args,
@@ -153,11 +153,11 @@ class TestSingleRestPublication:
     def _get_input_publication_workspace_and_type(cls, *,
                                                   input_test_case: TestCaseType,
                                                   params: dict,
-                                                  publication_definition: PublicationValues,
+                                                  publication_definition: TestPublicationValues,
                                                   parametrization: Parametrization,
-                                                  ) -> Tuple[Optional[Publication], str, str]:
+                                                  ) -> Tuple[Optional[Publication4Test], str, str]:
         input_publication = None
-        if isinstance(input_test_case.publication, Publication):
+        if isinstance(input_test_case.publication, Publication4Test):
             input_publication = input_test_case.publication
         elif callable(input_test_case.publication):
             args_spec = inspect.getfullargspec(input_test_case.publication)

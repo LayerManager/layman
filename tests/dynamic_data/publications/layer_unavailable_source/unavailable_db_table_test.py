@@ -5,7 +5,7 @@ from psycopg2 import sql
 from db import util as db_util
 from layman import app, settings
 from test_tools import process_client, external_db
-from tests import EnumTestTypes, Publication
+from tests import EnumTestTypes, Publication4Test
 from tests.asserts.final.publication import util as assert_publ_util
 from tests.dynamic_data import base_test
 
@@ -25,7 +25,7 @@ class TestLayer(base_test.TestSingleRestPublication):
         params=None
     )]
 
-    def test_internal_layer(self, layer: Publication):
+    def test_internal_layer(self, layer: Publication4Test):
         self.post_publication(layer)
         assert_publ_util.is_publication_valid_and_complete(layer)
 
@@ -52,7 +52,7 @@ class TestLayer(base_test.TestSingleRestPublication):
             'status': 'NOT_AVAILABLE',
         }
 
-    def test_external_layer(self, layer: Publication):
+    def test_external_layer(self, layer: Publication4Test):
         external_db_table = 'small_layer'
         external_db_schema = 'public'
 

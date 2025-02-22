@@ -6,7 +6,7 @@ from layman import LaymanError, names
 from test_tools import process_client, external_db
 from test_tools.data import wfs as wfs_data
 from test_tools.util import assert_error
-from tests import Publication, EnumTestTypes
+from tests import Publication4Test, EnumTestTypes
 from tests.asserts.final.publication import util as assert_publ_util
 from tests.dynamic_data import base_test, base_test_classes
 
@@ -16,8 +16,8 @@ EXTERNAL_DB_TABLE = 'small_layer'
 EXTERNAL_DB_SCHEMA = 'public'
 
 WORKSPACE = 'wrong_input_wfst_ws'
-EDITABLE_TABLE_LAYER = base_test.Publication(WORKSPACE, process_client.LAYER_TYPE, 'editable_table_layer')
-READ_ONLY_TABLE_LAYER = base_test.Publication(WORKSPACE, process_client.LAYER_TYPE, 'read_only_table_layer')
+EDITABLE_TABLE_LAYER = base_test.Publication4Test(WORKSPACE, process_client.LAYER_TYPE, 'editable_table_layer')
+READ_ONLY_TABLE_LAYER = base_test.Publication4Test(WORKSPACE, process_client.LAYER_TYPE, 'read_only_table_layer')
 
 TEST_CASES = {
     'editable_table_dangerous_attribute_name': {
@@ -92,7 +92,7 @@ class TestWfst(base_test.TestSingleRestPublication):
             'external_table_uri': f"{external_db.READ_ONLY_URI_STR}?schema={EXTERNAL_DB_SCHEMA}&table={EXTERNAL_DB_TABLE}&geo_column=wkb_geometry",
         }, scope='class')
 
-    def test_proxy_raises(self, layer: Publication, params):
+    def test_proxy_raises(self, layer: Publication4Test, params):
         layer_uuid = self.publ_uuids[layer]
         gs_layer_wfs = names.get_layer_names_by_source(uuid=layer_uuid, ).wfs
         data_xml = params['wfst_data_method'](gs_layer_wfs.workspace, gs_layer_wfs.name, *params['wfst_data_args'])

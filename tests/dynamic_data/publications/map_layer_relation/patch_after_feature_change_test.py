@@ -2,7 +2,7 @@ import os
 import pytest
 
 from test_tools import process_client, role_service
-from tests import EnumTestTypes, Publication
+from tests import EnumTestTypes, Publication4Test
 from tests.asserts.final.publication import util as assert_util, internal as assert_internal
 from tests.dynamic_data import base_test, base_test_classes
 
@@ -13,8 +13,8 @@ DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 USER = 'test_patch_after_feature_change_role_user'
 WORKSPACE = 'test_patch_after_feature_change_role_ws'  # public workspace
 ROLE = 'TEST_PATCH_AFTER_FEATURE_CHANGE_ROLE_ROLE'
-LAYER_SMALL = Publication(WORKSPACE, process_client.LAYER_TYPE, 'small_layer', uuid='bf667aba-035a-4731-9516-0d0c22e9b236')
-MAP = Publication(WORKSPACE, process_client.MAP_TYPE, 'map_hranice')
+LAYER_SMALL = Publication4Test(WORKSPACE, process_client.LAYER_TYPE, 'small_layer', uuid='bf667aba-035a-4731-9516-0d0c22e9b236')
+MAP = Publication4Test(WORKSPACE, process_client.MAP_TYPE, 'map_hranice')
 
 
 @pytest.mark.timeout(60)
@@ -28,7 +28,7 @@ class TestPublication(base_test.TestSingleRestPublication):
     usernames_to_reserve = [USER]
 
     test_cases = [base_test.TestCaseType(key='main',
-                                         publication=Publication(WORKSPACE, process_client.LAYER_TYPE, LAYER_SMALL.name, uuid=LAYER_SMALL.uuid),
+                                         publication=Publication4Test(WORKSPACE, process_client.LAYER_TYPE, LAYER_SMALL.name, uuid=LAYER_SMALL.uuid),
                                          rest_method=base_test_classes.RestMethod.PATCH,
                                          rest_args={
                                              'file_paths': [

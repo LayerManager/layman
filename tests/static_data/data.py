@@ -7,7 +7,7 @@ from layman.common import empty_method_returns_true
 from layman.common.prime_db_schema import workspaces
 from layman.layer.geoserver import wms
 from test_tools import process_client, process
-from .. import static_data as data, Publication
+from .. import static_data as data, Publication4Test
 from ..asserts import util as test_util
 
 
@@ -47,7 +47,7 @@ def ensure_test_data(oauth2_provider_mock, request):
         process.ensure_layman_function(process.LAYMAN_DEFAULT_SETTINGS)
 
         for workspace, publ_type, publication in data.PUBLICATIONS:
-            if test_util.get_publication_exists(Publication(workspace, publ_type, publication)):
+            if test_util.get_publication_exists(Publication4Test(workspace, publ_type, publication)):
                 headers = data.HEADERS.get(
                     data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_write', [None])[0])
                 process_client.delete_workspace_publication(publ_type, workspace, publication, headers=headers)
@@ -65,7 +65,7 @@ def ensure_all_users():
 def ensure_publication(workspace, publ_type, publication):
     ensure_all_users()
 
-    if not test_util.get_publication_exists(Publication(workspace, publ_type, publication)):
+    if not test_util.get_publication_exists(Publication4Test(workspace, publ_type, publication)):
         assert_publication_before_post(workspace, publ_type, publication)
         for idx, params in enumerate(data.PUBLICATIONS[(workspace, publ_type, publication)][data.DEFINITION]):
             write_method = process_client.patch_workspace_publication if idx > 0 else process_client.publish_workspace_publication

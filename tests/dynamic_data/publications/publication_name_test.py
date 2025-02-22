@@ -6,7 +6,7 @@ from test_tools import cleanup
 from tests.asserts.final import publication as publ_asserts
 from tests.asserts.final.publication import util as assert_util
 from tests.dynamic_data import base_test, base_test_classes
-from ... import Publication, EnumTestTypes, EnumTestKeys
+from ... import Publication4Test, EnumTestTypes, EnumTestKeys
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
@@ -26,9 +26,9 @@ def generate_test_cases():
         all_params = deepcopy(test_case_params)
         test_type = all_params.pop(EnumTestKeys.TYPE, EnumTestTypes.MANDATORY)
 
-        test_case = base_test.TestCaseType(publication=lambda publ_def, cls, params: Publication(cls.workspace,
-                                                                                                 publ_def.type,
-                                                                                                 params['name']),
+        test_case = base_test.TestCaseType(publication=lambda publ_def, cls, params: Publication4Test(cls.workspace,
+                                                                                                      publ_def.type,
+                                                                                                      params['name']),
                                            key=key,
                                            params=all_params,
                                            type=test_type,

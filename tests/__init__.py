@@ -13,7 +13,7 @@ Action = namedtuple('ActionTypeDef', ['method', 'params', ])
 
 
 @dataclass(frozen=True)
-class Publication:
+class Publication4Test:
     workspace: str
     type: str
     name: str
@@ -24,7 +24,7 @@ class Publication:
 
 
 @dataclass(frozen=True)
-class PublicationValues:
+class TestPublicationValues:
     type: str
     definition: dict
     info_values: dict

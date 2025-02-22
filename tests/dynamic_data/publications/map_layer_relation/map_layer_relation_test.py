@@ -5,7 +5,7 @@ from layman import app
 from layman.common import REQUEST_METHOD_POST, REQUEST_METHOD_PATCH
 from layman.util import get_publication_info
 from test_tools import process_client
-from tests import EnumTestTypes, Publication
+from tests import EnumTestTypes, Publication4Test
 from tests.asserts.final import publication as asserts_publ
 from tests.asserts.final.publication import util as assert_util
 from tests.dynamic_data import base_test, base_test_classes
@@ -18,10 +18,10 @@ DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 WORKSPACE = 'layer_map_relation_ws'
 PRIVATE_WORKSPACE = 'layer_map_relation_user'
 
-LAYER_HRANICE = Publication(WORKSPACE, process_client.LAYER_TYPE, 'hranice', uuid='6fd2541e-7389-447d-933d-33b3d30ff3d0')
-LAYER_HRANICE_PRIVATE = Publication(PRIVATE_WORKSPACE, process_client.LAYER_TYPE, 'hranice_private', uuid='78d3a314-cc4b-4893-aebc-754c9458a9af')
-LAYER_MISTA_NON_EXISTENT = Publication(WORKSPACE, process_client.LAYER_TYPE, 'mista', uuid='f83004db-da3d-4de2-85a0-844a66ab222e')
-MAP_HRANICE = Publication(WORKSPACE, process_client.MAP_TYPE, 'map_hranice')
+LAYER_HRANICE = Publication4Test(WORKSPACE, process_client.LAYER_TYPE, 'hranice', uuid='6fd2541e-7389-447d-933d-33b3d30ff3d0')
+LAYER_HRANICE_PRIVATE = Publication4Test(PRIVATE_WORKSPACE, process_client.LAYER_TYPE, 'hranice_private', uuid='78d3a314-cc4b-4893-aebc-754c9458a9af')
+LAYER_MISTA_NON_EXISTENT = Publication4Test(WORKSPACE, process_client.LAYER_TYPE, 'mista', uuid='f83004db-da3d-4de2-85a0-844a66ab222e')
+MAP_HRANICE = Publication4Test(WORKSPACE, process_client.MAP_TYPE, 'map_hranice')
 MAP_HRANICE_OPERATES_ON = [LAYER_HRANICE]
 
 TEST_CASES = {
@@ -131,7 +131,7 @@ class TestPublication(base_test.TestSingleRestPublication):
     usernames_to_reserve = [PRIVATE_WORKSPACE]
 
     test_cases = [base_test.TestCaseType(key=key,
-                                         publication=Publication(f'{WORKSPACE}_{key}', None, None),
+                                         publication=Publication4Test(f'{WORKSPACE}_{key}', None, None),
                                          params=params,
                                          rest_args=params['rest_args'],
                                          rest_method=params['rest_method'],

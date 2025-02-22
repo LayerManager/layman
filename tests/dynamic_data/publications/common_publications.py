@@ -3,9 +3,9 @@ from layman import settings
 from tests.asserts.final import publication
 from tests.asserts import processing
 from test_tools import process_client, external_db
-from ... import PublicationValues, dynamic_data as consts, Action
+from ... import TestPublicationValues, dynamic_data as consts, Action
 
-SMALL_LAYER = PublicationValues(
+SMALL_LAYER = TestPublicationValues(
     type=process_client.LAYER_TYPE,
     definition={
         'file_paths': ['sample/layman.layer/small_layer.geojson'],
@@ -23,7 +23,7 @@ SMALL_LAYER = PublicationValues(
     legend_image='tests/dynamic_data/publications/layer_by_used_servers/legend_vector_sld.png',
 )
 
-SMALL_LAYER_ZIP = PublicationValues(
+SMALL_LAYER_ZIP = TestPublicationValues(
     type=process_client.LAYER_TYPE,
     definition={
         'file_paths': ['sample/layman.layer/small_layer.geojson'],
@@ -37,7 +37,7 @@ SMALL_LAYER_ZIP = PublicationValues(
     thumbnail=SMALL_LAYER.thumbnail,
 )
 
-SMALL_LAYER_QML = PublicationValues(
+SMALL_LAYER_QML = TestPublicationValues(
     type=process_client.LAYER_TYPE,
     definition={
         'file_paths': ['sample/layman.layer/small_layer.geojson'],
@@ -51,7 +51,7 @@ SMALL_LAYER_QML = PublicationValues(
     legend_image=None,  # because layer name appears in the image
 )
 
-NE_110M_ADMIN_0_BOUNDARY_LINES_LAND = PublicationValues(
+NE_110M_ADMIN_0_BOUNDARY_LINES_LAND = TestPublicationValues(
     type=process_client.LAYER_TYPE,
     definition={
         'file_paths': [
@@ -76,7 +76,7 @@ NE_110M_ADMIN_0_BOUNDARY_LINES_LAND = PublicationValues(
     thumbnail='test_tools/data/thumbnail/ne_110m_admin_0_boundary_lines_land.png',
 )
 
-NE_110M_ADMIN_0_BOUNDARY_LINES_LAND_ZIP = PublicationValues(
+NE_110M_ADMIN_0_BOUNDARY_LINES_LAND_ZIP = TestPublicationValues(
     type=process_client.LAYER_TYPE,
     definition={
         **NE_110M_ADMIN_0_BOUNDARY_LINES_LAND.definition,
@@ -94,7 +94,7 @@ NE_110M_ADMIN_0_BOUNDARY_LINES_LAND_ZIP = PublicationValues(
     thumbnail=NE_110M_ADMIN_0_BOUNDARY_LINES_LAND.thumbnail,
 )
 
-SAMPLE_TIF_TFW_RGBA_OPAQUE = PublicationValues(
+SAMPLE_TIF_TFW_RGBA_OPAQUE = TestPublicationValues(
     type=process_client.LAYER_TYPE,
     definition={
         'file_paths': [
@@ -115,7 +115,7 @@ SAMPLE_TIF_TFW_RGBA_OPAQUE = PublicationValues(
     legend_image='tests/dynamic_data/publications/layer_by_used_servers/legend_raster.png',
 )
 
-SAMPLE_TIF_TFW_RGBA_OPAQUE_ZIP = PublicationValues(
+SAMPLE_TIF_TFW_RGBA_OPAQUE_ZIP = TestPublicationValues(
     type=process_client.LAYER_TYPE,
     definition={
         **SAMPLE_TIF_TFW_RGBA_OPAQUE.definition,
@@ -132,7 +132,7 @@ SAMPLE_TIF_TFW_RGBA_OPAQUE_ZIP = PublicationValues(
     thumbnail=SAMPLE_TIF_TFW_RGBA_OPAQUE.thumbnail,
 )
 
-SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE = PublicationValues(
+SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE = TestPublicationValues(
     type=process_client.LAYER_TYPE,
     definition={
         'file_paths': [
@@ -151,7 +151,7 @@ SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE = PublicationValues(
     thumbnail='test_tools/data/thumbnail/raster_layer_tif_colortable_nodata_opaque.png',
 )
 
-SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE_ZIP = PublicationValues(
+SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE_ZIP = TestPublicationValues(
     type=process_client.LAYER_TYPE,
     definition={
         **SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE.definition,
@@ -166,7 +166,7 @@ SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE_ZIP = PublicationValues(
     thumbnail=SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE.thumbnail,
 )
 
-EMPTY_MAP = PublicationValues(
+EMPTY_MAP = TestPublicationValues(
     type=process_client.MAP_TYPE,
     definition={},
     info_values={
@@ -184,7 +184,7 @@ INPUT_FILE_PATH = 'sample/layman.layer/small_layer.geojson'
 EXTERNAL_DB_TABLE = '_small_LAYER_by_used_servers'
 EXTERNAL_DB_SCHEMA = 'public'
 
-LAYER_EXTERNAL_TABLE_SLD = PublicationValues(
+LAYER_EXTERNAL_TABLE_SLD = TestPublicationValues(
     type=process_client.LAYER_TYPE,
     definition={
         'external_table_uri': f"{external_db.URI_STR}?schema={EXTERNAL_DB_SCHEMA}&table={EXTERNAL_DB_TABLE}&geo_column=wkb_geometry",
@@ -208,7 +208,7 @@ LAYER_EXTERNAL_TABLE_SLD = PublicationValues(
     legend_image='tests/dynamic_data/publications/layer_by_used_servers/legend_vector_sld.png',
 )
 
-LAYER_EXTERNAL_TABLE_QML = PublicationValues(
+LAYER_EXTERNAL_TABLE_QML = TestPublicationValues(
     type=process_client.LAYER_TYPE,
     definition={
         'external_table_uri': f"{external_db.URI_STR}?schema={EXTERNAL_DB_SCHEMA}&table={EXTERNAL_DB_TABLE}&geo_column=wkb_geometry",
