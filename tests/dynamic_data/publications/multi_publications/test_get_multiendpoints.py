@@ -10,7 +10,7 @@ import pytest
 import crs as crs_def
 from layman import app, settings
 from layman.common.prime_db_schema import publications as prime_db_schema_publications
-from tests import Publication, EnumTestTypes
+from tests import Publication4Test, EnumTestTypes
 from tests.dynamic_data import base_test
 from test_tools import process_client, prime_db_schema_client
 
@@ -27,15 +27,15 @@ AUTHN_HEADERS_USER1 = process_client.get_authz_headers(WS_USER1)
 AUTHN_HEADERS_USER2 = process_client.get_authz_headers(WS_USER2)
 AUTHN_HEADERS_USER3 = process_client.get_authz_headers(WS_USER3)
 
-MAP1_WS1_REWE_BBOX_BF46 = Publication(WS_USER1, process_client.MAP_TYPE, 'test_dynamic_map1')
-MAP2_WS1_REWE_BBOX_C3 = Publication(WS_USER1, process_client.MAP_TYPE, 'test_dynamic_map2')
-MAP3_WS1_ROWO_BBOX_BC26 = Publication(WS_USER1, process_client.MAP_TYPE, 'test_dynamic_map3')
-MAP4_WS1_REWO_BBOX_CE79 = Publication(WS_USER1, process_client.MAP_TYPE, 'test_dynamic_map4')
-MAP5_WS2_REWE_BBOX_CE35 = Publication(WS_USER2, process_client.MAP_TYPE, 'test_dynamic_map5')
-MAP6_WS2_ROWO_BBOX_BD24 = Publication(WS_USER2, process_client.MAP_TYPE, 'test_dynamic_map6')
-MAP7_WS3_ROWO_BBOX_EMPTY = Publication(WS_USER3, process_client.MAP_TYPE, 'test_dynamic_map7')
-LAY1_WSP_REWE_BBOX_BC26 = Publication(WS_PUBL, process_client.LAYER_TYPE, 'test_dynamic_lyr1')
-LAY2_WS1_R2WO_BBOX_BC26 = Publication(WS_USER1, process_client.LAYER_TYPE, 'test_dynamic_lyr2')
+MAP1_WS1_REWE_BBOX_BF46 = Publication4Test(WS_USER1, process_client.MAP_TYPE, 'test_dynamic_map1')
+MAP2_WS1_REWE_BBOX_C3 = Publication4Test(WS_USER1, process_client.MAP_TYPE, 'test_dynamic_map2')
+MAP3_WS1_ROWO_BBOX_BC26 = Publication4Test(WS_USER1, process_client.MAP_TYPE, 'test_dynamic_map3')
+MAP4_WS1_REWO_BBOX_CE79 = Publication4Test(WS_USER1, process_client.MAP_TYPE, 'test_dynamic_map4')
+MAP5_WS2_REWE_BBOX_CE35 = Publication4Test(WS_USER2, process_client.MAP_TYPE, 'test_dynamic_map5')
+MAP6_WS2_ROWO_BBOX_BD24 = Publication4Test(WS_USER2, process_client.MAP_TYPE, 'test_dynamic_map6')
+MAP7_WS3_ROWO_BBOX_EMPTY = Publication4Test(WS_USER3, process_client.MAP_TYPE, 'test_dynamic_map7')
+LAY1_WSP_REWE_BBOX_BC26 = Publication4Test(WS_PUBL, process_client.LAYER_TYPE, 'test_dynamic_lyr1')
+LAY2_WS1_R2WO_BBOX_BC26 = Publication4Test(WS_USER1, process_client.LAYER_TYPE, 'test_dynamic_lyr2')
 
 
 @dataclass(frozen=True)
@@ -1069,7 +1069,7 @@ class TestGet:
         })
 
         info_publications_json = info_publications_response.json()
-        info_publications = [Publication(item['workspace'], f'layman.{item["publication_type"]}', item['name'])
+        info_publications = [Publication4Test(item['workspace'], f'layman.{item["publication_type"]}', item['name'])
                              for item in info_publications_json]
 
         assert set(info_publications) == set(exp_result['items'])

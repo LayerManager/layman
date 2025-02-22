@@ -2,7 +2,7 @@ import pytest
 
 from test_tools import process_client
 from test_tools.external_db import URI_STR
-from tests import EnumTestTypes, PublicationValues
+from tests import EnumTestTypes, TestPublicationValues
 from tests.dynamic_data.publications import common_publications
 from .base_test_classes import RestMethod, RestArgs, CompressDomain, PublicationByUsedServers, LayerByUsedServers, CompressDomainBase, TestCaseType, Parametrization, WithChunksDomain, StyleFileDomainBase, PublicationByDefinitionBase
 from . import base_test_util as util
@@ -42,14 +42,14 @@ class PublicationByCompress(PublicationByDefinitionBase):
 
 
 class PublicationByCompressSettings(PublicationByDefinitionBase):
-    LAYER = (PublicationValues(
+    LAYER = (TestPublicationValues(
         type=process_client.LAYER_TYPE,
         definition={},
         info_values={},
         thumbnail='',
         legend_image='',
     ), 'no_compress_settings')
-    LAYER_COMPRESS_SETTINGS = (PublicationValues(
+    LAYER_COMPRESS_SETTINGS = (TestPublicationValues(
         type=process_client.LAYER_TYPE,
         definition={
             'compress_settings': process_client.CompressTypeDef(archive_name='data_zip')
@@ -61,7 +61,7 @@ class PublicationByCompressSettings(PublicationByDefinitionBase):
 
 
 class PublicationByInputData(PublicationByDefinitionBase):
-    FILE = (PublicationValues(
+    FILE = (TestPublicationValues(
         type=process_client.LAYER_TYPE,
         definition={
             'file_paths': ['sample/layman.layer/small_layer.geojson'],
@@ -70,7 +70,7 @@ class PublicationByInputData(PublicationByDefinitionBase):
         thumbnail='',
         legend_image='',
     ), 'file')
-    EXTERNAL_TABLE = (PublicationValues(
+    EXTERNAL_TABLE = (TestPublicationValues(
         type=process_client.LAYER_TYPE,
         definition={
             'external_table_uri': URI_STR,

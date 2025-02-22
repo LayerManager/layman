@@ -3,7 +3,7 @@ import os
 import pytest
 
 from test_tools import process_client, external_db
-from tests import EnumTestTypes, Publication
+from tests import EnumTestTypes, Publication4Test
 from tests.asserts.final.publication import util as asserts_util
 from tests.dynamic_data import base_test, base_test_classes
 
@@ -97,7 +97,7 @@ def generate_test_cases():
             specific_types[case] = EnumTestTypes.IGNORE
         specific_params = all_params.pop('specific_params')
         test_case = base_test.TestCaseType(key=name,
-                                           publication=lambda params, cls: Publication(
+                                           publication=lambda params, cls: Publication4Test(
                                                workspace=cls.workspace,
                                                type=params['publication_type'],
                                                name=params['expected_name']),
@@ -133,7 +133,7 @@ class TestLayer(base_test.TestSingleRestPublication):
                                                                     )]
 
     @staticmethod
-    def test_implicit_name(publication: Publication, rest_method, rest_args):
+    def test_implicit_name(publication: Publication4Test, rest_method, rest_args):
         """Parametrized using pytest_generate_tests"""
         rest_method.fn(publication, args=rest_args)
 

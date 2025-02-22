@@ -5,7 +5,7 @@ import pytest
 
 import jsonpath_ng as jp
 from test_tools import process_client
-from tests import Publication
+from tests import Publication4Test
 from tests.dynamic_data import base_test
 
 logger = logging.getLogger(__name__)
@@ -14,7 +14,7 @@ DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
 WORKSPACE = 'map_file_workspace'
 
-MAP = Publication(WORKSPACE, process_client.MAP_TYPE, 'map_hranice')
+MAP = Publication4Test(WORKSPACE, process_client.MAP_TYPE, 'map_hranice')
 MAP_FILE_PATH = os.path.join(DIRECTORY, 'internal_wms_and_wfs.json')
 
 

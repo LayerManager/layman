@@ -8,7 +8,7 @@ from layman import app, settings, LaymanError
 from layman.layer import db
 from test_tools import process_client, role_service as role_service_util
 from test_tools.data import wfs
-from tests import Publication, EnumTestTypes, EnumTestKeys
+from tests import Publication4Test, EnumTestTypes, EnumTestKeys
 from tests.asserts.final.publication import geoserver_proxy, util as assert_publ_util
 from tests.dynamic_data import base_test
 
@@ -16,8 +16,8 @@ OWNER = 'test_access_rights_application_owner'
 READER_BY_USERNAME = 'test_access_rights_application_reader_by_username'
 READER_BY_ROLE = 'test_access_rights_application_reader_by_role'
 
-LAYER_NO_ACCESS = Publication(OWNER, process_client.LAYER_TYPE, 'test_no_access_layer')
-LAYER_ACCESS_RIGHTS = Publication(OWNER, process_client.LAYER_TYPE, 'test_access_rights_layer')
+LAYER_NO_ACCESS = Publication4Test(OWNER, process_client.LAYER_TYPE, 'test_no_access_layer')
+LAYER_ACCESS_RIGHTS = Publication4Test(OWNER, process_client.LAYER_TYPE, 'test_access_rights_layer')
 
 ENDPOINTS_TO_TEST = {
     process_client.LAYER_TYPE: [
@@ -266,10 +266,10 @@ class TestAccessRights:
 
     LAYER_NO_ACCESS = LAYER_NO_ACCESS
     LAYER_ACCESS_RIGHTS = LAYER_ACCESS_RIGHTS
-    LAYER_EVERYONE_ACCESS = Publication(OWNER, process_client.LAYER_TYPE, 'test_everyone_access_layer')
-    MAP_NO_ACCESS = Publication(OWNER, process_client.MAP_TYPE, 'test_no_access_map')
-    MAP_ACCESS_RIGHTS = Publication(OWNER, process_client.MAP_TYPE, 'test_access_rights_map')
-    MAP_EVERYONE_ACCESS = Publication(OWNER, process_client.MAP_TYPE, 'test_everyone_access_map')
+    LAYER_EVERYONE_ACCESS = Publication4Test(OWNER, process_client.LAYER_TYPE, 'test_everyone_access_layer')
+    MAP_NO_ACCESS = Publication4Test(OWNER, process_client.MAP_TYPE, 'test_no_access_map')
+    MAP_ACCESS_RIGHTS = Publication4Test(OWNER, process_client.MAP_TYPE, 'test_access_rights_map')
+    MAP_EVERYONE_ACCESS = Publication4Test(OWNER, process_client.MAP_TYPE, 'test_everyone_access_map')
 
     ACCESS_RIGHT_NO_ACCESS = {
         'read': OWNER,

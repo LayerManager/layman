@@ -4,7 +4,7 @@ import pytest
 
 from layman.layer.filesystem import gdal
 from test_tools import process_client
-from tests import EnumTestTypes, Publication, EnumTestKeys
+from tests import EnumTestTypes, Publication4Test, EnumTestKeys
 from tests.asserts.final import publication as asserts_publ
 from tests.asserts.final.publication import util as assert_util
 from tests.dynamic_data import base_test
@@ -161,7 +161,7 @@ class TestLayer(base_test.TestSingleRestPublication):
     test_cases = [prepare_test_case(key) for key in TEST_CASES]
 
     @staticmethod
-    def test_contrast(layer: Publication, params, rest_method, rest_args):
+    def test_contrast(layer: Publication4Test, params, rest_method, rest_args):
         """Parametrized using pytest_generate_tests"""
 
         expected_input = params['expected_input']

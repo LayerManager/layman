@@ -4,7 +4,7 @@ from geoserver import util as gs_util
 from layman import app, settings, util as layman_util, names
 from layman.common import geoserver as gs_common
 from test_tools import process_client, role_service
-from tests import EnumTestTypes, Publication
+from tests import EnumTestTypes, Publication4Test
 from tests.asserts.final.publication import util as assert_util
 from tests.dynamic_data import base_test, base_test_classes
 
@@ -44,9 +44,9 @@ class TestPublication(base_test.TestSingleRestPublication):
                 role_service.delete_role(role)
 
     test_cases = [base_test.TestCaseType(key='role_test',
-                                         publication=lambda publ_def, cls: Publication(cls.workspace,
-                                                                                       publ_def.type,
-                                                                                       None),
+                                         publication=lambda publ_def, cls: Publication4Test(cls.workspace,
+                                                                                            publ_def.type,
+                                                                                            None),
                                          rest_args={
                                              'access_rights': {
                                                  'read': ','.join(USER_ROLE1_ROLE2),

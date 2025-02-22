@@ -8,7 +8,7 @@ import pytest
 from layman import LaymanError, settings, app, util as layman_util
 from layman.layer.util import EXTERNAL_TABLE_URI_PATTERN
 from test_tools import process_client
-from tests import EnumTestTypes, Publication
+from tests import EnumTestTypes, Publication4Test
 from tests.asserts import processing
 from tests.asserts.final import publication as publication_asserts
 from tests.asserts.final.publication import util as assert_utils
@@ -1497,10 +1497,10 @@ def generate_test_cases():
         publ_type = all_params.pop(Key.PUBLICATION_TYPE)
 
         publication_name = rest_args.pop('name', None)
-        publication = Publication(workspace=test_case_params.get(Key.WORKSPACE, WORKSPACE),
-                                  type=publ_type,
-                                  name=publication_name if publication_name else None,
-                                  )
+        publication = Publication4Test(workspace=test_case_params.get(Key.WORKSPACE, WORKSPACE),
+                                       type=publ_type,
+                                       name=publication_name if publication_name else None,
+                                       )
 
         test_case = base_test.TestCaseType(key=key,
                                            publication=publication,
@@ -1530,7 +1530,7 @@ class TestPublication(base_test.TestSingleRestPublication):
         CompressDomain,
     ]
 
-    def test_publication(self, publication: Publication, rest_method, rest_args, params,
+    def test_publication(self, publication: Publication4Test, rest_method, rest_args, params,
                          parametrization: base_test.Parametrization):
         """Parametrized using pytest_generate_tests"""
 

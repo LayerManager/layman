@@ -1,8 +1,8 @@
-from tests import Publication
+from tests import Publication4Test
 from tests.dynamic_data import base_test
 
 
-def format_exception(exception_info: dict, publication: Publication, parametrization: base_test.Parametrization):
+def format_exception(exception_info: dict, publication: Publication4Test, parametrization: base_test.Parametrization):
     compress_value = parametrization.rest_arg_dict[base_test.RestArgs.COMPRESS].raw_value
     chunks_value = parametrization.rest_arg_dict[base_test.RestArgs.WITH_CHUNKS].raw_value
     zip_file_name = f"{publication.name}.zip" if chunks_value is True else 'temporary_zip_file.zip'

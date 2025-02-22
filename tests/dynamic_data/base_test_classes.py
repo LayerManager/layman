@@ -5,7 +5,7 @@ from typing import Union, Callable, List, Dict, Optional
 import _pytest.mark
 
 from tests.dynamic_data.publications import common_publications
-from tests import Publication, EnumTestTypes, PublicationValues
+from tests import Publication4Test, EnumTestTypes, TestPublicationValues
 
 
 class RestArgDomain(Enum):
@@ -117,7 +117,7 @@ class Parametrization:
         return frozenset(self._values)
 
     @property
-    def publication_definition(self) -> Optional[PublicationValues]:
+    def publication_definition(self) -> Optional[TestPublicationValues]:
         # pylint: disable=no-member
         val = next((v for v in self._values if isinstance(v, PublicationByDefinitionBase)), None)
         return val.publication_definition if val is not None else None
@@ -145,7 +145,7 @@ class Parametrization:
 class TestCaseType:
     # pylint: disable=too-many-instance-attributes
     pytest_id: str = None
-    publication: Union[Publication, Callable[[dict], Publication]] = None
+    publication: Union[Publication4Test, Callable[[dict], Publication4Test]] = None
     publication_type: str = None
     key: str = None
     rest_method: RestMethodBase = None

@@ -2,7 +2,7 @@ import os
 import pytest
 
 from test_tools import process_client
-from tests import EnumTestTypes, Publication, EnumTestKeys
+from tests import EnumTestTypes, Publication4Test, EnumTestKeys
 from tests.asserts.final.publication import util as assert_util
 from tests.dynamic_data import base_test
 
@@ -52,7 +52,7 @@ class TestLayer(base_test.TestSingleRestPublication):
                                          ) for key, value in TEST_CASES.items()]
 
     @staticmethod
-    def test_style_xml(layer: Publication, params, rest_method):
+    def test_style_xml(layer: Publication4Test, params, rest_method):
         """Parametrized using pytest_generate_tests"""
         rest_method.fn(layer, args={
             'file_paths': ['sample/layman.layer/small_layer.geojson'],

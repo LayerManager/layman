@@ -4,7 +4,7 @@ from collections import defaultdict
 from enum import Enum
 from typing import List, Iterable
 
-from tests import PublicationValues
+from tests import TestPublicationValues
 from . import base_test_classes
 from .base_test_classes import RestArgs, RestMethodBase, PublicationByDefinitionBase, Parametrization, RestArgDomain
 
@@ -65,7 +65,7 @@ def check_rest_parametrization(rest_parametrization):
     if len(publ_by_defs) > 0 and sum(len(dims) for dims in base_args.values()) > 0:
         publ_by_def_dim: PublicationByDefinitionBase = publ_by_defs[0]
         for publ_by_def in publ_by_def_dim:
-            publ_values: PublicationValues = publ_by_def.publication_definition
+            publ_values: TestPublicationValues = publ_by_def.publication_definition
             rest_arg: RestArgDomain
             for base_arg_name, arg_dimensions in base_args.items():
                 arg_dimension = arg_dimensions[0]

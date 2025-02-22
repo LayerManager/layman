@@ -5,7 +5,7 @@ import pytest
 from db import util as db_util
 from layman import settings
 from test_tools import process_client, external_db
-from tests import EnumTestTypes, Publication
+from tests import EnumTestTypes, Publication4Test
 from tests.asserts.final.publication import util as assert_util
 from tests.dynamic_data import base_test, base_test_classes
 
@@ -53,7 +53,7 @@ class TestEdge(base_test.TestSingleRestPublication):
         ),
     ]
 
-    def test_layer(self, layer: Publication, rest_method, rest_args, ):
+    def test_layer(self, layer: Publication4Test, rest_method, rest_args, ):
         """Parametrized using pytest_generate_tests"""
         statement = sql.SQL(f"""
         DO

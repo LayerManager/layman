@@ -20,12 +20,11 @@ PUBLIC_WORKSPACES = [
 
 WORKSPACES = USERS + PUBLIC_WORKSPACES
 
-
 DEFAULT_THUMBNAIL_PIXEL_DIFF_LIMIT = 10
 
 
 @dataclass
-class Publication:
+class Publication4Test:
     type: str
     workspace: str
     name: str
@@ -35,73 +34,73 @@ class Publication:
     exp_thumbnail_path: str | None = None
 
 
-LAYER_VECTOR_SLD = Publication(type=LAYER_TYPE,
-                               workspace=USER_1,
-                               name='test_vector_layer_sld',
-                               owner=USER_1,
-                               rest_args={
-                                   'description': 'Description of test_vector_layer_sld',
-                               },
-                               exp_thumbnail_path='sample/style/basic_sld.png',
-                               )
+LAYER_VECTOR_SLD = Publication4Test(type=LAYER_TYPE,
+                                    workspace=USER_1,
+                                    name='test_vector_layer_sld',
+                                    owner=USER_1,
+                                    rest_args={
+                                        'description': 'Description of test_vector_layer_sld',
+                                    },
+                                    exp_thumbnail_path='sample/style/basic_sld.png',
+                                    )
 
-LAYER_VECTOR_QML = Publication(type=LAYER_TYPE,
-                               workspace=USER_1,
-                               name='test_vector_qml_layer',
-                               owner=USER_1,
-                               rest_args={
-                                   'style_file': 'sample/style/small_layer.qml',
-                                   'description': 'Description of test_vector_qml_layer',
-                               },
-                               exp_thumbnail_path='sample/style/small_layer_qml.png',
-                               )
+LAYER_VECTOR_QML = Publication4Test(type=LAYER_TYPE,
+                                    workspace=USER_1,
+                                    name='test_vector_qml_layer',
+                                    owner=USER_1,
+                                    rest_args={
+                                        'style_file': 'sample/style/small_layer.qml',
+                                        'description': 'Description of test_vector_qml_layer',
+                                    },
+                                    exp_thumbnail_path='sample/style/small_layer_qml.png',
+                                    )
 
-LAYER_RASTER_SLD = Publication(type=LAYER_TYPE,
-                               workspace=USER_1,
-                               name='test_raster_layer',
-                               owner=USER_1,
-                               rest_args={
-                                   'file_paths': [
-                                       'sample/layman.layer/sample_tif_tfw_rgba_opaque.tfw',
-                                       'sample/layman.layer/sample_tif_tfw_rgba_opaque.tif',
-                                   ],
-                                   'description': 'Description of test_raster_layer',
-                               },
-                               exp_thumbnail_path='test_tools/data/thumbnail/raster_layer_tiff.png',
-                               )
+LAYER_RASTER_SLD = Publication4Test(type=LAYER_TYPE,
+                                    workspace=USER_1,
+                                    name='test_raster_layer',
+                                    owner=USER_1,
+                                    rest_args={
+                                        'file_paths': [
+                                            'sample/layman.layer/sample_tif_tfw_rgba_opaque.tfw',
+                                            'sample/layman.layer/sample_tif_tfw_rgba_opaque.tif',
+                                        ],
+                                        'description': 'Description of test_raster_layer',
+                                    },
+                                    exp_thumbnail_path='test_tools/data/thumbnail/raster_layer_tiff.png',
+                                    )
 
-LAYER_RASTER_TIMESERIES = Publication(type=LAYER_TYPE,
-                                      workspace=WORKSPACE_BROWSER,
-                                      name='test_raster_timeseries_layer',
-                                      owner=settings.ANONYM_USER,
-                                      rest_args={
-                                          'file_paths': [
-                                              'tests/dynamic_data/publications/layer_timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
-                                              'tests/dynamic_data/publications/layer_timeseries/timeseries_tif/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.TIF',
-                                          ],
-                                          'time_regex': r'[0-9]{8}',
-                                          'description': 'Description of test_raster_timeseries_layer',
-                                      },
-                                      exp_thumbnail_path='tests/dynamic_data/publications/layer_timeseries/thumbnail_timeseries.png',
-                                      )
+LAYER_RASTER_TIMESERIES = Publication4Test(type=LAYER_TYPE,
+                                           workspace=WORKSPACE_BROWSER,
+                                           name='test_raster_timeseries_layer',
+                                           owner=settings.ANONYM_USER,
+                                           rest_args={
+                                               'file_paths': [
+                                                   'tests/dynamic_data/publications/layer_timeseries/timeseries_tif/S2A_MSIL2A_20220316T100031_N0400_R122_T33UWR_20220316T134748_TCI_10m.tif',
+                                                   'tests/dynamic_data/publications/layer_timeseries/timeseries_tif/S2A_MSIL2A_20220319T100731_N0400_R022_T33UWR_20220319T131812_TCI_10m.TIF',
+                                               ],
+                                               'time_regex': r'[0-9]{8}',
+                                               'description': 'Description of test_raster_timeseries_layer',
+                                           },
+                                           exp_thumbnail_path='tests/dynamic_data/publications/layer_timeseries/thumbnail_timeseries.png',
+                                           )
 
-INCOMPLETE_LAYER_VECTOR_SLD = Publication(type=LAYER_TYPE,
-                                          workspace=USER_1,
-                                          name='incomplete_test_vector_layer_sld',
-                                          owner=USER_1,
-                                          rest_args={
-                                              'description': 'Description of incomplete_test_vector_layer_sld',
-                                          },
-                                          )
+INCOMPLETE_LAYER_VECTOR_SLD = Publication4Test(type=LAYER_TYPE,
+                                               workspace=USER_1,
+                                               name='incomplete_test_vector_layer_sld',
+                                               owner=USER_1,
+                                               rest_args={
+                                                   'description': 'Description of incomplete_test_vector_layer_sld',
+                                               },
+                                               )
 
-MAP_1 = Publication(type=MAP_TYPE,
-                    workspace=USER_1,
-                    name='test_map_1',
-                    owner=USER_1,
-                    rest_args={
-                        'description': 'Description of test_map_1',
-                    },
-                    )
+MAP_1 = Publication4Test(type=MAP_TYPE,
+                         workspace=USER_1,
+                         name='test_map_1',
+                         owner=USER_1,
+                         rest_args={
+                             'description': 'Description of test_map_1',
+                         },
+                         )
 
 LAYERS_TO_MIGRATE = [
     LAYER_VECTOR_SLD,
@@ -121,7 +120,6 @@ INCOMPLETE_LAYERS = [
 ]
 
 PUBLICATIONS = PUBLICATIONS_TO_MIGRATE + INCOMPLETE_LAYERS
-
 
 UUID_FILE_PATH = 'tmp/migration_to_v2_0_tests/uuids.json'
 

@@ -10,7 +10,7 @@ from layman.layer.qgis import util as qgis_util, wms as qgis_wms
 from layman.util import get_publication_info, get_publication_uuid
 from test_tools.data import wfs as data_wfs
 from test_tools import process_client, external_db
-from tests import Publication, EnumTestTypes, PublicationValues
+from tests import Publication4Test, EnumTestTypes, TestPublicationValues
 from tests.asserts.final.publication import util as assert_publ_util
 from tests.dynamic_data import base_test, base_test_classes
 
@@ -27,7 +27,7 @@ class StyleFileDomain(base_test.StyleFileDomainBase):
 
 
 class LayerByTableLocation(base_test.PublicationByDefinitionBase):
-    INTERNAL = (PublicationValues(
+    INTERNAL = (TestPublicationValues(
         type=process_client.LAYER_TYPE,
         definition={
             'file_paths': [INPUT_FILE_PATH],
@@ -36,7 +36,7 @@ class LayerByTableLocation(base_test.PublicationByDefinitionBase):
         thumbnail='',
         legend_image='',
     ), 'internal_table')
-    EXTERNAL = (PublicationValues(
+    EXTERNAL = (TestPublicationValues(
         type=process_client.LAYER_TYPE,
         definition={
             'external_table_uri': f"{external_db.URI_STR}?schema={EXTERNAL_DB_SCHEMA}&table={EXTERNAL_DB_TABLE}&geo_column=wkb_geometry",
@@ -188,7 +188,7 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
     test_cases = [
         base_test.TestCaseType(
             key=key,
-            publication=lambda cls, parametrization: Publication(
+            publication=lambda cls, parametrization: Publication4Test(
                 workspace=cls.workspace,
                 type=cls.publication_type,
                 name=f"lr_{'_'.join(v.publ_name_part for v in parametrization.values_list)}",
@@ -242,7 +242,7 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
 
     usernames_to_reserve = [WORKSPACE]
 
-    def test_new_attribute(self, layer: Publication, rest_args, params, parametrization):
+    def test_new_attribute(self, layer: Publication4Test, rest_args, params, parametrization):
         workspace = self.workspace
 
         # ensure layers
@@ -251,7 +251,7 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
             'uuid': params['uuid'],
         }
         self.ensure_publication(layer, args=rest_args1, scope='class')
-        layer2 = Publication(name=f"{layer.name}_2", workspace=workspace, type=layer.type, uuid=params['uuid2'])
+        layer2 = Publication4Test(name=f"{layer.name}_2", workspace=workspace, type=layer.type, uuid=params['uuid2'])
         rest_args2 = copy.deepcopy(rest_args) if 'external_table_uri' not in rest_args else {
             **rest_args,
             'external_table_uri': f"{external_db.URI_STR}?schema={EXTERNAL_DB_SCHEMA}&table={EXTERNAL_DB_TABLE_2}&geo_column=wkb_geometry",

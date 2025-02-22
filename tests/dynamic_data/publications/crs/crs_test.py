@@ -3,7 +3,7 @@ import os
 import crs as crs_def
 from test_tools import process_client
 from tests.dynamic_data import base_test
-from tests import EnumTestTypes, Publication
+from tests import EnumTestTypes, Publication4Test
 from tests.asserts.final.publication import util as assert_util
 from tests.asserts.final.publication.geoserver import feature_spatial_precision, wfs_bbox, wms_geographic_bbox
 from tests.asserts.final.publication.internal import correct_values_in_detail, thumbnail_equals, \
@@ -155,7 +155,7 @@ class TestLayer(base_test.TestSingleRestPublication):
     ) for key, value in TEST_CASES.items()]
 
     @staticmethod
-    def test_precision(layer: Publication, params, rest_method, rest_args):
+    def test_precision(layer: Publication4Test, params, rest_method, rest_args):
         """Parametrized using pytest_generate_tests"""
         # publish layer
         response = rest_method.fn(layer, args=rest_args)

@@ -4,7 +4,7 @@ from tests.asserts import processing
 from tests.asserts.final import publication
 from test_tools import process_client, util
 from .. import common_publications as publications
-from .... import Action, Publication, dynamic_data as consts
+from .... import Action, Publication4Test, dynamic_data as consts
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
@@ -135,7 +135,7 @@ def generate(workspace=None):
                 ]
             }
             publ_name = "_".join([part for part in [testcase, 'post', test_case_postfix] if part])
-            result[Publication(workspace, tc_params[KEY_PUBLICATION_TYPE], publ_name)] = [action_def]
+            result[Publication4Test(workspace, tc_params[KEY_PUBLICATION_TYPE], publ_name)] = [action_def]
 
         for rest_param_dict in rest_param_dicts:
             test_case_postfix = '_'.join([REST_PARAMETRIZATION[key][value]
@@ -156,6 +156,6 @@ def generate(workspace=None):
                 ]
             }
             publ_name = "_".join([part for part in [testcase, 'patch', test_case_postfix] if part])
-            result[Publication(workspace, tc_params[KEY_PUBLICATION_TYPE], publ_name)] = [
+            result[Publication4Test(workspace, tc_params[KEY_PUBLICATION_TYPE], publ_name)] = [
                 publications.DEFAULT_POST_DICT[tc_params[KEY_PUBLICATION_TYPE]], patch_action]
     return result

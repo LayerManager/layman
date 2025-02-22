@@ -4,11 +4,11 @@ import tests
 from test_tools import process_client
 from tests.asserts.final import publication as asserts_publ
 from tests.dynamic_data import base_test
-from ..... import Publication
+from ..... import Publication4Test
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 WORKSPACE = 'dynamic_test_workspace_crs_maps'
-LAYER_FOR_MAPS = Publication(WORKSPACE, process_client.LAYER_TYPE, "layer_for_map_crs")
+LAYER_FOR_MAPS = Publication4Test(WORKSPACE, process_client.LAYER_TYPE, "layer_for_map_crs")
 
 KEY_INFO_VALUES = 'info_values'
 KEY_THUMBNAIL_TOLERANCE = 'thumbnail_tolerance'
