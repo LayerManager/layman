@@ -3,14 +3,14 @@ from typing import List, Tuple, Dict
 
 from db import TableUri
 from layman import names, settings
-from layman.publication_class import LaymanPublication
+from layman.publication_class import Publication
 
 from . import LAYER_TYPE
 from .prime_db_schema.table import get_layer_info
 
 
 @dataclass(frozen=True, )
-class LaymanLayer(LaymanPublication):
+class Layer(Publication):
     geodata_type: str
     style_type: str
     native_bounding_box: List[float]

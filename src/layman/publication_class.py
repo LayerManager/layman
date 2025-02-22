@@ -5,7 +5,7 @@ from layman import util
 
 
 @dataclass(frozen=True, )
-class LaymanPublication:
+class Publication:
     workspace: str
     type: str
     name: str
