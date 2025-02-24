@@ -54,8 +54,6 @@ def test_geoserver_bbox():
     assert_util.assert_wms_bbox(uuid, expected_bbox_1)
 
     kwargs = {
-        'description': '',
-        'title': layer,
         'access_rights': None,
         'uuid': response['uuid'],
     }
