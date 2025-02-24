@@ -78,15 +78,15 @@ def check_workspace_name(workspace):
         raise LaymanError(35, {'reserved_by': __name__, 'role': rolename})
 
 
-def set_security_rules(*, layer: Layer, geoserver_workspace, geoserver_layername, access_rights, auth, ):
+def set_security_rules(*, layer: Layer, gs_names, access_rights, auth, ):
     read_roles = access_rights.get('read') if access_rights and access_rights.get('read') else layer.access_rights['read']
     write_roles = access_rights.get('write') if access_rights and access_rights.get('write') else layer.access_rights['write']
 
     security_read_roles = gs_common.layman_users_and_roles_to_geoserver_roles(read_roles)
-    gs_util.ensure_layer_security_roles(geoserver_workspace, geoserver_layername, security_read_roles, 'r', auth)
+    gs_util.ensure_layer_security_roles(gs_names.workspace, gs_names.name, security_read_roles, 'r', auth)
 
     security_write_roles = gs_common.layman_users_and_roles_to_geoserver_roles(write_roles)
-    gs_util.ensure_layer_security_roles(geoserver_workspace, geoserver_layername, security_write_roles, 'w', auth)
+    gs_util.ensure_layer_security_roles(gs_names.workspace, gs_names.name, security_write_roles, 'w', auth)
 
 
 def get_layer_bbox(*, layer: Layer):
