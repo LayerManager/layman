@@ -34,19 +34,16 @@ def refresh_wms(
         *,
         uuid,
         store_in_geoserver,
-        description=None,
-        title=None,
         access_rights=None,
         image_mosaic=False,
         slugified_time_regex=None,
         slugified_time_regex_format=None,
-        original_data_source=settings.EnumOriginalDataSource.FILE.value,
 ):
     layer = Layer(uuid=uuid)
     gs_layername = layer.gs_names.wms
     info = layman_util.get_publication_info_by_class(layer, context={'keys': ['file']})
 
-    assert title is not None
+    assert layer.title is not None
     geoserver.ensure_workspace(layer.workspace)
     metadata_url = micka_util.get_metadata_url(layer.uuid, url_type=micka_util.RecordUrlType.XML)
 
@@ -55,7 +52,7 @@ def refresh_wms(
 
     if layer.geodata_type == settings.GEODATA_TYPE_VECTOR:
         if store_in_geoserver:
-            if original_data_source == settings.EnumOriginalDataSource.TABLE.value:
+            if layer.original_data_source == settings.EnumOriginalDataSource.TABLE.value:
                 store_name = geoserver.create_external_db_store(workspace=gs_layername.workspace,
                                                                 uuid=uuid,
                                                                 table_uri=layer.table_uri,
@@ -94,8 +91,8 @@ def refresh_wms(
             coverage_type = gs_util.COVERAGESTORE_IMAGEMOSAIC
             enable_time_dimension = True
         gs_util.create_coverage_store(gs_layername.workspace, settings.LAYMAN_GS_AUTH, coverage_store_name, source_file_or_dir, coverage_type=coverage_type)
-        gs_util.publish_coverage(gs_layername.workspace, settings.LAYMAN_GS_AUTH, coverage_store_name, gs_layername.name, title,
-                                 description, bbox, layer.native_crs, lat_lon_bbox=lat_lon_bbox, metadata_url=metadata_url, enable_time_dimension=enable_time_dimension)
+        gs_util.publish_coverage(gs_layername.workspace, settings.LAYMAN_GS_AUTH, coverage_store_name, gs_layername.name, layer.title,
+                                 layer.description, bbox, layer.native_crs, lat_lon_bbox=lat_lon_bbox, metadata_url=metadata_url, enable_time_dimension=enable_time_dimension)
     else:
         raise NotImplementedError(f"Unknown geodata type: {layer.geodata_type}")
 
