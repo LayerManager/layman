@@ -144,6 +144,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
     uuid = pub_info["uuid"]
     expected_detail = {
         'name': name,
+        '_workspace': workspace,
         'title': name,
         'type': publ_type,
         'thumbnail': {

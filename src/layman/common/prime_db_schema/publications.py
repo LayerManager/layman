@@ -268,6 +268,7 @@ from {DB_SCHEMA}.workspaces w inner join
     infos = {(workspace_name,
               publication_type,
               publication_name,): {'id': id_publication,
+                                   '_workspace': workspace_name,
                                    'name': publication_name,
                                    'title': title,
                                    'description': description,
