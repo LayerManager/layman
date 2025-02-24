@@ -27,18 +27,18 @@
     <customproperties>
       <Option/>
     </customproperties>
-    <layer-tree-layer source="dbname='{db_name}' host={db_host} port={db_port} user='{db_user}' password='{db_password}' sslmode=disable key='{primary_key_column}' srid={srid} type={source_type} checkPrimaryKeyUnicity='1' table=&quot;{db_schema}&quot;.&quot;{db_table}&quot; ({geo_column})" providerKey="postgres" legend_exp="" checked="Qt::Checked" id="{layer_name}_{layer_uuid}" expanded="1" name="{layer_name}" patch_size="-1,-1" legend_split_behavior="0">
+    <layer-tree-layer source="dbname='{db_name}' host={db_host} port={db_port} user='{db_user}' password='{db_password}' sslmode=disable key='{primary_key_column}' srid={srid} type={source_type} checkPrimaryKeyUnicity='1' table=&quot;{db_schema}&quot;.&quot;{db_table}&quot; ({geo_column})" providerKey="postgres" legend_exp="" checked="Qt::Checked" id="{qgis_layer_id}" expanded="1" name="{qgis_layer_name}" patch_size="-1,-1" legend_split_behavior="0">
       <customproperties>
         <Option/>
       </customproperties>
     </layer-tree-layer>
     <custom-order enabled="0">
-      <item>{layer_name}_{layer_uuid}</item>
+      <item>{qgis_layer_id}</item>
     </custom-order>
   </layer-tree-group>
   <snapping-settings mode="2" tolerance="20" unit="1" enabled="1" type="1" intersection-snapping="0" scaleDependencyMode="0" maxScale="0" self-snapping="0" minScale="0">
     <individual-layer-settings>
-      <layer-setting tolerance="20" id="{layer_name}_{layer_uuid}" enabled="1" type="1" units="1" maxScale="0" minScale="0"/>
+      <layer-setting tolerance="20" id="{qgis_layer_id}" enabled="1" type="1" units="1" maxScale="0" minScale="0"/>
     </individual-layer-settings>
   </snapping-settings>
   <relations/>
@@ -59,9 +59,9 @@
   </mapcanvas>
   <projectModels/>
   <legend updateDrawingOrder="true">
-    <legendlayer showFeatureCount="0" drawingOrder="-1" open="true" checked="Qt::Checked" name="{layer_name}">
+    <legendlayer showFeatureCount="0" drawingOrder="-1" open="true" checked="Qt::Checked" name="{qgis_layer_name}">
       <filegroup open="true" hidden="false">
-        <legendlayerfile visible="1" isInOverview="0" layerid="{layer_name}_{layer_uuid}"/>
+        <legendlayerfile visible="1" isInOverview="0" layerid="{qgis_layer_id}"/>
       </filegroup>
     </legendlayer>
   </legend>
@@ -70,7 +70,7 @@
     {layer_qml}
   </projectlayers>
   <layerorder>
-    <layer id="{layer_name}_{layer_uuid}"/>
+    <layer id="{qgis_layer_id}"/>
   </layerorder>
   <labelEngineSettings/>
   <properties>

@@ -3,14 +3,14 @@
     <extent>
         {extent}
     </extent>
-    <id>{layer_name}_{layer_uuid}</id>
+    <id>{qgis_layer_id}</id>
     <datasource>dbname='{db_name}' host={db_host} port={db_port} user='{db_user}' password='{db_password}' sslmode=disable key='{primary_key_column}'
         srid={srid} type={source_type} checkPrimaryKeyUnicity='1' table="{db_schema}"."{db_table}" ({geo_column})
     </datasource>
     <keywordList>
         <value></value>
     </keywordList>
-    <layername>{layer_name}</layername>
+    <layername>{qgis_layer_name}</layername>
     <srs>
         <spatialrefsys nativeFormat="Wkt">
             {qgis_template_spatialrefsys}
