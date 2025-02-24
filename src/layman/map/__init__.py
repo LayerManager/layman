@@ -50,7 +50,7 @@ PUBLICATION_TYPES = {
         ],
         # see also .util.TASKS_TO_MAP_INFO_KEYS
         'internal_sources': OrderedDict([
-            ('layman.map.prime_db_schema.table', InternalSourceTypeDef(info_items=['access_rights', 'name', 'title', 'description', 'uuid',
+            ('layman.map.prime_db_schema.table', InternalSourceTypeDef(info_items=['access_rights', 'name', 'workspace', 'title', 'description', 'uuid',
                                                                                    'bounding_box', 'native_crs', 'native_bounding_box',
                                                                                    'updated_at', 'type', 'id', 'image_mosaic',
                                                                                    'map_layers', 'created_at']),),
