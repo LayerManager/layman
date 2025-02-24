@@ -13,6 +13,7 @@ from layman.common import bbox as bbox_util
 from layman.common.micka import util as micka_common_util
 from layman.layer import util as layer_util, db as layer_db, get_layer_info_keys
 from layman.layer.geoserver.wms import DEFAULT_WMS_QGIS_STORE_PREFIX, VERSION
+from layman.layer.layer_class import Layer
 from layman.layer.micka import csw
 from layman.layer.qgis import util as qgis_util
 from test_tools import process_client, assert_util, geoserver_client
@@ -189,12 +190,8 @@ def test_fill_project_template(workspace, publ_type, publication):
     wms_version = '1.3.0'
 
     with app.app_context():
-        layer_info = layman_util.get_publication_info(workspace, publ_type, publication, context={
-            'keys': ['uuid', 'table_uri'],
-        })
-    layer_uuid = layer_info['uuid']
-    table_uri = layer_info['_table_uri']
-    table_name = table_uri.table
+        layer = Layer(layer_tuple=(workspace, publication))
+    table_name = layer.table_uri.table
 
     with pytest.raises(requests.exceptions.HTTPError) as excinfo:
         WebMapService(wms_url, version=wms_version)
@@ -205,7 +202,7 @@ def test_fill_project_template(workspace, publ_type, publication):
         layer_crs = layer_db.get_table_crs(workspace, table_name, use_internal_srid=True)
     layer_bbox = bbox_util.get_bbox_to_publish(real_bbox, layer_crs)
     with app.app_context():
-        qml_path = qgis_util.get_original_style_path(layer_uuid)
+        qml_path = qgis_util.get_original_style_path(layer.uuid)
     parser = ET.XMLParser(remove_blank_text=True)
     qml_xml = ET.parse(qml_path, parser=parser)
     exp_min_scale = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('min_scale')
@@ -220,23 +217,24 @@ def test_fill_project_template(workspace, publ_type, publication):
     qml_geometry = qgis_util.get_geometry_from_qml_and_db_types(qml_xml, db_types)
     source_type = qgis_util.get_source_type(db_types, qml_geometry)
     with app.app_context():
-        column_srid = layer_db.get_column_srid(table_uri.schema, table_uri.table, table_uri.geo_column)
+        column_srid = layer_db.get_column_srid(layer.table_uri.schema, layer.table_uri.table, layer.table_uri.geo_column)
     with app.app_context():
-        layer_qml_str = qgis_util.fill_layer_template(publication, layer_uuid, layer_bbox, layer_crs, qml_xml,
-                                                      source_type, db_cols, table_uri, column_srid, db_types)
+        layer_qml_str = qgis_util.fill_layer_template(layer.qgis_names.name, layer.qgis_names.id, layer_bbox,
+                                                      layer_crs, qml_xml,
+                                                      source_type, db_cols, layer.table_uri, column_srid, db_types)
     layer_qml = ET.fromstring(layer_qml_str.encode('utf-8'), parser=parser)
     if exp_min_scale is not None:
         assert layer_qml.attrib['minScale'] == exp_min_scale
     with app.app_context():
-        qgs_str = qgis_util.fill_project_template(publication, layer_uuid, layer_qml_str, layer_crs,
-                                                  settings.LAYMAN_OUTPUT_SRS_LIST, layer_bbox, source_type, table_uri,
+        qgs_str = qgis_util.fill_project_template(layer.qgis_names.name, layer.qgis_names.id, layer_qml_str, layer_crs,
+                                                  settings.LAYMAN_OUTPUT_SRS_LIST, layer_bbox, source_type, layer.table_uri,
                                                   column_srid)
     with open(qgs_path, "w", encoding="utf-8") as qgs_file:
         print(qgs_str, file=qgs_file)
 
     wmsi = WebMapService(wms_url, version=wms_version)
-    assert publication in wmsi.contents
-    wms_layer = wmsi.contents[publication]
+    assert layer.qgis_names.name in wmsi.contents
+    wms_layer = wmsi.contents[layer.qgis_names.name]
     exp_output_srs = set(settings.LAYMAN_OUTPUT_SRS_LIST)
     assert exp_output_srs.issubset(set(wms_layer.crsOptions))
     wms_layer_bbox = next((tuple(bbox_crs[:4]) for bbox_crs in wms_layer.crs_list if bbox_crs[4] == layer_crs))

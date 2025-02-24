@@ -57,11 +57,10 @@ def get_layer_original_style_stream(publ_uuid):
     return result
 
 
-def fill_layer_template(layer, uuid, native_bbox, crs, qml_xml, source_type, attrs_to_ensure, table_uri, column_srid, db_types):
+def fill_layer_template(qgis_layer_name, qgis_layer_id, native_bbox, crs, qml_xml, source_type, attrs_to_ensure, table_uri, column_srid, db_types):
     db_schema = table_uri.schema
     table_name = table_uri.table
     geo_column = table_uri.geo_column
-    layer_name = layer
     wkb_type = source_type
     qml_geometry = get_geometry_from_qml_and_db_types(qml_xml, db_types)
 
@@ -79,8 +78,8 @@ def fill_layer_template(layer, uuid, native_bbox, crs, qml_xml, source_type, att
         db_table=table_name,
         primary_key_column=table_uri.primary_key_column,
         geo_column=geo_column,
-        layer_name=layer_name,
-        layer_uuid=uuid,
+        qgis_layer_name=qgis_layer_name,
+        qgis_layer_id=qgis_layer_id,
         wkb_type=wkb_type,
         qml_geometry=qml_geometry,
         extent=extent_to_xml_string(native_bbox),
@@ -116,12 +115,11 @@ def fill_layer_template(layer, uuid, native_bbox, crs, qml_xml, source_type, att
     return full_xml_str
 
 
-def fill_project_template(layer, layer_uuid, layer_qml, crs, epsg_codes, extent, source_type, table_uri, column_srid):
+def fill_project_template(qgis_layer_name, qgis_layer_id, layer_qml, crs, epsg_codes, extent, source_type, table_uri, column_srid):
     wms_crs_list_values = "\n".join((f"<value>{code}</value>" for code in epsg_codes))
     db_schema = table_uri.table
     table_name = table_uri.table
     geo_column = table_uri.geo_column
-    layer_name = layer
     creation_iso_datetime = datetime.datetime.utcnow().replace(microsecond=0).isoformat()
 
     template_path = get_project_template_path()
@@ -138,8 +136,8 @@ def fill_project_template(layer, layer_uuid, layer_qml, crs, epsg_codes, extent,
         db_table=table_name,
         primary_key_column=table_uri.primary_key_column,
         geo_column=geo_column,
-        layer_name=layer_name,
-        layer_uuid=layer_uuid,
+        qgis_layer_name=qgis_layer_name,
+        qgis_layer_id=qgis_layer_id,
         layer_qml=layer_qml,
         wms_crs_list_values=wms_crs_list_values,
         creation_iso_datetime=creation_iso_datetime,

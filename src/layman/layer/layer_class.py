@@ -8,6 +8,12 @@ from layman.publication_class import Publication
 from . import LAYER_TYPE
 
 
+@dataclass(frozen=True)
+class QgisNames:
+    id: str  # pylint: disable=invalid-name
+    name: str
+
+
 @dataclass(frozen=True, )
 class Layer(Publication):
     geodata_type: str
@@ -31,3 +37,7 @@ class Layer(Publication):
     @property
     def gs_names(self):
         return names.get_names_by_source(uuid=self.uuid, publication_type=self.type)
+
+    @property
+    def qgis_names(self):
+        return QgisNames(id=f'l_{self.uuid}', name=self.name)

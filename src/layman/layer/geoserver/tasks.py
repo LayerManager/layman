@@ -76,7 +76,6 @@ def refresh_wms(
             geoserver.publish_layer_from_qgis(layer=layer,
                                               gs_layername=gs_layername.name,
                                               geoserver_workspace=gs_layername.workspace,
-                                              qgis_layername=layer.name,
                                               description=description,
                                               title=title,
                                               metadata_url=metadata_url,
