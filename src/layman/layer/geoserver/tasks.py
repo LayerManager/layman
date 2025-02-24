@@ -68,10 +68,7 @@ def refresh_wms(
                                             store_name=store_name)
         else:
             geoserver.publish_layer_from_qgis(layer=layer,
-                                              gs_layername=gs_layername.name,
-                                              geoserver_workspace=gs_layername.workspace,
-                                              description=description,
-                                              title=title,
+                                              gs_names=gs_layername,
                                               metadata_url=metadata_url,
                                               )
     elif layer.geodata_type == settings.GEODATA_TYPE_RASTER:
