@@ -122,6 +122,7 @@ INCOMPLETE_LAYERS = [
 PUBLICATIONS = PUBLICATIONS_TO_MIGRATE + INCOMPLETE_LAYERS
 
 UUID_FILE_PATH = 'tmp/migration_to_v2_0_tests/uuids.json'
+CREATED_AT_FILE_PATH = 'tmp/migration_to_v2_0_tests/created_at.json'
 
 
 def import_publication_uuids():

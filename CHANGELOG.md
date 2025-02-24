@@ -19,6 +19,7 @@
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Add column `created_at` to table `publications` in prime DB schema.
 #### Data migrations
 - [#1009](https://github.com/LayerManager/layman/issues/1009) Fill column `description` in `publications` table in prime DB schema. Value is taken from GeoServer for layers and from filesystem for maps.
+- [#1048](https://github.com/LayerManager/layman/issues/1048) Fill column `created_at` in `publications` table in prime DB schema. Value is taken from filesystem `uuid.txt` file creation. `uuid.txt` file is subsequently deleted.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) New workspaces ["layman" and "layman_wms"](doc/data-storage.md#geoserver) are created on GeoServer. 
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Layers, whose `wfs_wms_status` is not `AVAILABLE`, are deleted.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Layers are re-created on GeoServer with new names derived from `uuid`.
