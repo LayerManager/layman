@@ -1,3 +1,4 @@
+import dataclasses
 from copy import deepcopy
 from contextlib import nullcontext as does_not_raise
 from enum import Enum, unique
@@ -1536,7 +1537,6 @@ class TestPublication(base_test.TestSingleRestPublication):
 
         exp_exception = params[Key.EXPECTED_EXCEPTION]
         is_sync = exp_exception.pop('sync')
-        format_exception(exp_exception, publication, parametrization)
         exception = pytest.raises(params[Key.EXCEPTION]) if is_sync else does_not_raise()
         if rest_method.enum_item == base_test.RestMethod.PATCH:
             with app.app_context():
@@ -1548,6 +1548,8 @@ class TestPublication(base_test.TestSingleRestPublication):
             rest_args.pop('uuid', None)
         with exception as exception_info:
             response = rest_method.fn(publication, args=rest_args)
+        publication = dataclasses.replace(publication, uuid=self.publ_uuids.get(publication))
+        format_exception(exp_exception, publication, parametrization)
         if is_sync:
             processing.exception.response_exception(expected=exp_exception, thrown=exception_info)
             if rest_method.enum_item == base_test.RestMethod.PATCH:

@@ -13,9 +13,9 @@ from .util import format_exception
         id='path_prefix;chunks=FALSE,compress=TRUE'),
     pytest.param(
         {'data': {'path': '{path_prefix}file.shp'}},
-        Publication4Test('some_workspace', 'layer', 'some_name'),
+        Publication4Test('some_workspace', 'layer', 'some_name', uuid='d2816b8f-4be9-46c0-a5c4-8c305abdd4e2'),
         Parametrization([RestMethod.POST, WithChunksDomain.TRUE, CompressDomain.TRUE]),
-        {'data': {'path': 'some_name.zip/file.shp'}},
+        {'data': {'path': 'd2816b8f-4be9-46c0-a5c4-8c305abdd4e2.zip/file.shp'}},
         id='path_prefix;chunks=TRUE,compress=TRUE'),
     pytest.param(
         {'data': {'path': '{path_prefix}file.shp'}},
