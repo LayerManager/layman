@@ -95,10 +95,10 @@ def get_layer_bbox(*, layer: Layer):
     return result
 
 
-def publish_layer_from_db(*, layer: Layer, gs_layername, geoserver_workspace, description, title, crs, table_name, metadata_url, store_name=None):
+def publish_layer_from_db(*, layer: Layer, gs_names, metadata_url, store_name=None):
     bbox = get_layer_bbox(layer=layer)
-    lat_lon_bbox = bbox_util.transform(bbox, crs, crs_def.EPSG_4326)
-    gs_util.post_feature_type(geoserver_workspace, gs_layername, description, title, bbox, crs, settings.LAYMAN_GS_AUTH, lat_lon_bbox=lat_lon_bbox, table_name=table_name, metadata_url=metadata_url, store_name=store_name)
+    lat_lon_bbox = bbox_util.transform(bbox, layer.native_crs, crs_def.EPSG_4326)
+    gs_util.post_feature_type(gs_names.workspace, gs_names.name, layer.description, layer.title, bbox, layer.native_crs, settings.LAYMAN_GS_AUTH, lat_lon_bbox=lat_lon_bbox, table_name=layer.table_uri.table, metadata_url=metadata_url, store_name=store_name)
 
 
 def publish_layer_from_qgis(*, layer: Layer, gs_layername, geoserver_workspace, description, title, metadata_url, ):
