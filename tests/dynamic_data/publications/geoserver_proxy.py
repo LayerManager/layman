@@ -34,7 +34,6 @@ def wfst_insert_action(*,
                                      'message': 'WFS-T error',
                                      'data': {
                                          'status_code': 400,
-                                         'response.text': '''<?xml version="1.0" encoding="UTF-8"?><ows:ExceptionReport xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0.0" xsi:schemaLocation="http://www.opengis.net/ows/1.1 http://localhost:8000/geoserver/schemas/ows/1.1.0/owsAll.xsd">\n<ows:Exception exceptionCode="InvalidValue" locator="Transaction">\n<ows:ExceptionText>Could not parse input features</ows:ExceptionText>\n</ows:Exception>\n</ows:ExceptionReport>\n'''
                                      },
                                      }, }, ),
             ],
