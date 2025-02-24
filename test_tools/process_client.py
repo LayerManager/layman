@@ -714,7 +714,7 @@ def post_wfst(xml, *, headers=None, url=None, workspace=None):
         raise_layman_error(response)
     if response.status_code != 200:
         logger.error(f"GeoServer error response:\n{response.text}")
-        raise gs_error.Error(code_or_message='WFS-T error', data={'status_code': response.status_code, 'response.text': response.text})
+        raise gs_error.Error(code_or_message='WFS-T error', data={'status_code': response.status_code})
 
 
 def post_wfst_with_xml_getter(workspace, layer, *, xml_getter, actor_name=None, xml_getter_params=None):
