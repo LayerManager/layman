@@ -27,7 +27,7 @@ def patch_after_feature_change(
     layer_data = Layer(layer_tuple=(workspace, layer))
 
     if layer_data.geodata_type == settings.GEODATA_TYPE_VECTOR:
-        bbox = geoserver.get_layer_bbox_by_layer(layer=layer_data)
+        bbox = geoserver.get_layer_bbox(layer=layer_data)
         wms_layername = layer_data.gs_names.wms
         lat_lon_bbox = bbox_util.transform(bbox, layer_data.native_crs, crs_def.EPSG_4326)
         if layer_data.style_type == 'sld':
