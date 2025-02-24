@@ -33,6 +33,11 @@ def delete_layer_by_layer(*, layer: Layer):
     sld_stream = gs_util.delete_workspace_style(gs_style_name.workspace, gs_style_name.name, auth=settings.LAYMAN_GS_AUTH) \
         if layer else None
     wms.clear_cache()
+    sld_stream = None
+    if layer:
+        gs_style_name = layer.gs_names.sld
+        sld_stream = gs_util.delete_workspace_style(gs_style_name.workspace, gs_style_name.name, auth=settings.LAYMAN_GS_AUTH)
+        wms.clear_cache()
     if sld_stream:
         result = {
             'style': {
