@@ -100,8 +100,7 @@ def refresh_wms(
         raise NotImplementedError(f"Unknown geodata type: {layer.geodata_type}")
 
     geoserver.set_security_rules(layer=layer,
-                                 geoserver_workspace=gs_layername.workspace,
-                                 geoserver_layername=gs_layername.name,
+                                 gs_names=gs_layername,
                                  access_rights=access_rights,
                                  auth=settings.LAYMAN_GS_AUTH,
                                  )
@@ -153,8 +152,7 @@ def refresh_wfs(
                                     metadata_url=metadata_url,
                                     store_name=store_name)
     geoserver.set_security_rules(layer=layer,
-                                 geoserver_workspace=gs_layername.workspace,
-                                 geoserver_layername=gs_layername.name,
+                                 gs_names=gs_layername,
                                  access_rights=access_rights,
                                  auth=settings.LAYMAN_GS_AUTH,
                                  )
