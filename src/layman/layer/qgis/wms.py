@@ -43,7 +43,8 @@ def get_layer_info_by_uuid(publ_uuid, *, workspace, layername, x_forwarded_items
 def delete_layer(workspace, layername):
     publ_uuid = get_publication_uuid(workspace, LAYER_TYPE, layername)
     if publ_uuid:
-        delete_layer_by_uuid(publ_uuid)
+        return delete_layer_by_uuid(publ_uuid)
+    return {}
 
 
 def delete_layer_by_uuid(publ_uuid):
