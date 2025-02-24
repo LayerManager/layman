@@ -5,13 +5,16 @@ from layman import util
 
 
 @dataclass(frozen=True, )
+# pylint: disable=too-many-instance-attributes
 class Publication:
     workspace: str
     type: str
     name: str
     uuid: str
-    _info: Dict[str, Any]
+    description: str
+    title: str
     access_rights: Dict[str, List[str]]
+    _info: Dict[str, Any]
 
     def __init__(self, *, uuid: str = None, publ_tuple: Tuple[str, str, str] = None):
         assert uuid is not None or publ_tuple is not None
@@ -24,4 +27,6 @@ class Publication:
         object.__setattr__(self, 'type', info['type'])
         object.__setattr__(self, 'name', info['name'])
         object.__setattr__(self, 'access_rights', info['access_rights'])
+        object.__setattr__(self, 'description', info['description'])
+        object.__setattr__(self, 'title', info['title'])
         object.__setattr__(self, '_info', info)

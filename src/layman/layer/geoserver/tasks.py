@@ -55,7 +55,6 @@ def refresh_wms(
 
     if layer.geodata_type == settings.GEODATA_TYPE_VECTOR:
         if store_in_geoserver:
-            table_name = layer.table_uri.table
             if original_data_source == settings.EnumOriginalDataSource.TABLE.value:
                 store_name = geoserver.create_external_db_store(workspace=gs_layername.workspace,
                                                                 uuid=uuid,
@@ -64,12 +63,7 @@ def refresh_wms(
             else:
                 store_name = get_internal_db_store_name(db_schema=layer.workspace, )
             geoserver.publish_layer_from_db(layer=layer,
-                                            gs_layername=gs_layername.name,
-                                            geoserver_workspace=gs_layername.workspace,
-                                            description=description,
-                                            title=title,
-                                            crs=layer.native_crs,
-                                            table_name=table_name,
+                                            gs_names=gs_layername,
                                             metadata_url=metadata_url,
                                             store_name=store_name)
         else:
@@ -134,8 +128,6 @@ def refresh_wfs(
         layername,
         *,
         uuid,
-        description=None,
-        title=None,
         access_rights=None,
         original_data_source=settings.EnumOriginalDataSource.FILE.value,
 ):
@@ -146,12 +138,11 @@ def refresh_wfs(
     if layer.geodata_type != settings.GEODATA_TYPE_VECTOR:
         raise NotImplementedError(f"Unknown geodata type: {layer.geodata_type}")
 
-    assert title is not None
+    assert layer.title is not None
     geoserver.ensure_workspace(layer.workspace)
 
     if self.is_aborted():
         raise AbortedException
-    table_name = layer.table_uri.table
     if original_data_source == settings.EnumOriginalDataSource.TABLE.value:
         store_name = geoserver.create_external_db_store(workspace=gs_layername.workspace,
                                                         uuid=uuid,
@@ -161,12 +152,7 @@ def refresh_wfs(
         store_name = get_internal_db_store_name(db_schema=layer.workspace, )
     metadata_url = micka_util.get_metadata_url(uuid, url_type=micka_util.RecordUrlType.XML)
     geoserver.publish_layer_from_db(layer=layer,
-                                    gs_layername=gs_layername.name,
-                                    geoserver_workspace=gs_layername.workspace,
-                                    description=description,
-                                    title=title,
-                                    crs=layer.native_crs,
-                                    table_name=table_name,
+                                    gs_names=gs_layername,
                                     metadata_url=metadata_url,
                                     store_name=store_name)
     geoserver.set_security_rules(layer=layer,
