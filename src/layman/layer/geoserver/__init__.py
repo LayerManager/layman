@@ -101,17 +101,17 @@ def publish_layer_from_db(*, layer: Layer, gs_names, metadata_url, store_name=No
     gs_util.post_feature_type(gs_names.workspace, gs_names.name, layer.description, layer.title, bbox, layer.native_crs, settings.LAYMAN_GS_AUTH, lat_lon_bbox=lat_lon_bbox, table_name=layer.table_uri.table, metadata_url=metadata_url, store_name=store_name)
 
 
-def publish_layer_from_qgis(*, layer: Layer, gs_layername, geoserver_workspace, description, title, metadata_url, ):
+def publish_layer_from_qgis(*, layer: Layer, gs_names, metadata_url, ):
     store_name = wms.get_qgis_store_name(uuid=layer.uuid)
     info = layman_util.get_publication_info_by_class(layer, context={'keys': ['wms', ]})
     layer_capabilities_url = info['_wms']['qgis_capabilities_url']
-    gs_util.create_wms_store(geoserver_workspace,
+    gs_util.create_wms_store(gs_names.workspace,
                              settings.LAYMAN_GS_AUTH,
                              store_name,
                              layer_capabilities_url)
     bbox = get_layer_bbox(layer=layer)
     lat_lon_bbox = bbox_util.transform(bbox, layer.native_crs, crs_def.EPSG_4326)
-    gs_util.post_wms_layer(geoserver_workspace, gs_layername, layer.qgis_names.name, store_name, title, description, bbox, layer.native_crs, settings.LAYMAN_GS_AUTH,
+    gs_util.post_wms_layer(gs_names.workspace, gs_names.name, layer.qgis_names.name, store_name, layer.title, layer.description, bbox, layer.native_crs, settings.LAYMAN_GS_AUTH,
                            lat_lon_bbox=lat_lon_bbox, metadata_url=metadata_url)
 
 
