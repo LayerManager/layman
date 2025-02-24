@@ -60,7 +60,7 @@ def patch_layer(workspace, layername, *, uuid, title, description, original_data
                         )
 
 
-def delete_layer_by_layer(*, layer: Layer, db_schema):
+def delete_layer_by_class(*, layer: Layer, db_schema):
     db_store_name = get_internal_db_store_name(db_schema=db_schema)
     gs_layername = layer.gs_names.wfs
     gs_util.delete_feature_type(gs_layername.workspace, gs_layername.name, settings.LAYMAN_GS_AUTH, store=db_store_name)
@@ -75,7 +75,7 @@ def delete_layer_by_layer(*, layer: Layer, db_schema):
 
 def delete_layer(workspace, layername):
     layer = Layer(layer_tuple=(workspace, layername))
-    return delete_layer_by_layer(layer=layer, db_schema=workspace)
+    return delete_layer_by_class(layer=layer, db_schema=workspace)
 
 
 def get_wfs_url(external_url=False, *, x_forwarded_items=None):

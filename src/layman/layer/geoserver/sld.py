@@ -5,7 +5,7 @@ from layman.common import empty_method, empty_method_returns_dict
 from layman.common.db import launder_attribute_name
 from layman.layer.layer_class import Layer
 from layman.layer.filesystem import input_style
-from layman.util import url_for, get_publication_info_by_publication
+from layman.util import url_for, get_publication_info_by_class
 from . import wms
 from .. import LAYER_TYPE
 
@@ -25,14 +25,10 @@ def get_workspace_style_url(*, uuid):
 
 def delete_layer(workspace, layername):
     layer = Layer(layer_tuple=(workspace, layername))
-    return delete_layer_by_layer(layer=layer, )
+    return delete_layer_by_class(layer=layer, )
 
 
-def delete_layer_by_layer(*, layer: Layer):
-    gs_style_name = layer.gs_names.sld
-    sld_stream = gs_util.delete_workspace_style(gs_style_name.workspace, gs_style_name.name, auth=settings.LAYMAN_GS_AUTH) \
-        if layer else None
-    wms.clear_cache()
+def delete_layer_by_class(*, layer: Layer):
     sld_stream = None
     if layer:
         gs_style_name = layer.gs_names.sld
@@ -76,7 +72,7 @@ def ensure_custom_sld_file_if_needed(layer: Layer):
         return
     if layer.geodata_type != settings.GEODATA_TYPE_RASTER or layer.style_type != 'sld':
         return
-    info = get_publication_info_by_publication(layer, {
+    info = get_publication_info_by_class(layer, {
         'keys': ['file'],
         'extra_keys': [
             '_file.normalized_file.stats',

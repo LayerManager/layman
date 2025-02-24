@@ -6,9 +6,10 @@ from geoserver import util as gs_util
 from layman.http import LaymanError
 from layman import settings, util as layman_util, names
 from layman.common import bbox as bbox_util, geoserver as gs_common
-from layman.layer import LAYER_TYPE, layer_class
+from layman.layer import LAYER_TYPE
 from . import wms
 from .util import get_external_db_store_name, get_internal_db_store_name
+from ..layer_class import Layer
 
 logger = logging.getLogger(__name__)
 FLASK_RULES_KEY = f"{__name__}:RULES"
@@ -78,7 +79,7 @@ def check_workspace_name(workspace):
         raise LaymanError(35, {'reserved_by': __name__, 'role': rolename})
 
 
-def set_security_rules(*, layer: layer_class.Layer, geoserver_workspace, geoserver_layername, access_rights, auth, ):
+def set_security_rules(*, layer: Layer, geoserver_workspace, geoserver_layername, access_rights, auth, ):
     read_roles = access_rights.get('read') if access_rights and access_rights.get('read') else layer.access_rights['read']
     write_roles = access_rights.get('write') if access_rights and access_rights.get('write') else layer.access_rights['write']
 
@@ -90,11 +91,11 @@ def set_security_rules(*, layer: layer_class.Layer, geoserver_workspace, geoserv
 
 
 def get_layer_bbox(workspace, layer):
-    layer_data = layer_class.Layer(layer_tuple=(workspace, layer))
+    layer_data = Layer(layer_tuple=(workspace, layer))
     return get_layer_bbox_by_layer(layer=layer_data)
 
 
-def get_layer_bbox_by_layer(*, layer: layer_class.Layer):
+def get_layer_bbox_by_layer(*, layer: Layer):
     # GeoServer is not working good with degradeted bbox
     result = bbox_util.get_bbox_to_publish(layer.native_bounding_box, layer.native_crs)
     return result
@@ -106,15 +107,15 @@ def get_layer_native_bbox(workspace, layer):
     return gs_util.bbox_to_dict(bbox, crs)
 
 
-def publish_layer_from_db(*, layer: layer_class.Layer, gs_layername, geoserver_workspace, description, title, crs, table_name, metadata_url, store_name=None):
+def publish_layer_from_db(*, layer: Layer, gs_layername, geoserver_workspace, description, title, crs, table_name, metadata_url, store_name=None):
     bbox = get_layer_bbox_by_layer(layer=layer)
     lat_lon_bbox = bbox_util.transform(bbox, crs, crs_def.EPSG_4326)
     gs_util.post_feature_type(geoserver_workspace, gs_layername, description, title, bbox, crs, settings.LAYMAN_GS_AUTH, lat_lon_bbox=lat_lon_bbox, table_name=table_name, metadata_url=metadata_url, store_name=store_name)
 
 
-def publish_layer_from_qgis(*, layer: layer_class.Layer, gs_layername, geoserver_workspace, qgis_layername, description, title, metadata_url, ):
+def publish_layer_from_qgis(*, layer: Layer, gs_layername, geoserver_workspace, qgis_layername, description, title, metadata_url, ):
     store_name = wms.get_qgis_store_name(uuid=layer.uuid)
-    info = layman_util.get_publication_info_by_publication(layer, context={'keys': ['wms', ]})
+    info = layman_util.get_publication_info_by_class(layer, context={'keys': ['wms', ]})
     layer_capabilities_url = info['_wms']['qgis_capabilities_url']
     gs_util.create_wms_store(geoserver_workspace,
                              settings.LAYMAN_GS_AUTH,

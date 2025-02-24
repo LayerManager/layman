@@ -9,7 +9,8 @@ from layman import celery_app, settings, util as layman_util
 from layman.common import empty_method_returns_true, bbox as bbox_util
 from layman.common.micka import util as micka_util
 from . import wms, wfs, sld, get_internal_db_store_name
-from .. import geoserver, layer_class
+from .. import geoserver
+from ..layer_class import Layer
 
 logger = get_task_logger(__name__)
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
@@ -41,9 +42,9 @@ def refresh_wms(
         slugified_time_regex_format=None,
         original_data_source=settings.EnumOriginalDataSource.FILE.value,
 ):
-    layer = layer_class.Layer(uuid=uuid)
+    layer = Layer(uuid=uuid)
     gs_layername = layer.gs_names.wms
-    info = layman_util.get_publication_info_by_publication(layer, context={'keys': ['file']})
+    info = layman_util.get_publication_info_by_class(layer, context={'keys': ['file']})
 
     assert title is not None
     geoserver.ensure_workspace(layer.workspace)
@@ -118,7 +119,7 @@ def refresh_wms(
     wms.clear_cache()
 
     if self.is_aborted():
-        wms.delete_layer_by_layer(layer=layer, db_schema=layer.workspace)
+        wms.delete_layer_by_class(layer=layer, db_schema=layer.workspace)
         raise AbortedException
 
 
@@ -139,7 +140,7 @@ def refresh_wfs(
         access_rights=None,
         original_data_source=settings.EnumOriginalDataSource.FILE.value,
 ):
-    layer = layer_class.Layer(uuid=uuid)
+    layer = Layer(uuid=uuid)
     gs_layername = layer.gs_names.wfs
     if layer.geodata_type == settings.GEODATA_TYPE_RASTER:
         return
@@ -178,7 +179,7 @@ def refresh_wfs(
     wfs.clear_cache()
 
     if self.is_aborted():
-        wfs.delete_layer_by_layer(layer=layer, db_schema=layer.workspace)
+        wfs.delete_layer_by_class(layer=layer, db_schema=layer.workspace)
         raise AbortedException
 
 
@@ -191,11 +192,11 @@ def refresh_wfs(
 def refresh_sld(self, workspace, layername, store_in_geoserver, *, uuid):
     if self.is_aborted():
         raise AbortedException
-    layer = layer_class.Layer(uuid=uuid)
+    layer = Layer(uuid=uuid)
     if store_in_geoserver:
         sld.ensure_custom_sld_file_if_needed(layer=layer)
         sld.create_layer_style(layer=layer)
 
     if self.is_aborted():
-        sld.delete_layer_by_layer(layer=layer)
+        sld.delete_layer_by_class(layer=layer)
         raise AbortedException
