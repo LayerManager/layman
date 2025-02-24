@@ -411,7 +411,7 @@ def get_publication_info_by_uuid(uuid, context=None):
     return get_publication_info(workspace=workspace, publ_type=publ_type, publ_name=name, context=context)
 
 
-def get_publication_info_by_publication(publication: Publication, context=None):
+def get_publication_info_by_class(publication: Publication, context=None):
     return get_publication_info(workspace=publication.workspace, publ_type=publication.type, publ_name=publication.name, context=context)
 
 
