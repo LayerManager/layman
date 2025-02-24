@@ -4,6 +4,9 @@ import layman_settings as settings
 from geoserver import util as gs_util
 
 
+PUBL_TYPE_DEF_KEY = '.'.join(__name__.split('.')[:-1])
+
+
 def delete_layer_from_geoserver_v1_23(layername, workspace):
     # geoserver sld
     gs_wms_workspace = f"{workspace}_wms"
@@ -38,3 +41,9 @@ def get_task_kwargs(task_fn, kwargs):
 
 def run_task_sync(task_fn, args, kwargs):
     task_fn.apply(args=args, kwargs=get_task_kwargs(task_fn, kwargs), throw=True)
+
+
+def get_publication_dir(publ_type, workspace, publ_name):
+    publ_type_dir = f"{publ_type.split('.')[1]}s"
+    publ_dir = f"{settings.LAYMAN_DATA_DIR}/workspaces/{workspace}/{publ_type_dir}/{publ_name}"
+    return publ_dir

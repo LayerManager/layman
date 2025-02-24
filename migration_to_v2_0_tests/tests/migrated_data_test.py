@@ -1,10 +1,11 @@
+import json
 import pytest
 
 from tools.client import RestClient
 from tools.http import LaymanError
 from tools.oauth2_provider_mock import OAuth2ProviderMock
 from tools.test_data import import_publication_uuids, PUBLICATIONS_TO_MIGRATE, INCOMPLETE_LAYERS, Publication4Test, \
-    LAYERS_TO_MIGRATE, WORKSPACES, DEFAULT_THUMBNAIL_PIXEL_DIFF_LIMIT
+    LAYERS_TO_MIGRATE, WORKSPACES, DEFAULT_THUMBNAIL_PIXEL_DIFF_LIMIT, CREATED_AT_FILE_PATH
 from tools.test_settings import DB_URI
 from tools.util import compare_images
 
@@ -58,6 +59,17 @@ def test_complete_status(client, publication):
     publ_detail = client.get_workspace_publication(publication.type, publication.workspace, publication.name,
                                                    actor_name=publication.owner)
     assert publ_detail['layman_metadata']['publication_status'] == 'COMPLETE', f'rest_publication_detail={publ_detail}'
+
+
+@pytest.mark.usefixtures("import_publication_uuids_fixture", "oauth2_provider_mock_fixture")
+@pytest.mark.parametrize("publication", PUBLICATIONS_TO_MIGRATE, ids=ids_fn)
+def test_created_at(publication):
+    rows = db_util.run_query(f"select created_at from {settings.LAYMAN_PRIME_SCHEMA}.publications where uuid = %s",
+                             data=(publication.uuid,), uri_str=DB_URI)
+    assert len(rows) == 1
+    with open(CREATED_AT_FILE_PATH, encoding='utf-8') as uuid_file:
+        publ_created_at = json.load(uuid_file)
+    assert rows[0][0].isoformat() == publ_created_at[publication.uuid]
 
 
 @pytest.mark.usefixtures("import_publication_uuids_fixture")

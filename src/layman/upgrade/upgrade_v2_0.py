@@ -1,3 +1,4 @@
+from datetime import datetime
 import json
 import logging
 import os
@@ -97,6 +98,34 @@ def adjust_publications_description():
         db_util.run_statement(query, params)
 
     logger.info(f'    Adjusting publications description DONE')
+
+
+def adjust_publications_created_at():
+    logger.info(f'    Adjust created_at of publications')
+
+    query = f'''select w.name, p.type, p.name, p.uuid
+    from {DB_SCHEMA}.publications p inner join
+         {DB_SCHEMA}.workspaces w on w.id = p.id_workspace
+    where p.type = %s
+       or p.wfs_wms_status = %s
+    order by w.name, p.type, p.name
+    ;'''
+    publications = db_util.run_query(query, (MAP_TYPE, settings.EnumWfsWmsStatus.AVAILABLE.value, ))
+
+    update = f'''UPDATE {DB_SCHEMA}.publications SET created_at = %s WHERE uuid = %s'''
+
+    for workspace, publ_type, publication, uuid in publications:
+        logger.info(f'    Adjust created_at of {publ_type} {workspace}.{publication}')
+        uuid_file_path = os.path.join(util.get_publication_dir(publ_type, workspace, publication),
+                                      'uuid.txt')
+        created_at = datetime.fromtimestamp(os.path.getmtime(uuid_file_path))
+        db_util.run_statement(update, (created_at, uuid))
+        os.remove(uuid_file_path)
+
+    logger.info(f'    Adjusting publications created_at DONE')
+
+    alter_tabel = f'''ALTER TABLE {DB_SCHEMA}.publications ALTER COLUMN created_at  SET NOT NULL;'''
+    db_util.run_statement(alter_tabel)
 
 
 def ensure_gs_workspaces():
