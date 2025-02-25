@@ -9,7 +9,7 @@
   LAYMAN_CLIENT_VERSION=f6f79822de28f69dfe5c40e99e8b0fd603de9e78
   ```
 - Set new environment variable [GRANT_DELETE_OTHER_USER](doc/env-settings.md#GRANT_DELETE_OTHER_USER)  
-- In demo configuration, build QGIS v3.40.2 image using
+- In demo configuration, build QGIS v3.40.4 image using
   ```
   docker compose -f docker-compose.deps.demo.yml build qgis
   ```
@@ -38,7 +38,7 @@
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Layer in map JSON file is considered [internal](doc/models.md#internal-map-layer) if named `l_<UUID>` and is in GeoServer workspace `layman` or `layman_wms`. 
 - [#1064](https://github.com/LayerManager/layman/issues/1064) New method [DELETE User](doc/rest.md#delete-user) allows users to delete only their own account.
 - [#942](https://github.com/LayerManager/layman/issues/942) New key `used_in_maps` was added to responses of requests [GET Publications](doc/rest.md#get-publications), [GET Layers](doc/rest.md#get-layers), [GET Workspace Layers](doc/rest.md#get-workspace-layers), and [GET Workspace Layer](doc/rest.md#get-workspace-layer).
-- [#909](https://github.com/LayerManager/layman/issues/909) Upgrade QGIS Server from v3.32.2 to v3.40.2. Also use docker hub repo [layermanager/qgis-server](https://hub.docker.com/r/layermanager/qgis-server) instead of jirikcz/qgis-server,
+- [#909](https://github.com/LayerManager/layman/issues/909) Upgrade QGIS Server from v3.32.2 to v3.40.4. Also use docker hub repo [layermanager/qgis-server](https://hub.docker.com/r/layermanager/qgis-server) instead of jirikcz/qgis-server,
     - Precision error of EPSG:5514 in QGIS WMS GetMap increased from 0.5 m to 3.2 m. The error appears if either data CRS or WMS GetMap CRS is EPSG:5514 and the other one is not.
     - QML styles up to v3.40.2 are supported.
 - [#1009](https://github.com/LayerManager/layman/issues/1009) PATCH Workspace [Layer](doc/rest.md#patch-workspace-layer)/[Map](doc/rest.md#patch-workspace-map) returns same response as POST Workspace [Layers](doc/rest.md#post-workspace-layers)/[Maps](doc/rest.md#post-workspace-maps) with only `name`, `uuid`, `url` and for Layer also optional `files_to_upload` keys.

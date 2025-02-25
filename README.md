@@ -138,7 +138,7 @@ These external dependencies are shipped with Layman for development, testing and
 
 However, if you want to run Layman in production, it is strongly recommended to install external dependencies separately. Recommended (i.e. tested) versions are:
 - PostgreSQL 13.3 & PostGIS 3.1
-- QGIS Server 3.40.2
+- QGIS Server 3.40.4
 - GeoServer 2.21.2
 - Redis 4.0
 - Micka 2020.014 (versions >=2020.010 probably work too)
@@ -173,7 +173,7 @@ To run layman in production, you need to provide [external dependencies](#depend
 
 When providing **external dependencies**, check their production-related documentation:
 - [PostgreSQL 13.3](https://www.postgresql.org/docs/13/admin.html) & [PostGIS 3.1](http://postgis.net/docs/manual-3.1/performance_tips.html)
-- [QGIS Server 3.40.2](https://docs.qgis.org/3.40/en/docs/user_manual/working_with_ogc/server/index.html)
+- [QGIS Server 3.40.4](https://docs.qgis.org/3.40/en/docs/user_manual/working_with_ogc/server/index.html)
 - [GeoServer 2.21.2](https://geoserver.org/release/2.21.2/)
 - [Redis 4.0](https://redis.io/docs/latest/operate/oss_and_stack/management/admin/)
 - [Micka v2020.014](https://github.com/hsrs-cz/Micka/releases/tag/v2020.014), see also [configuration](deps/micka/sample/confs/config.local.neon) of [dockerized Micka](https://github.com/LayerManager/docker-micka).
