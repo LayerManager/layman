@@ -22,7 +22,8 @@
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Fill column `created_at` in `publications` table in prime DB schema. Value is taken from filesystem `uuid.txt` file creation. `uuid.txt` file is subsequently deleted.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) New workspaces ["layman" and "layman_wms"](doc/data-storage.md#geoserver) are created on GeoServer. 
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Layers, whose `wfs_wms_status` is not `AVAILABLE`, are deleted.
-- [#1048](https://github.com/LayerManager/layman/issues/1048) Layers are re-created on GeoServer with new names derived from `uuid`.
+- [#1048](https://github.com/LayerManager/layman/issues/1048) Layers files are moved to new path, layers are re-created on GeoServer with new names derived from `uuid`.
+- [#1048](https://github.com/LayerManager/layman/issues/1048) Map files are moved to new path with new names derived from `uuid`.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Old GeoServer workspaces (`<layman_workspace_name>` and `<layman_workspace_name>_wms` per each [Layman workspace](doc/models.md#workspace)) are deleted.
 ### Changes
 - [#161](https://github.com/LayerManager/layman/issues/161) [DELETE User](doc/rest.md#delete-user) now grants deletion rights to users or roles defined in the [GRANT_DELETE_OTHER_USER](doc/env-settings.md#GRANT_DELETE_OTHER_USER) environment variable.

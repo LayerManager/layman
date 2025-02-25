@@ -1,4 +1,6 @@
+from os import listdir
 import json
+from string import Template
 import pytest
 
 from tools.client import RestClient
@@ -70,6 +72,15 @@ def test_created_at(publication):
     with open(CREATED_AT_FILE_PATH, encoding='utf-8') as uuid_file:
         publ_created_at = json.load(uuid_file)
     assert rows[0][0].isoformat() == publ_created_at[publication.uuid]
+
+
+@pytest.mark.usefixtures("import_publication_uuids_fixture", "oauth2_provider_mock_fixture")
+@pytest.mark.parametrize("publication", PUBLICATIONS_TO_MIGRATE, ids=ids_fn)
+def test_input_files(publication):
+    exp_input_files = {Template(filename).substitute(uuid=publication.uuid) for filename in publication.exp_input_files}
+    input_file_path = f'.{settings.LAYMAN_DATA_DIR}/{publication.type.split(".")[1]}s/{publication.uuid}/input_file/'
+    input_files = set(listdir(input_file_path))
+    assert exp_input_files == input_files, f'{exp_input_files=}\n{input_files=}'
 
 
 @pytest.mark.usefixtures("import_publication_uuids_fixture")
