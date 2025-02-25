@@ -359,14 +359,16 @@ def migrate_layers():
         else:
             logger.warning("      geoserver.sld already exists!")
 
+        # Move thumbnail file
+        logger.info("      moving thumbnail file")
+        src_thumbnail_path = f"{settings.LAYMAN_DATA_DIR}/workspaces/{workspace}/layers/{layername}/thumbnail/{layername}.png"
+        dst_thumbnail_path = f"{settings.LAYMAN_DATA_DIR}/layers/{layer_uuid}/thumbnail/{layer_uuid}.png"
+        os.makedirs(f"{settings.LAYMAN_DATA_DIR}/layers/{layer_uuid}/thumbnail/", exist_ok=True)
+        shutil.move(src_thumbnail_path, dst_thumbnail_path)
+
         # assert that source keys up to geoserver are OK
         publ_info = get_complete_layer_info(workspace, layername)
-        keys_to_check = ['wms', 'style']
-        if publ_info['geodata_type'] == 'vector':
-            keys_to_check += ['db', 'wfs']
-        if publ_info['original_data_source'] == 'file':
-            keys_to_check += ['file']
-        assert all('status' not in publ_info[key] for key in keys_to_check), json.dumps(publ_info, indent=2)
+        assert publ_info['layman_metadata']['publication_status'] == 'COMPLETE', json.dumps(publ_info, indent=2)
 
         logger.info(f'    Migrate layer {workspace}.{layername} DONE')
 
