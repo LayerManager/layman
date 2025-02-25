@@ -194,14 +194,8 @@ EXP_WMS_PICTURES_QGIS_FIXES = {
     # This is probably bug in QGIS Server, and we are not able to fix it.
     # But we still want to check that the precision error is constant, so we use different expected images in such cases.
     (crs_def.CRS_84, crs_def.EPSG_5514),
-    (crs_def.EPSG_3857, crs_def.EPSG_5514),
     (crs_def.EPSG_4326, crs_def.EPSG_5514),
-    (crs_def.EPSG_32633, crs_def.EPSG_5514),
-    (crs_def.EPSG_32634, crs_def.EPSG_5514),
-    (crs_def.EPSG_5514, crs_def.EPSG_3857),
     (crs_def.EPSG_5514, crs_def.EPSG_4326),
-    (crs_def.EPSG_5514, crs_def.EPSG_32633),
-    (crs_def.EPSG_5514, crs_def.EPSG_32634),
 }
 
 
