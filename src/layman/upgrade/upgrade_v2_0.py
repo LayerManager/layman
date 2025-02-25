@@ -12,7 +12,7 @@ from geoserver import util as gs_util
 from layman import settings, names
 from layman.common.micka import util as micka_util, requests as micka_requests
 from layman.layer import LAYER_TYPE, STYLE_TYPES_DEF
-from layman.layer.filesystem import input_file, util as layer_file_util
+from layman.layer.filesystem import input_file, util as layer_file_util, gdal
 from layman.layer.geoserver import wfs, wms as gs_wms, sld
 from layman.layer.geoserver.tasks import refresh_wms, refresh_wfs, refresh_sld
 from layman.layer.geoserver.wms import get_timeregex_props
@@ -207,7 +207,7 @@ def migrate_layers():
     logger.info(f'    Migrate layers')
 
     query = f'''
-    select w.name, p.name, p.uuid::varchar as uuid, p.style_type, p.title, p.description, p.image_mosaic,
+    select w.name, p.name, p.uuid::varchar as uuid, p.style_type, p.title, p.description, p.image_mosaic, p.geodata_type,
         PGP_SYM_DECRYPT(p.external_table_uri, p.uuid::text)::json as external_table_uri,
        (select rtrim(concat(case when u.id is not null then w.name || ',' end,
                             string_agg(COALESCE(w2.name, r.role_name), ',' ORDER BY COALESCE(w2.name, r.role_name)) || ',',
@@ -235,7 +235,7 @@ def migrate_layers():
     ;'''
     layers = db_util.run_query(query, (LAYER_TYPE,))
 
-    for workspace, layername, layer_uuid, style_type_code, title, description, image_mosaic, external_table_uri, \
+    for workspace, layername, layer_uuid, style_type_code, title, description, image_mosaic, geodata_type, external_table_uri, \
             read_users_roles, write_users_roles in layers:
 
         # check if publication is not yet migrated
@@ -285,6 +285,41 @@ def migrate_layers():
             file_name_ext = f"{layer_uuid}.{os.path.splitext(filename)[1]}" if name_input_file_by_layer else os.path.basename(filename)
             dst_path = os.path.join(new_path, 'input_file', file_name_ext)
             shutil.move(filename, dst_path)
+
+        if geodata_type == settings.GEODATA_TYPE_RASTER:
+            logger.info("      moving normalized raster files")
+            gdal.ensure_normalized_raster_layer_dir(layer_uuid)
+            gdal_dir = gdal.get_normalized_raster_layer_dir(layer_uuid)
+            gdal_old_dir = f"{settings.LAYMAN_NORMALIZED_RASTER_DATA_DIR}/workspaces/{workspace}/layers/{layername}"
+            if image_mosaic:
+                for filename in [
+                    'sample_image.dat',
+                    f'{layername}.dbf',
+                    f'{layername}.fix',
+                    f'{layername}.prj',
+                    f'{layername}.properties',
+                    f'{layername}.qix',
+                    f'{layername}.shp',
+                    f'{layername}.shx',
+                ]:
+                    filepath = os.path.join(gdal_old_dir, filename)
+                    os.remove(filepath)
+
+                for filename in [
+                    'indexer.properties',
+                    'timeregex.properties',
+                ]:
+                    src_filepath = os.path.join(gdal_old_dir, filename)
+                    dst_filepath = os.path.join(gdal_dir, filename)
+                    shutil.move(src_filepath, dst_filepath)
+
+            for filename in input_files.raw_or_archived_main_file_paths:
+                old_file_name = os.path.splitext(os.path.basename(filename))[0]
+                new_file_name = layer_uuid if name_input_file_by_layer else old_file_name
+                for extension in ['tif', 'tif.aux.xml']:
+                    src_filepath = os.path.join(gdal_old_dir, f"{old_file_name}.{extension}")
+                    dst_filepath = os.path.join(gdal_dir, f"{new_file_name}.{extension}")
+                    shutil.move(src_filepath, dst_filepath)
 
         # delete layer from geoserver
         util.delete_layer_from_geoserver_v1_23(layername, workspace)
