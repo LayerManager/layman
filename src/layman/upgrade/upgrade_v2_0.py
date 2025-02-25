@@ -242,7 +242,7 @@ def migrate_layers():
         publ_status = publ_info['layman_metadata']['publication_status']
         assert publ_status in ['COMPLETE', 'INCOMPLETE']
         if publ_status == 'INCOMPLETE':
-            logger.info(f'    Migrate layer {workspace}.{layername}')
+            logger.info(f'    Migrate layer {workspace}.{layername} (uuid={layer_uuid})')
         else:
             logger.warning(f'    Layer {workspace}.{layername} seems already migrated!')
             continue
