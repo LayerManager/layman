@@ -19,6 +19,7 @@ from layman.layer.geoserver.wms import get_timeregex_props
 from layman.layer.qgis.tasks import refresh_wms as qgis_refresh_wms
 from layman.layer.util import get_complete_layer_info
 from layman.map import MAP_TYPE
+from layman.map.util import get_complete_map_info
 from layman.upgrade import upgrade_v2_0_util as util
 from layman.util import get_publication_info
 
@@ -371,6 +372,50 @@ def migrate_layers():
         assert publ_info['layman_metadata']['publication_status'] == 'COMPLETE', json.dumps(publ_info, indent=2)
 
         logger.info(f'    Migrate layer {workspace}.{layername} DONE')
+
+
+def migrate_maps():
+    logger.info(f'    Migrate maps')
+
+    query = f'''
+    select w.name, p.name, p.uuid::varchar as uuid
+    from {DB_SCHEMA}.publications p inner join
+         {DB_SCHEMA}.workspaces w on w.id = p.id_workspace left join
+         {DB_SCHEMA}.users u on u.id_workspace = w.id
+    where p.type = %s
+    order by w.name, p.name
+    ;'''
+    maps = db_util.run_query(query, (MAP_TYPE,))
+
+    for workspace, mapname, map_uuid, in maps:
+        # check if publication is not yet migrated
+        publ_info = get_complete_map_info(workspace, mapname)
+        publ_status = publ_info['layman_metadata']['publication_status']
+        assert publ_status in ['COMPLETE', 'INCOMPLETE']
+        if publ_status == 'INCOMPLETE':
+            logger.info(f'    Migrate map {workspace}.{mapname} (uuid={map_uuid})')
+        else:
+            logger.warning(f'    Map {workspace}.{mapname} seems already migrated!')
+            continue
+
+        # Move input files
+        logger.info("      moving input files")
+        src_input_file_path = f"{settings.LAYMAN_DATA_DIR}/workspaces/{workspace}/maps/{mapname}/input_file/{mapname}.json"
+        dst_input_filepath = f"{settings.LAYMAN_DATA_DIR}/maps/{map_uuid}/input_file/{map_uuid}.json"
+        os.makedirs(f"{settings.LAYMAN_DATA_DIR}/maps/{map_uuid}/input_file/", exist_ok=True)
+        shutil.move(src_input_file_path, dst_input_filepath)
+
+        # Move thumbnail file
+        logger.info("      moving thumbnail file")
+        src_thumbnail_path = f"{settings.LAYMAN_DATA_DIR}/workspaces/{workspace}/maps/{mapname}/thumbnail/{mapname}.png"
+        dst_thumbnail_path = f"{settings.LAYMAN_DATA_DIR}/maps/{map_uuid}/thumbnail/{map_uuid}.png"
+        os.makedirs(f"{settings.LAYMAN_DATA_DIR}/maps/{map_uuid}/thumbnail/", exist_ok=True)
+        shutil.move(src_thumbnail_path, dst_thumbnail_path)
+
+        # assert that source keys up to geoserver are OK
+        publ_info = get_complete_map_info(workspace, mapname)
+        assert publ_info['layman_metadata']['publication_status'] == 'COMPLETE', json.dumps(publ_info, indent=2)
+        logger.info(f'    Migrate map {workspace}.{mapname} DONE')
 
 
 def delete_old_workspaces():
