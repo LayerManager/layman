@@ -12,6 +12,7 @@ from geoserver import util as gs_util
 from layman import settings, names
 from layman.common.micka import util as micka_util, requests as micka_requests
 from layman.layer import LAYER_TYPE, STYLE_TYPES_DEF
+from layman.layer.filesystem import input_file, util as layer_file_util
 from layman.layer.geoserver import wfs, wms as gs_wms, sld
 from layman.layer.geoserver.tasks import refresh_wms, refresh_wfs, refresh_sld
 from layman.layer.geoserver.wms import get_timeregex_props
@@ -273,6 +274,17 @@ def migrate_layers():
             'slugified_time_regex': slugified_time_regex,
             'slugified_time_regex_format': slugified_time_regex_format,
         }
+
+        # Move input files
+        logger.info("      moving input files")
+        new_path = layer_file_util.get_layer_dir(layer_uuid)
+        input_file.ensure_layer_input_file_dir(layer_uuid)
+        input_files = util.get_layer_input_files(workspace, layername)
+        name_input_file_by_layer = image_mosaic is None or input_files.is_one_archive
+        for filename in input_files.raw_or_archived_paths:
+            file_name_ext = f"{layer_uuid}.{os.path.splitext(filename)[1]}" if name_input_file_by_layer else os.path.basename(filename)
+            dst_path = os.path.join(new_path, 'input_file', file_name_ext)
+            shutil.move(filename, dst_path)
 
         # delete layer from geoserver
         util.delete_layer_from_geoserver_v1_23(layername, workspace)
