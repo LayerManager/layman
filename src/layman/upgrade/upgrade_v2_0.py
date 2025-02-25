@@ -286,6 +286,15 @@ def migrate_layers():
             dst_path = os.path.join(new_path, 'input_file', file_name_ext)
             shutil.move(filename, dst_path)
 
+        # Move style files
+        old_style_dir = f"{settings.LAYMAN_DATA_DIR}/workspaces/{workspace}/layers/{layername}/input_style"
+        if os.path.isdir(old_style_dir):
+            logger.info("      moving style file")
+            dst_style_path = f"{settings.LAYMAN_DATA_DIR}/layers/{layer_uuid}/input_style/{layer_uuid}.{style_type.extension}"
+            src_style_path = f"{old_style_dir}/{layername}.{style_type.extension}"
+            os.makedirs(f"{settings.LAYMAN_DATA_DIR}/layers/{layer_uuid}/input_style/", exist_ok=True)
+            shutil.move(src_style_path, dst_style_path)
+
         if geodata_type == settings.GEODATA_TYPE_RASTER:
             logger.info("      moving normalized raster files")
             gdal.ensure_normalized_raster_layer_dir(layer_uuid)
