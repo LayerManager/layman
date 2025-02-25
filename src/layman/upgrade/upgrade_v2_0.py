@@ -16,6 +16,7 @@ from layman.layer.filesystem import input_file, util as layer_file_util, gdal
 from layman.layer.geoserver import wfs, wms as gs_wms, sld
 from layman.layer.geoserver.tasks import refresh_wms, refresh_wfs, refresh_sld
 from layman.layer.geoserver.wms import get_timeregex_props
+from layman.layer.qgis.tasks import refresh_wms as qgis_refresh_wms
 from layman.layer.util import get_complete_layer_info
 from layman.map import MAP_TYPE
 from layman.upgrade import upgrade_v2_0_util as util
@@ -329,6 +330,12 @@ def migrate_layers():
                     src_filepath = os.path.join(gdal_old_dir, f"{old_file_name}.{extension}")
                     dst_filepath = os.path.join(gdal_dir, f"{new_file_name}.{extension}")
                     shutil.move(src_filepath, dst_filepath)
+
+        if style_type.code == 'qml':
+            logger.info("      re-creating QGIS files")
+            old_qgis_path = f"{settings.LAYMAN_QGIS_DATA_DIR}/workspaces/{workspace}/layers/{layername}"
+            shutil.rmtree(old_qgis_path)
+            util.run_task_sync(qgis_refresh_wms, [workspace, layername], post_task_kwargs)
 
         # delete layer from geoserver
         util.delete_layer_from_geoserver_v1_23(layername, workspace)
