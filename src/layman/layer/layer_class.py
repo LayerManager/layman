@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Tuple
+from typing import List, Tuple, Literal
 
 from db import TableUri
 from layman import names, settings
@@ -16,7 +16,7 @@ class QgisNames:
 
 @dataclass(frozen=True, )
 class Layer(Publication):
-    geodata_type: str
+    geodata_type: Literal["vector", "raster", "unknown"]
     style_type: str
     native_bounding_box: List[float]
     native_crs: str
