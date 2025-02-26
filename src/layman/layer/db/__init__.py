@@ -213,11 +213,6 @@ AND data_type IN ('character varying', 'varchar', 'character', 'char', 'text')
     return [r[0] for r in rows]
 
 
-def get_internal_table_all_column_names(workspace, layername, ):
-    table_name = get_internal_table_name(workspace, layername)
-    return get_all_table_column_names(workspace, table_name, )
-
-
 def get_all_table_column_names(schema, table_name, uri_str=None):
     return [col.name for col in get_all_column_infos(schema, table_name, uri_str=uri_str)]
 

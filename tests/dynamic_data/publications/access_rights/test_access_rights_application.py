@@ -6,6 +6,7 @@ import pytest
 from geoserver.error import Error as GS_Error
 from layman import app, settings, LaymanError
 from layman.layer import db
+from layman.layer.layer_class import Layer
 from test_tools import process_client, role_service as role_service_util
 from test_tools.data import wfs
 from tests import Publication4Test, EnumTestTypes, EnumTestKeys
@@ -359,7 +360,9 @@ class TestAccessRights:
     def test_wfst_positive(self, publication, rest_method, rest_args, params):
         attr_names = params.get('new_attributes', [])
         with app.app_context():
-            old_db_attributes = db.get_internal_table_all_column_names(publication.workspace, publication.name)
+            layer = Layer(layer_tuple=(publication.workspace, publication.name))
+            table_uri = layer.table_uri
+            old_db_attributes = db.get_all_table_column_names(table_uri.schema, table_uri.table)
         for attr_name in attr_names:
             assert attr_name not in old_db_attributes, \
                 f"old_db_attributes={old_db_attributes}, attr_name={attr_name}"
@@ -370,7 +373,7 @@ class TestAccessRights:
                                                    headers=params['headers'])
         assert_publ_util.is_publication_valid_and_complete(publication)
         with app.app_context():
-            new_db_attributes = db.get_internal_table_all_column_names(publication.workspace, publication.name)
+            new_db_attributes = db.get_all_table_column_names(table_uri.schema, table_uri.table)
         for attr_name in attr_names:
             assert attr_name in new_db_attributes, \
                 f"new_db_attributes={new_db_attributes}, attr_name={attr_name}"
