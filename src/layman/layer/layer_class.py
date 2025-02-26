@@ -31,7 +31,8 @@ class Layer(Publication):
         object.__setattr__(self, 'style_type', info['_style_type'])
         object.__setattr__(self, 'native_bounding_box', info['native_bounding_box'])
         object.__setattr__(self, 'native_crs', info['native_crs'])
-        object.__setattr__(self, 'original_data_source', info['original_data_source'])
+        object.__setattr__(self, 'original_data_source',
+                           settings.EnumOriginalDataSource(info['original_data_source']))
         object.__setattr__(self, 'table_uri', info['_table_uri'])
 
     @property

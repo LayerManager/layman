@@ -52,7 +52,7 @@ def refresh_wms(
 
     if layer.geodata_type == settings.GEODATA_TYPE_VECTOR:
         if store_in_geoserver:
-            if layer.original_data_source == settings.EnumOriginalDataSource.TABLE.value:
+            if layer.original_data_source == settings.EnumOriginalDataSource.TABLE:
                 store_name = geoserver.create_external_db_store(workspace=gs_layername.workspace,
                                                                 uuid=uuid,
                                                                 table_uri=layer.table_uri,
