@@ -284,7 +284,7 @@ def migrate_layers():
         input_files = util.get_layer_input_files(workspace, layername)
         name_input_file_by_layer = image_mosaic is None or input_files.is_one_archive
         for filename in input_files.raw_or_archived_paths:
-            file_name_ext = f"{layer_uuid}.{os.path.splitext(filename)[1]}" if name_input_file_by_layer else os.path.basename(filename)
+            file_name_ext = f"{layer_uuid}{os.path.splitext(filename)[1]}" if name_input_file_by_layer else os.path.basename(filename)
             dst_path = os.path.join(new_path, 'input_file', file_name_ext)
             shutil.move(filename, dst_path)
 
