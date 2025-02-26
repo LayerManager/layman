@@ -103,11 +103,8 @@ def delete_whole_user(username):
     delete_workspace(username)
 
 
-def import_layer_vector_file_to_internal_table(workspace, layername, main_filepath, crs_id):
-    table_name = get_internal_table_name(workspace, layername)
-    assert table_name, f'workspace={workspace}, layername={layername}, table_name={table_name}'
-    process = import_layer_vector_file_to_internal_table_async(workspace, table_name, main_filepath,
-                                                               crs_id)
+def import_layer_vector_file_to_internal_table(schema, table, main_filepath, crs_id):
+    process = import_layer_vector_file_to_internal_table_async(schema, table, main_filepath, crs_id)
     while process.poll() is None:
         pass
     return_code = process.poll()
