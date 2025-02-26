@@ -2,6 +2,7 @@ from lxml import etree as ET
 import pytest
 
 from layman import app, LaymanError
+from layman.layer.layer_class import Layer
 from test_tools import process_client, util as test_util
 from . import util
 from .. import db
@@ -9,7 +10,7 @@ from ..filesystem import thumbnail
 
 
 @pytest.mark.parametrize('qml_version', ['3.16.2', '3.40.2'])
-@pytest.mark.parametrize('layer, exp_db_types, qml_geometry_dict', [
+@pytest.mark.parametrize('layername, exp_db_types, qml_geometry_dict', [
     ('all', {'ST_Point', 'ST_MultiPoint', 'ST_LineString', 'ST_MultiLineString', 'ST_Polygon', 'ST_MultiPolygon',
              'ST_GeometryCollection'}, {
         'Point': ('MultiPoint', 'point'),
@@ -45,14 +46,15 @@ from ..filesystem import thumbnail
     }),
 ])
 @pytest.mark.usefixtures('ensure_layman')
-def test_geometry_types(layer, exp_db_types, qml_geometry_dict, qml_version):
+def test_geometry_types(layername, exp_db_types, qml_geometry_dict, qml_version):
     workspace = 'test_geometry_types_workspace'
-    publ_uuid = process_client.publish_workspace_layer(
-        workspace, layer, file_paths=[f'/code/sample/data/geometry-types/{layer}.geojson']
-    )['uuid']
+    process_client.publish_workspace_layer(
+        workspace, layername, file_paths=[f'/code/sample/data/geometry-types/{layername}.geojson']
+    )
     with app.app_context():
-        table_name = db.get_internal_table_name(workspace, layer)
-        db_types = db.get_geometry_types(workspace, table_name)
+        layer = Layer(layer_tuple=(workspace, layername))
+        table_uri = layer.table_uri
+        db_types = db.get_geometry_types(table_uri.schema, table_uri.table)
     assert set(db_types) == exp_db_types
 
     qgis_geometries = ['Point', 'Line', 'Polygon', 'Unknown geometry']
@@ -69,9 +71,9 @@ def test_geometry_types(layer, exp_db_types, qml_geometry_dict, qml_version):
                                                    f"source_type={source_type}, db_types={db_types}"
         if qml_style_name:
             style_file_path = f'/code/sample/data/geometry-types/{qml_style_name}-v{qml_version}.qml'
-            process_client.patch_workspace_layer(workspace, layer, style_file=style_file_path)
+            process_client.patch_workspace_layer(layer.workspace, layer.name, style_file=style_file_path)
             with app.app_context():
-                qml = util.get_original_style_xml(publ_uuid)
+                qml = util.get_original_style_xml(layer.uuid)
             found_qml_geometry = util.get_geometry_from_qml_and_db_types(qml, db_types=[])
             assert found_qml_geometry == qml_geometry
             exp_file_path = f'/code/sample/data/geometry-types/{qml_style_name}.png'
@@ -81,11 +83,11 @@ def test_geometry_types(layer, exp_db_types, qml_geometry_dict, qml_version):
                 'polygon': 110,
             }[qml_style_name]
             with app.app_context():
-                thumbnail_path = thumbnail.get_layer_thumbnail_path(publ_uuid)
+                thumbnail_path = thumbnail.get_layer_thumbnail_path(layer.uuid)
             diff_pixels = test_util.compare_images(thumbnail_path, exp_file_path)
             assert diff_pixels < diff_pixels_limit, f"thumbnail_path={thumbnail_path}, exp_file_path={exp_file_path}"
 
-    process_client.delete_workspace_layer(workspace, layer)
+    process_client.delete_workspace_layer(layer.workspace, layer.name)
 
 
 @pytest.mark.parametrize('qml_path, exp_qml_type', [
