@@ -99,6 +99,36 @@ def adjust_publications_description():
     logger.info(f'    Adjusting publications description DONE')
 
 
+def adjust_map_layer_data():
+    logger.info(f'    Adjust UUID of layers in map_layer table')
+
+    update = f'''
+update {DB_SCHEMA}.map_layer
+set layer_uuid = p.uuid
+from {DB_SCHEMA}.publications p inner join
+     {DB_SCHEMA}.workspaces w on w.id = p.id_workspace
+where p.type = %s
+  and p.name = layer_name
+  and w.name = layer_workspace        
+    ;'''
+    db_util.run_statement(update, (LAYER_TYPE, ))
+
+    delete = f'''
+    delete from {DB_SCHEMA}.map_layer
+    where layer_uuid is null
+    ;'''
+    db_util.run_statement(delete)
+
+    db_util.run_statement(f'''
+    alter table {DB_SCHEMA}.map_layer
+      DROP COLUMN layer_name,
+      DROP COLUMN layer_workspace,
+      ALTER COLUMN layer_uuid SET NOT NULL
+      ;''')
+
+    logger.info(f'    Adjust UUID of layers in map_layer table DONE')
+
+
 def ensure_gs_workspaces():
     logger.info(f'    Ensure GS workspaces')
     all_gs_workspaces = gs_util.get_all_workspaces(auth=settings.LAYMAN_GS_AUTH)

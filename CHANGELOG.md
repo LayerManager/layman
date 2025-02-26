@@ -17,12 +17,14 @@
 #### Schema migrations
 - [#1009](https://github.com/LayerManager/layman/issues/1009) Add column `description` to table `publications` in prime DB schema.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Add column `created_at` to table `publications` in prime DB schema.
+- [#1048](https://github.com/LayerManager/layman/issues/1048) Add column `layer_uuid`, remove columns `layer_workspace` and `layer_name` in table `map_layer` in prime DB schema.
 #### Data migrations
 - [#1009](https://github.com/LayerManager/layman/issues/1009) Fill column `description` in `publications` table in prime DB schema. Value is taken from GeoServer for layers and from filesystem for maps.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) New workspaces ["layman" and "layman_wms"](doc/data-storage.md#geoserver) are created on GeoServer. 
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Layers, whose `wfs_wms_status` is not `AVAILABLE`, are deleted.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Layers are re-created on GeoServer with new names derived from `uuid`.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Old GeoServer workspaces (`<layman_workspace_name>` and `<layman_workspace_name>_wms` per each [Layman workspace](doc/models.md#workspace)) are deleted.
+- [#1048](https://github.com/LayerManager/layman/issues/1048) Migrate layer identifications from (workspace, name) to UUID in `map_layer` table in prime DB schema.
 ### Changes
 - [#161](https://github.com/LayerManager/layman/issues/161) [DELETE User](doc/rest.md#delete-user) now grants deletion rights to users or roles defined in the [GRANT_DELETE_OTHER_USER](doc/env-settings.md#GRANT_DELETE_OTHER_USER) environment variable.
 - [#161](https://github.com/LayerManager/layman/issues/161) New method [DELETE User](doc/rest.md#delete-user) allows to delete user account.
