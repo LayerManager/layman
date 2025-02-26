@@ -13,12 +13,14 @@ from layman import settings, names
 from layman.common.micka import util as micka_util, requests as micka_requests
 from layman.layer import LAYER_TYPE, STYLE_TYPES_DEF
 from layman.layer.filesystem import input_file, util as layer_file_util, gdal
+from layman.layer.filesystem.tasks import refresh_thumbnail as layer_refresh_thumbnail
 from layman.layer.geoserver import wfs, wms as gs_wms, sld
 from layman.layer.geoserver.tasks import refresh_wms, refresh_wfs, refresh_sld
 from layman.layer.geoserver.wms import get_timeregex_props
 from layman.layer.qgis.tasks import refresh_wms as qgis_refresh_wms
 from layman.layer.util import get_complete_layer_info
 from layman.map import MAP_TYPE
+from layman.map.filesystem.tasks import refresh_thumbnail as map_refresh_thumbnail
 from layman.map.util import get_complete_map_info
 from layman.upgrade import upgrade_v2_0_util as util
 from layman.util import get_publication_info
@@ -372,9 +374,13 @@ def migrate_layers():
         logger.info("      moving thumbnail file")
         src_thumbnail_path = f"{src_main_path}/thumbnail/{layername}.png"
         dst_thumbnail_path = f"{dst_main_path}/thumbnail/{layer_uuid}.png"
-        os.makedirs(f"{dst_main_path}/thumbnail/", exist_ok=True)
-        shutil.move(src_thumbnail_path, dst_thumbnail_path)
-        os.rmdir(f"{src_main_path}/thumbnail")
+        if os.path.exists(src_thumbnail_path):
+            os.makedirs(f"{dst_main_path}/thumbnail/", exist_ok=True)
+            shutil.move(src_thumbnail_path, dst_thumbnail_path)
+            os.rmdir(f"{src_main_path}/thumbnail")
+        else:
+            util.run_task_sync(layer_refresh_thumbnail, [workspace, layername], post_task_kwargs)
+            shutil.rmtree(f"{src_main_path}/thumbnail")
 
         # assert that source keys up to geoserver are OK
         publ_info = get_complete_layer_info(workspace, layername)
@@ -408,6 +414,10 @@ def migrate_maps():
             logger.warning(f'    Map {workspace}.{mapname} seems already migrated!')
             continue
 
+        post_task_kwargs = {
+            'uuid': map_uuid,
+        }
+
         src_main_path = f"{settings.LAYMAN_DATA_DIR}/workspaces/{workspace}/maps/{mapname}"
         dst_main_path = f"{settings.LAYMAN_DATA_DIR}/maps/{map_uuid}"
 
@@ -423,9 +433,13 @@ def migrate_maps():
         logger.info("      moving thumbnail file")
         src_thumbnail_path = f"{src_main_path}/thumbnail/{mapname}.png"
         dst_thumbnail_path = f"{dst_main_path}/thumbnail/{map_uuid}.png"
-        os.makedirs(f"{dst_main_path}/thumbnail/", exist_ok=True)
-        shutil.move(src_thumbnail_path, dst_thumbnail_path)
-        os.rmdir(f"{src_main_path}/thumbnail")
+        if os.path.exists(src_thumbnail_path):
+            os.makedirs(f"{dst_main_path}/thumbnail/", exist_ok=True)
+            shutil.move(src_thumbnail_path, dst_thumbnail_path)
+            os.rmdir(f"{src_main_path}/thumbnail")
+        else:
+            util.run_task_sync(map_refresh_thumbnail, [workspace, mapname], post_task_kwargs)
+            shutil.rmtree(f"{src_main_path}/thumbnail")
 
         # assert that source keys up to geoserver are OK
         publ_info = get_complete_map_info(workspace, mapname)
