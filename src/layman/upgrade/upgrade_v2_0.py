@@ -277,6 +277,11 @@ def migrate_layers():
             'slugified_time_regex_format': slugified_time_regex_format,
         }
 
+        src_main_path = f"{settings.LAYMAN_DATA_DIR}/workspaces/{workspace}/layers/{layername}"
+        dst_main_path = f"{settings.LAYMAN_DATA_DIR}/layers/{layer_uuid}"
+
+        shutil.rmtree(f"{src_main_path}/input_chunk", ignore_errors=True)
+
         # Move input files
         logger.info("      moving input files")
         new_path = layer_file_util.get_layer_dir(layer_uuid)
@@ -287,21 +292,23 @@ def migrate_layers():
             file_name_ext = f"{layer_uuid}{os.path.splitext(filename)[1]}" if name_input_file_by_layer else os.path.basename(filename)
             dst_path = os.path.join(new_path, 'input_file', file_name_ext)
             shutil.move(filename, dst_path)
+        os.rmdir(f"{src_main_path}/input_file")
 
         # Move style files
-        old_style_dir = f"{settings.LAYMAN_DATA_DIR}/workspaces/{workspace}/layers/{layername}/input_style"
+        old_style_dir = f"{src_main_path}/input_style"
         if os.path.isdir(old_style_dir):
             logger.info("      moving style file")
-            dst_style_path = f"{settings.LAYMAN_DATA_DIR}/layers/{layer_uuid}/input_style/{layer_uuid}.{style_type.extension}"
+            dst_style_path = f"{dst_main_path}/input_style/{layer_uuid}.{style_type.extension}"
             src_style_path = f"{old_style_dir}/{layername}.{style_type.extension}"
-            os.makedirs(f"{settings.LAYMAN_DATA_DIR}/layers/{layer_uuid}/input_style/", exist_ok=True)
+            os.makedirs(f"{dst_main_path}/input_style/", exist_ok=True)
             shutil.move(src_style_path, dst_style_path)
+            os.rmdir(f"{old_style_dir}")
 
+        gdal_old_dir = f"{settings.LAYMAN_NORMALIZED_RASTER_DATA_DIR}/workspaces/{workspace}/layers/{layername}"
         if geodata_type == settings.GEODATA_TYPE_RASTER:
             logger.info("      moving normalized raster files")
             gdal.ensure_normalized_raster_layer_dir(layer_uuid)
             gdal_dir = gdal.get_normalized_raster_layer_dir(layer_uuid)
-            gdal_old_dir = f"{settings.LAYMAN_NORMALIZED_RASTER_DATA_DIR}/workspaces/{workspace}/layers/{layername}"
             if image_mosaic:
                 for filename in [
                     'sample_image.dat',
@@ -331,10 +338,11 @@ def migrate_layers():
                     src_filepath = os.path.join(gdal_old_dir, f"{old_file_name}.{extension}")
                     dst_filepath = os.path.join(gdal_dir, f"{new_file_name}.{extension}")
                     shutil.move(src_filepath, dst_filepath)
+            os.rmdir(f"{gdal_old_dir}")
 
+        old_qgis_path = f"{settings.LAYMAN_QGIS_DATA_DIR}/workspaces/{workspace}/layers/{layername}"
         if style_type.code == 'qml':
             logger.info("      re-creating QGIS files")
-            old_qgis_path = f"{settings.LAYMAN_QGIS_DATA_DIR}/workspaces/{workspace}/layers/{layername}"
             shutil.rmtree(old_qgis_path)
             util.run_task_sync(qgis_refresh_wms, [workspace, layername], post_task_kwargs)
 
@@ -362,14 +370,16 @@ def migrate_layers():
 
         # Move thumbnail file
         logger.info("      moving thumbnail file")
-        src_thumbnail_path = f"{settings.LAYMAN_DATA_DIR}/workspaces/{workspace}/layers/{layername}/thumbnail/{layername}.png"
-        dst_thumbnail_path = f"{settings.LAYMAN_DATA_DIR}/layers/{layer_uuid}/thumbnail/{layer_uuid}.png"
-        os.makedirs(f"{settings.LAYMAN_DATA_DIR}/layers/{layer_uuid}/thumbnail/", exist_ok=True)
+        src_thumbnail_path = f"{src_main_path}/thumbnail/{layername}.png"
+        dst_thumbnail_path = f"{dst_main_path}/thumbnail/{layer_uuid}.png"
+        os.makedirs(f"{dst_main_path}/thumbnail/", exist_ok=True)
         shutil.move(src_thumbnail_path, dst_thumbnail_path)
+        os.rmdir(f"{src_main_path}/thumbnail")
 
         # assert that source keys up to geoserver are OK
         publ_info = get_complete_layer_info(workspace, layername)
         assert publ_info['layman_metadata']['publication_status'] == 'COMPLETE', json.dumps(publ_info, indent=2)
+        os.rmdir(f"{src_main_path}")
 
         logger.info(f'    Migrate layer {workspace}.{layername} DONE')
 
@@ -398,23 +408,29 @@ def migrate_maps():
             logger.warning(f'    Map {workspace}.{mapname} seems already migrated!')
             continue
 
+        src_main_path = f"{settings.LAYMAN_DATA_DIR}/workspaces/{workspace}/maps/{mapname}"
+        dst_main_path = f"{settings.LAYMAN_DATA_DIR}/maps/{map_uuid}"
+
         # Move input files
         logger.info("      moving input files")
-        src_input_file_path = f"{settings.LAYMAN_DATA_DIR}/workspaces/{workspace}/maps/{mapname}/input_file/{mapname}.json"
-        dst_input_filepath = f"{settings.LAYMAN_DATA_DIR}/maps/{map_uuid}/input_file/{map_uuid}.json"
-        os.makedirs(f"{settings.LAYMAN_DATA_DIR}/maps/{map_uuid}/input_file/", exist_ok=True)
+        src_input_file_path = f"{src_main_path}/input_file/{mapname}.json"
+        dst_input_filepath = f"{dst_main_path}/input_file/{map_uuid}.json"
+        os.makedirs(f"{dst_main_path}/input_file/", exist_ok=True)
         shutil.move(src_input_file_path, dst_input_filepath)
+        os.rmdir(f"{src_main_path}/input_file")
 
         # Move thumbnail file
         logger.info("      moving thumbnail file")
-        src_thumbnail_path = f"{settings.LAYMAN_DATA_DIR}/workspaces/{workspace}/maps/{mapname}/thumbnail/{mapname}.png"
-        dst_thumbnail_path = f"{settings.LAYMAN_DATA_DIR}/maps/{map_uuid}/thumbnail/{map_uuid}.png"
-        os.makedirs(f"{settings.LAYMAN_DATA_DIR}/maps/{map_uuid}/thumbnail/", exist_ok=True)
+        src_thumbnail_path = f"{src_main_path}/thumbnail/{mapname}.png"
+        dst_thumbnail_path = f"{dst_main_path}/thumbnail/{map_uuid}.png"
+        os.makedirs(f"{dst_main_path}/thumbnail/", exist_ok=True)
         shutil.move(src_thumbnail_path, dst_thumbnail_path)
+        os.rmdir(f"{src_main_path}/thumbnail")
 
         # assert that source keys up to geoserver are OK
         publ_info = get_complete_map_info(workspace, mapname)
         assert publ_info['layman_metadata']['publication_status'] == 'COMPLETE', json.dumps(publ_info, indent=2)
+        os.rmdir(f"{src_main_path}")
         logger.info(f'    Migrate map {workspace}.{mapname} DONE')
 
 
@@ -437,4 +453,18 @@ def delete_old_workspaces():
             gs_util.delete_db_store(gs_workspace, auth=settings.LAYMAN_GS_AUTH, store_name='postgresql')
             gs_util.delete_workspace(gs_workspace, auth=settings.LAYMAN_GS_AUTH)
 
+        util.safe_delete(f"{settings.LAYMAN_DATA_DIR}/workspaces/{workspace}/layers")
+        util.safe_delete(f"{settings.LAYMAN_DATA_DIR}/workspaces/{workspace}/maps")
+        util.safe_delete(f"{settings.LAYMAN_DATA_DIR}/workspaces/{workspace}")
+
+        util.safe_delete(f"{settings.LAYMAN_QGIS_DATA_DIR}/workspaces/{workspace}/layers")
+        util.safe_delete(f"{settings.LAYMAN_QGIS_DATA_DIR}/workspaces/{workspace}")
+        util.safe_delete(f"{settings.LAYMAN_NORMALIZED_RASTER_DATA_DIR}/workspaces/{workspace}/layers")
+        util.safe_delete(f"{settings.LAYMAN_NORMALIZED_RASTER_DATA_DIR}/workspaces/{workspace}")
+
+    util.safe_delete(f"{settings.LAYMAN_QGIS_DATA_DIR}/workspaces")
+
+    util.safe_delete(f"{settings.LAYMAN_NORMALIZED_RASTER_DATA_DIR}/workspaces")
+
+    util.safe_delete(f"{settings.LAYMAN_DATA_DIR}/workspaces")
     logger.info(f'    Delete old workspaces DONE!')

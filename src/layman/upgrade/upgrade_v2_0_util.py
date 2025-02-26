@@ -59,3 +59,8 @@ def get_layer_input_files(workspace, layername):
     pattern = os.path.join(input_file_dir, 'input_file', '*.*')
     filepaths = sorted(glob.glob(pattern))
     return file_util.InputFiles(saved_paths=filepaths)
+
+
+def safe_delete(path):
+    if os.path.exists(path):
+        os.rmdir(path)
