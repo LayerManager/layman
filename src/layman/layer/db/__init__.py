@@ -13,8 +13,7 @@ from db import util as db_util
 from layman.common.language import get_languages_iso639_2
 from layman.http import LaymanError
 from layman import settings
-from layman.util import get_publication_info
-from .. import LAYER_TYPE, ATTRNAME_PATTERN
+from .. import ATTRNAME_PATTERN
 
 FLASK_CONN_CUR_KEY = f'{__name__}:CONN_CUR'
 logger = logging.getLogger(__name__)
@@ -30,15 +29,6 @@ class DbNames:
     def __init__(self, *, uuid: str, workspace: str):
         object.__setattr__(self, 'schema', workspace)
         object.__setattr__(self, 'table', f"layer_{uuid.replace('-', '_')}")
-
-
-def get_internal_table_name(workspace, layer):
-    layer_info = get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['uuid', 'original_data_source']})
-    table_name = None
-    if layer_info and layer_info['original_data_source'] == settings.EnumOriginalDataSource.FILE.value:
-        uuid = layer_info['uuid'].replace('-', '_')
-        table_name = f'layer_{uuid}'
-    return table_name
 
 
 def get_workspaces():
