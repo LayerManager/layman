@@ -5,8 +5,9 @@ from layman.celery import AbortedException
 from layman.common import empty_method_returns_true
 from layman import celery_app, util as layman_util, settings
 from layman.http import LaymanError
+from layman.layer import db
+from layman.layer.layer_class import Layer
 from . import table
-from .. import db, LAYER_TYPE
 
 
 logger = get_task_logger(__name__)
@@ -19,20 +20,22 @@ refresh_table_needed = empty_method_returns_true
     bind=True,
     base=celery_app.AbortableTask
 )
+# pylint: disable=unused-argument
 def refresh_table(
         self,
         workspace,
         layername,
         crs_id=None,
-        original_data_source=settings.EnumOriginalDataSource.FILE.value,
+        uuid=None,
 ):
-    db.ensure_workspace(workspace)
+    layer = Layer(uuid=uuid)
+    db.ensure_workspace(layer.workspace)
     if self.is_aborted():
         raise AbortedException
 
-    if original_data_source == settings.EnumOriginalDataSource.TABLE.value:
+    if layer.original_data_source == settings.EnumOriginalDataSource.TABLE:
         return
-    publ_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file']})
+    publ_info = layman_util.get_publication_info_by_class(layer, context={'keys': ['file']})
     file_type = publ_info['_file']['file_type']
     if file_type == settings.GEODATA_TYPE_RASTER:
         return
@@ -45,25 +48,33 @@ def refresh_table(
     main_filepaths = list(path['gdal'] for path in publ_info['_file']['paths'].values())
     assert len(main_filepaths) == 1
     main_filepath = main_filepaths[0]
-    table_name = db.get_internal_table_name(workspace, layername)
+    db_names = layer.internal_db_names
 
     for try_num in [1, 2]:
         if try_num == 1:
-            processes = [db.import_layer_vector_file_to_internal_table_async(workspace, table_name, main_filepath, crs_id)]
+            processes = [db.import_layer_vector_file_to_internal_table_async(db_names.schema,
+                                                                             db_names.table,
+                                                                             main_filepath,
+                                                                             crs_id,
+                                                                             )]
         elif try_num == 2:
-            processes = db.import_layer_vector_file_to_internal_table_async_with_iconv(workspace, table_name, main_filepath, crs_id)
+            processes = db.import_layer_vector_file_to_internal_table_async_with_iconv(db_names.schema,
+                                                                                       db_names.table,
+                                                                                       main_filepath,
+                                                                                       crs_id,
+                                                                                       )
         process = processes[-1]
         stdout, stderr = process.communicate()
         return_code = process.poll()
         if self.is_aborted():
-            logger.info(f'terminating {workspace} {layername}')
+            logger.info(f'terminating {layer.workspace} {layer.name}')
             for proc in processes:
                 proc.terminate()
-            logger.info(f'deleting {workspace} {layername}')
-            table.delete_layer(workspace, layername)
+            logger.info(f'deleting {layer.workspace} {layer.name}')
+            table.delete_layer(layer.workspace, layer.name)
             raise AbortedException
         if return_code != 0 or stdout or stderr:
-            info = table.get_layer_info(workspace, layername)
+            info = table.get_layer_info(layer.workspace, layer.name)
             if not info:
                 str_error = str(stderr)
                 str_out = str(stdout)
@@ -78,6 +89,6 @@ def refresh_table(
                 raise LaymanError(err_code, private_data=str_error)
         break
 
-    crs = db.get_table_crs(workspace, table_name, use_internal_srid=True)
+    crs = db.get_table_crs(db_names.schema, db_names.table, use_internal_srid=True)
     if crs_def.CRSDefinitions[crs].internal_srid:
-        table.set_internal_table_layer_srid(workspace, table_name, crs_def.CRSDefinitions[crs].internal_srid)
+        table.set_internal_table_layer_srid(db_names.schema, db_names.table, crs_def.CRSDefinitions[crs].internal_srid)
