@@ -103,6 +103,64 @@ def test_delete_user_negative(setup_users_for_testing_errors):
         assert exc_info.value.http_code == expected_status
 
 
+@pytest.mark.usefixtures('ensure_layman_module', 'oauth2_provider_mock')
+def test_delete_own_public_publications():
+    username = "test_delete_user"
+    publication = 'test_delete_user_publication'
+    workspace = 'test_workspace'
+
+    # # create publication with only owners rights
+    process_client.reserve_username(username, actor_name=username)
+    for publication_type in process_client.PUBLICATION_TYPES:
+        process_client.publish_workspace_publication(publication_type, workspace, publication,actor_name=username)
+        publications = process_client.get_publications(publication_type, workspace=workspace, actor_name=username)
+        assert any(pub.get('name') == publication for pub in publications), f"Publication {publication} was not created"
+
+    process_client.delete_user(username, actor_name=username)
+
+    for publication_type in process_client.PUBLICATION_TYPES:
+        publications_after_delete = process_client.get_publications(publication_type, actor_name=username)
+        assert not any(pub.get('name') == publication for pub in publications_after_delete), f"Publication {publications_after_delete} was not deleted"
+
+
+@pytest.mark.usefixtures('ensure_layman_module', 'oauth2_provider_mock')
+def test_delete_shared_publications():
+    # create publication with different users write access rights
+    username = "test_delete_user"
+    publication = 'test_delete_user_publication'
+    workspace = 'test_workspace'
+    username2 = 'test_delete_user2'
+    access_rights = {
+        'read': ','.join([username, username2]),
+        'write': ','.join([username, username2])
+    }
+    process_client.reserve_username(username, actor_name=username)
+    process_client.reserve_username(username2, actor_name=username2)
+    for publication_type in process_client.PUBLICATION_TYPES:
+        process_client.publish_workspace_publication(publication_type, workspace, publication, actor_name=username, access_rights=access_rights)
+        publications = process_client.get_publications(publication_type, workspace=workspace, actor_name=username)
+        assert any(pub.get('name') == publication for pub in publications), f"Publication {publication} was not created"
+
+    process_client.delete_user(username, actor_name=username)
+
+    for publication_type in process_client.PUBLICATION_TYPES:
+        publications_after_delete = process_client.get_publications(publication_type, workspace=workspace, actor_name=username2)
+
+        # check if publication still exists
+        assert any(pub.get('name') == publication for pub in
+                   publications_after_delete), f"Publication {publications_after_delete} was deleted unexpectedly"
+        for pub in publications_after_delete:
+            if pub.get('name') == publication:
+                access_rights = pub.get('access_rights', {})
+                read_users = set(access_rights.get('read', []))
+                write_users = set(access_rights.get('write', []))
+
+                # check if rights was deleted
+                assert read_users == {username2}, f"Unexpected read access: {read_users}, expected: {{'{username2}'}}"
+                assert write_users == {
+                    username2}, f"Unexpected write access: {write_users}, expected: {{'{username2}'}}"
+
+
 def workspace_exists(workspace):
     with app.app_context():
         return workspace in layman_util.get_workspaces(use_cache=False)

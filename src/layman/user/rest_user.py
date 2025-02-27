@@ -5,7 +5,7 @@ from layman import util as layman_util, LaymanError
 from layman.common.prime_db_schema.users import get_user_infos
 from layman.layer import LAYER_TYPE, util as layer_util
 from layman.map import MAP_TYPE, util as map_util
-from .util import delete_user
+from .util import delete_user, delete_user_public_publications
 
 
 bp = Blueprint('rest_user', __name__)
@@ -52,6 +52,7 @@ def delete(username):
         x_forwarded_items=x_forwarded_items,
         actor_name=username,
     )
+    delete_user_public_publications(username)
     delete_user(username)
     return jsonify({
         'username': username

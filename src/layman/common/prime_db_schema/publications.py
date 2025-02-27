@@ -209,6 +209,14 @@ select p.id as id_publication,
              ) tmp_layer_maps
            ) layer_maps,
        p.wfs_wms_status,
+       CASE
+           WHEN (SELECT COUNT(*)
+                 FROM {DB_SCHEMA}.users wusr
+                 WHERE wusr.id_workspace = w.id
+                ) = 0
+           THEN true
+           ELSE false
+       END AS is_public_workspace,
        count(*) OVER() AS full_count
 from {DB_SCHEMA}.workspaces w inner join
      publs p on p.id_workspace = w.id left join
@@ -292,9 +300,10 @@ from {DB_SCHEMA}.workspaces w inner join
                                    '_map_layers': map_layers or [],
                                    'used_in_maps': layer_maps or [],
                                    '_wfs_wms_status': settings.EnumWfsWmsStatus(wfs_wms_status) if wfs_wms_status else None,
+                                   '_is_public_workspace': is_public_workspace,
                                    }
              for id_publication, workspace_name, publication_type, publication_name, title, description, uuid, geodata_type, style_type, image_mosaic, updated_at, xmin, ymin, xmax, ymax,
-             srid, external_table_uri, read_users_roles, write_users_roles, map_layers, layer_maps, wfs_wms_status, _
+             srid, external_table_uri, read_users_roles, write_users_roles, map_layers, layer_maps, wfs_wms_status, is_public_workspace,  _
              in values}
 
     infos = {key: {**value,
