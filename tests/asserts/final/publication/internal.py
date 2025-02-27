@@ -233,9 +233,10 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                            })
             else:
                 db_table = f'layer_{uuid.replace("-", "_")}'
+                db_schema = 'layers'
                 table_uri = TableUri(
                     db_uri_str='postgresql://docker:docker@postgresql:5432/layman_test',
-                    schema=workspace,
+                    schema=db_schema,
                     table=db_table,
                     geo_column='wkb_geometry',
                     primary_key_column='ogc_fid',
@@ -245,7 +246,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                                'wfs': {'name': f'l_{uuid}', 'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{names.GEOSERVER_WFS_WORKSPACE}/wfs'},
                                                '_file': {'file_type': 'vector'},
                                                'db': {
-                                                   'schema': workspace,
+                                                   'schema': db_schema,
                                                    'table': db_table,
                                                    'geo_column': 'wkb_geometry',
                                                },

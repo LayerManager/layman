@@ -109,9 +109,9 @@ class TestLayer(base_test.TestSingleRestPublication):
                                                        **params['exp_info_values'],
                                                        )
 
-        exp_existing_wfs_stores = {f'postgresql_{layer.workspace}', f'external_db_{uuid}'} if params['exp_info_values'].get('external_table_uri') else {f'postgresql_{layer.workspace}'}
+        exp_existing_wfs_stores = {f'postgresql', f'external_db_{uuid}'} if params['exp_info_values'].get('external_table_uri') else {f'postgresql'}
         exp_deleted_wfs_stores = {} if params['exp_info_values'].get('external_table_uri') else {f'external_db_{uuid}'}
-        exp_existing_wms_stores = {f'postgresql_{layer.workspace}', f'external_db_{uuid}'} if params['exp_info_values'].get('external_table_uri') and params['exp_info_values']['publ_type_detail'][1] == 'sld' else {f'postgresql_{layer.workspace}'}
+        exp_existing_wms_stores = {f'postgresql', f'external_db_{uuid}'} if params['exp_info_values'].get('external_table_uri') and params['exp_info_values']['publ_type_detail'][1] == 'sld' else {f'postgresql'}
         exp_deleted_wms_stores = {} if params['exp_info_values'].get('external_table_uri') and params['exp_info_values']['publ_type_detail'][1] == 'sld' else {f'external_db_{uuid}'}
         gs_asserts.assert_stores(exp_existing_wfs_stores=exp_existing_wfs_stores, exp_deleted_wfs_stores=exp_deleted_wfs_stores,
                                  exp_existing_wms_stores=exp_existing_wms_stores, exp_deleted_wms_stores=exp_deleted_wms_stores,
