@@ -238,17 +238,20 @@ def migrate_layers():
     ;'''
     layers = db_util.run_query(query, (LAYER_TYPE,))
     failed_layers = {}
+    layer_number = 0
+    layer_cnt = len(layers)
 
     for workspace, layername, layer_uuid, style_type_code, title, description, image_mosaic, geodata_type, external_table_uri, \
             read_users_roles, write_users_roles in layers:
         failed_steps = []
+        layer_number += 1
 
         # check if publication is not yet migrated
         publ_info = get_complete_layer_info(workspace, layername)
         publ_status = publ_info['layman_metadata']['publication_status']
         assert publ_status in ['COMPLETE', 'INCOMPLETE']
         if publ_status == 'INCOMPLETE':
-            logger.info(f'    Migrate layer {workspace}.{layername} (uuid={layer_uuid})')
+            logger.info(f'    Migrate layer {workspace}.{layername} (uuid={layer_uuid}), {layer_number}/{layer_cnt}')
         else:
             logger.warning(f'    Layer {workspace}.{layername} seems already migrated!')
             continue
@@ -456,15 +459,19 @@ def migrate_maps():
     ;'''
     maps = db_util.run_query(query, (MAP_TYPE,))
     failed_maps = {}
+    map_number = 0
+    map_cnt = len(maps)
 
     for workspace, mapname, map_uuid, in maps:
         failed_steps = []
+        map_number += 1
+
         # check if publication is not yet migrated
         publ_info = get_complete_map_info(workspace, mapname)
         publ_status = publ_info['layman_metadata']['publication_status']
         assert publ_status in ['COMPLETE', 'INCOMPLETE']
         if publ_status == 'INCOMPLETE':
-            logger.info(f'    Migrate map {workspace}.{mapname} (uuid={map_uuid})')
+            logger.info(f'    Migrate map {workspace}.{mapname} (uuid={map_uuid}), {map_number}/{map_cnt}')
         else:
             logger.warning(f'    Map {workspace}.{mapname} seems already migrated!')
             continue
