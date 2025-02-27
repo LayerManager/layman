@@ -21,6 +21,9 @@ logger = logging.getLogger(__name__)
 ColumnInfo = namedtuple('ColumnInfo', 'name data_type')
 
 
+LAYERS_SCHEMA = 'layers'
+
+
 @dataclass(frozen=True)
 class DbNames:
     schema: str
@@ -93,8 +96,8 @@ def delete_whole_user(username):
     delete_workspace(username)
 
 
-def import_layer_vector_file_to_internal_table(schema, table, main_filepath, crs_id):
-    process = import_layer_vector_file_to_internal_table_async(schema, table, main_filepath, crs_id)
+def import_vector_file_to_internal_table(schema, table, main_filepath, crs_id):
+    process = import_vector_file_to_internal_table_async(schema, table, main_filepath, crs_id)
     while process.poll() is None:
         pass
     return_code = process.poll()
@@ -131,7 +134,7 @@ def create_ogr2ogr_args(*, schema, table_name, main_filepath, crs_id, output):
     return ogr2ogr_args
 
 
-def import_layer_vector_file_to_internal_table_async_with_iconv(schema, table_name, main_filepath, crs_id):
+def import_vector_file_to_internal_table_async_with_iconv(schema, table_name, main_filepath, crs_id):
     assert table_name, f'schema={schema}, table_name={table_name}, main_filepath={main_filepath}'
 
     first_ogr2ogr_args = [
@@ -170,8 +173,7 @@ def import_layer_vector_file_to_internal_table_async_with_iconv(schema, table_na
     return [first_ogr2ogr_process, iconv_process, final_ogr2ogr_process]
 
 
-def import_layer_vector_file_to_internal_table_async(schema, table_name, main_filepath,
-                                                     crs_id):
+def import_vector_file_to_internal_table_async(schema, table_name, main_filepath, crs_id):
     # import file to database table
     assert table_name, f'schema={schema}, table_name={table_name}, main_filepath={main_filepath}'
     bash_args = create_ogr2ogr_args(schema=schema,

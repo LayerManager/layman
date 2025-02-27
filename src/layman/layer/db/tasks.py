@@ -52,17 +52,17 @@ def refresh_table(
 
     for try_num in [1, 2]:
         if try_num == 1:
-            processes = [db.import_layer_vector_file_to_internal_table_async(db_names.schema,
-                                                                             db_names.table,
-                                                                             main_filepath,
-                                                                             crs_id,
-                                                                             )]
+            processes = [db.import_vector_file_to_internal_table_async(db_names.schema,
+                                                                       db_names.table,
+                                                                       main_filepath,
+                                                                       crs_id,
+                                                                       )]
         elif try_num == 2:
-            processes = db.import_layer_vector_file_to_internal_table_async_with_iconv(db_names.schema,
-                                                                                       db_names.table,
-                                                                                       main_filepath,
-                                                                                       crs_id,
-                                                                                       )
+            processes = db.import_vector_file_to_internal_table_async_with_iconv(db_names.schema,
+                                                                                 db_names.table,
+                                                                                 main_filepath,
+                                                                                 crs_id,
+                                                                                 )
         process = processes[-1]
         stdout, stderr = process.communicate()
         return_code = process.poll()
