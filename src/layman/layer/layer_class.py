@@ -46,4 +46,4 @@ class Layer(Publication):
 
     @property
     def internal_db_names(self):
-        return DbNames(workspace=self.workspace, uuid=self.uuid)
+        return DbNames(uuid=self.uuid)
