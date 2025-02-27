@@ -143,19 +143,19 @@ def post_layer(workspace, layername, task_options, start_async_at):
     celery_util.set_publication_chain_info(workspace, LAYER_TYPE, layername, post_tasks, res)
 
 
-def patch_layer(workspace, layername, task_options, stop_sync_at, start_async_at):
+def patch_layer(workspace, layername, task_options, stop_sync_at, start_async_at, *, only_sync=False):
     # sync processing
     sources = get_sources()
     stop_idx = next((idx for idx, s in enumerate(sources) if s.__name__ == stop_sync_at), len(sources))
     sources = sources[:stop_idx]
     call_modules_fn(sources, 'patch_layer', [workspace, layername], kwargs=task_options)
+    if not only_sync:
+        patch_tasks = tasks_util.get_task_methods(get_layer_type_def(), workspace, layername, task_options, start_async_at)
+        patch_chain = tasks_util.get_chain_of_methods(workspace, layername, patch_tasks, task_options, 'layername')
+        # res = patch_chain.apply_async()
+        res = patch_chain()
 
-    patch_tasks = tasks_util.get_task_methods(get_layer_type_def(), workspace, layername, task_options, start_async_at)
-    patch_chain = tasks_util.get_chain_of_methods(workspace, layername, patch_tasks, task_options, 'layername')
-    # res = patch_chain.apply_async()
-    res = patch_chain()
-
-    celery_util.set_publication_chain_info(workspace, LAYER_TYPE, layername, patch_tasks, res)
+        celery_util.set_publication_chain_info(workspace, LAYER_TYPE, layername, patch_tasks, res)
 
 
 TASKS_TO_LAYER_INFO_KEYS = {
