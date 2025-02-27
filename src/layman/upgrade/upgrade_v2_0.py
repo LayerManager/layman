@@ -347,19 +347,19 @@ def migrate_layers():
                         dst_filepath = os.path.join(gdal_dir, filename)
                         shutil.move(src_filepath, dst_filepath)
 
-                filenames = set(
-                    os.path.splitext(os.path.basename(filename))[0] for filename in os.listdir(gdal_old_dir) if filename.endswith('.tif'))
-                for old_file_name in filenames:
-                    new_file_name = layer_uuid if image_mosaic is None else old_file_name
-                    src_filepath = os.path.join(gdal_old_dir, f"{old_file_name}.tif")
-                    dst_filepath = os.path.join(gdal_dir, f"{new_file_name}.tif")
-                    shutil.move(src_filepath, dst_filepath)
-
-                    src_filepath = os.path.join(gdal_old_dir, f"{old_file_name}.tif.aux.xml")
-                    dst_filepath = os.path.join(gdal_dir, f"{new_file_name}.tif.aux.xml")
-                    if os.path.exists(src_filepath):
+                all_filenames = set(
+                    os.path.basename(filename) for filename in os.listdir(gdal_old_dir))
+                tif_filenames = set(
+                    os.path.splitext(filename)[0] for filename in all_filenames if filename.endswith('.tif'))
+                main_filenames = set(tif_filename for tif_filename in tif_filenames if tif_filename == layername or image_mosaic)
+                for src_filename in main_filenames:
+                    file_to_move = {filename for filename in all_filenames if filename.startswith(f'{src_filename}.tif')}
+                    for filename in file_to_move:
+                        dst_filename = f'{layer_uuid}{filename[len(layername):]}' if not image_mosaic else filename
+                        src_filepath = os.path.join(gdal_old_dir, filename)
+                        dst_filepath = os.path.join(gdal_dir, dst_filename)
                         shutil.move(src_filepath, dst_filepath)
-                os.rmdir(f"{gdal_old_dir}")
+                os.rmdir(gdal_old_dir)
             except BaseException:
                 failed_steps.append('normalized_raster_files')
                 logger.error(f'    Fail to move normalized raster files: : \n{traceback.format_exc()}')
@@ -368,7 +368,7 @@ def migrate_layers():
         if style_type.code == 'qml':
             logger.info("      re-creating QGIS files")
             try:
-                shutil.rmtree(old_qgis_path)
+                shutil.rmtree(old_qgis_path, ignore_errors=True)
                 util.run_task_sync(qgis_refresh_wms, [workspace, layername], post_task_kwargs)
             except BaseException:
                 failed_steps.append('qgis')
@@ -418,7 +418,7 @@ def migrate_layers():
                 shutil.move(src_thumbnail_path, dst_thumbnail_path)
                 os.rmdir(f"{src_main_path}/thumbnail")
             else:
-                shutil.rmtree(f"{src_main_path}/thumbnail")
+                util.safe_delete(f"{src_main_path}/thumbnail")
         except BaseException:
             failed_steps.append('thumbnail')
             logger.error(f'    Fail to move thumbnail file: : \n{traceback.format_exc()}')
@@ -434,6 +434,7 @@ def migrate_layers():
             assert all('status' not in publ_info[key] for key in keys_to_check), json.dumps(publ_info, indent=2)
             os.rmdir(f"{src_main_path}")
         else:
+            util.safe_delete(src_main_path)
             failed_layers[(workspace, layername, layer_uuid)] = failed_steps
 
         logger.info(f'    Migrate layer {workspace}.{layername} DONE')
