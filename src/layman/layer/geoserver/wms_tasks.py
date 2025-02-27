@@ -31,7 +31,7 @@ def patch_after_feature_change(
         wms_layername = layer_data.gs_names.wms
         lat_lon_bbox = bbox_util.transform(bbox, layer_data.native_crs, crs_def.EPSG_4326)
         if layer_data.style_type == 'sld':
-            store_name = get_db_store_name(uuid=layer_data.uuid, db_schema=workspace,
+            store_name = get_db_store_name(uuid=layer_data.uuid,
                                            original_data_source=layer_data.original_data_source.value)
             gs_util.patch_feature_type(wms_layername.workspace, wms_layername.name, auth=settings.LAYMAN_GS_AUTH, bbox=bbox, crs=layer_data.native_crs,
                                        lat_lon_bbox=lat_lon_bbox, store_name=store_name)

@@ -8,7 +8,8 @@ from layman.celery import AbortedException
 from layman import celery_app, settings, util as layman_util
 from layman.common import empty_method_returns_true, bbox as bbox_util
 from layman.common.micka import util as micka_util
-from . import wms, wfs, sld, get_internal_db_store_name
+from . import wms, wfs, sld
+from .util import DEFAULT_INTERNAL_DB_STORE
 from .. import geoserver
 from ..layer_class import Layer
 
@@ -44,7 +45,6 @@ def refresh_wms(
     info = layman_util.get_publication_info_by_class(layer, context={'keys': ['file']})
 
     assert layer.title is not None
-    geoserver.ensure_workspace(layer.workspace)
     metadata_url = micka_util.get_metadata_url(layer.uuid, url_type=micka_util.RecordUrlType.XML)
 
     if self.is_aborted():
@@ -58,7 +58,7 @@ def refresh_wms(
                                                                 table_uri=layer.table_uri,
                                                                 )
             else:
-                store_name = get_internal_db_store_name(db_schema=layer.workspace, )
+                store_name = DEFAULT_INTERNAL_DB_STORE
             geoserver.publish_layer_from_db(layer=layer,
                                             gs_names=gs_layername,
                                             metadata_url=metadata_url,
@@ -105,7 +105,7 @@ def refresh_wms(
     wms.clear_cache()
 
     if self.is_aborted():
-        wms.delete_layer_by_class(layer=layer, db_schema=layer.workspace)
+        wms.delete_layer_by_class(layer=layer)
         raise AbortedException
 
 
@@ -132,7 +132,6 @@ def refresh_wfs(
         raise NotImplementedError(f"Unknown geodata type: {layer.geodata_type}")
 
     assert layer.title is not None
-    geoserver.ensure_workspace(layer.workspace)
 
     if self.is_aborted():
         raise AbortedException
@@ -142,7 +141,7 @@ def refresh_wfs(
                                                         table_uri=layer.table_uri,
                                                         )
     else:
-        store_name = get_internal_db_store_name(db_schema=layer.workspace, )
+        store_name = DEFAULT_INTERNAL_DB_STORE
     metadata_url = micka_util.get_metadata_url(uuid, url_type=micka_util.RecordUrlType.XML)
     geoserver.publish_layer_from_db(layer=layer,
                                     gs_names=gs_layername,
@@ -156,7 +155,7 @@ def refresh_wfs(
     wfs.clear_cache()
 
     if self.is_aborted():
-        wfs.delete_layer_by_class(layer=layer, db_schema=layer.workspace)
+        wfs.delete_layer_by_class(layer=layer)
         raise AbortedException
 
 

@@ -393,7 +393,7 @@ def migrate_layers():
         util.delete_layer_from_geoserver_v1_23(layername, workspace)
 
         # re-create layer on geoserver
-        if not wfs.get_layer_info_by_uuid(uuid=layer_uuid, layman_workspace=workspace):
+        if not wfs.get_layer_info_by_uuid(uuid=layer_uuid):
             logger.info("      re-creating geoserver.wfs")
             try:
                 util.run_task_sync(refresh_wfs, [workspace, layername], post_task_kwargs)
