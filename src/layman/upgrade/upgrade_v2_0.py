@@ -13,14 +13,12 @@ from layman import settings, names
 from layman.common.micka import util as micka_util, requests as micka_requests
 from layman.layer import LAYER_TYPE, STYLE_TYPES_DEF
 from layman.layer.filesystem import input_file, util as layer_file_util, gdal
-from layman.layer.filesystem.tasks import refresh_thumbnail as layer_refresh_thumbnail
 from layman.layer.geoserver import wfs, wms as gs_wms, sld
 from layman.layer.geoserver.tasks import refresh_wms, refresh_wfs, refresh_sld
 from layman.layer.geoserver.wms import get_timeregex_props
 from layman.layer.qgis.tasks import refresh_wms as qgis_refresh_wms
 from layman.layer.util import get_complete_layer_info
 from layman.map import MAP_TYPE
-from layman.map.filesystem.tasks import refresh_thumbnail as map_refresh_thumbnail
 from layman.map.util import get_complete_map_info
 from layman.upgrade import upgrade_v2_0_util as util
 from layman.util import get_publication_info
@@ -380,12 +378,16 @@ def migrate_layers():
             shutil.move(src_thumbnail_path, dst_thumbnail_path)
             os.rmdir(f"{src_main_path}/thumbnail")
         else:
-            util.run_task_sync(layer_refresh_thumbnail, [workspace, layername], post_task_kwargs)
             shutil.rmtree(f"{src_main_path}/thumbnail")
 
         # assert that source keys up to geoserver are OK
         publ_info = get_complete_layer_info(workspace, layername)
-        assert publ_info['layman_metadata']['publication_status'] == 'COMPLETE', json.dumps(publ_info, indent=2)
+        keys_to_check = ['wms', 'style']
+        if publ_info['geodata_type'] == 'vector':
+            keys_to_check += ['db', 'wfs']
+        if publ_info['original_data_source'] == 'file':
+            keys_to_check += ['file']
+        assert all('status' not in publ_info[key] for key in keys_to_check), json.dumps(publ_info, indent=2)
         os.rmdir(f"{src_main_path}")
 
         logger.info(f'    Migrate layer {workspace}.{layername} DONE')
@@ -415,10 +417,6 @@ def migrate_maps():
             logger.warning(f'    Map {workspace}.{mapname} seems already migrated!')
             continue
 
-        post_task_kwargs = {
-            'uuid': map_uuid,
-        }
-
         src_main_path = f"{settings.LAYMAN_DATA_DIR}/workspaces/{workspace}/maps/{mapname}"
         dst_main_path = f"{settings.LAYMAN_DATA_DIR}/maps/{map_uuid}"
 
@@ -439,12 +437,13 @@ def migrate_maps():
             shutil.move(src_thumbnail_path, dst_thumbnail_path)
             os.rmdir(f"{src_main_path}/thumbnail")
         else:
-            util.run_task_sync(map_refresh_thumbnail, [workspace, mapname], post_task_kwargs)
             shutil.rmtree(f"{src_main_path}/thumbnail")
 
         # assert that source keys up to geoserver are OK
         publ_info = get_complete_map_info(workspace, mapname)
-        assert publ_info['layman_metadata']['publication_status'] == 'COMPLETE', json.dumps(publ_info, indent=2)
+        keys_to_check = ['file']
+        assert all('status' not in publ_info[key] for key in keys_to_check), json.dumps(publ_info, indent=2)
+
         os.rmdir(f"{src_main_path}")
         logger.info(f'    Migrate map {workspace}.{mapname} DONE')
 
