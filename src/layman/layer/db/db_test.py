@@ -35,7 +35,7 @@ def post_layer(workspace, layername, file_path):
                                                           )
         ensure_layer_input_file_dir(publ_uuid)
         layer = Layer(uuid=publ_uuid)
-        db.import_layer_vector_file_to_internal_table(layer.table_uri.schema, layer.table_uri.table, file_path, None)
+        db.import_vector_file_to_internal_table(layer.table_uri.schema, layer.table_uri.table, file_path, None)
 
     yield layer.table_uri
 
@@ -163,8 +163,8 @@ def test_abort_import_layer_vector_file():
         with layman.app_context():
             layer = Layer(uuid=publ_uuid)
         table_uri = layer.table_uri
-        process = db.import_layer_vector_file_to_internal_table_async(table_uri.schema, table_uri.table, main_filepath,
-                                                                      crs_id)
+        process = db.import_vector_file_to_internal_table_async(table_uri.schema, table_uri.table, main_filepath,
+                                                                crs_id)
         time1 = time.time()
         while process.poll() is None:
             if time.time() - time1 > 0.1:

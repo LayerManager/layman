@@ -12,10 +12,11 @@ from db import util as db_util
 from geoserver import util as gs_util
 from layman import settings, names
 from layman.common.micka import util as micka_util, requests as micka_requests
-from layman.layer import LAYER_TYPE, STYLE_TYPES_DEF
+from layman.layer import LAYER_TYPE, STYLE_TYPES_DEF, db as layer_db
 from layman.layer.filesystem import input_file, util as layer_file_util, gdal
 from layman.layer.geoserver import wfs, wms as gs_wms, sld
 from layman.layer.geoserver.tasks import refresh_wms, refresh_wfs, refresh_sld
+from layman.layer.geoserver.util import DEFAULT_INTERNAL_DB_STORE
 from layman.layer.geoserver.wms import get_timeregex_props
 from layman.layer.qgis.tasks import refresh_wms as qgis_refresh_wms
 from layman.layer.util import get_complete_layer_info
@@ -132,13 +133,27 @@ def adjust_publications_created_at():
     db_util.run_statement(alter_tabel)
 
 
-def ensure_gs_workspaces():
-    logger.info(f'    Ensure GS workspaces')
+def ensure_layers_db_schema():
+    logger.info(f'    Ensure DB schema')
+    statement = sql.SQL("""CREATE SCHEMA IF NOT EXISTS {schema} AUTHORIZATION {user}""").format(
+        schema=sql.Identifier(layer_db.LAYERS_SCHEMA),
+        user=sql.Identifier(settings.LAYMAN_PG_USER),
+    )
+    db_util.run_statement(statement)
+
+
+def ensure_gs_workspaces_and_stores():
+    logger.info(f'    Ensure GS workspaces and data stores')
     all_gs_workspaces = gs_util.get_all_workspaces(auth=settings.LAYMAN_GS_AUTH)
     assert names.GEOSERVER_WFS_WORKSPACE not in all_gs_workspaces
     assert names.GEOSERVER_WMS_WORKSPACE not in all_gs_workspaces
     gs_util.ensure_workspace(names.GEOSERVER_WFS_WORKSPACE, auth=settings.LAYMAN_GS_AUTH)
     gs_util.ensure_workspace(names.GEOSERVER_WMS_WORKSPACE, auth=settings.LAYMAN_GS_AUTH)
+
+    gs_util.ensure_db_store(names.GEOSERVER_WFS_WORKSPACE, db_schema=layer_db.LAYERS_SCHEMA, pg_conn=settings.PG_CONN,
+                            name=DEFAULT_INTERNAL_DB_STORE, auth=settings.LAYMAN_GS_AUTH)
+    gs_util.ensure_db_store(names.GEOSERVER_WMS_WORKSPACE, db_schema=layer_db.LAYERS_SCHEMA, pg_conn=settings.PG_CONN,
+                            name=DEFAULT_INTERNAL_DB_STORE, auth=settings.LAYMAN_GS_AUTH)
 
 
 def delete_layers_without_wfs_wms_available():

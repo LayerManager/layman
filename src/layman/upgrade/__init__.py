@@ -32,7 +32,8 @@ MIGRATIONS = {
         ((2, 0, 0), [
             upgrade_v2_0.adjust_publications_description,
             upgrade_v2_0.adjust_publications_created_at,
-            upgrade_v2_0.ensure_gs_workspaces,
+            upgrade_v2_0.ensure_layers_db_schema,
+            upgrade_v2_0.ensure_gs_workspaces_and_stores,
             upgrade_v2_0.delete_layers_without_wfs_wms_available,
             upgrade_v2_0.migrate_layers,
             upgrade_v2_0.migrate_maps,
