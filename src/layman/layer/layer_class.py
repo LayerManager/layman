@@ -6,6 +6,7 @@ from layman import names, settings
 from layman.publication_class import Publication
 
 from . import LAYER_TYPE
+from .db import DbNames
 
 
 @dataclass(frozen=True)
@@ -42,3 +43,7 @@ class Layer(Publication):
     @property
     def qgis_names(self):
         return QgisNames(id=f'l_{self.uuid}', name=self.name)
+
+    @property
+    def internal_db_names(self):
+        return DbNames(workspace=self.workspace, uuid=self.uuid)

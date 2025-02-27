@@ -3,6 +3,7 @@ from layman.common import empty_method_returns_dict
 from layman.common.prime_db_schema import publications as pubs_util
 from layman.layer import LAYER_TYPE
 from layman import patch_mode, settings
+from layman.layer.db import DbNames
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 get_metadata_comparison = empty_method_returns_dict
@@ -13,10 +14,11 @@ def get_layer_info(workspace, layername):
     info = layers.get((workspace, LAYER_TYPE, layername), {})
     if info:
         uuid = info['uuid']
+        db_names = DbNames(workspace=workspace, uuid=uuid)
         info['_table_uri'] = TableUri(
             db_uri_str=settings.PG_URI_STR,
-            schema=workspace,
-            table=f'layer_{uuid.replace("-", "_")}',
+            schema=db_names.schema,
+            table=db_names.table,
             geo_column=settings.OGR_DEFAULT_GEOMETRY_COLUMN,
             primary_key_column=settings.OGR_DEFAULT_PRIMARY_KEY,
         ) if info['geodata_type'] == settings.GEODATA_TYPE_VECTOR and not info.get('_table_uri') else info.get('_table_uri')

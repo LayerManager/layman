@@ -4,6 +4,8 @@ import math
 import os
 import logging
 import subprocess
+from dataclasses import dataclass
+
 from psycopg2 import sql
 from psycopg2.errors import InsufficientPrivilege
 
@@ -18,6 +20,16 @@ FLASK_CONN_CUR_KEY = f'{__name__}:CONN_CUR'
 logger = logging.getLogger(__name__)
 
 ColumnInfo = namedtuple('ColumnInfo', 'name data_type')
+
+
+@dataclass(frozen=True)
+class DbNames:
+    schema: str
+    table: str
+
+    def __init__(self, *, uuid: str, workspace: str):
+        object.__setattr__(self, 'schema', workspace)
+        object.__setattr__(self, 'table', f"layer_{uuid.replace('-', '_')}")
 
 
 def get_internal_table_name(workspace, layer):
