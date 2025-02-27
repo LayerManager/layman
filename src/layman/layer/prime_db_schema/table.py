@@ -14,7 +14,7 @@ def get_layer_info(workspace, layername):
     info = layers.get((workspace, LAYER_TYPE, layername), {})
     if info:
         uuid = info['uuid']
-        db_names = DbNames(workspace=workspace, uuid=uuid)
+        db_names = DbNames(uuid=uuid)
         info['_table_uri'] = TableUri(
             db_uri_str=settings.PG_URI_STR,
             schema=db_names.schema,

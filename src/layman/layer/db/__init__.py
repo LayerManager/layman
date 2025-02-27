@@ -29,8 +29,8 @@ class DbNames:
     schema: str
     table: str
 
-    def __init__(self, *, uuid: str, workspace: str):
-        object.__setattr__(self, 'schema', workspace)
+    def __init__(self, *, uuid: str):
+        object.__setattr__(self, 'schema', LAYERS_SCHEMA)
         object.__setattr__(self, 'table', f"layer_{uuid.replace('-', '_')}")
 
 
