@@ -37,8 +37,7 @@
   - directory `LAYMAN_NORMALIZED_RASTER_DATA_DIR/workspaces`
   - directory `LAYMAN_DATA_DIR/workspaces`
 ### Changes
-- [#161](https://github.com/LayerManager/layman/issues/161) [DELETE User](doc/rest.md#delete-user) now grants deletion rights to users or roles defined in the [GRANT_DELETE_OTHER_USER](doc/env-settings.md#GRANT_DELETE_OTHER_USER) environment variable.
-- [#161](https://github.com/LayerManager/layman/issues/161) New method [DELETE User](doc/rest.md#delete-user) allows to delete user account.
+- [#161](https://github.com/LayerManager/layman/issues/161) New method [DELETE User](doc/rest.md#delete-user) allows users to delete accounts.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Stop saving publication UUID to `uuid.txt` file.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) New keys `wfs`.`name` and `wms`.`name` were added to [GET Workspace Layer](doc/rest.md#get-workspace-layer) response.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Names of [Feature types, Coverages, Layers and Styles in GeoServer WFS and WMS workspaces](doc/data-storage.md#geoserver) are derived from layer `uuid`. All GeoServer entities are created in two global workspaces (`layman` for WFS layers and `layman_wms` for WMS layers), instead of separate workspaces for each Layman workspace.

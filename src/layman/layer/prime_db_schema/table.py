@@ -42,6 +42,7 @@ def patch_layer(workspace,
                 access_rights=None,
                 image_mosaic=None,
                 geodata_type=None,
+                is_part_of_user_delete=False,
                 ):
     db_info = {"name": layername,
                "title": title,
@@ -56,7 +57,7 @@ def patch_layer(workspace,
         db_info['style_type'] = style_type.code
     if access_rights:
         db_info['access_rights'] = access_rights
-    pubs_util.update_publication(workspace, db_info)
+    pubs_util.update_publication(workspace, db_info, is_part_of_user_delete)
 
 
 def pre_publication_action_check(workspace,
