@@ -336,9 +336,13 @@ def migrate_layers():
                 os.path.splitext(os.path.basename(filename))[0] for filename in os.listdir(gdal_old_dir) if filename.endswith('.tif'))
             for old_file_name in filenames:
                 new_file_name = layer_uuid if image_mosaic is None else old_file_name
-                for extension in ['tif', 'tif.aux.xml']:
-                    src_filepath = os.path.join(gdal_old_dir, f"{old_file_name}.{extension}")
-                    dst_filepath = os.path.join(gdal_dir, f"{new_file_name}.{extension}")
+                src_filepath = os.path.join(gdal_old_dir, f"{old_file_name}.tif")
+                dst_filepath = os.path.join(gdal_dir, f"{new_file_name}.tif")
+                shutil.move(src_filepath, dst_filepath)
+
+                src_filepath = os.path.join(gdal_old_dir, f"{old_file_name}.tif.aux.xml")
+                dst_filepath = os.path.join(gdal_dir, f"{new_file_name}.tif.aux.xml")
+                if os.path.exists(src_filepath):
                     shutil.move(src_filepath, dst_filepath)
             os.rmdir(f"{gdal_old_dir}")
 
