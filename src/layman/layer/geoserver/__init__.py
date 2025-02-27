@@ -4,10 +4,10 @@ from flask import g
 import crs as crs_def
 from geoserver import util as gs_util
 from layman.http import LaymanError
-from layman import settings, util as layman_util, names
-from layman.common import bbox as bbox_util, geoserver as gs_common
+from layman import settings, util as layman_util
+from layman.common import bbox as bbox_util, geoserver as gs_common, empty_method
 from . import wms
-from .util import get_external_db_store_name, get_internal_db_store_name
+from .util import get_external_db_store_name
 from ..layer_class import Layer
 
 logger = logging.getLogger(__name__)
@@ -16,18 +16,13 @@ FLASK_RULES_KEY = f"{__name__}:RULES"
 
 def ensure_whole_user(username, auth=settings.LAYMAN_GS_AUTH):
     gs_util.ensure_user(username, None, auth)
-    ensure_workspace(username, auth)
 
 
 def delete_whole_user(username, auth=settings.LAYMAN_GS_AUTH):
-    delete_workspace(username, auth)
     gs_util.delete_user(username, auth)
 
 
-def ensure_workspace(workspace, auth=settings.LAYMAN_GS_AUTH):
-    db_store_name = get_internal_db_store_name(db_schema=workspace)
-    gs_util.ensure_db_store(names.GEOSERVER_WFS_WORKSPACE, auth, db_schema=workspace, pg_conn=settings.PG_CONN, name=db_store_name)
-    gs_util.ensure_db_store(names.GEOSERVER_WMS_WORKSPACE, auth, db_schema=workspace, pg_conn=settings.PG_CONN, name=db_store_name)
+ensure_workspace = empty_method
 
 
 def create_external_db_store(workspace, *, uuid, table_uri, auth=settings.LAYMAN_GS_AUTH):
@@ -48,10 +43,7 @@ def create_external_db_store(workspace, *, uuid, table_uri, auth=settings.LAYMAN
     return store_name
 
 
-def delete_workspace(workspace, auth=settings.LAYMAN_GS_AUTH):
-    db_store_name = get_internal_db_store_name(db_schema=workspace)
-    gs_util.delete_db_store(names.GEOSERVER_WFS_WORKSPACE, auth, store_name=db_store_name)
-    gs_util.delete_db_store(names.GEOSERVER_WMS_WORKSPACE, auth, store_name=db_store_name)
+delete_workspace = empty_method
 
 
 def get_all_rules(auth):

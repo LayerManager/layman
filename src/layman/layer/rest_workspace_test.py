@@ -19,7 +19,7 @@ from layman import settings
 from layman.layer.filesystem.thumbnail import get_layer_thumbnail_path
 from layman import uuid, names
 from layman.layer import db
-from layman.layer.geoserver import wms as geoserver_wms, sld as geoserver_sld, get_internal_db_store_name
+from layman.layer.geoserver import wms as geoserver_wms, sld as geoserver_sld
 from layman import celery as celery_util
 from layman.common.metadata import prop_equals_strict, PROPERTIES
 from layman.util import SimpleCounter, get_publication_uuid
@@ -27,7 +27,7 @@ from test_tools.data import wfs as data_wfs
 from test_tools.util import url_for, url_for_external
 from test_tools import flask_client, process_client
 from . import util, LAYER_TYPE
-from .geoserver.util import wms_proxy
+from .geoserver.util import wms_proxy, DEFAULT_INTERNAL_DB_STORE
 
 logger = logging.getLogger(__name__)
 
@@ -503,7 +503,7 @@ def test_post_layers_complex(client):
         root = tree.getroot()
         assert root.attrib['version'] == '1.0.0'
 
-        db_store = get_internal_db_store_name(db_schema=workspace)
+        db_store = DEFAULT_INTERNAL_DB_STORE
         feature_type = get_feature_type(all_names.wfs.workspace, db_store, all_names.wfs.name)
         attributes = feature_type['attributes']['attribute']
         assert next((
@@ -589,7 +589,7 @@ def test_uppercase_attr(client):
 
         layeruuid = resp_json['uuid']
         gs_layername = names.get_layer_names_by_source(uuid=layeruuid, ).wfs
-        db_store = get_internal_db_store_name(db_schema=workspace)
+        db_store = DEFAULT_INTERNAL_DB_STORE
         feature_type = get_feature_type(gs_layername.workspace, db_store, gs_layername.name)
         attributes = feature_type['attributes']['attribute']
         attr_names = ["id", "dpr_smer_k", "fid_zbg", "silnice", "silnice_bs", "typsil_p", "cislouseku", "jmeno",
@@ -795,7 +795,7 @@ def test_patch_layer_data(client):
         resp_json = response.get_json()
         assert resp_json['title'] == "populated places"
         gs_layername = names.get_layer_names_by_source(uuid=layeruuid, ).wfs
-        db_store = get_internal_db_store_name(db_schema=workspace)
+        db_store = DEFAULT_INTERNAL_DB_STORE
         feature_type = get_feature_type(gs_layername.workspace, db_store, gs_layername.name)
         attributes = feature_type['attributes']['attribute']
         assert next((
