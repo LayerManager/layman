@@ -17,7 +17,7 @@
       - [REST API](rest.md): `/rest/workspaces/<workspace_name>/layers/<layername>` 
   - or by UUID:
       - [filesystem](data-storage.md#filesystem): `/path/to/LAYMAN_DATA_DIR/layers/<UUID>` 
-      - [PostgreSQL](data-storage.md#postgresql): `db=LAYMAN_PG_DBNAME, schema=<workspace_name>, table=layer_<UUID>` 
+      - [PostgreSQL](data-storage.md#postgresql): `db=LAYMAN_PG_DBNAME, schema=layers, table=layer_<UUID>` 
       - [GeoServer WFS](data-storage.md#geoserver): `/geoserver/layman/ows, layer=l_<UUID>`
       - [GeoServer WMS](data-storage.md#geoserver): `/geoserver/layman_wms/ows, layer=l_<UUID>, style=<UUID>`
       - Micka: `/record/basic/m-<UUID>`
