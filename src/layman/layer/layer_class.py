@@ -1,11 +1,12 @@
 from dataclasses import dataclass
-from typing import List, Tuple
+from typing import List, Tuple, Literal
 
 from db import TableUri
 from layman import names, settings
 from layman.publication_class import Publication
 
 from . import LAYER_TYPE
+from .db import DbNames
 
 
 @dataclass(frozen=True)
@@ -16,7 +17,7 @@ class QgisNames:
 
 @dataclass(frozen=True, )
 class Layer(Publication):
-    geodata_type: str
+    geodata_type: Literal["vector", "raster", "unknown"]
     style_type: str
     native_bounding_box: List[float]
     native_crs: str
@@ -31,7 +32,8 @@ class Layer(Publication):
         object.__setattr__(self, 'style_type', info['_style_type'])
         object.__setattr__(self, 'native_bounding_box', info['native_bounding_box'])
         object.__setattr__(self, 'native_crs', info['native_crs'])
-        object.__setattr__(self, 'original_data_source', info['original_data_source'])
+        object.__setattr__(self, 'original_data_source',
+                           settings.EnumOriginalDataSource(info['original_data_source']))
         object.__setattr__(self, 'table_uri', info['_table_uri'])
 
     @property
@@ -41,3 +43,7 @@ class Layer(Publication):
     @property
     def qgis_names(self):
         return QgisNames(id=f'l_{self.uuid}', name=self.name)
+
+    @property
+    def internal_db_names(self):
+        return DbNames(uuid=self.uuid)

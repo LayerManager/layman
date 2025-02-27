@@ -4,6 +4,8 @@ import math
 import os
 import logging
 import subprocess
+from dataclasses import dataclass
+
 from psycopg2 import sql
 from psycopg2.errors import InsufficientPrivilege
 
@@ -11,8 +13,7 @@ from db import util as db_util
 from layman.common.language import get_languages_iso639_2
 from layman.http import LaymanError
 from layman import settings
-from layman.util import get_publication_info
-from .. import LAYER_TYPE, ATTRNAME_PATTERN
+from .. import ATTRNAME_PATTERN
 
 FLASK_CONN_CUR_KEY = f'{__name__}:CONN_CUR'
 logger = logging.getLogger(__name__)
@@ -20,13 +21,17 @@ logger = logging.getLogger(__name__)
 ColumnInfo = namedtuple('ColumnInfo', 'name data_type')
 
 
-def get_internal_table_name(workspace, layer):
-    layer_info = get_publication_info(workspace, LAYER_TYPE, layer, context={'keys': ['uuid', 'original_data_source']})
-    table_name = None
-    if layer_info and layer_info['original_data_source'] == settings.EnumOriginalDataSource.FILE.value:
-        uuid = layer_info['uuid'].replace('-', '_')
-        table_name = f'layer_{uuid}'
-    return table_name
+LAYERS_SCHEMA = 'layers'
+
+
+@dataclass(frozen=True)
+class DbNames:
+    schema: str
+    table: str
+
+    def __init__(self, *, uuid: str):
+        object.__setattr__(self, 'schema', LAYERS_SCHEMA)
+        object.__setattr__(self, 'table', f"layer_{uuid.replace('-', '_')}")
 
 
 def get_workspaces():
@@ -91,11 +96,8 @@ def delete_whole_user(username):
     delete_workspace(username)
 
 
-def import_layer_vector_file_to_internal_table(workspace, layername, main_filepath, crs_id):
-    table_name = get_internal_table_name(workspace, layername)
-    assert table_name, f'workspace={workspace}, layername={layername}, table_name={table_name}'
-    process = import_layer_vector_file_to_internal_table_async(workspace, table_name, main_filepath,
-                                                               crs_id)
+def import_vector_file_to_internal_table(schema, table, main_filepath, crs_id):
+    process = import_vector_file_to_internal_table_async(schema, table, main_filepath, crs_id)
     while process.poll() is None:
         pass
     return_code = process.poll()
@@ -132,7 +134,7 @@ def create_ogr2ogr_args(*, schema, table_name, main_filepath, crs_id, output):
     return ogr2ogr_args
 
 
-def import_layer_vector_file_to_internal_table_async_with_iconv(schema, table_name, main_filepath, crs_id):
+def import_vector_file_to_internal_table_async_with_iconv(schema, table_name, main_filepath, crs_id):
     assert table_name, f'schema={schema}, table_name={table_name}, main_filepath={main_filepath}'
 
     first_ogr2ogr_args = [
@@ -171,8 +173,7 @@ def import_layer_vector_file_to_internal_table_async_with_iconv(schema, table_na
     return [first_ogr2ogr_process, iconv_process, final_ogr2ogr_process]
 
 
-def import_layer_vector_file_to_internal_table_async(schema, table_name, main_filepath,
-                                                     crs_id):
+def import_vector_file_to_internal_table_async(schema, table_name, main_filepath, crs_id):
     # import file to database table
     assert table_name, f'schema={schema}, table_name={table_name}, main_filepath={main_filepath}'
     bash_args = create_ogr2ogr_args(schema=schema,
@@ -202,11 +203,6 @@ AND data_type IN ('character varying', 'varchar', 'character', 'char', 'text')
         logger.error(f'get_text_column_names ERROR')
         raise LaymanError(7) from exc
     return [r[0] for r in rows]
-
-
-def get_internal_table_all_column_names(workspace, layername, ):
-    table_name = get_internal_table_name(workspace, layername)
-    return get_all_table_column_names(workspace, table_name, )
 
 
 def get_all_table_column_names(schema, table_name, uri_str=None):

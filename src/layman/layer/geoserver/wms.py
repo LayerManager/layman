@@ -15,8 +15,8 @@ from layman.layer import LAYER_TYPE
 from layman.layer.filesystem import gdal
 from layman.layer.layer_class import Layer
 import requests_util.retry
-from .util import get_gs_proxy_server_url, get_external_db_store_name, get_internal_db_store_name, \
-    image_mosaic_granules_to_wms_time_key, get_db_store_name
+from .util import get_gs_proxy_server_url, get_external_db_store_name, image_mosaic_granules_to_wms_time_key, \
+    get_db_store_name, DEFAULT_INTERNAL_DB_STORE
 
 FLASK_PROXY_KEY = f'{__name__}:PROXY:{{workspace}}'
 DEFAULT_WMS_QGIS_STORE_PREFIX = 'qgis'
@@ -36,7 +36,7 @@ def get_flask_proxy_key():
     return FLASK_PROXY_KEY.format(workspace=workspace)
 
 
-def patch_layer_by_uuid(*, uuid, db_schema, original_data_source, title, description, access_rights=None):
+def patch_layer_by_uuid(*, uuid, original_data_source, title, description, access_rights=None):
     gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wms
     if not get_layer_info_by_uuid(uuid=uuid):
         return
@@ -44,7 +44,7 @@ def patch_layer_by_uuid(*, uuid, db_schema, original_data_source, title, descrip
     geodata_type = info['geodata_type']
     if geodata_type == settings.GEODATA_TYPE_VECTOR:
         if info['_style_type'] == 'sld':
-            store_name = get_db_store_name(uuid=uuid, db_schema=db_schema, original_data_source=original_data_source)
+            store_name = get_db_store_name(uuid=uuid, original_data_source=original_data_source)
             gs_util.patch_feature_type(gs_layername.workspace, gs_layername.name, store_name=store_name, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
         if info['_style_type'] == 'qml':
             gs_util.patch_wms_layer(gs_layername.workspace, gs_layername.name, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
@@ -71,7 +71,6 @@ def patch_layer_by_uuid(*, uuid, db_schema, original_data_source, title, descrip
 # pylint: disable=unused-argument
 def patch_layer(workspace, layername, *, uuid, title, description, original_data_source, access_rights=None):
     patch_layer_by_uuid(uuid=uuid,
-                        db_schema=workspace,
                         title=title,
                         description=description,
                         original_data_source=original_data_source,
@@ -79,8 +78,8 @@ def patch_layer(workspace, layername, *, uuid, title, description, original_data
                         )
 
 
-def delete_layer_by_class(*, layer: Layer, db_schema):
-    db_store_name = get_internal_db_store_name(db_schema=db_schema)
+def delete_layer_by_class(*, layer: Layer):
+    db_store_name = DEFAULT_INTERNAL_DB_STORE
     gs_layername = layer.gs_names.wms
     gs_util.delete_feature_type(gs_layername.workspace, gs_layername.name, settings.LAYMAN_GS_AUTH, store=db_store_name)
     gs_util.delete_feature_type(gs_layername.workspace, gs_layername.name, settings.LAYMAN_GS_AUTH, store=get_external_db_store_name(uuid=layer.uuid))
@@ -98,7 +97,7 @@ def delete_layer_by_class(*, layer: Layer, db_schema):
 
 def delete_layer(workspace, layername):
     layer = Layer(layer_tuple=(workspace, layername))
-    return delete_layer_by_class(layer=layer, db_schema=workspace)
+    return delete_layer_by_class(layer=layer)
 
 
 def get_wms_url(external_url=False, *, x_forwarded_items=None):

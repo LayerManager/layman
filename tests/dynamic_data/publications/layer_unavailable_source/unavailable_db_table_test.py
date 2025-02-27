@@ -33,15 +33,16 @@ class TestLayer(base_test.TestSingleRestPublication):
         rest_info_pre = process_client.get_workspace_layer(layer.workspace, layer.name)
 
         table_name = f"layer_{rest_info_pre['uuid'].replace('-', '_')}"
+        table_schema = 'layers'
         assert rest_info_pre['db'] == {
-            'schema': layer.workspace,
+            'schema': table_schema,
             'table': table_name,
             'geo_column': settings.OGR_DEFAULT_GEOMETRY_COLUMN,
         }
 
         # drop internal table
         statement = sql.SQL('DROP TABLE {table};').format(
-            table=sql.Identifier(layer.workspace, table_name),
+            table=sql.Identifier(table_schema, table_name),
         )
         with app.app_context():
             db_util.run_statement(statement)

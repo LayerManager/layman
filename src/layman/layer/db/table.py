@@ -6,8 +6,8 @@ from db import util as db_util
 from layman import settings, patch_mode, util as layman_util
 from layman.common import empty_method, empty_method_returns_dict
 from layman.http import LaymanError
-from . import get_internal_table_name
 from .. import LAYER_TYPE
+from ..layer_class import Layer
 
 logger = logging.getLogger(__name__)
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
@@ -70,19 +70,22 @@ def get_layer_info(workspace, layername,):
     return result
 
 
-def delete_layer(workspace, layername, ):
+def delete_layer(workspace, layername):
+    layer = Layer(layer_tuple=(workspace, layername))
+    delete_layer_by_class(layer=layer)
+
+
+def delete_layer_by_class(*, layer: Layer):
     """Deletes table from internal DB only"""
-    table_name = get_internal_table_name(workspace, layername)
-    if table_name:
-        query = sql.SQL("""
-        DROP TABLE IF EXISTS {table} CASCADE
-        """).format(
-            table=sql.Identifier(workspace, table_name),
-        )
-        try:
-            db_util.run_statement(query)
-        except BaseException as exc:
-            raise LaymanError(7)from exc
+    query = sql.SQL("""
+    DROP TABLE IF EXISTS {table} CASCADE
+    """).format(
+        table=sql.Identifier(layer.internal_db_names.schema, layer.internal_db_names.table),
+    )
+    try:
+        db_util.run_statement(query)
+    except BaseException as exc:
+        raise LaymanError(7)from exc
 
 
 def set_internal_table_layer_srid(schema, table_name, srid, ):

@@ -4,7 +4,6 @@ import pytest
 
 from db import util as db_util
 from layman import app, settings
-from layman.map.prime_db_schema import get_workspaces
 from layman.util import get_publication_info
 from test_tools import process_client, external_db
 from tests import EnumTestTypes, Publication4Test
@@ -252,10 +251,9 @@ class TestLayer(base_test.TestSingleRestPublication):
         asserts_publ.internal.thumbnail_equals(layer.workspace, layer.type, layer.name, exp_thumbnail, max_diffs=1)
 
         # check GeoServer store of external DB exists
-        workspaces = get_workspaces()
-        all_db_stores = {f'postgresql_{workspace}' for workspace in workspaces}
-        both_db_stores = all_db_stores.union({f'external_db_{uuid}'})
-        exp_wms_stores = both_db_stores if style_type == 'sld' else all_db_stores
+        internal_db_stores = {f'postgresql'}
+        both_db_stores = internal_db_stores.union({f'external_db_{uuid}'})
+        exp_wms_stores = both_db_stores if style_type == 'sld' else internal_db_stores
         gs_asserts.assert_stores(exp_wfs_stores=both_db_stores, exp_wms_stores=exp_wms_stores)
 
         # check metadata properties language and scale_denominator (they are derived from DB)
@@ -276,7 +274,7 @@ class TestLayer(base_test.TestSingleRestPublication):
         process_client.delete_workspace_layer(layer.workspace, layer.name)
 
         # check GeoServer store of external DB does not exist anymore
-        gs_asserts.assert_stores(exp_wfs_stores=all_db_stores, exp_wms_stores=all_db_stores)
+        gs_asserts.assert_stores(exp_wfs_stores=internal_db_stores, exp_wms_stores=internal_db_stores)
 
         # check there is no information about the layer anymore
         with app.app_context():
