@@ -8,6 +8,7 @@ logger = logging.getLogger(__name__)
 CACHE_GS_PROXY_BASE_URL_KEY = f'{__name__}:GS_PROXY_BASE_URL'
 DEFAULT_EXTERNAL_DB_STORE_PREFIX = 'external_db'
 DEFAULT_INTERNAL_DB_STORE_PREFIX = 'postgresql'
+DEFAULT_INTERNAL_DB_STORE = 'postgresql'
 
 
 def get_gs_proxy_server_url(*, x_forwarded_items=None):
