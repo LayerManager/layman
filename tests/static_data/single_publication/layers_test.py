@@ -192,14 +192,15 @@ def test_fill_project_template(workspace, publ_type, publication):
     with app.app_context():
         layer = Layer(layer_tuple=(workspace, publication))
     table_name = layer.table_uri.table
+    table_schema = layer.table_uri.schema
 
     with pytest.raises(requests.exceptions.HTTPError) as excinfo:
         WebMapService(wms_url, version=wms_version)
     assert excinfo.value.response.status_code == 500
 
     with app.app_context():
-        real_bbox = layer_db.get_bbox(workspace, table_name)
-        layer_crs = layer_db.get_table_crs(workspace, table_name, use_internal_srid=True)
+        real_bbox = layer_db.get_bbox(table_schema, table_name)
+        layer_crs = layer_db.get_table_crs(table_schema, table_name, use_internal_srid=True)
     layer_bbox = bbox_util.get_bbox_to_publish(real_bbox, layer_crs)
     with app.app_context():
         qml_path = qgis_util.get_original_style_path(layer.uuid)
@@ -209,9 +210,9 @@ def test_fill_project_template(workspace, publ_type, publication):
     if exp_min_scale is not None:
         assert qml_xml.getroot().attrib['minScale'] == exp_min_scale
     with app.app_context():
-        db_types = layer_db.get_geometry_types(workspace, table_name)
+        db_types = layer_db.get_geometry_types(table_schema, table_name)
         db_cols = [
-            col for col in layer_db.get_all_column_infos(workspace, table_name)
+            col for col in layer_db.get_all_column_infos(table_schema, table_name)
             if col.name not in ['wkb_geometry', 'ogc_fid']
         ]
     qml_geometry = qgis_util.get_geometry_from_qml_and_db_types(qml_xml, db_types)

@@ -114,7 +114,7 @@ class TestResponsesClass:
         'bounding_box': list(test_data.SMALL_LAYER_BBOX),
         'native_crs': 'EPSG:4326',
         'native_bounding_box': list(test_data.SMALL_LAYER_NATIVE_BBOX),
-        'db': {'schema': workspace,
+        'db': {'schema': "layers",
                'table': f"layer_{layer_uuid.replace('-', '_')}",
                'geo_column': 'wkb_geometry',
                },
