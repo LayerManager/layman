@@ -4,6 +4,7 @@ import logging
 import os
 import shutil
 from urllib.parse import urljoin
+import traceback
 import requests
 from psycopg2 import sql
 
@@ -236,9 +237,11 @@ def migrate_layers():
     order by w.name, p.name
     ;'''
     layers = db_util.run_query(query, (LAYER_TYPE,))
+    failed_layers = {}
 
     for workspace, layername, layer_uuid, style_type_code, title, description, image_mosaic, geodata_type, external_table_uri, \
             read_users_roles, write_users_roles in layers:
+        failed_steps = []
 
         # check if publication is not yet migrated
         publ_info = get_complete_layer_info(workspace, layername)
@@ -288,69 +291,85 @@ def migrate_layers():
         input_file.ensure_layer_input_file_dir(layer_uuid)
         input_files = util.get_layer_input_files(workspace, layername)
         name_input_file_by_layer = not image_mosaic or input_files.is_one_archive
-        for filename in input_files.raw_paths:
-            base_filename = os.path.basename(filename)
-            dst_filename = f'{layer_uuid}{base_filename[len(layername):]}' if name_input_file_by_layer else base_filename
-            dst_path = os.path.join(new_path, 'input_file', dst_filename)
-            shutil.move(filename, dst_path)
-        os.rmdir(f"{src_main_path}/input_file")
+        try:
+            for filename in input_files.raw_paths:
+                base_filename = os.path.basename(filename)
+                dst_filename = f'{layer_uuid}{base_filename[len(layername):]}' if name_input_file_by_layer else base_filename
+                dst_path = os.path.join(new_path, 'input_file', dst_filename)
+                shutil.move(filename, dst_path)
+            os.rmdir(f"{src_main_path}/input_file")
+        except BaseException:
+            failed_steps.append('input_file')
+            logger.error(f'    Fail to move input files: : \n{traceback.format_exc()}')
 
         # Move style files
         old_style_dir = f"{src_main_path}/input_style"
-        if os.path.isdir(old_style_dir):
-            logger.info("      moving style file")
-            dst_style_path = f"{dst_main_path}/input_style/{layer_uuid}.{style_type.extension}"
-            src_style_path = f"{old_style_dir}/{layername}.{style_type.extension}"
-            os.makedirs(f"{dst_main_path}/input_style/", exist_ok=True)
-            shutil.move(src_style_path, dst_style_path)
-            os.rmdir(f"{old_style_dir}")
+        try:
+            if os.path.isdir(old_style_dir):
+                logger.info("      moving style file")
+                dst_style_path = f"{dst_main_path}/input_style/{layer_uuid}.{style_type.extension}"
+                src_style_path = f"{old_style_dir}/{layername}.{style_type.extension}"
+                os.makedirs(f"{dst_main_path}/input_style/", exist_ok=True)
+                shutil.move(src_style_path, dst_style_path)
+                os.rmdir(f"{old_style_dir}")
+        except BaseException:
+            failed_steps.append('input_style')
+            logger.error(f'    Fail to move style file: : \n{traceback.format_exc()}')
 
         gdal_old_dir = f"{settings.LAYMAN_NORMALIZED_RASTER_DATA_DIR}/workspaces/{workspace}/layers/{layername}"
         if geodata_type == settings.GEODATA_TYPE_RASTER:
             logger.info("      moving normalized raster files")
-            gdal.ensure_normalized_raster_layer_dir(layer_uuid)
-            gdal_dir = gdal.get_normalized_raster_layer_dir(layer_uuid)
-            if image_mosaic:
-                for filename in [
-                    'sample_image.dat',
-                    f'{layername}.dbf',
-                    f'{layername}.fix',
-                    f'{layername}.prj',
-                    f'{layername}.properties',
-                    f'{layername}.qix',
-                    f'{layername}.shp',
-                    f'{layername}.shx',
-                ]:
-                    filepath = os.path.join(gdal_old_dir, filename)
-                    os.remove(filepath)
+            try:
+                gdal.ensure_normalized_raster_layer_dir(layer_uuid)
+                gdal_dir = gdal.get_normalized_raster_layer_dir(layer_uuid)
+                if image_mosaic:
+                    for filename in [
+                        'sample_image.dat',
+                        f'{layername}.dbf',
+                        f'{layername}.fix',
+                        f'{layername}.prj',
+                        f'{layername}.properties',
+                        f'{layername}.qix',
+                        f'{layername}.shp',
+                        f'{layername}.shx',
+                    ]:
+                        filepath = os.path.join(gdal_old_dir, filename)
+                        os.remove(filepath)
 
-                for filename in [
-                    'indexer.properties',
-                    'timeregex.properties',
-                ]:
-                    src_filepath = os.path.join(gdal_old_dir, filename)
-                    dst_filepath = os.path.join(gdal_dir, filename)
+                    for filename in [
+                        'indexer.properties',
+                        'timeregex.properties',
+                    ]:
+                        src_filepath = os.path.join(gdal_old_dir, filename)
+                        dst_filepath = os.path.join(gdal_dir, filename)
+                        shutil.move(src_filepath, dst_filepath)
+
+                filenames = set(
+                    os.path.splitext(os.path.basename(filename))[0] for filename in os.listdir(gdal_old_dir) if filename.endswith('.tif'))
+                for old_file_name in filenames:
+                    new_file_name = layer_uuid if image_mosaic is None else old_file_name
+                    src_filepath = os.path.join(gdal_old_dir, f"{old_file_name}.tif")
+                    dst_filepath = os.path.join(gdal_dir, f"{new_file_name}.tif")
                     shutil.move(src_filepath, dst_filepath)
 
-            filenames = set(
-                os.path.splitext(os.path.basename(filename))[0] for filename in os.listdir(gdal_old_dir) if filename.endswith('.tif'))
-            for old_file_name in filenames:
-                new_file_name = layer_uuid if image_mosaic is None else old_file_name
-                src_filepath = os.path.join(gdal_old_dir, f"{old_file_name}.tif")
-                dst_filepath = os.path.join(gdal_dir, f"{new_file_name}.tif")
-                shutil.move(src_filepath, dst_filepath)
-
-                src_filepath = os.path.join(gdal_old_dir, f"{old_file_name}.tif.aux.xml")
-                dst_filepath = os.path.join(gdal_dir, f"{new_file_name}.tif.aux.xml")
-                if os.path.exists(src_filepath):
-                    shutil.move(src_filepath, dst_filepath)
-            os.rmdir(f"{gdal_old_dir}")
+                    src_filepath = os.path.join(gdal_old_dir, f"{old_file_name}.tif.aux.xml")
+                    dst_filepath = os.path.join(gdal_dir, f"{new_file_name}.tif.aux.xml")
+                    if os.path.exists(src_filepath):
+                        shutil.move(src_filepath, dst_filepath)
+                os.rmdir(f"{gdal_old_dir}")
+            except BaseException:
+                failed_steps.append('normalized_raster_files')
+                logger.error(f'    Fail to move normalized raster files: : \n{traceback.format_exc()}')
 
         old_qgis_path = f"{settings.LAYMAN_QGIS_DATA_DIR}/workspaces/{workspace}/layers/{layername}"
         if style_type.code == 'qml':
             logger.info("      re-creating QGIS files")
-            shutil.rmtree(old_qgis_path)
-            util.run_task_sync(qgis_refresh_wms, [workspace, layername], post_task_kwargs)
+            try:
+                shutil.rmtree(old_qgis_path)
+                util.run_task_sync(qgis_refresh_wms, [workspace, layername], post_task_kwargs)
+            except BaseException:
+                failed_steps.append('qgis')
+                logger.error(f'    Fail to move qgis file: : \n{traceback.format_exc()}')
 
         # delete layer from geoserver
         util.delete_layer_from_geoserver_v1_23(layername, workspace)
@@ -358,19 +377,31 @@ def migrate_layers():
         # re-create layer on geoserver
         if not wfs.get_layer_info_by_uuid(uuid=layer_uuid, layman_workspace=workspace):
             logger.info("      re-creating geoserver.wfs")
-            util.run_task_sync(refresh_wfs, [workspace, layername], post_task_kwargs)
+            try:
+                util.run_task_sync(refresh_wfs, [workspace, layername], post_task_kwargs)
+            except BaseException:
+                failed_steps.append('geoserver_wfs')
+                logger.error(f'    Fail to recreate layer in GeoServer WFS workspace: : \n{traceback.format_exc()}')
         else:
             logger.warning("      geoserver.wfs already exists!")
 
         if not gs_wms.get_layer_info_by_uuid(uuid=layer_uuid):
             logger.info("      re-creating geoserver.wms")
-            util.run_task_sync(refresh_wms, [workspace, layername], post_task_kwargs)
+            try:
+                util.run_task_sync(refresh_wms, [workspace, layername], post_task_kwargs)
+            except BaseException:
+                failed_steps.append('geoserver_wms')
+                logger.error(f'    Fail to recreate layer in GeoServer WMS workspace: : \n{traceback.format_exc()}')
         else:
             logger.warning("      geoserver.wms already exists!")
 
         if not sld.get_layer_info_by_uuid(workspace, uuid=layer_uuid, layername=layername):
             logger.info("      re-creating geoserver.sld")
-            util.run_task_sync(refresh_sld, [workspace, layername], post_task_kwargs)
+            try:
+                util.run_task_sync(refresh_sld, [workspace, layername], post_task_kwargs)
+            except BaseException:
+                failed_steps.append('geoserver_wms')
+                logger.error(f'    Fail to recreate style in GeoServer: \n{traceback.format_exc()}')
         else:
             logger.warning("      geoserver.sld already exists!")
 
@@ -378,24 +409,38 @@ def migrate_layers():
         logger.info("      moving thumbnail file")
         src_thumbnail_path = f"{src_main_path}/thumbnail/{layername}.png"
         dst_thumbnail_path = f"{dst_main_path}/thumbnail/{layer_uuid}.png"
-        if os.path.exists(src_thumbnail_path):
-            os.makedirs(f"{dst_main_path}/thumbnail/", exist_ok=True)
-            shutil.move(src_thumbnail_path, dst_thumbnail_path)
-            os.rmdir(f"{src_main_path}/thumbnail")
-        else:
-            shutil.rmtree(f"{src_main_path}/thumbnail")
+        try:
+            if os.path.exists(src_thumbnail_path):
+                os.makedirs(f"{dst_main_path}/thumbnail/", exist_ok=True)
+                shutil.move(src_thumbnail_path, dst_thumbnail_path)
+                os.rmdir(f"{src_main_path}/thumbnail")
+            else:
+                shutil.rmtree(f"{src_main_path}/thumbnail")
+        except BaseException:
+            failed_steps.append('thumbnail')
+            logger.error(f'    Fail to move thumbnail file: : \n{traceback.format_exc()}')
 
         # assert that source keys up to geoserver are OK
-        publ_info = get_complete_layer_info(workspace, layername)
-        keys_to_check = ['wms', 'style']
-        if publ_info['geodata_type'] == 'vector':
-            keys_to_check += ['db', 'wfs']
-        if publ_info['original_data_source'] == 'file':
-            keys_to_check += ['file']
-        assert all('status' not in publ_info[key] for key in keys_to_check), json.dumps(publ_info, indent=2)
-        os.rmdir(f"{src_main_path}")
+        if not failed_steps:
+            publ_info = get_complete_layer_info(workspace, layername)
+            keys_to_check = ['wms', 'style']
+            if publ_info['geodata_type'] == 'vector':
+                keys_to_check += ['db', 'wfs']
+            if publ_info['original_data_source'] == 'file':
+                keys_to_check += ['file']
+            assert all('status' not in publ_info[key] for key in keys_to_check), json.dumps(publ_info, indent=2)
+            os.rmdir(f"{src_main_path}")
+        else:
+            failed_layers[(workspace, layername, layer_uuid)] = failed_steps
 
         logger.info(f'    Migrate layer {workspace}.{layername} DONE')
+
+    if failed_layers:
+        warning = f'  These layers were not migrated successfully:\n'
+        for layer_ws_name_uuid, failed_steps in failed_layers.items():
+            workspace, layername, layer_uuid = layer_ws_name_uuid
+            warning += f'    {workspace}.{layername} (uuid={layer_uuid}): {failed_steps}\n'
+        logger.warning(warning)
 
 
 def migrate_maps():
@@ -410,8 +455,10 @@ def migrate_maps():
     order by w.name, p.name
     ;'''
     maps = db_util.run_query(query, (MAP_TYPE,))
+    failed_maps = {}
 
     for workspace, mapname, map_uuid, in maps:
+        failed_steps = []
         # check if publication is not yet migrated
         publ_info = get_complete_map_info(workspace, mapname)
         publ_status = publ_info['layman_metadata']['publication_status']
@@ -427,30 +474,48 @@ def migrate_maps():
 
         # Move input files
         logger.info("      moving input files")
-        src_input_file_path = f"{src_main_path}/input_file/{mapname}.json"
-        dst_input_filepath = f"{dst_main_path}/input_file/{map_uuid}.json"
-        os.makedirs(f"{dst_main_path}/input_file/", exist_ok=True)
-        shutil.move(src_input_file_path, dst_input_filepath)
-        os.rmdir(f"{src_main_path}/input_file")
+        try:
+            src_input_file_path = f"{src_main_path}/input_file/{mapname}.json"
+            dst_input_filepath = f"{dst_main_path}/input_file/{map_uuid}.json"
+            os.makedirs(f"{dst_main_path}/input_file/", exist_ok=True)
+            shutil.move(src_input_file_path, dst_input_filepath)
+            os.rmdir(f"{src_main_path}/input_file")
+        except BaseException:
+            failed_steps.append('input_file')
+            logger.error(f'    Fail to move input files: : \n{traceback.format_exc()}')
 
         # Move thumbnail file
         logger.info("      moving thumbnail file")
         src_thumbnail_path = f"{src_main_path}/thumbnail/{mapname}.png"
         dst_thumbnail_path = f"{dst_main_path}/thumbnail/{map_uuid}.png"
         if os.path.exists(src_thumbnail_path):
-            os.makedirs(f"{dst_main_path}/thumbnail/", exist_ok=True)
-            shutil.move(src_thumbnail_path, dst_thumbnail_path)
-            os.rmdir(f"{src_main_path}/thumbnail")
+            try:
+                os.makedirs(f"{dst_main_path}/thumbnail/", exist_ok=True)
+                shutil.move(src_thumbnail_path, dst_thumbnail_path)
+                os.rmdir(f"{src_main_path}/thumbnail")
+            except BaseException:
+                failed_steps.append('thumbnail')
+                logger.error(f'    Fail to move thumbnail file: : \n{traceback.format_exc()}')
         else:
-            shutil.rmtree(f"{src_main_path}/thumbnail")
+            util.safe_delete(f"{src_main_path}/thumbnail")
 
         # assert that source keys up to geoserver are OK
-        publ_info = get_complete_map_info(workspace, mapname)
-        keys_to_check = ['file']
-        assert all('status' not in publ_info[key] for key in keys_to_check), json.dumps(publ_info, indent=2)
+        if not failed_steps:
+            publ_info = get_complete_map_info(workspace, mapname)
+            keys_to_check = ['file']
+            assert all('status' not in publ_info[key] for key in keys_to_check), json.dumps(publ_info, indent=2)
+        else:
+            failed_maps[(workspace, mapname, map_uuid)] = failed_steps
 
         os.rmdir(f"{src_main_path}")
         logger.info(f'    Migrate map {workspace}.{mapname} DONE')
+
+    if failed_maps:
+        warning = f'  These maps were not migrated successfully:\n'
+        for map_ws_name_uuid, failed_steps in failed_maps.items():
+            workspace, mapname, map_uuid = map_ws_name_uuid
+            warning += f'    {workspace}.{mapname} (uuid={map_uuid}): {failed_steps}\n'
+        logger.warning(warning)
 
 
 def delete_old_workspaces():
