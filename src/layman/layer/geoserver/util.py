@@ -7,7 +7,6 @@ from geoserver.util import wms_direct, wfs_direct
 logger = logging.getLogger(__name__)
 CACHE_GS_PROXY_BASE_URL_KEY = f'{__name__}:GS_PROXY_BASE_URL'
 DEFAULT_EXTERNAL_DB_STORE_PREFIX = 'external_db'
-DEFAULT_INTERNAL_DB_STORE_PREFIX = 'postgresql'
 DEFAULT_INTERNAL_DB_STORE = 'postgresql'
 
 
@@ -62,13 +61,9 @@ def get_external_db_store_name(*, uuid):
     return f'{DEFAULT_EXTERNAL_DB_STORE_PREFIX}_{uuid}'
 
 
-def get_internal_db_store_name(*, db_schema):
-    return f'{DEFAULT_INTERNAL_DB_STORE_PREFIX}_{db_schema}'
-
-
-def get_db_store_name(*, uuid, db_schema, original_data_source):
+def get_db_store_name(*, uuid, original_data_source):
     return get_external_db_store_name(uuid=uuid) if original_data_source == settings.EnumOriginalDataSource.TABLE.value \
-        else get_internal_db_store_name(db_schema=db_schema)
+        else DEFAULT_INTERNAL_DB_STORE
 
 
 def image_mosaic_granules_to_wms_time_key(granules_json):

@@ -11,8 +11,9 @@ from geoserver import util as gs_util
 from layman import settings, names
 from layman.common.micka import util as micka_util, requests as micka_requests
 from layman.layer import LAYER_TYPE, STYLE_TYPES_DEF, db as layer_db
-from layman.layer.geoserver import wfs, wms as gs_wms, sld, DEFAULT_INTERNAL_DB_STORE
+from layman.layer.geoserver import wfs, wms as gs_wms, sld
 from layman.layer.geoserver.tasks import refresh_wms, refresh_wfs, refresh_sld
+from layman.layer.geoserver.util import DEFAULT_INTERNAL_DB_STORE
 from layman.layer.geoserver.wms import get_timeregex_props
 from layman.layer.util import get_complete_layer_info
 from layman.map import MAP_TYPE
@@ -263,7 +264,7 @@ def migrate_layers():
         util.delete_layer_from_geoserver_v1_23(layername, workspace)
 
         # re-create layer on geoserver
-        if not wfs.get_layer_info_by_uuid(uuid=layer_uuid, layman_workspace=workspace):
+        if not wfs.get_layer_info_by_uuid(uuid=layer_uuid):
             logger.info("      re-creating geoserver.wfs")
             util.run_task_sync(refresh_wfs, [workspace, layername], post_task_kwargs)
         else:

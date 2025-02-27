@@ -10,7 +10,7 @@ from layman import util as layman_util
 from layman.layer import LAYER_TYPE
 from layman.layer.layer_class import Layer
 import requests_util.retry
-from .util import get_gs_proxy_server_url, get_external_db_store_name, get_internal_db_store_name, get_db_store_name
+from .util import get_gs_proxy_server_url, get_external_db_store_name, get_db_store_name, DEFAULT_INTERNAL_DB_STORE
 from . import wms
 
 FLASK_PROXY_KEY = f'{__name__}:PROXY:{{workspace}}'
@@ -27,16 +27,16 @@ def get_flask_proxy_key():
     return FLASK_PROXY_KEY.format(workspace=workspace)
 
 
-def patch_layer_by_uuid(*, uuid, title, description, original_data_source, access_rights=None, layman_workspace):
+def patch_layer_by_uuid(*, uuid, title, description, original_data_source, access_rights=None):
     gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wfs
-    if not get_layer_info_by_uuid(uuid=uuid, layman_workspace=layman_workspace):
+    if not get_layer_info_by_uuid(uuid=uuid):
         return
     info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['geodata_type', ]})
     geodata_type = info['geodata_type']
     if geodata_type != settings.GEODATA_TYPE_VECTOR:
         raise NotImplementedError(f"Unknown geodata type: {geodata_type}")
 
-    store_name = get_db_store_name(uuid=uuid, db_schema=layman_workspace, original_data_source=original_data_source)
+    store_name = get_db_store_name(uuid=uuid, original_data_source=original_data_source)
     gs_util.patch_feature_type(gs_layername.workspace, gs_layername.name, store_name=store_name, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
     clear_cache()
 
@@ -56,12 +56,11 @@ def patch_layer(workspace, layername, *, uuid, title, description, original_data
                         description=description,
                         original_data_source=original_data_source,
                         access_rights=access_rights,
-                        layman_workspace=workspace,
                         )
 
 
-def delete_layer_by_class(*, layer: Layer, db_schema):
-    db_store_name = get_internal_db_store_name(db_schema=db_schema)
+def delete_layer_by_class(*, layer: Layer):
+    db_store_name = DEFAULT_INTERNAL_DB_STORE
     gs_layername = layer.gs_names.wfs
     gs_util.delete_feature_type(gs_layername.workspace, gs_layername.name, settings.LAYMAN_GS_AUTH, store=db_store_name)
     gs_util.delete_feature_type(gs_layername.workspace, gs_layername.name, settings.LAYMAN_GS_AUTH, store=get_external_db_store_name(uuid=layer.uuid))
@@ -75,7 +74,7 @@ def delete_layer_by_class(*, layer: Layer, db_schema):
 
 def delete_layer(workspace, layername):
     layer = Layer(layer_tuple=(workspace, layername))
-    return delete_layer_by_class(layer=layer, db_schema=workspace)
+    return delete_layer_by_class(layer=layer)
 
 
 def get_wfs_url(external_url=False, *, x_forwarded_items=None):
@@ -151,10 +150,10 @@ def clear_cache():
 
 def get_layer_info(workspace, layername, *, x_forwarded_items=None):
     uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layername)
-    return get_layer_info_by_uuid(uuid=uuid, x_forwarded_items=x_forwarded_items, layman_workspace=workspace)
+    return get_layer_info_by_uuid(uuid=uuid, x_forwarded_items=x_forwarded_items)
 
 
-def get_layer_info_by_uuid(*, uuid, layman_workspace, x_forwarded_items=None):
+def get_layer_info_by_uuid(*, uuid, x_forwarded_items=None):
     gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wfs
     if uuid is None:
         return {}
@@ -162,7 +161,7 @@ def get_layer_info_by_uuid(*, uuid, layman_workspace, x_forwarded_items=None):
 
     info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['original_data_source']})
     original_data_source = info['original_data_source']
-    data_store_name = get_db_store_name(uuid=uuid, db_schema=layman_workspace, original_data_source=original_data_source)
+    data_store_name = get_db_store_name(uuid=uuid, original_data_source=original_data_source)
     feature_type = gs_util.get_feature_type(gs_layername.workspace, data_store_name, gs_layername.name)
     if not feature_type:
         return {}
