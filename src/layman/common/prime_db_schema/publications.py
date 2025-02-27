@@ -209,6 +209,10 @@ select p.id as id_publication,
              ) tmp_layer_maps
            ) layer_maps,
        p.wfs_wms_status,
+       CASE
+            WHEN u.id IS NULL THEN TRUE
+                ELSE FALSE
+       END AS is_public_workspace,
        count(*) OVER() AS full_count
 from {DB_SCHEMA}.workspaces w inner join
      publs p on p.id_workspace = w.id left join
@@ -292,9 +296,10 @@ from {DB_SCHEMA}.workspaces w inner join
                                    '_map_layers': map_layers or [],
                                    'used_in_maps': layer_maps or [],
                                    '_wfs_wms_status': settings.EnumWfsWmsStatus(wfs_wms_status) if wfs_wms_status else None,
+                                   '_is_public_workspace': is_public_workspace,
                                    }
              for id_publication, workspace_name, publication_type, publication_name, title, description, uuid, geodata_type, style_type, image_mosaic, updated_at, xmin, ymin, xmax, ymax,
-             srid, external_table_uri, read_users_roles, write_users_roles, map_layers, layer_maps, wfs_wms_status, _
+             srid, external_table_uri, read_users_roles, write_users_roles, map_layers, layer_maps, wfs_wms_status, is_public_workspace, _
              in values}
 
     infos = {key: {**value,
@@ -420,7 +425,9 @@ def check_rights_axioms(can_read,
                         actor_name,
                         owner,
                         can_read_old=None,
-                        can_write_old=None):
+                        can_write_old=None,
+                        *,
+                        is_part_of_user_delete=False):
     if can_read:
         read_users, read_roles = split_user_and_role_names(can_read)
         only_valid_user_names(read_users)
@@ -431,14 +438,15 @@ def check_rights_axioms(can_read,
         only_valid_role_names(write_roles)
         owner_can_still_write(owner, can_write)
         at_least_one_can_write(write_users, write_roles)
-        i_can_still_write(actor_name, can_write)
+        if not is_part_of_user_delete:
+            i_can_still_write(actor_name, can_write)
     if can_read or can_write:
         can_read_check = can_read or can_read_old
         can_write_check = can_write or can_write_old
         who_can_write_can_read(can_read_check, can_write_check)
 
 
-def check_publication_info(workspace_name, info):
+def check_publication_info(workspace_name, info, *, is_part_of_user_delete=False):
     owner_info = users.get_user_infos(workspace_name).get(workspace_name)
     info["owner"] = owner_info and owner_info["username"]
     try:
@@ -448,6 +456,7 @@ def check_publication_info(workspace_name, info):
                             info["owner"],
                             info['access_rights'].get('read_old'),
                             info['access_rights'].get('write_old'),
+                            is_part_of_user_delete=is_part_of_user_delete,
                             )
     except LaymanError as exc_info:
         raise LaymanError(43, {'workspace_name': workspace_name,
@@ -523,7 +532,7 @@ returning id
     return pub_id
 
 
-def update_publication(workspace_name, info):
+def update_publication(workspace_name, info, is_part_of_user_delete=False):
     id_workspace = workspaces.get_workspace_infos(workspace_name)[workspace_name]["id"]
     right_type_list = ['read', 'write']
 
@@ -553,7 +562,7 @@ def update_publication(workspace_name, info):
         for right_type in right_type_list:
             access_rights_changes[right_type]['username_list_old'] = info_old["access_rights"][right_type]
             info["access_rights"][right_type + "_old"] = access_rights_changes[right_type]['username_list_old']
-        check_publication_info(workspace_name, info)
+        check_publication_info(workspace_name, info, is_part_of_user_delete=is_part_of_user_delete)
 
         for right_type in right_type_list:
             if info['access_rights'].get(right_type):
