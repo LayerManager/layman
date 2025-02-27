@@ -97,9 +97,8 @@ Layman uses directly **one database** specified by [LAYMAN_PG_DBNAME](env-settin
    - users, workspaces, and publications including access rights
    - data version including migration ID
 - [Internal Role Service Schema](security.md#internal-role-service-schema) with table and view structure that can be used as [role service](security.md#role-service)
-- Schemas holding vector layer data.
-    - One **[workspace schema](https://www.postgresql.org/docs/13/ddl-schemas.html)** is created for every created [workspace](models.md#workspace). Name of workspace schema is always the same as workspace name.
-    - One **[table](https://www.postgresql.org/docs/13/sql-createtable.html)** is created in workspace schema for each layer published with input vector files. Name of the table is in form `layer_<UUID>` with `-` replaced with `_`, e.g. `layer_96b918c6_d88c_42d8_b999_f3992b826958`. The table contains data from vector data files.
+- Schema `layers` holding vector layer data.
+    - One **[table](https://www.postgresql.org/docs/13/sql-createtable.html)** is created in the schema for each layer published with input vector files. Name of the table is in form `layer_<UUID>` with `-` replaced with `_`, e.g. `layer_96b918c6_d88c_42d8_b999_f3992b826958`. The table contains data from vector data files.
 
 **Second database** is used by Micka to store metadata records. The database including its structure is completely managed by Micka. By default, it's named `hsrs_micka6`.
 
@@ -114,7 +113,7 @@ There are only two **[workspaces](https://docs.geoserver.org/2.21.x/en/user/data
 
 **[User](https://docs.geoserver.org/2.21.x/en/user/security/webadmin/ugr.html)** is created for every [user](models.md#user) who reserved [username](models.md#username). Username on GeoServer is the same as username on Layman.
 
-One **[PostgreSQL datastore](https://docs.geoserver.org/2.21.x/en/user/data/app-schema/data-stores.html#postgis)** per Layman workspace named `postgresql_<workspace>` is created in each GeoServer workspace.
+One **[PostgreSQL datastore](https://docs.geoserver.org/2.21.x/en/user/data/app-schema/data-stores.html#postgis)** named `postgresql` is created in each GeoServer workspace.
 
 For each vector layer from external PostGIS table, **[PostgreSQL datastore](https://docs.geoserver.org/2.21.x/en/user/data/app-schema/data-stores.html#postgis)** is created. Name of the data store is `external_db_<uuid>`.
 

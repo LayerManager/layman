@@ -20,7 +20,7 @@
 #### Data migrations
 - [#1009](https://github.com/LayerManager/layman/issues/1009) Fill column `description` in `publications` table in prime DB schema. Value is taken from GeoServer for layers and from filesystem for maps.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Fill column `created_at` in `publications` table in prime DB schema. Value is taken from filesystem `uuid.txt` file creation. `uuid.txt` file is subsequently deleted.
-- [#1048](https://github.com/LayerManager/layman/issues/1048) New workspaces ["layman" and "layman_wms"](doc/data-storage.md#geoserver) are created on GeoServer. 
+- [#1048](https://github.com/LayerManager/layman/issues/1048) New workspaces [`layman` and `layman_wms`](doc/data-storage.md#geoserver) are created on GeoServer, each with PostgreSQL data store `postgresql`. 
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Layers, whose `wfs_wms_status` is not `AVAILABLE`, are deleted.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Layers files are moved to new path, layers are re-created on GeoServer with new names derived from `uuid`.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Map files are moved to new path with new names derived from `uuid`.
@@ -30,10 +30,11 @@
 - [#161](https://github.com/LayerManager/layman/issues/161) New method [DELETE User](doc/rest.md#delete-user) allows to delete user account.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Stop saving publication UUID to `uuid.txt` file.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) New keys `wfs`.`name` and `wms`.`name` were added to [GET Workspace Layer](doc/rest.md#get-workspace-layer) response.
-- [#1048](https://github.com/LayerManager/layman/issues/1048) Names of [Feature types, Coverages, Layers and Styles in GeoServer WFS and WMS workspaces](doc/data-storage.md#geoserver) are derived from layer`uuid`. All GeoServer entities are created in two global workspaces (`layman` for WFS layers and `layman_wms` for WMS layers), instead of separate workspaces for each Layman workspace. Separate PostgreSQL datastore is created for each Layman workspace.
+- [#1048](https://github.com/LayerManager/layman/issues/1048) Names of [Feature types, Coverages, Layers and Styles in GeoServer WFS and WMS workspaces](doc/data-storage.md#geoserver) are derived from layer`uuid`. All GeoServer entities are created in two global workspaces (`layman` for WFS layers and `layman_wms` for WMS layers), instead of separate workspaces for each Layman workspace.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) POST Workspace [Layers](doc/rest.md#post-workspace-layers)/[Maps](doc/rest.md#post-workspace-maps) accepts new body parameter *uuid*.
-- [#1048](https://github.com/LayerManager/layman/issues/1048) Names of all GeoServer stores are derived from layer's `uuid` (previously were derived from layer's `name`). 
+- [#1048](https://github.com/LayerManager/layman/issues/1048) Names of all GeoServer per-layer stores are derived from layer's `uuid` (previously were derived from layer's `name`). 
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Names of [files and directories](doc/data-storage.md#filesystem) are derived from publication`uuid`. Workspace directories are not used anymore.
+- [#1048](https://github.com/LayerManager/layman/issues/1048) All layer tables are stored in `layers` DB schema. Workspace schemas are not used anymore.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Keys `file.paths`, `file.path` and `thumbnail.path` of GET Workspace [Layer](doc/rest.md#get-workspace-layer)/[Map](doc/rest.md#get-workspace-map) are relative to [LAYMAN_DATA_DIR](doc/env-settings.md#layman_data_dir) instead of workspace directory.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Information about layer WMS (e.g. key `wms` in [GET Workspace Layer](doc/rest.md#get-workspace-layer)) is obtained from GeoServer REST API instead of WMS GetCapabilities to improve speed.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Information about layer WFS (e.g. key `wfs` in [GET Workspace Layer](doc/rest.md#get-workspace-layer)) is obtained from GeoServer REST API instead of WFS GetCapabilities to improve speed.
