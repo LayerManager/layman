@@ -53,7 +53,7 @@ PUBLICATION_TYPES = {
             ('layman.map.prime_db_schema.table', InternalSourceTypeDef(info_items=['access_rights', 'name', 'workspace', 'title', 'description', 'uuid',
                                                                                    'bounding_box', 'native_crs', 'native_bounding_box',
                                                                                    'updated_at', 'type', 'id', 'image_mosaic',
-                                                                                   'map_layers', 'created_at']),),
+                                                                                   'map_layers', 'created_at', 'is_public_workspace',]),),
             ('layman.map.filesystem.input_file', InternalSourceTypeDef(info_items=['file']),),
             ('layman.map.prime_db_schema.file_data', InternalSourceTypeDef(info_items=[]),),
             ('layman.map.filesystem.thumbnail', InternalSourceTypeDef(info_items=['thumbnail', ]),),

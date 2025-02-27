@@ -23,7 +23,8 @@ def patch_map(workspace,
               actor_name,
               title=None,
               description=None,
-              access_rights=None):
+              access_rights=None,
+              is_part_of_user_delete=False):
     db_info = {"name": mapname,
                "title": title,
                "description": description,
@@ -32,7 +33,7 @@ def patch_map(workspace,
                }
     if access_rights:
         db_info['access_rights'] = access_rights
-    pubs_util.update_publication(workspace, db_info)
+    pubs_util.update_publication(workspace, db_info, is_part_of_user_delete)
 
 
 def pre_publication_action_check(workspace,

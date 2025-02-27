@@ -158,6 +158,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
         '_thumbnail': {'path': f'/layman_data_test/{publ_type_dir}/{uuid}/thumbnail/{uuid}.png'},
         'access_rights': {'read': ['EVERYONE'], 'write': ['EVERYONE']},
         'image_mosaic': False,
+        '_is_public_workspace': True,
     }
     if publ_type == process_client.LAYER_TYPE:
         geodata_type = publ_type_detail[0]
