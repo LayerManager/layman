@@ -188,11 +188,11 @@ select p.id as id_publication,
                    'workspace', layer_ws.name,
                    'index', ml.layer_index,
                    'uuid', ml.layer_uuid
-                   ) order by ml.layer_index, ml.layer_workspace, ml.layer_name)
+                   ) order by ml.layer_index, layer_ws.name, lr.name)
         from {DB_SCHEMA}.map_layer ml left join
              {DB_SCHEMA}.publications lr inner join
              {DB_SCHEMA}.workspaces layer_ws on lr.id_workspace = layer_ws.id
-                                          on ml.layer_uuid = lr.uuid
+                                         on ml.layer_uuid = lr.uuid
         where ml.id_map = p.id) map_layers,
        (select json_agg(json_build_object(
            'name', map_name,
@@ -202,8 +202,9 @@ select p.id as id_publication,
                  select distinct map.name    map_name,
                                  map_ws.name map_ws_name
                  from {DB_SCHEMA}.map_layer ml left join
-                     {DB_SCHEMA}.publications map on ml.id_map = map.id inner join
+                     {DB_SCHEMA}.publications map inner join
                      {DB_SCHEMA}.workspaces map_ws on map.id_workspace = map_ws.id
+                                               on ml.id_map = map.id
                  where ml.layer_uuid = p.uuid
                  order by map_ws_name, map_name
              ) tmp_layer_maps
