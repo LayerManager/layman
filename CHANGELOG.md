@@ -21,10 +21,16 @@
 - [#1009](https://github.com/LayerManager/layman/issues/1009) Fill column `description` in `publications` table in prime DB schema. Value is taken from GeoServer for layers and from filesystem for maps.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Fill column `created_at` in `publications` table in prime DB schema. Value is taken from filesystem `uuid.txt` file creation. `uuid.txt` file is subsequently deleted.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) New workspaces [`layman` and `layman_wms`](doc/data-storage.md#geoserver) are created on GeoServer, each with PostgreSQL data store `postgresql`. 
+- [#1048](https://github.com/LayerManager/layman/issues/1048) New schema `layers` is created in [database](doc/data-storage.md#postgresql).
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Layers, whose `wfs_wms_status` is not `AVAILABLE`, are deleted.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Layers files are moved to new path, layers are re-created on GeoServer with new names derived from `uuid`.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Map files are moved to new path with new names derived from `uuid`.
-- [#1048](https://github.com/LayerManager/layman/issues/1048) Old GeoServer workspaces (`<layman_workspace_name>` and `<layman_workspace_name>_wms` per each [Layman workspace](doc/models.md#workspace)) are deleted.
+- [#1048](https://github.com/LayerManager/layman/issues/1048) Some workspace-related data is removed:
+  - GeoServer workspaces `<layman_workspace_name>` and `<layman_workspace_name>_wms` per each [Layman workspace](doc/models.md#workspace)
+  - database schemas `<layman_workspace_name>` per each [Layman workspace](doc/models.md#workspace)
+  - directory `LAYMAN_QGIS_DATA_DIR/workspaces`
+  - directory `LAYMAN_NORMALIZED_RASTER_DATA_DIR/workspaces`
+  - directory `LAYMAN_DATA_DIR/workspaces`
 ### Changes
 - [#161](https://github.com/LayerManager/layman/issues/161) [DELETE User](doc/rest.md#delete-user) now grants deletion rights to users or roles defined in the [GRANT_DELETE_OTHER_USER](doc/env-settings.md#GRANT_DELETE_OTHER_USER) environment variable.
 - [#161](https://github.com/LayerManager/layman/issues/161) New method [DELETE User](doc/rest.md#delete-user) allows to delete user account.
