@@ -143,9 +143,12 @@ MAP_1 = Publication4Test(type=MAP_TYPE,
                          exp_input_files={'$uuid.json'},
                          )
 
-LAYERS_TO_MIGRATE = [
+LAYERS_TO_MIGRATE_VECTOR_INTERNAL_DB = [
     LAYER_VECTOR_SLD,
     LAYER_VECTOR_QML,
+]
+
+LAYERS_TO_MIGRATE = LAYERS_TO_MIGRATE_VECTOR_INTERNAL_DB + [
     LAYER_RASTER_SLD,
     LAYER_RASTER_SLD_JPG,
     LAYER_RASTER_TIMESERIES,
