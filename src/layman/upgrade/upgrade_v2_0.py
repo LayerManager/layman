@@ -427,8 +427,10 @@ def migrate_layers():
         logger.info("      moving thumbnail file")
         src_thumbnail_path = f"{src_main_path}/thumbnail/{layername}.png"
         dst_thumbnail_path = f"{dst_main_path}/thumbnail/{layer_uuid}.png"
+        check_thumbnail_key = False
         try:
             if os.path.exists(src_thumbnail_path):
+                check_thumbnail_key = True
                 os.makedirs(f"{dst_main_path}/thumbnail/", exist_ok=True)
                 shutil.move(src_thumbnail_path, dst_thumbnail_path)
                 os.rmdir(f"{src_main_path}/thumbnail")
@@ -446,6 +448,8 @@ def migrate_layers():
                 keys_to_check += ['db', 'wfs']
             if publ_info['original_data_source'] == 'file':
                 keys_to_check += ['file']
+            if check_thumbnail_key:
+                keys_to_check += ['thumbnail']
             assert all('status' not in publ_info[key] for key in keys_to_check), json.dumps(publ_info, indent=2)
             os.rmdir(f"{src_main_path}")
         else:
@@ -511,7 +515,9 @@ def migrate_maps():
         logger.info("      moving thumbnail file")
         src_thumbnail_path = f"{src_main_path}/thumbnail/{mapname}.png"
         dst_thumbnail_path = f"{dst_main_path}/thumbnail/{map_uuid}.png"
+        check_thumbnail_key = False
         if os.path.exists(src_thumbnail_path):
+            check_thumbnail_key = True
             try:
                 os.makedirs(f"{dst_main_path}/thumbnail/", exist_ok=True)
                 shutil.move(src_thumbnail_path, dst_thumbnail_path)
@@ -526,6 +532,8 @@ def migrate_maps():
         if not failed_steps:
             publ_info = get_complete_map_info(workspace, mapname)
             keys_to_check = ['file']
+            if check_thumbnail_key:
+                keys_to_check += ['thumbnail']
             assert all('status' not in publ_info[key] for key in keys_to_check), json.dumps(publ_info, indent=2)
         else:
             failed_maps[(workspace, mapname, map_uuid)] = failed_steps
