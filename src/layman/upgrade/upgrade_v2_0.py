@@ -13,6 +13,7 @@ from geoserver import util as gs_util
 from layman import settings, names
 from layman.common.micka import util as micka_util, requests as micka_requests
 from layman.layer import LAYER_TYPE, STYLE_TYPES_DEF, db as layer_db
+from layman.layer.db import table as layer_db_table
 from layman.layer.filesystem import input_file, util as layer_file_util, gdal
 from layman.layer.geoserver import wfs, wms as gs_wms, sld
 from layman.layer.geoserver.tasks import refresh_wms, refresh_wfs, refresh_sld
@@ -334,6 +335,7 @@ def migrate_layers():
             failed_steps.append('input_style')
             logger.error(f'    Fail to move style file: : \n{traceback.format_exc()}')
 
+        # move normalized raster files
         gdal_old_dir = f"{settings.LAYMAN_NORMALIZED_RASTER_DATA_DIR}/workspaces/{workspace}/layers/{layername}"
         if geodata_type == settings.GEODATA_TYPE_RASTER:
             logger.info("      moving normalized raster files")
@@ -379,6 +381,25 @@ def migrate_layers():
                 failed_steps.append('normalized_raster_files')
                 logger.error(f'    Fail to move normalized raster files: : \n{traceback.format_exc()}')
 
+        # move layer in DB
+        if geodata_type == settings.GEODATA_TYPE_VECTOR \
+                and original_data_source == settings.EnumOriginalDataSource.FILE.value:
+            if not layer_db_table.get_layer_info(workspace, layername):
+                logger.info("      moving table in DB")
+                try:
+                    statement = sql.SQL('''
+                    ALTER TABLE {layer_table} SET SCHEMA layers;
+                    ''').format(
+                        layer_table=sql.Identifier(workspace, f"layer_{layer_uuid.replace('-', '_')}")
+                    )
+                    db_util.run_statement(statement)
+                except BaseException:
+                    failed_steps.append('db_table')
+                    logger.error(f'    Fail to move DB table to global schema: : \n{traceback.format_exc()}')
+            else:
+                logger.warning("      table in DB already exists in global schema!")
+
+        # re-create QGIS files
         old_qgis_path = f"{settings.LAYMAN_QGIS_DATA_DIR}/workspaces/{workspace}/layers/{layername}"
         if style_type.code == 'qml':
             logger.info("      re-creating QGIS files")
@@ -567,6 +588,12 @@ def delete_old_workspaces():
         for gs_workspace in [workspace, f"{workspace}_wms"]:
             gs_util.delete_db_store(gs_workspace, auth=settings.LAYMAN_GS_AUTH, store_name='postgresql')
             gs_util.delete_workspace(gs_workspace, auth=settings.LAYMAN_GS_AUTH)
+
+        # db
+        statement = f'''
+        DROP SCHEMA IF EXISTS {workspace};
+        '''
+        db_util.run_statement(statement)
 
         util.safe_delete(f"{settings.LAYMAN_DATA_DIR}/workspaces/{workspace}/layers")
         util.safe_delete(f"{settings.LAYMAN_DATA_DIR}/workspaces/{workspace}/maps")
