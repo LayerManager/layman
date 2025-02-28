@@ -7,7 +7,8 @@ from tools.client import RestClient
 from tools.http import LaymanError
 from tools.oauth2_provider_mock import OAuth2ProviderMock
 from tools.test_data import import_publication_uuids, PUBLICATIONS_TO_MIGRATE, INCOMPLETE_LAYERS, Publication4Test, \
-    LAYERS_TO_MIGRATE, WORKSPACES, DEFAULT_THUMBNAIL_PIXEL_DIFF_LIMIT, CREATED_AT_FILE_PATH
+    LAYERS_TO_MIGRATE, WORKSPACES, DEFAULT_THUMBNAIL_PIXEL_DIFF_LIMIT, CREATED_AT_FILE_PATH, \
+    LAYERS_TO_MIGRATE_VECTOR_INTERNAL_DB
 from tools.test_settings import DB_URI
 from tools.util import compare_images
 
@@ -117,3 +118,31 @@ def test_workspaces_deleted(layman_workspace):
     for gs_workspace in [layman_workspace, f"{layman_workspace}_wms"]:
         found_ws = gs_util.get_workspace(layman_workspace, auth=settings.LAYMAN_GS_AUTH)
         assert found_ws is None, f"GeoServer workspace {gs_workspace} should be deleted, but it is not."
+
+
+def test_schemas_deleted():
+    rows = db_util.run_query(f"""
+select schema_name
+from information_schema.schemata
+order by schema_name;
+""", uri_str=DB_URI)
+    exp_schema_names = [
+        '_prime_schema',
+        '_role_service',
+        'information_schema',
+        'layers',
+        'pg_catalog',
+        'pg_toast',
+        'public',
+    ]
+    schema_names = [row[0] for row in rows]
+    assert schema_names == exp_schema_names
+
+
+@pytest.mark.usefixtures("import_publication_uuids_fixture")
+@pytest.mark.parametrize("layer", LAYERS_TO_MIGRATE_VECTOR_INTERNAL_DB, ids=ids_fn)
+def test_layer_table_in_internal_db(layer):
+    table_name = f"layer_{layer.uuid.replace('-', '_')}"
+    db_util.run_query(f"""
+    select * from layers.{table_name}
+    """, uri_str=DB_URI)
