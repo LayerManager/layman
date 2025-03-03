@@ -17,6 +17,7 @@
 #### Schema migrations
 - [#1009](https://github.com/LayerManager/layman/issues/1009) Add column `description` to table `publications` in prime DB schema.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Add column `created_at` to table `publications` in prime DB schema.
+- [#1048](https://github.com/LayerManager/layman/issues/1048) Add column `layer_uuid` to table `map_layer` in prime DB schema.
 #### Data migrations
 - [#1009](https://github.com/LayerManager/layman/issues/1009) Fill column `description` in `publications` table in prime DB schema. Value is taken from GeoServer for layers and from filesystem for maps.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Fill column `created_at` in `publications` table in prime DB schema. Value is taken from filesystem `uuid.txt` file creation. `uuid.txt` file is subsequently deleted.
@@ -27,6 +28,7 @@
   - layers files are moved to new paths derived from `uuid`
   - internal layer tables are moved to database schema `layers`, index and sequence names are derived from `uuid` (table name already was)
   - layers are re-created on GeoServer with new names derived from `uuid`.
+- [#1048](https://github.com/LayerManager/layman/issues/1048) Relations in prime DB schema table `map_layer` are migrated from columns `layer_workspace` and `layer_name` into column `layer_uuid`. Columns  `layer_workspace` and `layer_name` are subsequently dropped and column `layer_uuid` is set as NOT NULL.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Map files are moved to new path with new names derived from `uuid`.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Some workspace-related data is removed:
   - GeoServer workspaces `<layman_workspace_name>` and `<layman_workspace_name>_wms` per each [Layman workspace](doc/models.md#workspace)
