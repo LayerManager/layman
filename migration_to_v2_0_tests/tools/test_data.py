@@ -1,14 +1,18 @@
 from __future__ import annotations
 
+from urllib.parse import quote
 import json
 from dataclasses import dataclass
 from abc import ABC
 from typing import Set, List
 
+from tools.test_settings import EXTERNAL_URI_STR
 import layman_settings as settings
 from .client import LAYER_TYPE, MAP_TYPE
 
 USER_1 = 'test_migrate_2_user_1'
+EXTERNAL_DB_SCHEMA = 'external_db_schema'
+EXTERNAL_DB_TABLE = 'external_db_table'
 
 USERS = [
     USER_1,
@@ -136,6 +140,20 @@ LAYER_RASTER_ZIPPED_TIMESERIES_BY_CHUNKS = Layer4Test(workspace=WORKSPACE_BROWSE
                                                       exp_layer_maps=[],
                                                       )
 
+LAYER_EXTERNAL_VECTOR_SLD = Layer4Test(workspace=USER_1,
+                                       name='test_external_vector_layer_sld',
+                                       owner=USER_1,
+                                       rest_args={
+                                           'external_table_uri': f"{EXTERNAL_URI_STR}"
+                                                                 f"?schema={quote(EXTERNAL_DB_SCHEMA)}"
+                                                                 f"&table={quote(EXTERNAL_DB_TABLE)}",
+                                           'description': 'Description of test_external_vector_layer_sld',
+                                       },
+                                       exp_input_files=set(),
+                                       exp_thumbnail_path='tmp/migration_to_v2_0_tests/data/external_vector_layer_sld_thumbnail.png',
+                                       exp_layer_maps=[],
+                                       )
+
 INCOMPLETE_LAYER_VECTOR_SLD = Layer4Test(workspace=USER_1,
                                          name='incomplete_test_vector_layer_sld',
                                          owner=USER_1,
@@ -176,6 +194,7 @@ LAYERS_TO_MIGRATE_VECTOR_INTERNAL_DB = [
 ]
 
 LAYERS_TO_MIGRATE = LAYERS_TO_MIGRATE_VECTOR_INTERNAL_DB + [
+    LAYER_EXTERNAL_VECTOR_SLD,
     LAYER_RASTER_SLD,
     LAYER_RASTER_SLD_JPG,
     LAYER_RASTER_TIMESERIES,
