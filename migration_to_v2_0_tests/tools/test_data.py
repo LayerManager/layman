@@ -49,13 +49,21 @@ class Layer4Test(Publication4Test):
 @dataclass
 class Map4Test(Publication4Test):
     exp_internal_layers: List[Layer4Test]
+    exp_thumbnail_path: str | None = None
     type: str = MAP_TYPE
+
+    def __post_init__(self):
+        assert not (self.exp_internal_layers and not self.exp_thumbnail_path), f'We patch first layer to trigger thumbnail re-generation. {self=}'
+        if self.exp_internal_layers:
+            assert self.exp_internal_layers[0].rest_args[
+                'file_paths'], f'We patch first layer with the same files to trigger thumbnail re-generation. {self=}, {self.exp_internal_layers[0]}'
 
 
 LAYER_VECTOR_SLD = Layer4Test(workspace=USER_1,
                               name='test_vector_layer_sld',
                               owner=USER_1,
                               rest_args={
+                                  'file_paths': ['sample/layman.layer/small_layer.geojson'],
                                   'description': 'Description of test_vector_layer_sld',
                               },
                               exp_input_files={'$uuid.geojson'},
@@ -184,6 +192,7 @@ MAP_WITH_INTERNAL_LAYER = Map4Test(workspace=USER_1,
                                    },
                                    exp_input_files={'$uuid.json'},
                                    exp_internal_layers=[LAYER_VECTOR_SLD],
+                                   exp_thumbnail_path='tmp/migration_to_v2_0_tests/data/map_with_internal_layer_thumbnail.png',
                                    )
 
 LAYER_VECTOR_SLD.exp_layer_maps = [MAP_WITH_INTERNAL_LAYER]

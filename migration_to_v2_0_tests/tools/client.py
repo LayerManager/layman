@@ -304,6 +304,124 @@ class RestClient:
             shutil.rmtree(temp_dir)
         return response.json()[0]
 
+    def patch_workspace_publication(self,
+                                    publication_type,
+                                    workspace,
+                                    name,
+                                    *,
+                                    file_paths=None,
+                                    external_table_uri=None,
+                                    headers=None,
+                                    actor_name=None,
+                                    access_rights=None,
+                                    title=None,
+                                    style_file=None,
+                                    check_response_fn=None,
+                                    raise_if_not_complete=True,
+                                    compress=False,
+                                    compress_settings=None,
+                                    with_chunks=False,
+                                    crs=None,
+                                    # map_layers=None,  # not yet supported
+                                    native_extent=None,
+                                    overview_resampling=None,
+                                    do_not_upload_chunks=False,
+                                    time_regex=None,
+                                    time_regex_format=None,
+                                    skip_asserts=False,
+                                    ):
+        headers = headers or {}
+        if actor_name:
+            assert TOKEN_HEADER not in headers
+        publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
+
+        if not skip_asserts:
+            # map layers must not be set together with file_paths
+
+            assert not (not with_chunks and do_not_upload_chunks)
+            assert not (check_response_fn and do_not_upload_chunks)  # because check_response_fn is not called when do_not_upload_chunks
+            assert not (raise_if_not_complete and do_not_upload_chunks)
+            assert not (check_response_fn and raise_if_not_complete)
+
+            assert not (time_regex and publication_type == MAP_TYPE)
+            assert not (publication_type == LAYER_TYPE and crs and not file_paths)
+
+            if style_file or with_chunks or compress or compress_settings or overview_resampling:
+                assert publication_type == LAYER_TYPE
+            if native_extent:
+                assert publication_type == MAP_TYPE
+
+            # Compress settings can be used only with compress option
+            assert not compress_settings or compress
+
+        if actor_name and actor_name != settings.ANONYM_USER:
+            headers.update(get_authz_headers(actor_name))
+
+        r_url = f"{self.base_url}/rest/workspaces/{workspace}/{publication_type_def.url_path_name}/{name}"
+
+        temp_dir = None
+        if compress:
+            temp_dir = tempfile.mkdtemp(prefix="layman_zip_")
+            zip_file = compress_files(file_paths, compress_settings=compress_settings, output_dir=temp_dir)
+            file_paths = [zip_file]
+
+        for file_path in file_paths:
+            assert os.path.isfile(file_path), file_path
+        files = []
+        with ExitStack() as stack:
+            data = {}
+            if not with_chunks:
+                for file_path in file_paths:
+                    assert os.path.isfile(file_path), file_path
+                files = [('file', (os.path.basename(fp), stack.enter_context(open(fp, 'rb')))) for fp in file_paths]
+            else:
+                data['file'] = [os.path.basename(file) for file in file_paths]
+            if access_rights and access_rights.get('read'):
+                data["access_rights.read"] = access_rights['read']
+            if access_rights and access_rights.get('write'):
+                data["access_rights.write"] = access_rights['write']
+            if title:
+                data['title'] = title
+            if style_file:
+                files.append(('style', (os.path.basename(style_file), stack.enter_context(open(style_file, 'rb')))))
+            if overview_resampling:
+                data['overview_resampling'] = overview_resampling
+            if time_regex:
+                data['time_regex'] = time_regex
+            if time_regex_format:
+                data['time_regex_format'] = time_regex_format
+            if publication_type == LAYER_TYPE and crs:
+                data['crs'] = crs
+            if external_table_uri:
+                data['external_table_uri'] = external_table_uri
+
+            response = requests.patch(r_url,
+                                      files=files,
+                                      headers=headers,
+                                      data=data,
+                                      timeout=HTTP_TIMEOUT,
+                                      )
+        raise_layman_error(response)
+
+        assert response.json()['name'] == name or not name, f'name={name}, response.name={response.json()[0]["name"]}'
+        expected_resp_keys = ['name', 'uuid', 'url']
+        if with_chunks:
+            expected_resp_keys.append('files_to_upload')
+        assert all(key in response.json() for key in expected_resp_keys), f'name={name}, response.name={response.json()[0]["name"]}'
+
+        if with_chunks and not do_not_upload_chunks:
+            self.upload_file_chunks(publication_type,
+                                    workspace,
+                                    name,
+                                    file_paths, )
+
+        if not do_not_upload_chunks:
+            self.wait_for_publication_status(workspace, publication_type, name, check_response_fn=check_response_fn,
+                                             headers=headers, raise_if_not_complete=raise_if_not_complete)
+        if temp_dir:
+            shutil.rmtree(temp_dir)
+        return response.json()
+
     def upload_file_chunks(self,
                            publication_type,
                            workspace,
@@ -334,8 +452,13 @@ class RestClient:
             raise_layman_error(chunk_response)
 
     def wait_for_publication_status(self, workspace, publication_type, publication, *, check_response_fn=None,
-                                    headers=None, raise_if_not_complete=True):
+                                    headers=None, raise_if_not_complete=True, actor_name=None):
         publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
+        headers = headers or {}
+        if actor_name:
+            assert TOKEN_HEADER not in headers
+        if actor_name and actor_name != settings.ANONYM_USER:
+            headers.update(get_authz_headers(actor_name))
         r_url = f"{self.base_url}/rest/workspaces/{workspace}/{publication_type_def.url_path_name}/{publication}"
         check_response_fn = check_response_fn or check_publication_status
         response = wait_for_rest(r_url, 60, 0.5, check_response=check_response_fn, headers=headers)

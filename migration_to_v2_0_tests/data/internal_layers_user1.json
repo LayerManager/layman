@@ -4,10 +4,10 @@
   "abstract": "World places and boundaries abstract",
   "title": "World places and boundaries",
   "extent": [
-    -35.0,
-    -48.5,
-    179,
-    81.5
+    14.114369,
+    48.964832,
+    14.126824,
+    48.970612
   ],
   "nativeExtent": [
     -3896182.18,
