@@ -386,13 +386,79 @@ def migrate_layers():
                 and original_data_source == settings.EnumOriginalDataSource.FILE.value:
             if not layer_db_table.get_layer_info(workspace, layername):
                 logger.info("      moving table in DB")
+                layer_table = f"layer_{layer_uuid.replace('-', '_')}"
                 try:
+                    # move table
                     statement = sql.SQL('''
                     ALTER TABLE {layer_table} SET SCHEMA layers;
                     ''').format(
-                        layer_table=sql.Identifier(workspace, f"layer_{layer_uuid.replace('-', '_')}")
+                        layer_table=sql.Identifier(workspace, layer_table)
                     )
                     db_util.run_statement(statement)
+
+                    # rename indexes
+                    new_pkey_index = f"{layer_table}_pkey"
+                    statement = sql.SQL('''
+                    ALTER INDEX IF EXISTS {old_pkey_index} RENAME TO {new_pkey_index};
+                    ''').format(
+                        old_pkey_index=sql.Identifier('layers', f"{layername}_pkey"),
+                        new_pkey_index=sql.Identifier(new_pkey_index),
+                    )
+                    db_util.run_statement(statement)
+
+                    new_geom_index = f"{layer_table}_wkb_geometry_geom_id"
+                    statement = sql.SQL('''
+                    ALTER INDEX IF EXISTS {old_geom_index} RENAME TO {new_geom_index};
+                    ''').format(
+                        old_geom_index=sql.Identifier('layers', f"{layername}_wkb_geometry_geom_idx"),
+                        new_geom_index=sql.Identifier(new_geom_index),
+                    )
+                    db_util.run_statement(statement)
+
+                    # rename sequences
+                    new_pkey_seq = f"{layer_table}_ogc_fid_seq"
+                    for old_pkey_seq in [f"{layername}_ogc_fid_seq", f"{layername}_id_seq"]:
+                        statement = sql.SQL('''
+                        ALTER SEQUENCE IF EXISTS {old_pkey_seq} RENAME TO {new_pkey_seq};
+                        ''').format(
+                            old_pkey_seq=sql.Identifier('layers', old_pkey_seq),
+                            new_pkey_seq=sql.Identifier(new_pkey_seq),
+                        )
+                        db_util.run_statement(statement)
+
+                    # check indexes
+                    query = sql.SQL('''
+                    select indexname from pg_indexes
+                    where schemaname = 'layers' and tablename = {layer_table};
+                    ''').format(
+                        layer_table=sql.Literal(layer_table)
+                    )
+                    rows = db_util.run_query(query)
+                    exp_indexes = {new_pkey_index, new_geom_index}
+                    found_indexes = {row[0] for row in rows}
+                    assert found_indexes == exp_indexes, f"found_indexes={found_indexes}, exp_indexes={exp_indexes}"
+
+                    # check sequences
+                    query = sql.SQL('''
+                    select seq_ns.nspname as sequence_schema,
+                           seq.relname as sequence_name,
+                           tab_ns.nspname as table_schema,
+                           tab.relname as related_table
+                    from pg_class seq
+                        join pg_namespace seq_ns on seq.relnamespace = seq_ns.oid
+                        JOIN pg_depend d ON d.objid = seq.oid
+                        JOIN pg_class tab ON d.refobjid = tab.oid
+                        JOIN pg_namespace tab_ns on tab.relnamespace = tab_ns.oid
+                    where seq.relkind = 'S'
+                    and tab_ns.nspname = 'layers' and tab.relname={layer_table}
+                    ''').format(
+                        layer_table=sql.Literal(layer_table)
+                    )
+                    rows = db_util.run_query(query)
+                    found_sequences = {(row[0], row[1]) for row in rows}
+                    exp_sequences = {('layers', new_pkey_seq)}
+                    assert found_sequences == exp_sequences, f"exp_sequences={exp_sequences}, all_sequences={found_sequences}"
+
                 except BaseException:
                     failed_steps.append('db_table')
                     logger.error(f'    Fail to move DB table to global schema: : \n{traceback.format_exc()}')
