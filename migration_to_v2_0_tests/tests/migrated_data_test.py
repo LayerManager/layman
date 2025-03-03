@@ -8,13 +8,16 @@ from tools.http import LaymanError
 from tools.oauth2_provider_mock import OAuth2ProviderMock
 from tools.test_data import import_publication_uuids, PUBLICATIONS_TO_MIGRATE, INCOMPLETE_LAYERS, Publication4Test, \
     LAYERS_TO_MIGRATE, WORKSPACES, DEFAULT_THUMBNAIL_PIXEL_DIFF_LIMIT, CREATED_AT_FILE_PATH, \
-    LAYERS_TO_MIGRATE_VECTOR_INTERNAL_DB
+    LAYERS_TO_MIGRATE_VECTOR_INTERNAL_DB, MAPS_TO_MIGRATE, Map4Test, Layer4Test
 from tools.test_settings import DB_URI
 from tools.util import compare_images
 
 from db import util as db_util
 from geoserver import util as gs_util
 import layman_settings as settings
+
+
+DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 
 
 @pytest.fixture(scope="session")
@@ -94,6 +97,38 @@ def test_layer_thumbnails(client, layer):
     exp_img_path = layer.exp_thumbnail_path
     diff_pixels = compare_images(img_path, exp_img_path)
     assert diff_pixels <= DEFAULT_THUMBNAIL_PIXEL_DIFF_LIMIT, f"diff_pixels={diff_pixels}\nimg_path={img_path}\nexp_img_path={exp_img_path}"
+
+
+@pytest.mark.usefixtures("import_publication_uuids_fixture")
+@pytest.mark.parametrize("map", MAPS_TO_MIGRATE, ids=ids_fn)
+def test_maps_internal_layers(client, map: Map4Test):
+    query = f'''
+select ml.layer_uuid
+from {DB_SCHEMA}.publications map inner join
+     {DB_SCHEMA}.map_layer ml on map.id = ml.id_map
+where map.uuid = %s
+order by ml.id
+;
+'''
+    rows = db_util.run_query(query, data=(map.uuid,), uri_str=DB_URI)
+    exp_map_layer_uuids = {layer.uuid for layer in map.exp_internal_layers}
+    assert len(rows) == len(exp_map_layer_uuids), f"{rows=}, {exp_map_layer_uuids=}"
+    map_layer_uuids = {row[0] for row in rows}
+    assert map_layer_uuids == exp_map_layer_uuids, f"{rows=}, {exp_map_layer_uuids=}"
+
+    for layer in map.exp_internal_layers:
+        layer_info = client.get_workspace_publication(layer.type, layer.workspace, layer.name, actor_name=layer.owner)
+        layer_maps = layer_info['used_in_maps']
+        assert {'workspace': map.workspace, 'name': map.name, } in layer_maps, f"{map=}, {layer=}, {layer_maps=}"
+
+
+@pytest.mark.usefixtures("import_publication_uuids_fixture")
+@pytest.mark.parametrize("layer", LAYERS_TO_MIGRATE, ids=ids_fn)
+def test_layer_maps(client, layer: Layer4Test):
+    layer_info = client.get_workspace_publication(layer.type, layer.workspace, layer.name, actor_name=layer.owner)
+    layer_maps = layer_info['used_in_maps']
+    exp_maps = [{'workspace': map.workspace, 'name': map.name, } for map in layer.exp_layer_maps]
+    assert layer_maps == exp_maps, f"{layer_maps=}, {map=}"
 
 
 @pytest.mark.usefixtures("import_publication_uuids_fixture")
