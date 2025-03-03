@@ -36,7 +36,7 @@ class Publication4Test(ABC):
     owner: str
     rest_args: dict
     uuid = None
-    exp_input_files: Set[str]
+    exp_input_files: Set[str] | None
 
 
 @dataclass
@@ -149,7 +149,7 @@ LAYER_EXTERNAL_VECTOR_SLD = Layer4Test(workspace=USER_1,
                                                                  f"&table={quote(EXTERNAL_DB_TABLE)}",
                                            'description': 'Description of test_external_vector_layer_sld',
                                        },
-                                       exp_input_files=set(),
+                                       exp_input_files=None,
                                        exp_thumbnail_path='tmp/migration_to_v2_0_tests/data/external_vector_layer_sld_thumbnail.png',
                                        exp_layer_maps=[],
                                        )

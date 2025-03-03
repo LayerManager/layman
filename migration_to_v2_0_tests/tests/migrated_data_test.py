@@ -1,4 +1,4 @@
-from os import listdir
+from os import listdir, path
 import json
 from string import Template
 import pytest
@@ -81,10 +81,13 @@ def test_created_at(publication):
 @pytest.mark.usefixtures("import_publication_uuids_fixture", "oauth2_provider_mock_fixture")
 @pytest.mark.parametrize("publication", PUBLICATIONS_TO_MIGRATE, ids=ids_fn)
 def test_input_files(publication):
-    exp_input_files = {Template(filename).substitute(uuid=publication.uuid) for filename in publication.exp_input_files}
     input_file_path = f'.{settings.LAYMAN_DATA_DIR}/{publication.type.split(".")[1]}s/{publication.uuid}/input_file/'
-    input_files = set(listdir(input_file_path))
-    assert exp_input_files == input_files, f'{exp_input_files=}\n{input_files=}'
+    if publication.exp_input_files is not None:
+        exp_input_files = {Template(filename).substitute(uuid=publication.uuid) for filename in publication.exp_input_files}
+        input_files = set(listdir(input_file_path))
+        assert exp_input_files == input_files, f'{exp_input_files=}\n{input_files=}'
+    else:
+        assert not path.exists(input_file_path), f'{input_file_path=}'
 
 
 @pytest.mark.usefixtures("import_publication_uuids_fixture")

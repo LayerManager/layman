@@ -349,21 +349,22 @@ def migrate_layers():
         shutil.rmtree(f"{src_main_path}/input_chunk", ignore_errors=True)
 
         # Move input files
-        logger.info("      moving input files")
-        new_path = layer_file_util.get_layer_dir(layer_uuid)
-        input_file.ensure_layer_input_file_dir(layer_uuid)
-        input_files = util.get_layer_input_files(workspace, layername)
-        name_input_file_by_layer = not image_mosaic or input_files.is_one_archive
-        try:
-            for filename in input_files.raw_paths:
-                base_filename = os.path.basename(filename)
-                dst_filename = f'{layer_uuid}{base_filename[len(layername):]}' if name_input_file_by_layer else base_filename
-                dst_path = os.path.join(new_path, 'input_file', dst_filename)
-                shutil.move(filename, dst_path)
-            os.rmdir(f"{src_main_path}/input_file")
-        except BaseException:
-            failed_steps.append('input_file')
-            logger.error(f'    Fail to move input files: : \n{traceback.format_exc()}')
+        if original_data_source == settings.EnumOriginalDataSource.FILE.value:
+            logger.info("      moving input files")
+            new_path = layer_file_util.get_layer_dir(layer_uuid)
+            input_file.ensure_layer_input_file_dir(layer_uuid)
+            input_files = util.get_layer_input_files(workspace, layername)
+            name_input_file_by_layer = not image_mosaic or input_files.is_one_archive
+            try:
+                for filename in input_files.raw_paths:
+                    base_filename = os.path.basename(filename)
+                    dst_filename = f'{layer_uuid}{base_filename[len(layername):]}' if name_input_file_by_layer else base_filename
+                    dst_path = os.path.join(new_path, 'input_file', dst_filename)
+                    shutil.move(filename, dst_path)
+                os.rmdir(f"{src_main_path}/input_file")
+            except BaseException:
+                failed_steps.append('input_file')
+                logger.error(f'    Fail to move input files: : \n{traceback.format_exc()}')
 
         # Move style files
         old_style_dir = f"{src_main_path}/input_style"
