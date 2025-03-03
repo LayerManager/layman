@@ -134,6 +134,50 @@ def adjust_publications_created_at():
     db_util.run_statement(alter_tabel)
 
 
+def adjust_map_layer_data():
+    logger.info(f'    Adjust UUID of layers in map_layer table')
+
+    update = f'''
+update {DB_SCHEMA}.map_layer
+set layer_uuid = p.uuid
+from {DB_SCHEMA}.publications p inner join
+     {DB_SCHEMA}.workspaces w on w.id = p.id_workspace
+where p.type = %s
+  and p.name = layer_name
+  and w.name = layer_workspace
+    ;'''
+    db_util.run_statement(update, (LAYER_TYPE, ))
+
+    # Log rows before delete
+    logger.info(f'    Deleting map_layer rows for non-existing layers:')
+    query = f'''
+    select w.name, p.name, ml.layer_workspace, ml.layer_name
+    from {DB_SCHEMA}.map_layer ml inner join
+         {DB_SCHEMA}.publications p on ml.id_map = p.id inner join
+         {DB_SCHEMA}.workspaces w on w.id = p.id_workspace
+    where layer_uuid is null
+    order by w.name, p.name, ml.layer_workspace, ml.layer_name
+;'''
+    rows_to_delete = db_util.run_query(query)
+    for map_ws, map_name, layer_ws, layer_name in rows_to_delete:
+        logger.info(f'      Delete relation between map {map_ws}.{map_name} and layer {layer_ws}.{layer_name}')
+
+    delete = f'''
+    delete from {DB_SCHEMA}.map_layer
+    where layer_uuid is null
+    ;'''
+    db_util.run_statement(delete)
+
+    db_util.run_statement(f'''
+    alter table {DB_SCHEMA}.map_layer
+      DROP COLUMN layer_name,
+      DROP COLUMN layer_workspace,
+      ALTER COLUMN layer_uuid SET NOT NULL
+      ;''')
+
+    logger.info(f'    Adjust UUID of layers in map_layer table DONE')
+
+
 def ensure_layers_db_schema():
     logger.info(f'    Ensure DB schema')
     statement = sql.SQL("""CREATE SCHEMA IF NOT EXISTS {schema} AUTHORIZATION {user}""").format(

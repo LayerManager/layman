@@ -35,6 +35,7 @@ MIGRATIONS = {
             upgrade_v2_0.ensure_layers_db_schema,
             upgrade_v2_0.ensure_gs_workspaces_and_stores,
             upgrade_v2_0.delete_layers_without_wfs_wms_available,
+            upgrade_v2_0.adjust_map_layer_data,
             upgrade_v2_0.migrate_layers,
             upgrade_v2_0.migrate_maps,
             upgrade_v2_0.delete_old_workspaces,
