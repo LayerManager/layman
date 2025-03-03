@@ -1,6 +1,8 @@
 from os import listdir, path
+from datetime import datetime
 import json
 from string import Template
+from typing import List
 import pytest
 
 from tools.client import RestClient
@@ -18,6 +20,7 @@ import layman_settings as settings
 
 
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
+MAPS_FOR_THUMBNAIL_TEST: List[Map4Test] = [map for map in MAPS_TO_MIGRATE if map.exp_internal_layers and map.exp_thumbnail_path]
 
 
 @pytest.fixture(scope="session")
@@ -102,6 +105,42 @@ def test_layer_thumbnails(client, layer):
     assert diff_pixels <= DEFAULT_THUMBNAIL_PIXEL_DIFF_LIMIT, f"diff_pixels={diff_pixels}\nimg_path={img_path}\nexp_img_path={exp_img_path}"
 
 
+def get_map_thumbnail_timestamp(publication: Publication4Test):
+    thumbnail_file_path = f"./layman_data/{publication.type.split('.')[1]}s/{publication.uuid}/thumbnail/{publication.uuid}.png"
+    thumbnail_timestamp = datetime.fromtimestamp(path.getmtime(thumbnail_file_path))
+    return thumbnail_timestamp
+
+
+@pytest.mark.usefixtures("import_publication_uuids_fixture", "oauth2_provider_mock_fixture")
+@pytest.mark.parametrize("map", MAPS_FOR_THUMBNAIL_TEST, ids=ids_fn)
+def test_maps_thumbnail(client, map: Map4Test):
+    # Check map thumbnail
+    thumbnail_path = f'.{settings.LAYMAN_DATA_DIR}/maps/{map.uuid}/thumbnail/{map.uuid}.png'
+    exp_img_path = map.exp_thumbnail_path
+    diff_pixels = compare_images(thumbnail_path, exp_img_path)
+    assert diff_pixels <= DEFAULT_THUMBNAIL_PIXEL_DIFF_LIMIT, f"{diff_pixels=}\n{thumbnail_path=}\n{exp_img_path=}"
+
+    # Trigger thumbnail re-generation
+    layer = map.exp_internal_layers[0]
+    file_paths = layer.rest_args['file_paths']
+    pre_thumbnail_timestamp = get_map_thumbnail_timestamp(map)
+    client.patch_workspace_publication(layer.type,
+                                       layer.workspace,
+                                       layer.name,
+                                       actor_name=layer.owner,
+                                       file_paths=file_paths,
+                                       )
+    client.wait_for_publication_status(map.workspace, map.type, map.name, actor_name=map.owner)
+
+    # Check thumbnail was re-generated
+    post_thumbnail_timestamp = get_map_thumbnail_timestamp(map)
+    assert post_thumbnail_timestamp > pre_thumbnail_timestamp
+
+    # Check new map thumbnail
+    diff_pixels = compare_images(thumbnail_path, exp_img_path)
+    assert diff_pixels <= DEFAULT_THUMBNAIL_PIXEL_DIFF_LIMIT, f"{diff_pixels=}\n{thumbnail_path=}\n{exp_img_path=}"
+
+
 @pytest.mark.usefixtures("import_publication_uuids_fixture")
 @pytest.mark.parametrize("map", MAPS_TO_MIGRATE, ids=ids_fn)
 def test_maps_internal_layers(client, map: Map4Test):
@@ -114,9 +153,9 @@ order by ml.id
 ;
 '''
     rows = db_util.run_query(query, data=(map.uuid,), uri_str=DB_URI)
-    exp_map_layer_uuids = {layer.uuid for layer in map.exp_internal_layers}
+    exp_map_layer_uuids = [layer.uuid for layer in map.exp_internal_layers]
     assert len(rows) == len(exp_map_layer_uuids), f"{rows=}, {exp_map_layer_uuids=}"
-    map_layer_uuids = {row[0] for row in rows}
+    map_layer_uuids = [row[0] for row in rows]
     assert map_layer_uuids == exp_map_layer_uuids, f"{rows=}, {exp_map_layer_uuids=}"
 
     for layer in map.exp_internal_layers:
