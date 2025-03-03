@@ -23,7 +23,10 @@
 - [#1048](https://github.com/LayerManager/layman/issues/1048) New workspaces [`layman` and `layman_wms`](doc/data-storage.md#geoserver) are created on GeoServer, each with PostgreSQL data store `postgresql`. 
 - [#1048](https://github.com/LayerManager/layman/issues/1048) New schema `layers` is created in [database](doc/data-storage.md#postgresql).
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Layers, whose `wfs_wms_status` is not `AVAILABLE`, are deleted.
-- [#1048](https://github.com/LayerManager/layman/issues/1048) Layers files are moved to new path, layers are re-created on GeoServer with new names derived from `uuid`.
+- [#1048](https://github.com/LayerManager/layman/issues/1048) Most layer data is moved, renamed and/or re-created:
+  - layers files are moved to new paths derived from `uuid`
+  - internal layer tables are moved to database schema `layers`, index and sequence names are derived from `uuid` (table name already was)
+  - layers are re-created on GeoServer with new names derived from `uuid`.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Map files are moved to new path with new names derived from `uuid`.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Some workspace-related data is removed:
   - GeoServer workspaces `<layman_workspace_name>` and `<layman_workspace_name>_wms` per each [Layman workspace](doc/models.md#workspace)
