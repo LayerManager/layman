@@ -175,7 +175,6 @@ PG_NON_USER_SCHEMAS = [
     LAYMAN_PRIME_SCHEMA,
     LAYMAN_INTERNAL_ROLE_SERVICE_SCHEMA,
 ]
-
 PG_POSTGIS_SCHEMA = 'public'
 
 # Name of "everyone" role in rights

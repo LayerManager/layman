@@ -36,23 +36,23 @@ def main():
     conn.autocommit = True
     cur = conn.cursor()
     cur.execute(f"""
-select catalog_name, schema_name, schema_owner
-from information_schema.schemata
-where schema_owner = '{settings.LAYMAN_PG_USER}'
-and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_USER_SCHEMAS))})
-""")
+    select catalog_name, schema_name, schema_owner
+    from information_schema.schemata
+    where schema_owner = '{settings.LAYMAN_PG_USER}'
+    and schema_name NOT IN ({', '.join(map(lambda s: "'" + s + "'", settings.PG_NON_USER_SCHEMAS))})
+    """)
     rows = cur.fetchall()
     print(f"Dropping schemas in DB {conn_dict['dbname']}: {[r[1] for r in rows]}")
     for row in rows:
         cur.execute(f"""DROP SCHEMA "{row[1]}" CASCADE""")
     print(f"Dropping external test DB '{EXTERNAL_DB_NAME}'")
     cur.execute(f"""
-DROP DATABASE IF EXISTS {EXTERNAL_DB_NAME} WITH (FORCE)
-    """)
+    DROP DATABASE IF EXISTS {EXTERNAL_DB_NAME} WITH (FORCE)
+        """)
     print(f"Dropping user '{READ_ONLY_USER}'")
     cur.execute(f"""
-DROP USER IF EXISTS {READ_ONLY_USER}
-    """)
+    DROP USER IF EXISTS {READ_ONLY_USER}
+        """)
     conn.close()
 
     # redis
