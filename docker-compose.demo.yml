@@ -115,3 +115,4 @@ services:
         - layman_client
         - flower
         - geoserver
+        - qgis
