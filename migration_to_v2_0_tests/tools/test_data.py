@@ -191,7 +191,7 @@ MAP_WITH_INTERNAL_LAYER = Map4Test(workspace=USER_1,
                                        'description': 'Description of test_map_with_internal_layer',
                                    },
                                    exp_input_files={'$uuid.json'},
-                                   exp_internal_layers=[LAYER_VECTOR_SLD],
+                                   exp_internal_layers=[LAYER_VECTOR_SLD, LAYER_VECTOR_SLD],
                                    exp_thumbnail_path='tmp/migration_to_v2_0_tests/data/map_with_internal_layer_thumbnail.png',
                                    )
 

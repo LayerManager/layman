@@ -598,11 +598,66 @@ def migrate_layers():
         logger.warning(warning)
 
 
+def migrate_map_file_layer_names(layers_str: str, layer_name, layer_uuid, layer_ws) -> str:
+    layers = layers_str.split(',')
+    for layer_idx, full_layername in enumerate(layers):
+        layer_parts = full_layername.split(':')
+        if len(layer_parts) == 1:
+            if layer_parts[0] == layer_name:
+                layers[layer_idx] = f'l_{layer_uuid}'
+        elif len(layer_parts) == 2:
+            if layer_parts[0] in [f'{layer_ws}_wms', f'{layer_ws}'] and layer_parts[1] == layer_name:
+                wspace = 'layman_wms' if layer_parts[0] == f'{layer_ws}_wms' else 'layman'
+                layers[layer_idx] = f'{wspace}:l_{layer_uuid}'
+    return ','.join(layers)
+
+
+def migrate_map_file(map_file_path, map_layers):
+    with open(map_file_path, 'r', encoding="utf-8") as map_file:
+        map_json = json.load(map_file)
+    for map_layer in map_layers:
+        layer_index = map_layer['index']
+        layer_uuid = map_layer['uuid']
+        layer_ws = map_layer['workspace']
+        layer_name = map_layer['name']
+
+        layer_def = map_json['layers'][layer_index]
+        class_name = layer_def.get('className', '').split('.')[-1]
+        if class_name == 'WMS':
+            layer_def['url'] = layer_def['url'].replace(f'/geoserver/{layer_ws}_wms/', f'/geoserver/layman_wms/').replace(f'/geoserver/{layer_ws}/', f'/geoserver/layman/')
+            old_layers = layer_def['params']['LAYERS']
+            new_layers = migrate_map_file_layer_names(old_layers, layer_name, layer_uuid, layer_ws)
+            layer_def['params']['LAYERS'] = new_layers
+        elif class_name == 'Vector':
+            layer_def['protocol']['url'] = layer_def['protocol']['url'].replace(f'/{layer_ws}/', f'/layman/').replace(
+                f'/{layer_ws}_wms/', f'/layman_wms/')
+            old_layers = layer_def['name']
+            new_layers = migrate_map_file_layer_names(old_layers, layer_name, layer_uuid, layer_ws)
+            layer_def['name'] = new_layers
+        else:
+            raise ValueError(f'Unknown layer type: {layer_def["type"]}')
+    with open(map_file_path, 'w', encoding="utf-8") as map_file:
+        json.dump(map_json, map_file, indent=4)
+
+
 def migrate_maps():
     logger.info(f'    Migrate maps')
 
     query = f'''
-    select w.name, p.name, p.uuid::varchar as uuid
+    select w.name,
+           p.name,
+           p.uuid::varchar as uuid,
+           (select json_agg(json_build_object(
+                   'name', lr.name,
+                   'workspace', layer_ws.name,
+                   'index', ml.layer_index,
+                   'uuid', ml.layer_uuid
+                   ) order by ml.layer_index, layer_ws.name, lr.name)
+        from {DB_SCHEMA}.map_layer ml left join
+             {DB_SCHEMA}.publications lr inner join
+             {DB_SCHEMA}.workspaces layer_ws on lr.id_workspace = layer_ws.id
+                                         on ml.layer_uuid = lr.uuid
+        where ml.id_map = p.id) map_layers
     from {DB_SCHEMA}.publications p inner join
          {DB_SCHEMA}.workspaces w on w.id = p.id_workspace left join
          {DB_SCHEMA}.users u on u.id_workspace = w.id
@@ -614,7 +669,7 @@ def migrate_maps():
     map_number = 0
     map_cnt = len(maps)
 
-    for workspace, mapname, map_uuid, in maps:
+    for workspace, mapname, map_uuid, map_layers, in maps:
         failed_steps = []
         map_number += 1
 
@@ -642,6 +697,11 @@ def migrate_maps():
         except BaseException:
             failed_steps.append('input_file')
             logger.error(f'    Fail to move input files: : \n{traceback.format_exc()}')
+
+        # Migrate layers in map file
+        if map_layers:
+            map_file_path = f"{dst_main_path}/input_file/{map_uuid}.json"
+            migrate_map_file(map_file_path, map_layers)
 
         # Move thumbnail file
         logger.info("      moving thumbnail file")
