@@ -29,7 +29,7 @@
   - internal layer tables are moved to database schema `layers`, index and sequence names are derived from `uuid` (table name already was)
   - layers are re-created on GeoServer with new names derived from `uuid`.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Relations in prime DB schema table `map_layer` are migrated from columns `layer_workspace` and `layer_name` into column `layer_uuid`. Columns  `layer_workspace` and `layer_name` are subsequently dropped and column `layer_uuid` is set as NOT NULL.
-- [#1048](https://github.com/LayerManager/layman/issues/1048) Map files are moved to new path with new names derived from `uuid`.
+- [#1048](https://github.com/LayerManager/layman/issues/1048) Map files are moved to new path with new names derived from `uuid` and referenced internal layers' url and names are changed to the new ones.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Some workspace-related data is removed:
   - GeoServer workspaces `<layman_workspace_name>` and `<layman_workspace_name>_wms` per each [Layman workspace](doc/models.md#workspace)
   - database schemas `<layman_workspace_name>` per each [Layman workspace](doc/models.md#workspace)

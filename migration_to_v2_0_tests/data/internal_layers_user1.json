@@ -21,7 +21,7 @@
       "metadata": {},
       "visibility": true,
       "opacity": 1,
-      "title": "Hranice",
+      "title": "Vector WMS layer",
       "className": "HSLayers.Layer.WMS",
       "singleTile": true,
       "url": "http://localhost:8000/geoserver/test_migrate_2_user_1_wms/ows",
@@ -34,7 +34,7 @@
       "metadata": {},
       "visibility": true,
       "opacity": 1,
-      "title": "Hranice",
+      "title": "Non existing internal layer",
       "className": "HSLayers.Layer.WMS",
       "singleTile": true,
       "url": "http://localhost:8000/geoserver/test_migrate_2_user_1_wms/ows",
@@ -42,6 +42,28 @@
         "LAYERS": "test_non_existing_internal_layer",
         "FORMAT": "image\/png"
       }
+    },
+    {
+      "className": "OpenLayers.Layer.Vector",
+      "dimensions": {},
+      "legends": [
+        ""
+      ],
+      "maxResolution": null,
+      "metadata": {},
+      "minResolution": 0,
+      "name": "test_migrate_2_user_1:test_vector_layer_sld",
+      "opacity": 1,
+      "path": "group2",
+      "protocol": {
+        "format": "hs.format.WFS",
+        "url": "http://localhost:8000/geoserver/wfs"
+      },
+      "ratio": 1.5,
+      "singleTile": true,
+      "title": "Vector WFS layer",
+      "visibility": false,
+      "wmsMaxScale": 0
     }
   ]
 }
