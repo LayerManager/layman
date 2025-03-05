@@ -18,7 +18,6 @@ from layman import app
 from layman import settings
 from layman.layer.filesystem.thumbnail import get_layer_thumbnail_path
 from layman import uuid, names
-from layman.layer import db
 from layman.layer.geoserver import wms as geoserver_wms, sld as geoserver_sld
 from layman import celery as celery_util
 from layman.common.metadata import prop_equals_strict, PROPERTIES
@@ -160,34 +159,6 @@ def test_wrong_value_of_layername(client):
         assert response.status_code == 400, resp_json
         assert resp_json['code'] == 2
         assert resp_json['detail']['parameter'] == 'layername'
-
-
-@pytest.mark.usefixtures('app_context', 'ensure_layman')
-def test_workspace_schema_conflict(client):
-    if len(settings.PG_NON_USER_SCHEMAS) == 0:
-        return
-    response = client.post(url_for('rest_workspace_layers.post', workspace=settings.PG_NON_USER_SCHEMAS[0]))
-    assert response.status_code == 409
-    resp_json = response.get_json()
-    # print(resp_json)
-    assert resp_json['code'] == 35
-    assert resp_json['detail']['reserved_by'] == db.__name__
-    assert 'reason' not in resp_json['detail']
-    for schema_name in [
-        'pg_catalog',
-        'pg_toast',
-        'information_schema',
-    ]:
-        response = client.post(url_for('rest_workspace_layers.post', workspace=schema_name), data={
-            'file': [
-                (io.BytesIO(MIN_GEOJSON.encode()), '/file.geojson')
-            ]
-        })
-        resp_json = response.get_json()
-        # print(resp_json)
-        assert response.status_code == 409
-        assert resp_json['code'] == 35
-        assert resp_json['detail']['reserved_by'] == db.__name__
 
 
 @pytest.mark.usefixtures('app_context', 'ensure_layman')

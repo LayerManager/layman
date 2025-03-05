@@ -10,6 +10,7 @@ from psycopg2 import sql
 from psycopg2.errors import InsufficientPrivilege
 
 from db import util as db_util
+from layman.common import empty_method
 from layman.common.language import get_languages_iso639_2
 from layman.http import LaymanError
 from layman import settings
@@ -22,6 +23,11 @@ ColumnInfo = namedtuple('ColumnInfo', 'name data_type')
 
 
 LAYERS_SCHEMA = 'layers'
+check_workspace_name = empty_method
+ensure_workspace = empty_method
+ensure_whole_user = empty_method
+delete_workspace = empty_method
+delete_whole_user = empty_method
 
 
 @dataclass(frozen=True)
@@ -35,65 +41,11 @@ class DbNames:
 
 
 def get_workspaces():
-    """Returns workspaces from internal DB only"""
-    query = sql.SQL("""select schema_name
-    from information_schema.schemata
-    where schema_name NOT IN ({schemas}) AND schema_owner = {layman_pg_user}""").format(
-        schemas=sql.SQL(', ').join([sql.Literal(schema) for schema in settings.PG_NON_USER_SCHEMAS]),
-        layman_pg_user=sql.Literal(settings.LAYMAN_PG_USER),
-    )
-    try:
-        rows = db_util.run_query(query)
-    except BaseException as exc:
-        logger.error(f'get_workspaces ERROR')
-        raise LaymanError(7) from exc
-    return [
-        r[0] for r in rows
-    ]
+    return []
 
 
 def get_usernames():
     return []
-
-
-def check_workspace_name(workspace):
-    if workspace in settings.PG_NON_USER_SCHEMAS:
-        raise LaymanError(35, {'reserved_by': __name__, 'schema': workspace})
-
-
-def ensure_workspace(workspace, ):
-    """Ensures workspace in internal DB only"""
-    statement = sql.SQL("""CREATE SCHEMA IF NOT EXISTS {schema} AUTHORIZATION {user}""").format(
-        schema=sql.Identifier(workspace),
-        user=sql.Identifier(settings.LAYMAN_PG_USER),
-    )
-    try:
-        db_util.run_statement(statement)
-    except BaseException as exc:
-        logger.error(f'ensure_workspace ERROR')
-        raise LaymanError(7) from exc
-
-
-def delete_workspace(workspace, ):
-    """Deletes workspace from internal DB only"""
-    statement = sql.SQL("""DROP SCHEMA IF EXISTS {schema} RESTRICT""").format(
-        schema=sql.Identifier(workspace),
-    )
-    try:
-        db_util.run_statement(statement, (workspace, ))
-    except BaseException as exc:
-        logger.error(f'delete_workspace ERROR')
-        raise LaymanError(7) from exc
-
-
-def ensure_whole_user(username):
-    """Ensures whole user in internal DB only"""
-    ensure_workspace(username)
-
-
-def delete_whole_user(username):
-    """Deletes whole user from internal DB only"""
-    delete_workspace(username)
 
 
 def import_vector_file_to_internal_table(schema, table, main_filepath, crs_id):
