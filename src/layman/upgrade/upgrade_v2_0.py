@@ -710,9 +710,14 @@ def migrate_maps():
             logger.error(f'    Fail to move input files: : \n{traceback.format_exc()}')
 
         # Migrate layers in map file
+        map_file_path = f"{dst_main_path}/input_file/{map_uuid}.json"
         if map_layers:
-            map_file_path = f"{dst_main_path}/input_file/{map_uuid}.json"
             migrate_map_file(map_file_path, map_layers)
+        else:
+            with open(map_file_path, 'r', encoding="utf-8") as map_file:
+                map_json = json.load(map_file)
+            new_layers = get_layers_from_json(map_json)
+            assert new_layers == [], f'Still no internal layer should be found.'
 
         # Move thumbnail file
         logger.info("      moving thumbnail file")
