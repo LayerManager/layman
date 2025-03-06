@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Tuple, Literal
+from typing import Tuple, Literal
 
 from db import TableUri
 from layman import names, settings
@@ -19,8 +19,6 @@ class QgisNames:
 class Layer(Publication):
     geodata_type: Literal["vector", "raster", "unknown"]
     style_type: str
-    native_bounding_box: List[float]
-    native_crs: str
     original_data_source: settings.EnumOriginalDataSource
     table_uri: TableUri
 
@@ -30,8 +28,6 @@ class Layer(Publication):
         info = self._info
         object.__setattr__(self, 'geodata_type', info['geodata_type'])
         object.__setattr__(self, 'style_type', info['_style_type'])
-        object.__setattr__(self, 'native_bounding_box', info['native_bounding_box'])
-        object.__setattr__(self, 'native_crs', info['native_crs'])
         object.__setattr__(self, 'original_data_source',
                            settings.EnumOriginalDataSource(info['original_data_source']))
         object.__setattr__(self, 'table_uri', info['_table_uri'])
