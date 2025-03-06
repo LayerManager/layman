@@ -13,9 +13,10 @@ sys.modules.pop('layman', None)
 from layman import app, LaymanError
 from layman import settings
 from layman.common.micka import util as common_util
+from layman.layer.layer_class import Layer
 from test_tools import flask_client
 from test_tools.mock.micka import run
-from .csw import get_layer_info, delete_layer
+from .csw import get_layer_info, delete_layer_by_class
 
 MICKA_PORT = 8020
 
@@ -49,10 +50,11 @@ TEST_LAYER = 'ne_110m_admin_0_countries'
 def provide_layer(client):
     username = TEST_USER
     layername = TEST_LAYER
-    response = flask_client.publish_layer(username,
-                                          layername,
-                                          client,)
-    yield response
+    flask_client.publish_layer(username, layername, client)
+    with app.app_context():
+        layer = Layer(layer_tuple=(username, layername))
+
+    yield layer
 
     flask_client.delete_layer(username,
                               layername,
@@ -129,10 +131,10 @@ def no_micka_url():
 
 
 @pytest.mark.usefixtures('ensure_layman', 'provide_layer', 'broken_micka_url')
-def test_delete_layer_broken_micka():
+def test_delete_layer_broken_micka(provide_layer):
     with pytest.raises(LaymanError) as exc_info:
         with app.app_context():
-            delete_layer(TEST_USER, TEST_LAYER)
+            delete_layer_by_class(provide_layer)
     assert exc_info.value.code == 38
 
 
@@ -149,23 +151,23 @@ def test_get_layer_info_no_micka():
 
 
 @pytest.mark.usefixtures('ensure_layman', 'provide_layer', 'no_micka_url')
-def test_delete_layer_no_micka():
+def test_delete_layer_no_micka(provide_layer):
     with pytest.raises(LaymanError) as exc_info:
         with app.app_context():
-            delete_layer(TEST_USER, TEST_LAYER)
+            delete_layer_by_class(provide_layer)
     assert exc_info.value.code == 38
 
 
 @pytest.mark.usefixtures('ensure_layman', 'provide_layer')
-def test_patch_layer_without_metadata(client):
+def test_patch_layer_without_metadata(client, provide_layer):
     with app.app_context():
-        delete_layer(TEST_USER, TEST_LAYER)
+        delete_layer_by_class(provide_layer)
     patch_layer(client)
 
 
-@pytest.mark.usefixtures('ensure_layman')
+@pytest.mark.usefixtures('ensure_layman', 'provide_layer')
 def test_public_metadata(provide_layer):
-    uuid = provide_layer['uuid']
+    uuid = provide_layer.uuid
     muuid = common_util.get_metadata_uuid(uuid)
     micka_url = urljoin(settings.CSW_URL, "./")
     response = requests.get(micka_url, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)

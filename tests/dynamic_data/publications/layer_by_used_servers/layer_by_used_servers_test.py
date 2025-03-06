@@ -2,6 +2,8 @@ from copy import deepcopy
 import os
 import pytest
 
+from layman import app
+from layman.layer.layer_class import Layer
 from test_tools import process_client
 from tests import EnumTestTypes
 from tests.asserts.final import publication as asserts_publ
@@ -79,4 +81,6 @@ class TestLayer(base_test.TestSingleRestPublication):
                                                                   version='1.1.1')
         asserts_publ.geoserver_proxy.wms_legend_url_with_x_forwarded_headers(layer.workspace, layer.type, layer.name, )
         asserts_publ.metadata.correct_comparison_response_with_x_forwarded_headers(layer.workspace, layer.type, layer.name, )
-        asserts_publ.metadata.correct_values_in_metadata(layer.workspace, layer.type, layer.name, http_method=rest_method.enum_item.publ_name_part)
+        with app.app_context():
+            prod_layer = Layer(layer_tuple=(layer.workspace, layer.name))
+        asserts_publ.metadata.correct_values_in_metadata(prod_layer, http_method=rest_method.enum_item.publ_name_part)

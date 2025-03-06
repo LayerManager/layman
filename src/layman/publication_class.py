@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Tuple, Dict, Any, List
 
 from layman import util
@@ -14,6 +15,7 @@ class Publication:
     description: str
     title: str
     access_rights: Dict[str, List[str]]
+    created_at: datetime
     _info: Dict[str, Any]
 
     def __init__(self, *, uuid: str = None, publ_tuple: Tuple[str, str, str] = None):
@@ -29,4 +31,5 @@ class Publication:
         object.__setattr__(self, 'access_rights', info['access_rights'])
         object.__setattr__(self, 'description', info['description'])
         object.__setattr__(self, 'title', info['title'])
+        object.__setattr__(self, 'created_at', info['_created_at'])
         object.__setattr__(self, '_info', info)

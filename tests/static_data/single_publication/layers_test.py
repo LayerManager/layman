@@ -265,7 +265,8 @@ def test_micka_xml(workspace, publ_type, publication):
 
     # assert metadata file is the same as filled template except for UUID
     with app.app_context():
-        template_path, prop_values = csw.get_template_path_and_values(workspace, publication, http_method='post')
+        layer = Layer(layer_tuple=(workspace, publication))
+        template_path, prop_values = csw.get_template_path_and_values(layer, http_method='post')
     xml_file_object = micka_common_util.fill_xml_template_as_pretty_file_object(template_path, prop_values,
                                                                                 csw.METADATA_PROPERTIES)
     micka_xml_def = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA]['micka_xml']

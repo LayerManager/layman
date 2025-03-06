@@ -10,6 +10,7 @@ from flask import current_app
 import crs as crs_def
 from layman.common.micka import util as common_util, requests as micka_requests
 from layman.common import language as common_language, empty_method, bbox as bbox_util
+from layman.layer.layer_class import Layer
 from layman.layer.prime_db_schema import table as prime_db_table
 from layman.layer.filesystem import gdal
 from layman.layer import db
@@ -17,7 +18,7 @@ from layman.layer.geoserver import wms
 from layman.layer.geoserver import wfs
 from layman.layer import LAYER_TYPE
 from layman import settings, patch_mode, LaymanError, common
-from layman.util import url_for, get_publication_info
+from layman.util import url_for, get_publication_info_by_class
 from layman import util as layman_util
 
 logger = logging.getLogger(__name__)
@@ -55,23 +56,29 @@ def get_layer_info(workspace, layername, *, x_forwarded_items=None):
 
 
 def patch_layer(workspace, layername, metadata_properties_to_refresh, _actor_name=None, create_if_not_exists=True, timeout=None):
+    layer = Layer(layer_tuple=(workspace, layername))
+    return patch_layer_by_class(layer, metadata_properties_to_refresh=metadata_properties_to_refresh,
+                                _actor_name=_actor_name, create_if_not_exists=create_if_not_exists, timeout=timeout)
+
+
+def patch_layer_by_class(publication: Layer, *, metadata_properties_to_refresh, _actor_name=None,
+                         create_if_not_exists=True, timeout=None):
     timeout = timeout or settings.DEFAULT_CONNECTION_TIMEOUT
     # current_app.logger.info(f"patch_layer metadata_properties_to_refresh={metadata_properties_to_refresh}")
     if len(metadata_properties_to_refresh) == 0:
         return None
-    uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layername)
     csw = common_util.create_csw()
-    if uuid is None or csw is None:
+    if publication.uuid is None or csw is None:
         return None
-    muuid = common_util.get_metadata_uuid(uuid)
+    muuid = common_util.get_metadata_uuid(publication.uuid)
     element = common_util.get_record_element_by_id(csw, muuid)
     if element is None:
         if create_if_not_exists:
-            return csw_insert(workspace, layername)
+            return csw_insert(publication)
         return None
     # current_app.logger.info(f"Current element=\n{ET.tostring(el, encoding='unicode', pretty_print=True)}")
 
-    _, prop_values = get_template_path_and_values(workspace, layername, http_method=common.REQUEST_METHOD_PATCH)
+    _, prop_values = get_template_path_and_values(publication, http_method=common.REQUEST_METHOD_PATCH)
     prop_values = {
         k: v for k, v in prop_values.items()
         if k in metadata_properties_to_refresh + ['md_date_stamp']
@@ -90,7 +97,12 @@ def patch_layer(workspace, layername, metadata_properties_to_refresh, _actor_nam
 
 
 def delete_layer(workspace, layername, *, backup_uuid=None):
-    uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layername) or backup_uuid
+    layer = Layer(layer_tuple=(workspace, layername))
+    return delete_layer_by_class(layer, backup_uuid=backup_uuid)
+
+
+def delete_layer_by_class(publication: Layer, *, backup_uuid=None):
+    uuid = publication.uuid or backup_uuid
     if backup_uuid and uuid:
         assert backup_uuid == uuid
     muuid = common_util.get_metadata_uuid(uuid)
@@ -99,8 +111,8 @@ def delete_layer(workspace, layername, *, backup_uuid=None):
     micka_requests.csw_delete(muuid)
 
 
-def csw_insert(workspace, layername):
-    template_path, prop_values = get_template_path_and_values(workspace, layername, http_method='post')
+def csw_insert(publication: Layer):
+    template_path, prop_values = get_template_path_and_values(publication, http_method='post')
     record = common_util.fill_xml_template_as_pretty_str(template_path, prop_values, METADATA_PROPERTIES)
     muuid = common_util.csw_insert({
         'record': record
@@ -108,22 +120,21 @@ def csw_insert(workspace, layername):
     return muuid
 
 
-def get_template_path_and_values(workspace, layername, http_method):
-    logger.info(f'get_template_path_and_values start calculating data for {workspace}:{layername}')
+def get_template_path_and_values(publication: Layer, *, http_method):
+    logger.info(f'get_template_path_and_values start calculating data for {publication.workspace}:{publication.name}')
     assert http_method in [common.REQUEST_METHOD_POST, common.REQUEST_METHOD_PATCH]
-    publ_info = get_publication_info(workspace, LAYER_TYPE, layername, context={
-        'keys': ['title', 'native_bounding_box', 'native_crs', 'description', 'geodata_type', 'table_uri', 'wms',
-                 'created_at', 'uuid'],
+    publ_info = get_publication_info_by_class(publication, context={
+        'keys': ['wms'],
     })
-    title = publ_info['title']
-    abstract = publ_info.get('description')
-    native_bbox = publ_info.get('native_bounding_box')
-    crs = publ_info.get('native_crs')
+    title = publication.title
+    abstract = publication.description
+    native_bbox = publication.native_bounding_box
+    crs = publication.native_crs
     if bbox_util.is_empty(native_bbox):
         native_bbox = crs_def.CRSDefinitions[crs].default_bbox
     extent = bbox_util.transform(native_bbox, crs_from=crs, crs_to=crs_def.EPSG_4326)
 
-    publ_datetime = publ_info['_created_at']
+    publ_datetime = publication.created_at
     revision_date = datetime.now()
     md_language = next(iter(common_language.get_languages_iso639_2(' '.join([
         title or '',
@@ -131,9 +142,9 @@ def get_template_path_and_values(workspace, layername, http_method):
     ]))), None)
     temporal_extent = publ_info['wms'].get('time', {}).get('values', None)
 
-    geodata_type = publ_info.get('geodata_type')
+    geodata_type = publication.geodata_type
     if geodata_type == settings.GEODATA_TYPE_VECTOR:
-        table_uri = publ_info['_table_uri']
+        table_uri = publication.table_uri
         table_name = table_uri.table
         try:
             languages = db.get_text_languages(table_uri.schema, table_name, table_uri.primary_key_column,
@@ -151,8 +162,8 @@ def get_template_path_and_values(workspace, layername, http_method):
         wfs_url = wfs.get_wfs_url(external_url=True)
     elif geodata_type == settings.GEODATA_TYPE_RASTER:
         languages = []
-        bbox_sphere_size = prime_db_table.get_bbox_sphere_size(workspace, layername)
-        distance_value = gdal.get_normalized_ground_sample_distance_in_m(publ_info['uuid'], bbox_size=bbox_sphere_size)
+        bbox_sphere_size = prime_db_table.get_bbox_sphere_size(publication.workspace, publication.name)
+        distance_value = gdal.get_normalized_ground_sample_distance_in_m(publication.uuid, bbox_size=bbox_sphere_size)
         spatial_resolution = {
             'ground_sample_distance': {
                 'value': distance_value,
@@ -168,23 +179,26 @@ def get_template_path_and_values(workspace, layername, http_method):
     languages = languages or []
 
     prop_values = {
-        'md_file_identifier': common_util.get_metadata_uuid(publ_info['uuid']),
+        'md_file_identifier': common_util.get_metadata_uuid(publication.uuid),
         'md_language': md_language,
         'md_date_stamp': date.today().strftime('%Y-%m-%d'),
         'reference_system': settings.LAYMAN_OUTPUT_SRS_LIST,
         'title': title,
         'publication_date': publ_datetime.strftime('%Y-%m-%d'),
         'identifier': {
-            'identifier': url_for('rest_workspace_layer.get', workspace=workspace, layername=layername),
-            'label': layername,
+            'identifier': url_for('rest_workspace_layer.get', workspace=publication.workspace,
+                                  layername=publication.name),
+            'label': publication.name,
         },
         'abstract': abstract,
-        'graphic_url': url_for('rest_workspace_layer_thumbnail.get', workspace=workspace, layername=layername),
+        'graphic_url': url_for('rest_workspace_layer_thumbnail.get', workspace=publication.workspace,
+                               layername=publication.name),
         'extent': extent,
         'temporal_extent': temporal_extent,
-        'wms_url': f"{wms.add_capabilities_params_to_url(wms.get_wms_url(external_url=True))}&LAYERS={layername}",
-        'wfs_url': f"{wfs.add_capabilities_params_to_url(wfs_url)}&LAYERS={layername}" if wfs_url else None,
-        'layer_endpoint': url_for('rest_workspace_layer.get', workspace=workspace, layername=layername),
+        'wms_url': f"{wms.add_capabilities_params_to_url(wms.get_wms_url(external_url=True))}&LAYERS={publication.name}",
+        'wfs_url': f"{wfs.add_capabilities_params_to_url(wfs_url)}&LAYERS={publication.name}" if wfs_url else None,
+        'layer_endpoint': url_for('rest_workspace_layer.get', workspace=publication.workspace,
+                                  layername=publication.name),
         'spatial_resolution': spatial_resolution,
         'language': languages,
         'md_organisation_name': None,
@@ -193,7 +207,7 @@ def get_template_path_and_values(workspace, layername, http_method):
     if http_method == common.REQUEST_METHOD_PATCH:
         prop_values['revision_date'] = revision_date.strftime('%Y-%m-%d')
     template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'record-template.xml')
-    logger.info(f'get_template_path_and_values data calculated for {workspace}:{layername}')
+    logger.info(f'get_template_path_and_values data calculated for {publication.workspace}:{publication.name}')
     return template_path, prop_values
 
 
@@ -343,11 +357,15 @@ METADATA_PROPERTIES = {
 
 
 def get_metadata_comparison(workspace, layername):
-    uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layername)
+    layer = Layer(layer_tuple=(workspace, layername))
+    return get_metadata_comparison_by_class(layer)
+
+
+def get_metadata_comparison_by_class(publication: Layer):
     csw = common_util.create_csw()
-    if uuid is None or csw is None:
+    if publication.uuid is None or csw is None:
         return {}
-    muuid = common_util.get_metadata_uuid(uuid)
+    muuid = common_util.get_metadata_uuid(publication.uuid)
     element = common_util.get_record_element_by_id(csw, muuid)
     if element is None:
         return {}
