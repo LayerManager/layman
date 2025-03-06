@@ -21,6 +21,7 @@ import layman_settings as settings
 
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 MAPS_FOR_THUMBNAIL_TEST: List[Map4Test] = [map for map in MAPS_TO_MIGRATE if map.exp_internal_layers and map.exp_thumbnail_path]
+MAPS_FOR_INPUT_FILE_TEST: List[Map4Test] = [map for map in MAPS_TO_MIGRATE if map.exp_input_file and map.exp_internal_layers]
 
 
 @pytest.fixture(scope="session")
@@ -139,6 +140,26 @@ def test_maps_thumbnail(client, map: Map4Test):
     # Check new map thumbnail
     diff_pixels = compare_images(thumbnail_path, exp_img_path)
     assert diff_pixels <= DEFAULT_THUMBNAIL_PIXEL_DIFF_LIMIT, f"{diff_pixels=}\n{thumbnail_path=}\n{exp_img_path=}"
+
+
+@pytest.mark.usefixtures("import_publication_uuids_fixture", "oauth2_provider_mock_fixture")
+@pytest.mark.parametrize("map", MAPS_FOR_INPUT_FILE_TEST, ids=ids_fn)
+def test_maps_input_file(map: Map4Test):
+    with open(map.exp_input_file, 'r', encoding="utf-8") as map_file:
+        src_map_file = map_file.read()
+
+    # Replace layers' UUIDs
+    template_mapping = {}
+    for idx, layer in enumerate(map.exp_internal_layers):
+        template_mapping[f'uuid{idx}'] = layer.uuid
+
+    exp_input_file_txt = Template(src_map_file).substitute(**template_mapping)
+    exp_input_file = json.loads(exp_input_file_txt)
+
+    input_file_path = f'.{settings.LAYMAN_DATA_DIR}/maps/{map.uuid}/input_file/{map.uuid}.json'
+    with open(input_file_path, 'r', encoding="utf-8") as map_file:
+        input_file = json.load(map_file)
+    assert exp_input_file == input_file
 
 
 @pytest.mark.usefixtures("import_publication_uuids_fixture")

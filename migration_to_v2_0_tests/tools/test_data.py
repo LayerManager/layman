@@ -50,6 +50,7 @@ class Layer4Test(Publication4Test):
 class Map4Test(Publication4Test):
     exp_internal_layers: List[Layer4Test]
     exp_thumbnail_path: str | None = None
+    exp_input_file: str | None = None
     type: str = MAP_TYPE
 
     def __post_init__(self):
@@ -57,6 +58,7 @@ class Map4Test(Publication4Test):
         if self.exp_internal_layers:
             assert self.exp_internal_layers[0].rest_args[
                 'file_paths'], f'We patch first layer with the same files to trigger thumbnail re-generation. {self=}, {self.exp_internal_layers[0]}'
+        assert not (self.exp_input_file and not self.exp_internal_layers), f'UUIDs of internal layers are replaced int input_file. {self=}, {self.exp_input_file}'
 
 
 LAYER_VECTOR_SLD = Layer4Test(workspace=USER_1,
@@ -193,6 +195,7 @@ MAP_WITH_INTERNAL_LAYER = Map4Test(workspace=USER_1,
                                    exp_input_files={'$uuid.json'},
                                    exp_internal_layers=[LAYER_VECTOR_SLD, LAYER_VECTOR_SLD],
                                    exp_thumbnail_path='tmp/migration_to_v2_0_tests/data/map_with_internal_layer_thumbnail.png',
+                                   exp_input_file='tmp/migration_to_v2_0_tests/data/exp_map_with_internal_layer.json'
                                    )
 
 LAYER_VECTOR_SLD.exp_layer_maps = [MAP_WITH_INTERNAL_LAYER]
