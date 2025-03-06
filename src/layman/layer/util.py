@@ -16,6 +16,7 @@ from layman.common.util import clear_publication_info as common_clear_publicatio
 from . import get_layer_sources, LAYER_TYPE, get_layer_type_def, get_layer_info_keys, LAYERNAME_PATTERN, \
     LAYERNAME_MAX_LENGTH, SAFE_PG_IDENTIFIER_PATTERN
 from .db import get_all_table_column_names, get_table_crs
+from .layer_class import Layer
 from ..uuid import delete_publication_uuid_from_redis
 
 FLASK_PROVIDERS_KEY = f'{__name__}:PROVIDERS'
@@ -235,14 +236,14 @@ def layer_info_to_metadata_properties(info):
     return result
 
 
-def get_metadata_comparison(workspace, layername):
-    layman_info = get_complete_layer_info(workspace, layername)
+def get_metadata_comparison(publication: Layer):
+    layman_info = get_complete_layer_info(publication.workspace, publication.name)
     layman_props = layer_info_to_metadata_properties(layman_info)
     all_props = {
         f"{layman_props['layer_endpoint']}": layman_props,
     }
     sources = get_sources()
-    partial_infos = call_modules_fn(sources, 'get_metadata_comparison', [workspace, layername])
+    partial_infos = call_modules_fn(sources, 'get_metadata_comparison', [publication.workspace, publication.name])
     for partial_info in partial_infos.values():
         if partial_info is not None:
             all_props.update(partial_info)
@@ -253,8 +254,8 @@ def get_metadata_comparison(workspace, layername):
 get_syncable_prop_names = partial(metadata_common.get_syncable_prop_names, LAYER_TYPE)
 
 
-def get_same_or_missing_prop_names(workspace, layername):
-    md_comparison = get_metadata_comparison(workspace, layername)
+def get_same_or_missing_prop_names(layer: Layer):
+    md_comparison = get_metadata_comparison(layer)
     prop_names = get_syncable_prop_names()
     return metadata_common.get_same_or_missing_prop_names(prop_names, md_comparison)
 

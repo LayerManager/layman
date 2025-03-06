@@ -12,6 +12,7 @@ from layman.authn import authenticate
 from layman.authz import authorize_workspace_publications_decorator
 from . import util, LAYER_REST_PATH_NAME, LAYER_TYPE, get_layer_patch_keys
 from .filesystem import input_file, input_style, input_chunk, util as fs_util
+from .layer_class import Layer
 
 bp = Blueprint('rest_workspace_layer', __name__)
 logger = logging.getLogger(__name__)
@@ -198,7 +199,8 @@ def patch(workspace, layername):
     kwargs['enable_more_main_files'] = enable_more_main_files
     request_method = request.method.lower()
     kwargs['http_method'] = request_method
-    props_to_refresh = util.get_same_or_missing_prop_names(workspace, layername)
+    layer = Layer(layer_tuple=(workspace, layername))
+    props_to_refresh = util.get_same_or_missing_prop_names(layer)
     kwargs['metadata_properties_to_refresh'] = props_to_refresh
 
     kwargs['external_table_uri'] = external_table_uri
