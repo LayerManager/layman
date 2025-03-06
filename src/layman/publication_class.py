@@ -16,6 +16,8 @@ class Publication:
     title: str
     access_rights: Dict[str, List[str]]
     created_at: datetime
+    native_bounding_box: List[float]
+    native_crs: str
     _info: Dict[str, Any]
 
     def __init__(self, *, uuid: str = None, publ_tuple: Tuple[str, str, str] = None):
@@ -32,4 +34,6 @@ class Publication:
         object.__setattr__(self, 'description', info['description'])
         object.__setattr__(self, 'title', info['title'])
         object.__setattr__(self, 'created_at', info['_created_at'])
+        object.__setattr__(self, 'native_bounding_box', info['native_bounding_box'])
+        object.__setattr__(self, 'native_crs', info['native_crs'])
         object.__setattr__(self, '_info', info)
