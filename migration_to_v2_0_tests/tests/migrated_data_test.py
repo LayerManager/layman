@@ -122,7 +122,7 @@ def test_maps_thumbnail(client, map: Map4Test):
     assert diff_pixels <= DEFAULT_THUMBNAIL_PIXEL_DIFF_LIMIT, f"{diff_pixels=}\n{thumbnail_path=}\n{exp_img_path=}"
 
     # Trigger thumbnail re-generation
-    layer = map.exp_internal_layers[0]
+    layer = next(iter(next(iter(map.exp_internal_layers.values()))))
     file_paths = layer.rest_args['file_paths']
     pre_thumbnail_timestamp = get_map_thumbnail_timestamp(map)
     client.patch_workspace_publication(layer.type,
@@ -150,7 +150,8 @@ def test_maps_input_file(map: Map4Test):
 
     # Replace layers' UUIDs
     template_mapping = {}
-    for idx, layer in enumerate(map.exp_internal_layers):
+    layers = [layer for layers in map.exp_internal_layers.values() for layer in layers]
+    for idx, layer in enumerate(layers):
         template_mapping[f'uuid{idx}'] = layer.uuid
 
     exp_input_file_txt = Template(src_map_file).substitute(**template_mapping)
@@ -166,20 +167,23 @@ def test_maps_input_file(map: Map4Test):
 @pytest.mark.parametrize("map", MAPS_TO_MIGRATE, ids=ids_fn)
 def test_maps_internal_layers(client, map: Map4Test):
     query = f'''
-select ml.layer_uuid
-from {DB_SCHEMA}.publications map inner join
-     {DB_SCHEMA}.map_layer ml on map.id = ml.id_map
-where map.uuid = %s
-order by ml.id
+select layer_index, layers
+from (
+    select ml.layer_index, json_agg(ml.layer_uuid order by ml.layer_uuid) layers
+    from {DB_SCHEMA}.publications map inner join
+         {DB_SCHEMA}.map_layer ml on map.id = ml.id_map
+    where map.uuid = %s
+    group by ml.layer_index
+    order by ml.layer_index) tab
 ;
 '''
     rows = db_util.run_query(query, data=(map.uuid,), uri_str=DB_URI)
-    exp_map_layer_uuids = [layer.uuid for layer in map.exp_internal_layers]
-    assert len(rows) == len(exp_map_layer_uuids), f"{rows=}, {exp_map_layer_uuids=}"
-    map_layer_uuids = [row[0] for row in rows]
-    assert map_layer_uuids == exp_map_layer_uuids, f"{rows=}, {exp_map_layer_uuids=}"
+    map_layers = dict(rows)
+    exp_map_internal_layers = {layer_index: sorted([layer.uuid for layer in layers]) for layer_index, layers in map.exp_internal_layers.items()}
+    assert map_layers == exp_map_internal_layers, f"{map_layers=}, {exp_map_internal_layers=}"
 
-    for layer in map.exp_internal_layers:
+    map_layers_set = [layer for layers in map.exp_internal_layers.values() for layer in layers]
+    for layer in map_layers_set:
         layer_info = client.get_workspace_publication(layer.type, layer.workspace, layer.name, actor_name=layer.owner)
         layer_maps = layer_info['used_in_maps']
         assert {'workspace': map.workspace, 'name': map.name, } in layer_maps, f"{map=}, {layer=}, {layer_maps=}"
@@ -191,6 +195,8 @@ def test_layer_maps(client, layer: Layer4Test):
     layer_info = client.get_workspace_publication(layer.type, layer.workspace, layer.name, actor_name=layer.owner)
     layer_maps = layer_info['used_in_maps']
     exp_maps = [{'workspace': map.workspace, 'name': map.name, } for map in layer.exp_layer_maps]
+    layer_maps.sort(key=lambda x: (x['workspace'], x['name']))
+    exp_maps.sort(key=lambda x: (x['workspace'], x['name']))
     assert layer_maps == exp_maps, f"{layer_maps=}, {map=}"
 
 
