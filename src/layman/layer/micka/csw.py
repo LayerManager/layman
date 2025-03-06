@@ -58,10 +58,11 @@ def get_layer_info(workspace, layername, *, x_forwarded_items=None):
 def patch_layer(workspace, layername, metadata_properties_to_refresh, _actor_name=None, create_if_not_exists=True, timeout=None):
     layer = Layer(layer_tuple=(workspace, layername))
     return patch_layer_by_class(layer, metadata_properties_to_refresh=metadata_properties_to_refresh,
-                                _actor_name=_actor_name, create_if_not_exists=create_if_not_exists, timeout=timeout)
+                                actor_name=_actor_name, create_if_not_exists=create_if_not_exists, timeout=timeout)
 
 
-def patch_layer_by_class(publication: Layer, *, metadata_properties_to_refresh, _actor_name=None,
+# pylint: disable=unused-argument
+def patch_layer_by_class(publication: Layer, *, metadata_properties_to_refresh, actor_name=None,
                          create_if_not_exists=True, timeout=None):
     timeout = timeout or settings.DEFAULT_CONNECTION_TIMEOUT
     # current_app.logger.info(f"patch_layer metadata_properties_to_refresh={metadata_properties_to_refresh}")

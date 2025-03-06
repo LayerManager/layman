@@ -11,12 +11,13 @@ post_layer = empty_method
 
 get_layer_info = csw.get_layer_info
 delete_layer = csw.delete_layer
+delete_layer_by_class = csw.delete_layer_by_class
 get_metadata_comparison = csw.get_metadata_comparison
 patch_layer = empty_method
 
 
-def soap_insert(username, layername, access_rights, _actor_name=None):
+# pylint: disable=unused-argument
+def soap_insert(publication: Layer, *, access_rights, actor_name=None):
     is_public = authz.is_user_in_access_rule(settings.RIGHTS_EVERYONE_ROLE, access_rights['read'])
-    layer = Layer(layer_tuple=(username, layername))
-    template_path, prop_values = csw.get_template_path_and_values(layer, http_method='post')
+    template_path, prop_values = csw.get_template_path_and_values(publication, http_method='post')
     common_util.soap_insert_record_from_template(template_path, prop_values, csw.METADATA_PROPERTIES, is_public)
