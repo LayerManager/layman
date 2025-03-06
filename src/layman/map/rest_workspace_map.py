@@ -11,6 +11,7 @@ from layman.authn import authenticate
 from layman.authz import authorize_workspace_publications_decorator
 from . import util, MAP_REST_PATH_NAME, get_map_patch_keys
 from .filesystem import input_file, thumbnail
+from .map_class import Map
 
 bp = Blueprint('rest_workspace_map', __name__)
 
@@ -67,7 +68,8 @@ def patch(workspace, mapname):
     else:
         description = info['description']
 
-    props_to_refresh = util.get_same_or_missing_prop_names(workspace, mapname)
+    publication = Map(map_tuple=(workspace, mapname))
+    props_to_refresh = util.get_same_or_missing_prop_names(publication)
     metadata_properties_to_refresh = props_to_refresh
     file_changed = file is not None
     kwargs = {

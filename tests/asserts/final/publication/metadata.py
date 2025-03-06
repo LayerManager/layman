@@ -73,7 +73,7 @@ def correct_values_in_metadata(publication: Publication, http_method, *, exp_val
 
     get_template_path_and_values_method, args, kwargs = {
         process_client.LAYER_TYPE: (layer_csw_util.get_template_path_and_values, (publication,), {}),
-        process_client.MAP_TYPE: (map_csw_util.get_template_path_and_values, (publication.workspace, publication.name),
+        process_client.MAP_TYPE: (map_csw_util.get_template_path_and_values, (publication,),
                                   {'actor_name': actor_name}),
     }[publication.type]
     with app.app_context():
