@@ -3,6 +3,7 @@ import pytest
 
 from layman import app
 from layman.common import REQUEST_METHOD_POST, REQUEST_METHOD_PATCH
+from layman.map.map_class import Map
 from layman.util import get_publication_info
 from test_tools import process_client
 from tests import EnumTestTypes, Publication4Test
@@ -191,10 +192,12 @@ class TestPublication(base_test.TestSingleRestPublication):
                 }
                 for layer in exp_operates_on
             ]
-            asserts_publ.metadata.correct_values_in_metadata(
-                map.workspace, map.type, map.name, http_method=http_method, actor_name=actor_name, exp_values={
-                    'operates_on': exp_operates_on,
-                })
+            with app.app_context():
+                prod_map = Map(map_tuple=(map.workspace, map.name))
+            asserts_publ.metadata.correct_values_in_metadata(prod_map, http_method=http_method, actor_name=actor_name,
+                                                             exp_values={
+                                                                 'operates_on': exp_operates_on,
+                                                             })
 
     @staticmethod
     def assert_exp_layer_maps(layer, map_operates_on_tuples, workspaces_to_check):
@@ -219,7 +222,8 @@ class TestPublication(base_test.TestSingleRestPublication):
 
     def test_publication(self, map, rest_method, rest_args, params):
         exp = params['exp_before_rest_method']
-        self.assert_exp_map_layers(map, exp['map_layers'], exp['operates_on'], http_method=REQUEST_METHOD_POST,
+        self.assert_exp_map_layers(map, exp['map_layers'], exp['operates_on'],
+                                   http_method=REQUEST_METHOD_POST,
                                    actor_name=params['post_before_test_args'].get('actor_name'))
         self.assert_exp_layer_maps(LAYER_HRANICE, [
             (MAP_HRANICE, MAP_HRANICE_OPERATES_ON),

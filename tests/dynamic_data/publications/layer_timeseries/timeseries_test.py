@@ -3,7 +3,8 @@ import os
 import pytest
 
 import crs as crs_def
-from layman import common
+from layman import common, app
+from layman.layer.layer_class import Layer
 from test_tools import process_client
 from tests import EnumTestTypes, Publication4Test, EnumTestKeys
 from tests.asserts.final import publication as asserts_publ
@@ -344,6 +345,8 @@ class TestLayer(base_test.TestSingleRestPublication):
                                                        )
 
         if params['do_complex_test']:
+            with app.app_context():
+                prod_layer = Layer(uuid=self.publ_uuids[layer])
             time_snaps = [time_snap[:10] for time_snap in params['detail_values']['exp_publication_detail']['wms']['time']['values']]
             for time in time_snaps:
                 exp_wms = os.path.join(DIRECTORY, f"wms_{time}.png")
@@ -369,7 +372,7 @@ class TestLayer(base_test.TestSingleRestPublication):
             else:
                 raise NotImplementedError(f"Unknown rest_method: {rest_method}")
 
-            asserts_publ.metadata.correct_values_in_metadata(layer.workspace, layer.type, layer.name, http_method=http_method)
+            asserts_publ.metadata.correct_values_in_metadata(prod_layer, http_method=http_method)
 
             process_client.patch_workspace_layer(layer.workspace,
                                                  layer.name,
