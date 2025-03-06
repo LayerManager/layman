@@ -13,9 +13,9 @@ from lxml import etree as ET
 
 from layman import settings, authz
 from layman.common.metadata import PROPERTIES as COMMON_PROPERTIES
-from layman.util import get_publication_info
 from micka import NAMESPACES
 from .requests import base_insert, csw_delete, fill_template_as_str
+from ...publication_class import Publication
 
 logger = logging.getLogger(__name__)
 
@@ -661,16 +661,13 @@ def is_soap_visibility_change_needed(muuid, access_rights):
     return needed
 
 
-def patch_publication_by_soap(workspace,
-                              publ_type,
-                              publ_name,
+def patch_publication_by_soap(publication: Publication,
                               metadata_properties_to_refresh,
                               actor_name,
                               access_rights,
                               csw_patch_method,
                               soap_insert_method):
-    publ_info = get_publication_info(workspace, publ_type, publ_name, context={'keys': ['access_rights'], })
-    uuid = publ_info.get('uuid')
+    uuid = publication.uuid
 
     csw_instance = create_csw()
     if uuid is None or csw_instance is None:
@@ -678,13 +675,14 @@ def patch_publication_by_soap(workspace,
     muuid = get_metadata_uuid(uuid)
     num_records = get_number_of_records(muuid, True)
     if num_records == 0:
-        full_access_rights = authz.complete_access_rights(access_rights, publ_info['access_rights'])
-        soap_insert_method(workspace, publ_name, full_access_rights, actor_name)
+        full_access_rights = authz.complete_access_rights(access_rights, publication.access_rights)
+        soap_insert_method(publication, access_rights=full_access_rights, actor_name=actor_name)
     else:
         use_soap = is_soap_visibility_change_needed(muuid, access_rights)
         if use_soap:
             csw_delete(muuid)
             time.sleep(1)
-            soap_insert_method(workspace, publ_name, access_rights, actor_name)
+            soap_insert_method(publication, access_rights=access_rights, actor_name=actor_name)
         else:
-            csw_patch_method(workspace, publ_name, metadata_properties_to_refresh, actor_name)
+            csw_patch_method(publication, metadata_properties_to_refresh=metadata_properties_to_refresh,
+                             actor_name=actor_name)
