@@ -4,7 +4,7 @@ from urllib.parse import quote
 import json
 from dataclasses import dataclass
 from abc import ABC
-from typing import Set, List
+from typing import Set, List, Dict
 
 from tools.test_settings import EXTERNAL_URI_STR
 import layman_settings as settings
@@ -48,7 +48,7 @@ class Layer4Test(Publication4Test):
 
 @dataclass
 class Map4Test(Publication4Test):
-    exp_internal_layers: List[Layer4Test]
+    exp_internal_layers: Dict[int, List[Layer4Test]]
     exp_thumbnail_path: str | None = None
     exp_input_file: str | None = None
     type: str = MAP_TYPE
@@ -56,7 +56,7 @@ class Map4Test(Publication4Test):
     def __post_init__(self):
         assert not (self.exp_internal_layers and not self.exp_thumbnail_path), f'We patch first layer to trigger thumbnail re-generation. {self=}'
         if self.exp_internal_layers:
-            assert self.exp_internal_layers[0].rest_args[
+            assert next(iter(next(iter(self.exp_internal_layers.values())))).rest_args[
                 'file_paths'], f'We patch first layer with the same files to trigger thumbnail re-generation. {self=}, {self.exp_internal_layers[0]}'
         assert not (self.exp_input_file and not self.exp_internal_layers), f'UUIDs of internal layers are replaced int input_file. {self=}, {self.exp_input_file}'
 
@@ -72,6 +72,18 @@ LAYER_VECTOR_SLD = Layer4Test(workspace=USER_1,
                               exp_thumbnail_path='sample/style/basic_sld.png',
                               exp_layer_maps=[],  # Set later
                               )
+
+LAYER_PUBLIC_VECTOR_SLD = Layer4Test(workspace=WORKSPACE_BROWSER,
+                                     name='test_public_vector_layer_sld',
+                                     owner=settings.ANONYM_USER,
+                                     rest_args={
+                                         'file_paths': ['sample/layman.layer/small_layer.geojson'],
+                                         'description': 'Description of test_vector_layer_sld',
+                                     },
+                                     exp_input_files={'$uuid.geojson'},
+                                     exp_thumbnail_path='sample/style/basic_sld.png',
+                                     exp_layer_maps=[],  # Set later
+                                     )
 
 LAYER_VECTOR_QML = Layer4Test(workspace=USER_1,
                               name='test_vector_qml_layer',
@@ -182,7 +194,7 @@ MAP_1 = Map4Test(workspace=USER_1,
                      'description': 'Description of test_map_1',
                  },
                  exp_input_files={'$uuid.json'},
-                 exp_internal_layers=[],
+                 exp_internal_layers={},
                  )
 
 MAP_WITH_INTERNAL_LAYER = Map4Test(workspace=USER_1,
@@ -193,16 +205,32 @@ MAP_WITH_INTERNAL_LAYER = Map4Test(workspace=USER_1,
                                        'description': 'Description of test_map_with_internal_layer',
                                    },
                                    exp_input_files={'$uuid.json'},
-                                   exp_internal_layers=[LAYER_VECTOR_SLD, LAYER_VECTOR_SLD],
+                                   exp_internal_layers={0: [LAYER_VECTOR_SLD], 2: [LAYER_VECTOR_SLD]},
                                    exp_thumbnail_path='tmp/migration_to_v2_0_tests/data/map_with_internal_layer_thumbnail.png',
                                    exp_input_file='tmp/migration_to_v2_0_tests/data/exp_map_with_internal_layer.json'
                                    )
 
-LAYER_VECTOR_SLD.exp_layer_maps = [MAP_WITH_INTERNAL_LAYER]
+MAP_WITH_INTERNAL_LAYERS_COMPLEX = Map4Test(workspace=WORKSPACE_BROWSER,
+                                            name='test_map_with_internal_layers_complex',
+                                            owner=settings.ANONYM_USER,
+                                            rest_args={
+                                                'file_paths': ['tmp/migration_to_v2_0_tests/data/internal_layers_complex.json'],
+                                                'description': 'Description of internal_layers_complex',
+                                            },
+                                            exp_input_files={'$uuid.json'},
+                                            exp_internal_layers={0: [LAYER_PUBLIC_VECTOR_SLD, LAYER_RASTER_TIMESERIES], 1: [LAYER_PUBLIC_VECTOR_SLD, LAYER_VECTOR_SLD, LAYER_RASTER_TIMESERIES]},
+                                            exp_thumbnail_path='tmp/migration_to_v2_0_tests/data/map_with_internal_layer_thumbnail.png',
+                                            exp_input_file='tmp/migration_to_v2_0_tests/data/exp_map_with_internal_layers_complex.json'
+                                            )
+
+LAYER_VECTOR_SLD.exp_layer_maps = [MAP_WITH_INTERNAL_LAYER, MAP_WITH_INTERNAL_LAYERS_COMPLEX]
+LAYER_RASTER_TIMESERIES.exp_layer_maps = [MAP_WITH_INTERNAL_LAYERS_COMPLEX]
+LAYER_PUBLIC_VECTOR_SLD.exp_layer_maps = [MAP_WITH_INTERNAL_LAYERS_COMPLEX]
 
 LAYERS_TO_MIGRATE_VECTOR_INTERNAL_DB = [
     LAYER_VECTOR_SLD,
     LAYER_VECTOR_QML,
+    LAYER_PUBLIC_VECTOR_SLD,
 ]
 
 LAYERS_TO_MIGRATE = LAYERS_TO_MIGRATE_VECTOR_INTERNAL_DB + [
@@ -216,6 +244,7 @@ LAYERS_TO_MIGRATE = LAYERS_TO_MIGRATE_VECTOR_INTERNAL_DB + [
 MAPS_TO_MIGRATE = [
     MAP_1,
     MAP_WITH_INTERNAL_LAYER,
+    MAP_WITH_INTERNAL_LAYERS_COMPLEX,
 ]
 
 PUBLICATIONS_TO_MIGRATE = LAYERS_TO_MIGRATE + MAPS_TO_MIGRATE
