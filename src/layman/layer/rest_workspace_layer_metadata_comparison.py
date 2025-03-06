@@ -4,6 +4,7 @@ from layman import util as layman_util
 from layman.authn import authenticate
 from layman.authz import authorize_workspace_publications_decorator
 from . import util, LAYER_REST_PATH_NAME
+from .layer_class import Layer
 
 bp = Blueprint('rest_workspace_layer_metadata_comparison', __name__)
 
@@ -21,6 +22,7 @@ def before_request():
 def get(workspace, layername):
     app.logger.info(f"GET Layer Metadata Comparison, actor={g.user}")
 
-    md_props = util.get_metadata_comparison(workspace, layername)
+    layer = Layer(layer_tuple=(workspace, layername))
+    md_props = util.get_metadata_comparison(layer)
 
     return jsonify(md_props), 200
