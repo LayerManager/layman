@@ -3,6 +3,7 @@ from layman.common import empty_method
 from layman.common.micka import util as common_util
 from . import csw
 from .. import MAP_TYPE
+from ..map_class import Map
 
 pre_publication_action_check = empty_method
 
@@ -26,5 +27,7 @@ def patch_map(workspace, mapname, metadata_properties_to_refresh=None, access_ri
 
 def soap_insert(workspace, mapname, access_rights=None, actor_name=None):
     is_public = authz.is_user_in_access_rule(settings.RIGHTS_EVERYONE_ROLE, access_rights['read'])
-    template_path, prop_values = csw.get_template_path_and_values(workspace, mapname, http_method='post', actor_name=actor_name)
+    publication = Map(map_tuple=(workspace, mapname))
+    template_path, prop_values = csw.get_template_path_and_values(publication, http_method='post',
+                                                                  actor_name=actor_name)
     common_util.soap_insert_record_from_template(template_path, prop_values, csw.METADATA_PROPERTIES, is_public)

@@ -4,6 +4,7 @@ from layman import util as layman_util
 from layman.authn import authenticate
 from layman.authz import authorize_workspace_publications_decorator
 from . import util, MAP_REST_PATH_NAME
+from .map_class import Map
 
 bp = Blueprint('rest_workspace_map_metadata_comparison', __name__)
 
@@ -21,6 +22,7 @@ def before_request():
 def get(workspace, mapname):
     app.logger.info(f"GET Map Metadata Comparison, actor={g.user}")
 
-    md_props = util.get_metadata_comparison(workspace, mapname)
+    publication = Map(map_tuple=(workspace, mapname))
+    md_props = util.get_metadata_comparison(publication)
 
     return jsonify(md_props), 200

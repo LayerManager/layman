@@ -14,6 +14,7 @@ from layman.common.micka import util as common_util, requests as micka_requests
 from layman.common.micka.util import get_metadata_uuid
 from layman.layer import LAYER_TYPE
 from layman.map import MAP_TYPE
+from layman.map.map_class import Map
 from layman.util import url_for, get_publication_info
 
 post_map = empty_method
@@ -49,32 +50,44 @@ def get_map_info(workspace, mapname, *, x_forwarded_items=None):
 
 
 def delete_map(workspace, mapname):
-    uuid = layman_util.get_publication_uuid(workspace, MAP_TYPE, mapname)
-    muuid = common_util.get_metadata_uuid(uuid)
+    publication = Map(map_tuple=(workspace, mapname))
+    return delete_map_by_class(publication)
+
+
+def delete_map_by_class(publication: Map):
+    muuid = common_util.get_metadata_uuid(publication.uuid)
     if muuid is None:
         return
     micka_requests.csw_delete(muuid)
 
 
-def patch_map(workspace, mapname, metadata_properties_to_refresh=None, actor_name=None, create_if_not_exists=True, timeout=None):
+def patch_map(workspace, mapname, metadata_properties_to_refresh=None, actor_name=None, create_if_not_exists=True,
+              timeout=None):
+    publication = Map(map_tuple=(workspace, mapname))
+    return patch_map_by_class(publication, metadata_properties_to_refresh=metadata_properties_to_refresh,
+                              actor_name=actor_name, create_if_not_exists=create_if_not_exists, timeout=timeout)
+
+
+def patch_map_by_class(publication: Map, metadata_properties_to_refresh=None, actor_name=None,
+                       create_if_not_exists=True, timeout=None):
     timeout = timeout or settings.DEFAULT_CONNECTION_TIMEOUT
     # current_app.logger.info(f"patch_map metadata_properties_to_refresh={metadata_properties_to_refresh}")
     metadata_properties_to_refresh = metadata_properties_to_refresh or []
     if len(metadata_properties_to_refresh) == 0:
         return {}
-    uuid = layman_util.get_publication_uuid(workspace, MAP_TYPE, mapname)
     csw = common_util.create_csw()
-    if uuid is None or csw is None:
+    if publication.uuid is None or csw is None:
         return None
-    muuid = common_util.get_metadata_uuid(uuid)
+    muuid = common_util.get_metadata_uuid(publication.uuid)
     element = common_util.get_record_element_by_id(csw, muuid)
     if element is None:
         if create_if_not_exists:
-            return csw_insert(workspace, mapname, actor_name=actor_name)
+            return csw_insert(publication, actor_name=actor_name)
         return None
     # current_app.logger.info(f"Current element=\n{ET.tostring(element, encoding='unicode', pretty_print=True)}")
 
-    _, prop_values = get_template_path_and_values(workspace, mapname, http_method=common.REQUEST_METHOD_PATCH, actor_name=actor_name)
+    _, prop_values = get_template_path_and_values(publication, http_method=common.REQUEST_METHOD_PATCH,
+                                                  actor_name=actor_name)
     prop_values = {
         k: v for k, v in prop_values.items()
         if k in metadata_properties_to_refresh + ['md_date_stamp']
@@ -92,8 +105,9 @@ def patch_map(workspace, mapname, metadata_properties_to_refresh=None, actor_nam
     return muuid
 
 
-def csw_insert(workspace, mapname, actor_name):
-    template_path, prop_values = get_template_path_and_values(workspace, mapname, http_method=common.REQUEST_METHOD_POST, actor_name=actor_name)
+def csw_insert(publication: Map, actor_name):
+    template_path, prop_values = get_template_path_and_values(publication, http_method=common.REQUEST_METHOD_POST,
+                                                              actor_name=actor_name)
     record = common_util.fill_xml_template_as_pretty_str(template_path, prop_values, METADATA_PROPERTIES)
     muuid = common_util.csw_insert({
         'record': record
@@ -113,11 +127,10 @@ def map_layers_to_operates_on_layers(map_layers):
     return operates_on
 
 
-def map_to_operates_on(workspace, mapname, operates_on_muuids_filter=None, editor=None):
+def map_to_operates_on(publication: Map, operates_on_muuids_filter=None, editor=None):
     # Either caller know muuids or wants filter by editor, never both at the same time, at least one must be used
     assert (operates_on_muuids_filter is None) != (editor is None)
-    publ_info = layman_util.get_publication_info(workspace, MAP_TYPE, mapname, context={'keys': ['map_layers']})
-    operates_on_layers = map_layers_to_operates_on_layers(publ_info['_map_layers'])
+    operates_on_layers = map_layers_to_operates_on_layers(publication.map_layers)
 
     operates_on = []
     csw_url = settings.CSW_PROXY_URL
@@ -143,37 +156,34 @@ def map_to_operates_on(workspace, mapname, operates_on_muuids_filter=None, edito
     return operates_on
 
 
-def get_template_path_and_values(workspace, mapname, *, http_method=None, actor_name):
+def get_template_path_and_values(publication: Map, *, http_method=None, actor_name):
     assert http_method in [common.REQUEST_METHOD_POST, common.REQUEST_METHOD_PATCH]
-    operates_on = map_to_operates_on(workspace, mapname, editor=actor_name)
-    publ_info = get_publication_info(workspace, MAP_TYPE, mapname, context={
-        'keys': ['title', 'native_bounding_box', 'description', 'native_crs', 'created_at', 'uuid'],
-    })
-    publ_datetime = publ_info['_created_at']
+    operates_on = map_to_operates_on(publication, editor=actor_name)
+    publ_datetime = publication.created_at
     revision_date = datetime.now()
-    native_bbox = publ_info.get('native_bounding_box')
-    crs = publ_info.get('native_crs')
+    native_bbox = publication.native_bounding_box
+    crs = publication.native_crs
     if bbox_util.is_empty(native_bbox):
         native_bbox = crs_def.CRSDefinitions[crs].default_bbox
-    extent = bbox_util.transform(native_bbox, crs_from=publ_info.get('native_crs'), crs_to=crs_def.EPSG_4326)
-    title = publ_info['title']
-    abstract = publ_info.get('description')
+    extent = bbox_util.transform(native_bbox, crs_from=publication.native_crs, crs_to=crs_def.EPSG_4326)
+    title = publication.title
+    abstract = publication.description
     md_language = next(iter(common_language.get_languages_iso639_2(' '.join([
         title or '',
         abstract or '',
     ]))), None)
 
     prop_values = _get_property_values(
-        workspace=workspace,
-        mapname=mapname,
-        uuid=publ_info['uuid'],
+        workspace=publication.workspace,
+        mapname=publication.name,
+        uuid=publication.uuid,
         title=title,
         abstract=abstract or None,
         publication_date=publ_datetime.strftime('%Y-%m-%d'),
         revision_date=revision_date.strftime('%Y-%m-%d'),
         md_date_stamp=date.today().strftime('%Y-%m-%d'),
-        identifier=url_for('rest_workspace_map.get', workspace=workspace, mapname=mapname),
-        identifier_label=mapname,
+        identifier=url_for('rest_workspace_map.get', workspace=publication.workspace, mapname=publication.name),
+        identifier_label=publication.name,
         extent=extent,
         crs_list=[crs],
         md_organisation_name=None,
@@ -372,7 +382,12 @@ METADATA_PROPERTIES = {
 
 
 def get_metadata_comparison(workspace, mapname):
-    uuid = layman_util.get_publication_uuid(workspace, MAP_TYPE, mapname)
+    publication = Map(map_tuple=(workspace, mapname))
+    return get_metadata_comparison_by_class(publication)
+
+
+def get_metadata_comparison_by_class(publication: Map):
+    uuid = publication.uuid
     csw = common_util.create_csw()
     if uuid is None or csw is None:
         return {}

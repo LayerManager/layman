@@ -14,6 +14,7 @@ del sys.modules['layman']
 from layman import app, settings, uuid, celery as celery_util, names
 from layman.common.micka import util as micka_common_util
 from layman.common.metadata import prop_equals_strict, PROPERTIES
+from layman.map.map_class import Map
 from layman.util import SimpleCounter, get_publication_uuid
 from test_tools import flask_client
 from test_tools.util import url_for, url_for_external
@@ -730,7 +731,8 @@ def test_map_composed_from_local_layers(client):
 
     with app.app_context():
         # assert metadata file is the same as filled template except for UUID and dates
-        template_path, prop_values = csw.get_template_path_and_values(workspace, mapname, http_method='post',
+        publication = Map(map_tuple=(workspace, mapname))
+        template_path, prop_values = csw.get_template_path_and_values(publication, http_method='post',
                                                                       actor_name=settings.ANONYM_USER)
         xml_file_object = micka_common_util.fill_xml_template_as_pretty_file_object(template_path, prop_values,
                                                                                     csw.METADATA_PROPERTIES)

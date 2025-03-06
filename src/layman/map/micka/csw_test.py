@@ -13,9 +13,10 @@ sys.modules.pop('layman', None)
 from layman import app, LaymanError
 from layman import settings
 from layman.common.micka import util as common_util
+from layman.map.map_class import Map
 from layman.map.rest_workspace_test import wait_till_ready
 from test_tools.mock.micka import run
-from .csw import get_map_info, delete_map, map_layers_to_operates_on_layers
+from .csw import get_map_info, map_layers_to_operates_on_layers, delete_map_by_class
 
 MICKA_PORT = 8020
 
@@ -65,7 +66,11 @@ def provide_map(client):
         assert response.status_code == 200
 
     wait_till_ready(workspace, mapname)
-    yield response.get_json()[0]
+    with app.app_context():
+        publication = Map(map_tuple=(workspace, mapname))
+
+    yield publication
+
     with app.app_context():
         rest_path = url_for('rest_workspace_map.delete_map', workspace=workspace, mapname=mapname)
         response = client.delete(rest_path)
@@ -142,10 +147,10 @@ def no_micka_url():
 
 
 @pytest.mark.usefixtures('ensure_layman', 'provide_map', 'broken_micka_url')
-def test_delete_map_broken_micka():
+def test_delete_map_broken_micka(provide_map):
     with pytest.raises(LaymanError) as exc_info:
         with app.app_context():
-            delete_map(TEST_WORKSPACE, TEST_MAP)
+            delete_map_by_class(provide_map)
     assert exc_info.value.code == 38
 
 
@@ -162,23 +167,23 @@ def test_get_map_info_no_micka():
 
 
 @pytest.mark.usefixtures('ensure_layman', 'provide_map', 'no_micka_url')
-def test_delete_map_no_micka():
+def test_delete_map_no_micka(provide_map):
     with pytest.raises(LaymanError) as exc_info:
         with app.app_context():
-            delete_map(TEST_WORKSPACE, TEST_MAP)
+            delete_map_by_class(provide_map)
     assert exc_info.value.code == 38
 
 
 @pytest.mark.usefixtures('ensure_layman', 'provide_map')
-def test_patch_map_without_metadata(client):
+def test_patch_map_without_metadata(client, provide_map):
     with app.app_context():
-        delete_map(TEST_WORKSPACE, TEST_MAP)
+        delete_map_by_class(provide_map)
     patch_map(client)
 
 
 @pytest.mark.usefixtures('ensure_layman')
 def test_public_metadata(provide_map):
-    uuid = provide_map['uuid']
+    uuid = provide_map.uuid
     muuid = common_util.get_metadata_uuid(uuid)
     micka_url = urljoin(settings.CSW_URL, "./")
     response = requests.get(micka_url, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
