@@ -22,7 +22,7 @@ from layman.layer.geoserver.wms import get_timeregex_props
 from layman.layer.qgis.tasks import refresh_wms as qgis_refresh_wms
 from layman.layer.util import get_complete_layer_info
 from layman.map import MAP_TYPE
-from layman.map.util import get_complete_map_info
+from layman.map.util import get_complete_map_info, get_layers_from_json
 from layman.upgrade import upgrade_v2_0_util as util
 from layman.util import get_publication_info
 
@@ -636,6 +636,17 @@ def migrate_map_file(map_file_path, map_layers):
             layer_def['name'] = new_layers
         else:
             raise ValueError(f'Unknown layer type: {layer_def["type"]}')
+
+    new_layers = get_layers_from_json(map_json)
+    old_layers = [(layer['uuid'], layer['index']) for layer in map_layers]
+    new_layers.sort(key=lambda x: (x[1], x[0]))
+    old_layers.sort(key=lambda x: (x[1], x[0]))
+    if new_layers != old_layers:
+        new_map_file_path = map_file_path + '.new'
+        with open(new_map_file_path, 'w', encoding="utf-8") as map_file:
+            json.dump(map_json, map_file, indent=4)
+        assert new_layers == old_layers, f'New internal layers do not correspond to the old ones. New file saved as {new_map_file_path}.\n{new_layers=}\n{old_layers=}'
+
     with open(map_file_path, 'w', encoding="utf-8") as map_file:
         json.dump(map_json, map_file, indent=4)
 
