@@ -1,6 +1,7 @@
 import os
 import glob
 import inspect
+import traceback
 import logging
 
 from layman.layer.filesystem import util as file_util
@@ -61,6 +62,11 @@ def get_layer_input_files(workspace, layername):
     return file_util.InputFiles(saved_paths=filepaths)
 
 
-def safe_delete(path):
-    if os.path.exists(path):
+def safe_delete(path, *, warn_OSError=False):
+    try:
         os.rmdir(path)
+    except FileNotFoundError:
+        pass
+    except OSError:
+        if warn_OSError:
+            logger.warning(f"    Directory {path} was not deleted, because it is not empty.\n{traceback.format_exc()}")

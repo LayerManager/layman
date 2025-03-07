@@ -791,9 +791,9 @@ def delete_old_workspaces():
         util.safe_delete(f"{settings.LAYMAN_NORMALIZED_RASTER_DATA_DIR}/workspaces/{workspace}/layers")
         util.safe_delete(f"{settings.LAYMAN_NORMALIZED_RASTER_DATA_DIR}/workspaces/{workspace}")
 
-    util.safe_delete(f"{settings.LAYMAN_QGIS_DATA_DIR}/workspaces")
+    util.safe_delete(f"{settings.LAYMAN_QGIS_DATA_DIR}/workspaces", warn_OSError=True)
 
-    util.safe_delete(f"{settings.LAYMAN_NORMALIZED_RASTER_DATA_DIR}/workspaces")
+    util.safe_delete(f"{settings.LAYMAN_NORMALIZED_RASTER_DATA_DIR}/workspaces", warn_OSError=True)
 
-    util.safe_delete(f"{settings.LAYMAN_DATA_DIR}/workspaces")
+    util.safe_delete(f"{settings.LAYMAN_DATA_DIR}/workspaces", warn_OSError=True)
     logger.info(f'    Delete old workspaces DONE!')
