@@ -19,10 +19,6 @@ USERS = {OWNER, OWNER2, NOT_OWNER, }
 HEADERS = {user: process_client.get_authz_headers(user) for user in USERS}
 
 MICKA_XML_LAYER_DIFF_LINES = [
-    {'plus_line': '+    <gco:CharacterString>m-81c0debe-b2ea-4829-9b16-581083b29907</gco:CharacterString>\n',
-     'minus_line_starts_with': '-    <gco:CharacterString>m',
-     'minus_line_ends_with': '</gco:CharacterString>\n',
-     },
     {'plus_line': '+    <gco:Date>2007-05-25</gco:Date>\n',
      'minus_line_starts_with': '-    <gco:Date>',
      'minus_line_ends_with': '</gco:Date>\n',
@@ -282,7 +278,7 @@ PUBLICATIONS = {
     },
     (COMMON_WORKSPACE, LAYER_TYPE, 'post_tif_rgba_4326'): {
         DEFINITION: [
-            {},
+            {'uuid': '81c0debe-b2ea-4829-9b16-581083b29907'},
             {'file_paths': ['sample/layman.layer/sample_tif_rgba_4326.tif', ]},
         ],
         TEST_DATA: {
@@ -294,7 +290,7 @@ PUBLICATIONS = {
             'style_type': 'sld',
             'micka_xml': {'filled_template': 'test_tools/data/micka/rest_test_filled_raster_template.xml',
                           'diff_lines': MICKA_XML_LAYER_DIFF_LINES,
-                          'diff_lines_len': 29,
+                          'diff_lines_len': 20,
                           },
         },
     },
@@ -559,7 +555,10 @@ PUBLICATIONS = {
     },
     (WORKSPACE1, LAYER_TYPE, 'test_publications_same_name_publ'): {
         DEFINITION: [
-            {'file_paths': ['sample/layman.layer/sample_tif_rgba_4326.tif', ]},
+            {
+                'file_paths': ['sample/layman.layer/sample_tif_rgba_4326.tif', ],
+                'uuid': 'b12141ae-1004-48f3-a281-0921ab2a7789',
+            },
             {'file_paths': [
                 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.cpg',
                 'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.dbf',
@@ -576,7 +575,7 @@ PUBLICATIONS = {
             'style_type': 'sld',
             'micka_xml': {'filled_template': 'test_tools/data/micka/rest_test_filled_template.xml',
                           'diff_lines': MICKA_XML_LAYER_DIFF_LINES,
-                          'diff_lines_len': 29,
+                          'diff_lines_len': 20,
                           },
         },
     },
