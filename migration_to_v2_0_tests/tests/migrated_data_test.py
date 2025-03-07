@@ -5,7 +5,7 @@ from string import Template
 from typing import List
 import pytest
 
-from tools.client import RestClient
+from tools.client import RestClient, LAYER_TYPE, MAP_TYPE
 from tools.http import LaymanError
 from tools.oauth2_provider_mock import OAuth2ProviderMock
 from tools.test_data import import_publication_uuids, PUBLICATIONS_TO_MIGRATE, INCOMPLETE_LAYERS, Publication4Test, \
@@ -22,6 +22,39 @@ import layman_settings as settings
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 MAPS_FOR_THUMBNAIL_TEST: List[Map4Test] = [map for map in MAPS_TO_MIGRATE if map.exp_internal_layers and map.exp_thumbnail_path]
 MAPS_FOR_INPUT_FILE_TEST: List[Map4Test] = [map for map in MAPS_TO_MIGRATE if map.exp_input_file and map.exp_internal_layers]
+
+LAYER_METADATA_PROPERTIES = {
+    'abstract',
+    'extent',
+    'graphic_url',
+    'identifier',
+    'layer_endpoint',
+    'language',
+    'organisation_name',
+    'publication_date',
+    'reference_system',
+    'revision_date',
+    # 'spatial_resolution',  # It is not updated for vector layer updated as raster one (probably because of bug in Micka)
+    'temporal_extent',
+    'title',
+    'wfs_url',
+    'wms_url',
+}
+
+MAP_METADATA_PROPERTIES = {
+    'abstract',
+    'extent',
+    'graphic_url',
+    'identifier',
+    'map_endpoint',
+    'map_file_endpoint',
+    'operates_on',  # When sending map with no items after there were some items, items are not deleted (probably because of bug in Micka)
+    'organisation_name',
+    'publication_date',
+    'reference_system',
+    'revision_date',
+    'title',
+}
 
 
 @pytest.fixture(scope="session")
@@ -209,6 +242,25 @@ def test_deleted_incomplete_layers(client, layer):
     rows = db_util.run_query(f"select * from {settings.LAYMAN_PRIME_SCHEMA}.publications where uuid = %s",
                              data=(layer.uuid,), uri_str=DB_URI)
     assert len(rows) == 0
+
+
+@pytest.mark.usefixtures("import_publication_uuids_fixture")
+@pytest.mark.parametrize("publication", PUBLICATIONS_TO_MIGRATE, ids=ids_fn)
+def test_metadata_comparison(client, publication):
+    md_props = {
+        LAYER_TYPE: LAYER_METADATA_PROPERTIES,
+        MAP_TYPE: MAP_METADATA_PROPERTIES,
+    }[publication.type]
+
+    metadata_comparison_json = client.get_workspace_publication_metadata_comparison(publication.type,
+                                                                                    publication.workspace,
+                                                                                    publication.name,
+                                                                                    actor_name=publication.owner)
+
+    assert md_props.issubset(set(metadata_comparison_json['metadata_properties'].keys()))
+    for key, value in metadata_comparison_json['metadata_properties'].items():
+        assert value['equal_or_null'] is True, f'{key=}, {value=}\n{metadata_comparison_json=}'
+        assert value['equal'] is True, f'{key=}, {value=}\n{metadata_comparison_json=}'
 
 
 @pytest.mark.parametrize("geoserver_workspace", ["layman", "layman_wms"], ids=ids_fn)
