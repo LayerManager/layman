@@ -10,7 +10,7 @@ from psycopg2 import sql
 
 from db import util as db_util
 from geoserver import util as gs_util
-from layman import settings, names
+from layman import settings, names, common
 from layman.common.micka import util as micka_util, requests as micka_requests
 from layman.layer import LAYER_TYPE, STYLE_TYPES_DEF, db as layer_db
 from layman.layer.db import table as layer_db_table
@@ -19,6 +19,8 @@ from layman.layer.geoserver import wfs, wms as gs_wms, sld
 from layman.layer.geoserver.tasks import refresh_wms, refresh_wfs, refresh_sld
 from layman.layer.geoserver.util import DEFAULT_INTERNAL_DB_STORE
 from layman.layer.geoserver.wms import get_timeregex_props
+from layman.layer.micka import csw
+from layman.layer.micka.tasks import refresh_soap
 from layman.layer.qgis.tasks import refresh_wms as qgis_refresh_wms
 from layman.layer.util import get_complete_layer_info
 from layman.map import MAP_TYPE
@@ -571,6 +573,21 @@ def migrate_layers():
         except BaseException:
             failed_steps.append('thumbnail')
             logger.error(f'    Fail to move thumbnail file: : \n{traceback.format_exc()}')
+
+        # Refresh metadata
+        csw_info = csw.get_layer_info(workspace, layername)
+        if csw_info:
+            logger.info("      update micka metadata")
+            try:
+                kwargs = {
+                    'http_method': common.REQUEST_METHOD_PATCH,
+                    'metadata_properties_to_refresh': ['wms_url', 'wfs_url'],
+                    'uuid': layer_uuid
+                }
+                util.run_task_sync(refresh_soap, [workspace, layername], kwargs)
+            except BaseException:
+                failed_steps.append('micka_soap')
+                logger.error(f'    Fail to refresh metadata od Micka: \n{traceback.format_exc()}')
 
         # assert that source keys up to geoserver are OK
         if not failed_steps:
