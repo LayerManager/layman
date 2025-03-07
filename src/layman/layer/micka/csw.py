@@ -179,6 +179,8 @@ def get_template_path_and_values(publication: Layer, *, http_method):
     extent = [max(west, -180), max(south, -90), min(east, 180), min(north, 90)]
     languages = languages or []
 
+    wfs_name = publication.gs_names.wfs.name
+    wms_name = publication.gs_names.wms.name
     prop_values = {
         'md_file_identifier': common_util.get_metadata_uuid(publication.uuid),
         'md_language': md_language,
@@ -196,8 +198,8 @@ def get_template_path_and_values(publication: Layer, *, http_method):
                                layername=publication.name),
         'extent': extent,
         'temporal_extent': temporal_extent,
-        'wms_url': f"{wms.add_capabilities_params_to_url(wms.get_wms_url(external_url=True))}&LAYERS={publication.name}",
-        'wfs_url': f"{wfs.add_capabilities_params_to_url(wfs_url)}&LAYERS={publication.name}" if wfs_url else None,
+        'wms_url': f"{wms.add_capabilities_params_to_url(wms.get_wms_url(external_url=True))}&LAYERS={wms_name}",
+        'wfs_url': f"{wfs.add_capabilities_params_to_url(wfs_url)}&LAYERS={wfs_name}" if wfs_url else None,
         'layer_endpoint': url_for('rest_workspace_layer.get', workspace=publication.workspace,
                                   layername=publication.name),
         'spatial_resolution': spatial_resolution,
