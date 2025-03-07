@@ -2,7 +2,7 @@ from copy import deepcopy
 import os
 import pytest
 
-from layman import app
+from layman import app, settings
 from layman.layer.layer_class import Layer
 from test_tools import process_client
 from tests import EnumTestTypes
@@ -84,3 +84,12 @@ class TestLayer(base_test.TestSingleRestPublication):
         with app.app_context():
             prod_layer = Layer(layer_tuple=(layer.workspace, layer.name))
         asserts_publ.metadata.correct_values_in_metadata(prod_layer, http_method=rest_method.enum_item.publ_name_part)
+
+        gs_url = f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/geoserver/'
+
+        exp_wfs_url = f'{gs_url}layman/wfs?SERVICE=WFS&REQUEST=GetCapabilities&VERSION=2.0.0&LAYERS=l_{prod_layer.uuid}' \
+            if prod_layer.geodata_type == settings.GEODATA_TYPE_VECTOR else None
+        asserts_publ.metadata.expected_values_in_micka_metadata(prod_layer, expected_values={
+            'wms_url': f'{gs_url}layman_wms/ows?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0&LAYERS=l_{prod_layer.uuid}',
+            'wfs_url': exp_wfs_url,
+        })
