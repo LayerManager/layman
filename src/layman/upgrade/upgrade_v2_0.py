@@ -555,6 +555,24 @@ def migrate_layers():
         else:
             logger.warning("      geoserver.sld already exists!")
 
+        # Refresh metadata
+        from layman import common
+        from layman.layer.micka import csw
+        from layman.layer.micka.tasks import refresh_soap
+        csw_info = csw.get_layer_info(workspace, layername)
+        if csw_info:
+            logger.info("      update micka metadata")
+            try:
+                kwargs = {
+                    'http_method': common.REQUEST_METHOD_PATCH,
+                    'metadata_properties_to_refresh': ['wms_url', 'wfs_url'],
+                    'uuid': layer_uuid
+                }
+                util.run_task_sync(refresh_soap, [workspace, layername], kwargs)
+            except BaseException:
+                failed_steps.append('micka_soap')
+                logger.error(f'    Fail to refresh metadata od Micka: \n{traceback.format_exc()}')
+
         # Move thumbnail file
         logger.info("      moving thumbnail file")
         src_thumbnail_path = f"{src_main_path}/thumbnail/{layername}.png"
