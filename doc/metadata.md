@@ -305,7 +305,7 @@ Multiplicity: 1
 
 Shape: String
 
-Example: `"http://localhost:8600/geoserver/workspace1/ows?SERVICE=WFS&REQUEST=GetCapabilities&VERSION=2.0.0&LAYERS=layer"`
+Example: `"http://localhost:8600/geoserver/layman/ows?SERVICE=WFS&REQUEST=GetCapabilities&VERSION=2.0.0&LAYERS=l_ca238200-8200-1a23-9399-42c9fca53542"`
 
 Synchronizable: yes
 
@@ -319,7 +319,7 @@ Multiplicity: 1
 
 Shape: String
 
-Example: `"http://localhost:8600/geoserver/workspace1_wms/ows?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0&LAYERS=layer"`
+Example: `"http://localhost:8600/geoserver/layman_wms/ows?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0&LAYERS=l_ca238200-8200-1a23-9399-42c9fca53542"`
 
 Synchronizable: yes
 

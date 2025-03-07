@@ -42,9 +42,10 @@ def test_fill_template():
         pass
     workspace = 'browser'
     layer = 'layer'
+    layer_uuid = 'ca238200-8200-1a23-9399-42c9fca53542'
     file_object = common_util.fill_xml_template_as_pretty_file_object('src/layman/layer/micka/record-template.xml',
                                                                       {
-                                                                          'md_file_identifier': common_util.get_metadata_uuid('ca238200-8200-1a23-9399-42c9fca53542'),
+                                                                          'md_file_identifier': common_util.get_metadata_uuid(layer_uuid),
                                                                           'md_language': None,
                                                                           'md_date_stamp': '2007-05-25',
                                                                           'reference_system': ['EPSG:3857', 'EPSG:4326'],
@@ -63,8 +64,8 @@ def test_fill_template():
                                                                           'extent': [11.87, 48.12, 19.13, 51.59],
                                                                           'temporal_extent': ['2022-03-16T00:00:00.000Z',
                                                                                               '2022-03-19T00:00:00.000Z', ],
-                                                                          'wms_url': f"{wms.add_capabilities_params_to_url('http://www.env.cz/corine/data/download.zip')}&LAYERS={layer}",
-                                                                          'wfs_url': f"{wfs.add_capabilities_params_to_url('http://www.env.cz/corine/data/download.zip')}&LAYERS={layer}",
+                                                                          'wms_url': f"{wms.add_capabilities_params_to_url('http://www.env.cz/corine/data/download.zip')}&LAYERS=l_{layer_uuid}",
+                                                                          'wfs_url': f"{wfs.add_capabilities_params_to_url('http://www.env.cz/corine/data/download.zip')}&LAYERS=l_{layer_uuid}",
                                                                           'layer_endpoint': layman_util.url_for(
                                                                               'rest_workspace_layer.get',
                                                                               workspace=workspace,
