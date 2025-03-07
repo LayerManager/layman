@@ -499,3 +499,17 @@ class RestClient:
         Path(os.path.dirname(output_path)).mkdir(parents=True, exist_ok=True)
         with open(output_path, "wb") as out_file:
             out_file.write(response.content)
+
+    def get_workspace_publication_metadata_comparison(self, publication_type, workspace, name, headers=None, actor_name=None):
+        headers = headers or {}
+        if actor_name:
+            assert TOKEN_HEADER not in headers
+
+        if actor_name and actor_name != settings.ANONYM_USER:
+            headers.update(get_authz_headers(actor_name))
+
+        publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
+        r_url = f"{self.base_url}/rest/workspaces/{workspace}/{publication_type_def.url_path_name}/{name}/metadata-comparison"
+        response = requests.get(r_url, headers=headers, timeout=HTTP_TIMEOUT)
+        raise_layman_error(response)
+        return response.json()
