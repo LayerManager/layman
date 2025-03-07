@@ -1,4 +1,6 @@
 from layman import app, settings
+from layman.layer.layer_class import Layer
+from layman.map.map_class import Map
 from layman.publication_class import Publication
 from layman.util import XForwardedClass
 from layman.layer.micka import csw as layer_csw_util
@@ -39,13 +41,14 @@ MAP_METADATA_PROPERTIES = {
 }
 
 
-def expected_values_in_micka_metadata(workspace, publ_type, name, expected_values):
+def expected_values_in_micka_metadata(publication: Publication, expected_values):
     md_comparison_method = {
-        process_client.LAYER_TYPE: layer_csw_util.get_metadata_comparison,
-        process_client.MAP_TYPE: map_csw_util.get_metadata_comparison,
-    }[publ_type]
+        process_client.LAYER_TYPE: layer_csw_util.get_metadata_comparison_by_class,
+        process_client.MAP_TYPE: map_csw_util.get_metadata_comparison_by_class,
+    }[publication.type]
     with app.app_context():
-        md_dict = md_comparison_method(workspace, name)
+        assert isinstance(publication, (Layer, Map))
+        md_dict = md_comparison_method(publication)
 
     assert len(md_dict) == 1
     md_record = next(iter(md_record for md_record in md_dict.values()))
@@ -83,7 +86,7 @@ def correct_values_in_metadata(publication: Publication, http_method, *, exp_val
         exp_metadata['reference_system'] = [int(crs.split(':')[1]) for crs in exp_metadata['reference_system']]
     for key, value in exp_values.items():
         assert exp_metadata[key] == value, f"Template value differ from expected value, key={key}"
-    expected_values_in_micka_metadata(publication.workspace, publication.type, publication.name, exp_metadata)
+    expected_values_in_micka_metadata(publication, exp_metadata)
 
 
 def correct_comparison_response_with_x_forwarded_headers(workspace, publ_type, name, *, actor_name=None, headers=None):
