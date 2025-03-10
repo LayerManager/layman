@@ -50,7 +50,7 @@ def patch(workspace, mapname):
     if 'file' in request.files and not request.files['file'].filename == '':
         file = request.files["file"]
     if file is not None:
-        file_json = util.check_file(file)
+        file_json = util.check_file(file, x_forwarded_items=x_forwarded_items)
 
     # TITLE
     if len(request.form.get('title', '')) > 0:

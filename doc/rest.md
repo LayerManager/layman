@@ -574,6 +574,7 @@ Body parameters:
      - or its URL protocol and its URL host corresponds with [X-Forwarded headers](client-proxy.md#x-forwarded-http-headers) (with or without client-proxy URL path prefix)
      - is named `l_<UUID>`
      - is in GeoServer workspace `layman` or `layman_wms`
+   - if there is internal layer referenced by its name and Layman workspace, Layman error is raised
 - *name*, string
    - computer-friendly identifier of the map
    - must be unique among all maps of one workspace
