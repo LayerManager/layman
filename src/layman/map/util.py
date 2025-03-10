@@ -16,7 +16,7 @@ from layman.common import redis as redis_util, tasks as tasks_util, metadata as 
 from layman.common.util import PUBLICATION_NAME_PATTERN, PUBLICATION_MAX_LENGTH, clear_publication_info as common_clear_publication_info
 from layman.layer.geoserver.util import get_gs_proxy_server_url
 from layman.util import call_modules_fn, get_providers_from_source_names, get_internal_sources, \
-    to_safe_name, url_for, WORKSPACE_NAME_PATTERN, XForwardedClass, get_publication_uuid
+    to_safe_name, url_for, WORKSPACE_NAME_PATTERN, XForwardedClass
 from . import get_map_sources, MAP_TYPE, get_map_type_def, get_map_info_keys
 from .filesystem import input_file
 from .map_class import Map
@@ -125,12 +125,16 @@ def patch_map(workspace, mapname, task_options, start_at):
     celery_util.set_publication_chain_info(workspace, MAP_TYPE, mapname, patch_tasks, res)
 
 
-def delete_map(workspace, mapname, kwargs=None):
-    publ_uuid = get_publication_uuid(workspace, MAP_TYPE, mapname)
+def delete_map_ws_name(workspace, mapname, kwargs=None):
+    map = Map(map_tuple=(workspace, mapname))
+    delete_map(map, kwargs=kwargs)
+
+
+def delete_map(map: Map, kwargs=None):
     sources = get_sources()
-    call_modules_fn(sources[::-1], 'delete_map', [workspace, mapname], kwargs=kwargs)
-    delete_publication_uuid_from_redis(workspace, MAP_TYPE, mapname, publ_uuid)
-    celery_util.delete_publication(workspace, MAP_TYPE, mapname)
+    call_modules_fn(sources[::-1], 'delete_map', [map], kwargs=kwargs)
+    delete_publication_uuid_from_redis(map.workspace, MAP_TYPE, map.name, map.uuid)
+    celery_util.delete_publication(map.workspace, MAP_TYPE, map.name)
 
 
 def clear_publication_info(layer_info):

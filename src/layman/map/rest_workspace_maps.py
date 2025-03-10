@@ -140,7 +140,7 @@ def delete(workspace):
                                             MAP_TYPE,
                                             util.is_map_chain_ready,
                                             util.abort_map_chain,
-                                            util.delete_map,
+                                            util.delete_map_ws_name,
                                             request.method,
                                             'rest_workspace_map.get',
                                             'mapname',
