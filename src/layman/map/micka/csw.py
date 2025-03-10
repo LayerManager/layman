@@ -49,12 +49,7 @@ def get_map_info(workspace, mapname, *, x_forwarded_items=None):
     return {}
 
 
-def delete_map(workspace, mapname):
-    publication = Map(map_tuple=(workspace, mapname))
-    return delete_map_by_class(publication)
-
-
-def delete_map_by_class(publication: Map):
+def delete_map(publication: Map):
     muuid = common_util.get_metadata_uuid(publication.uuid)
     if muuid is None:
         return

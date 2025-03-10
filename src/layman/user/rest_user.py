@@ -45,7 +45,7 @@ def delete(username):
         MAP_TYPE,
         map_util.is_map_chain_ready,
         map_util.abort_map_chain,
-        map_util.delete_map,
+        map_util.delete_map_ws_name,
         request.method,
         'rest_workspace_map.get',
         'mapname',

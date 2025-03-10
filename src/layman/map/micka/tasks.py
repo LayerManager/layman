@@ -28,5 +28,5 @@ def refresh_soap(self, workspace, mapname, http_method=common.REQUEST_METHOD_POS
                                 actor_name=actor_name, access_rights=access_rights)
 
     if self.is_aborted():
-        csw.delete_map_by_class(publication)
+        csw.delete_map(publication)
         raise AbortedException

@@ -505,18 +505,6 @@ def get_publication_infos_with_metainfo(workspace=None, publ_type=None, context=
     return infos
 
 
-def delete_workspace_publication(workspace, publication_type, publication):
-    from layman.layer import LAYER_TYPE, util as layer_util
-    from layman.map import MAP_TYPE, util as map_util
-
-    delete_method = {
-        LAYER_TYPE: layer_util.delete_layer,
-        MAP_TYPE: map_util.delete_map,
-    }[publication_type]
-
-    delete_method(workspace, publication)
-
-
 def delete_publications(workspace,
                         publ_type,
                         is_chain_ready_fn,

@@ -10,7 +10,6 @@ get_map_info = csw.get_map_info
 post_map = csw.post_map
 get_metadata_comparison = csw.get_metadata_comparison
 delete_map = csw.delete_map
-delete_map_by_class = csw.delete_map_by_class
 
 
 def patch_map(workspace, mapname, metadata_properties_to_refresh=None, access_rights=None, actor_name=None):

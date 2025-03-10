@@ -16,7 +16,7 @@ from layman.common.micka import util as common_util
 from layman.map.map_class import Map
 from layman.map.rest_workspace_test import wait_till_ready
 from test_tools.mock.micka import run
-from .csw import get_map_info, map_layers_to_operates_on_layers, delete_map_by_class
+from .csw import get_map_info, map_layers_to_operates_on_layers, delete_map
 
 MICKA_PORT = 8020
 
@@ -150,7 +150,7 @@ def no_micka_url():
 def test_delete_map_broken_micka(provide_map):
     with pytest.raises(LaymanError) as exc_info:
         with app.app_context():
-            delete_map_by_class(provide_map)
+            delete_map(provide_map)
     assert exc_info.value.code == 38
 
 
@@ -170,14 +170,14 @@ def test_get_map_info_no_micka():
 def test_delete_map_no_micka(provide_map):
     with pytest.raises(LaymanError) as exc_info:
         with app.app_context():
-            delete_map_by_class(provide_map)
+            delete_map(provide_map)
     assert exc_info.value.code == 38
 
 
 @pytest.mark.usefixtures('ensure_layman', 'provide_map')
 def test_patch_map_without_metadata(client, provide_map):
     with app.app_context():
-        delete_map_by_class(provide_map)
+        delete_map(provide_map)
     patch_map(client)
 
 
