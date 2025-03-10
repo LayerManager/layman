@@ -1,4 +1,6 @@
 import pytest
+
+from layman import app
 from layman.util import XForwardedClass
 from . import util as map_util
 
@@ -32,7 +34,8 @@ from . import util as map_util
 ])
 def test_get_layers_from_json(json_path, exp_result):
     with open(json_path, 'r', encoding="utf-8") as map_file:
-        map_json = map_util.check_file(map_file)
+        with app.app_context():
+            map_json = map_util.check_file(map_file)
     x_forwarded_items = XForwardedClass(proto='https', host='laymanproxy.com', prefix='/some-proxy-path')
     result = map_util.get_layers_from_json(map_json, x_forwarded_items=x_forwarded_items)
     assert result == exp_result
