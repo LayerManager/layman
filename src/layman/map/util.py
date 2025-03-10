@@ -22,6 +22,7 @@ from .filesystem import input_file
 from .map_class import Map
 from .micka import csw
 from .micka.csw import map_to_operates_on
+from ..publication_relation.util import check_no_internal_workspace_name_layer
 from ..uuid import delete_publication_uuid_from_redis
 
 MAPNAME_PATTERN = PUBLICATION_NAME_PATTERN
@@ -208,7 +209,7 @@ def get_composition_schema(url):
     return schema_json
 
 
-def check_file(file):
+def check_file(file, *, x_forwarded_items=None):
     try:
         file_json = json.load(file)
     except ValueError as exc:
@@ -243,6 +244,8 @@ def check_file(file):
             'validation-errors': errors,
         })
     validate(instance=file_json, schema=schema_json)
+
+    check_no_internal_workspace_name_layer(file_json, x_forwarded_items=x_forwarded_items)
 
     map_crs = get_crs_from_json(file_json)
     if map_crs not in settings.INPUT_SRS_LIST:
@@ -443,7 +446,7 @@ def _get_layer_names_from_vector_json(map_layer):
     ]
 
 
-def get_layers_from_json(map_json, *, x_forwarded_items=None):
+def get_internal_gs_layers_from_json(map_json, *, x_forwarded_items=None):
     x_forwarded_items = x_forwarded_items or XForwardedClass()
     map_json = input_file.unquote_urls(map_json)
     gs_server_raw_url = get_gs_proxy_server_url()
@@ -487,10 +490,18 @@ def get_layers_from_json(map_json, *, x_forwarded_items=None):
             else:
                 layer_geoserver_workspace = url_geoserver_workspace
                 layer_geoserver_name = full_layername
-            layer_uuid = names.geoserver_layername_to_uuid(geoserver_workspace=layer_geoserver_workspace,
-                                                           geoserver_name=layer_geoserver_name)
-            if layer_uuid:
-                layer_def = (layer_uuid, layer_idx)
-                if layer_def not in found_layers:
-                    found_layers.append(layer_def)
+            found_layers.append((layer_idx, layer_geoserver_workspace, layer_geoserver_name))
+    return found_layers
+
+
+def get_layers_from_json(map_json, *, x_forwarded_items=None):
+    found_gs_layer = get_internal_gs_layers_from_json(map_json, x_forwarded_items=x_forwarded_items)
+    found_layers = []
+    for layer_idx, gs_workspace, gs_layer in found_gs_layer:
+        layer_uuid = names.geoserver_layername_to_uuid(geoserver_workspace=gs_workspace,
+                                                       geoserver_name=gs_layer)
+        if layer_uuid:
+            layer_def = (layer_uuid, layer_idx)
+            if layer_def not in found_layers:
+                found_layers.append(layer_def)
     return found_layers
