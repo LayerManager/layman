@@ -16,7 +16,7 @@ from layman.common import redis as redis_util, tasks as tasks_util, metadata as 
 from layman.common.util import PUBLICATION_NAME_PATTERN, PUBLICATION_MAX_LENGTH, clear_publication_info as common_clear_publication_info
 from layman.layer.geoserver.util import get_gs_proxy_server_url
 from layman.util import call_modules_fn, get_providers_from_source_names, get_internal_sources, \
-    to_safe_name, url_for, WORKSPACE_NAME_PATTERN, XForwardedClass, get_publication_uuid
+    to_safe_name, url_for, WORKSPACE_NAME_PATTERN, XForwardedClass
 from . import get_map_sources, MAP_TYPE, get_map_type_def, get_map_info_keys
 from .filesystem import input_file
 from .map_class import Map
@@ -126,21 +126,20 @@ def patch_map(workspace, mapname, task_options, start_at, *, only_sync=False):
         celery_util.set_publication_chain_info(workspace, MAP_TYPE, mapname, patch_tasks, res)
 
 
-def delete_map(workspace, mapname, kwargs=None, *, x_forwarded_items=None):
-    publ_uuid = get_publication_uuid(workspace, MAP_TYPE, mapname)
+def delete_map(map: Map, kwargs=None, *, x_forwarded_items=None):
     sources = get_sources()
     delete_info = {}
-    results = call_modules_fn(sources[::-1], 'delete_map', [workspace, mapname], kwargs=kwargs)
+    results = call_modules_fn(sources[::-1], 'delete_map', [map], kwargs=kwargs)
     for partial_result in results.values():
         if partial_result is not None:
             delete_info.update(partial_result)
-    delete_publication_uuid_from_redis(workspace, MAP_TYPE, mapname, publ_uuid)
-    celery_util.delete_publication(workspace, MAP_TYPE, mapname)
+    delete_publication_uuid_from_redis(map.workspace, map.type, map.name, map.uuid)
+    celery_util.delete_publication(map.workspace, map.type, map.name)
     result = {
         **delete_info,
         'url': url_for(**{'endpoint': 'rest_workspace_map.get',
-                          'workspace': workspace,
-                          'mapname': mapname,
+                          'workspace': map.workspace,
+                          'mapname': map.name,
                           'x_forwarded_items': x_forwarded_items
                           }),
     }

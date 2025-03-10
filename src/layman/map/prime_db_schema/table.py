@@ -2,6 +2,7 @@ from layman.common import empty_method_returns_dict
 from . import util
 from ...common.prime_db_schema import publications as pubs_util
 from .. import MAP_TYPE
+from ..map_class import Map
 
 get_metadata_comparison = empty_method_returns_dict
 
@@ -76,6 +77,6 @@ def post_map(workspace,
     pubs_util.insert_publication(workspace, db_info)
 
 
-def delete_map(workspace, map_name):
-    util.delete_internal_layer_relations(workspace, map_name, )
-    return pubs_util.delete_publication(workspace, MAP_TYPE, map_name)
+def delete_map(map: Map):
+    util.delete_internal_layer_relations(map.workspace, map.name, )
+    return pubs_util.delete_publication(map.workspace, map.type, map.name)

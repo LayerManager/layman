@@ -43,6 +43,7 @@ def patch(workspace, mapname):
 
     x_forwarded_items = layman_util.get_x_forwarded_items(request.headers)
     info = util.get_complete_map_info(workspace, mapname)
+    map = Map(uuid=info['uuid'])
 
     # FILE
     file = None
@@ -90,7 +91,7 @@ def patch(workspace, mapname):
                                       )
 
     if file is not None:
-        thumbnail.delete_map_by_uuid(info['uuid'])
+        thumbnail.delete_map(map)
         file = FileStorage(
             io.BytesIO(json.dumps(file_json).encode()),
             file.filename
@@ -123,7 +124,8 @@ def delete_map(workspace, mapname):
 
     util.abort_map_chain(workspace, mapname)
 
-    util.delete_map(workspace, mapname)
+    map = Map(map_tuple=(workspace, mapname))
+    util.delete_map(map)
 
     app.logger.info('DELETE Map done')
 
