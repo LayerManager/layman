@@ -331,7 +331,7 @@ def get_metadata_comparison(publication: Map):
         f"{layman_props['map_endpoint']}": layman_props,
     }
     sources = get_sources()
-    partial_infos = call_modules_fn(sources, 'get_metadata_comparison', [publication.workspace, publication.name])
+    partial_infos = call_modules_fn(sources, 'get_metadata_comparison', [publication])
     for partial_info in partial_infos.values():
         if partial_info is not None:
             all_props.update(partial_info)

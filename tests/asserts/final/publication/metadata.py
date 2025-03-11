@@ -43,8 +43,8 @@ MAP_METADATA_PROPERTIES = {
 
 def expected_values_in_micka_metadata(publication: Publication, expected_values):
     md_comparison_method = {
-        process_client.LAYER_TYPE: layer_csw_util.get_metadata_comparison_by_class,
-        process_client.MAP_TYPE: map_csw_util.get_metadata_comparison_by_class,
+        process_client.LAYER_TYPE: layer_csw_util.get_metadata_comparison,
+        process_client.MAP_TYPE: map_csw_util.get_metadata_comparison,
     }[publication.type]
     with app.app_context():
         assert isinstance(publication, (Layer, Map))
