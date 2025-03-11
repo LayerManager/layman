@@ -78,6 +78,7 @@ def oauth2_provider_mock():
                 'test_delete_owner_writer': None,
                 'test_delete_owner_reader': None,
                 'test_delete_reader': None,
+                'test_delete_owner_reader_role': None,
                 'test_patch_current_user_username_fail_xxxxxxxxxxxxxxxxxxxxxx': None,
             },
         },

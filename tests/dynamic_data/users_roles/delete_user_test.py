@@ -131,14 +131,17 @@ def test_delete_own_public_publications(publication_type):
 @pytest.mark.parametrize('publication_type', process_client.PUBLICATION_TYPES)
 @pytest.mark.usefixtures('ensure_layman_module', 'oauth2_provider_mock')
 def test_delete_shared_publications(publication_type):
-    # create publication with different users write access rights
+    # create publication with different users, roles write access rights
+    rolename = 'TEST_ROLE'
     username = "test_delete_owner_writer"
     publication = 'test_delete_user_publication_writer'
     public_workspace = 'test_workspace'
     username2 = 'test_delete_writer'
+    with app.app_context():
+        role_service.ensure_role(rolename)
     access_rights = {
-        'read': ','.join([username, username2]),
-        'write': ','.join([username, username2])
+        'read': ','.join([username, username2, rolename]),
+        'write': ','.join([username, username2, rolename])
     }
     users = process_client.get_users()
     if not any(user['username'] == username for user in users):
@@ -151,7 +154,8 @@ def test_delete_shared_publications(publication_type):
         publ_info = layman_util.get_publication_info(public_workspace, publication_type, publication)
     assert publ_info, f"Publication {publication} was deleted unexpectedly"
     access_rights = publ_info.get('access_rights', {})
-    assert access_rights == {'read': [username2], 'write': [username2]}
+    assert {tuple(sorted(v)) for v in access_rights.values()} == {tuple(sorted([username2, rolename]))}
+    role_service.delete_role(rolename)
 
 
 @pytest.mark.parametrize('setup_user_or_everyone', [
@@ -192,6 +196,30 @@ def test_delete_shared_publications_with_readers(setup_user_or_everyone, publica
 
     )
     process_client.delete_workspace_publications(publication_type, public_workspace, actor_name=username)
+
+
+@pytest.mark.parametrize('publication_type', process_client.PUBLICATION_TYPES)
+@pytest.mark.parametrize('workspace', ["public_workspace", "test_delete_owner_reader_role"])
+@pytest.mark.usefixtures('ensure_layman_module', 'oauth2_provider_mock')
+def test_delete_shared_publication_with_role(publication_type):
+    rolename = 'TEST_ROLE'
+    username = "test_delete_owner_reader_role"
+    publication = "test_delete_user_publication_role"
+    process_client.reserve_username(username, actor_name=username)
+    with app.app_context():
+        role_service.ensure_role(rolename)
+    access_rights = {
+        'read': f"{username},{rolename}",
+        'write': f"{username}"
+    }
+    process_client.publish_workspace_publication(publication_type, workspace, publication,
+                                                 actor_name=username,
+                                                 access_rights=access_rights)
+    process_client.delete_user(username, actor_name=username)
+    with app.app_context():
+        publ_info = layman_util.get_publication_info(workspace, publication_type, publication)
+    assert not publ_info, f"Publication {publication} in workspace {workspace} was not deleted"
+    role_service.delete_role(rolename)
 
 
 def workspace_exists(workspace):
