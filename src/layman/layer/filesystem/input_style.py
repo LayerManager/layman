@@ -7,10 +7,9 @@ from werkzeug.datastructures import FileStorage
 
 from layman import patch_mode, LaymanError, layer
 from layman.common import empty_method, empty_method_returns_dict
-from layman.layer import LAYER_TYPE
-from layman.util import get_publication_uuid
 from . import util
 from . import input_file
+from ..layer_class import Layer
 
 LAYER_SUBDIR = __name__.rsplit('.', maxsplit=1)[-1]
 
@@ -36,10 +35,8 @@ def ensure_layer_input_style_dir(publ_uuid):
 get_layer_info = input_file.get_layer_info
 
 
-def delete_layer(workspace, layername):
-    publ_uuid = get_publication_uuid(workspace, LAYER_TYPE, layername)
-    if publ_uuid:
-        delete_layer_by_uuid(publ_uuid)
+def delete_layer(layer: Layer):
+    util.delete_layer_subdir(layer.uuid, LAYER_SUBDIR)
 
 
 def delete_layer_by_uuid(publ_uuid):

@@ -90,8 +90,9 @@ def test_single_abortable_task():
     # first one is failure, because it throws AbortedException
     assert results[0].state == results_copy[0].state == 'FAILURE'
     with app.app_context():
-        input_chunk.delete_layer_by_uuid(publ_uuid)
-        table.delete_layer(workspace, layername)
+        layer = LayerMock(uuid=publ_uuid, layer_tuple=(workspace, layername))
+        input_chunk.delete_layer(layer)
+        table.delete_layer(layer)
 
 
 @pytest.mark.usefixtures('client')
@@ -170,5 +171,6 @@ def test_abortable_task_chain():
     assert results[1].state == results_copy[1].state == 'FAILURE'
     assert results[2].state == results_copy[2].state == 'FAILURE'
     with app.app_context():
-        input_chunk.delete_layer_by_uuid(publ_uuid)
-        table.delete_layer(workspace, layername)
+        layer = LayerMock(uuid=publ_uuid, layer_tuple=(workspace, layername))
+        input_chunk.delete_layer(layer)
+        table.delete_layer(layer)
