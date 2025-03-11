@@ -14,6 +14,7 @@ from layman.layer import LAYER_TYPE
 from layman.util import get_publication_uuid
 from . import util
 from . import input_file
+from ..layer_class import Layer
 
 LAYER_SUBDIR = __name__.rsplit('.', maxsplit=1)[-1]
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
@@ -36,15 +37,9 @@ def ensure_layer_resumable_dir(publ_uuid):
     return resumable_dir
 
 
-def delete_layer(workspace, layername):
-    publ_uuid = get_publication_uuid(workspace, LAYER_TYPE, layername)
-    if publ_uuid:
-        delete_layer_by_uuid(publ_uuid)
-
-
-def delete_layer_by_uuid(publ_uuid):
-    util.delete_layer_subdir(publ_uuid, LAYER_SUBDIR)
-    chunk_key = get_layer_redis_total_chunks_key(publ_uuid)
+def delete_layer(layer: Layer):
+    util.delete_layer_subdir(layer.uuid, LAYER_SUBDIR)
+    chunk_key = get_layer_redis_total_chunks_key(layer.uuid)
     settings.LAYMAN_REDIS.delete(chunk_key)
 
 
@@ -189,6 +184,7 @@ def layer_file_chunk_exists(publ_uuid, parameter_name, filename,
 
 def layer_file_chunk_info(publ_uuid):
     # print('print layer_file_chunk_info')
+    layer = Layer(uuid=publ_uuid)
     resumable_dir = get_layer_resumable_dir(publ_uuid)
     info_path = os.path.join(resumable_dir, 'info.json')
     chunk_dir = os.path.join(resumable_dir, 'chunks')
@@ -234,7 +230,7 @@ def layer_file_chunk_info(publ_uuid):
             ])
             all_files_saved = num_files_saved == len(files_to_upload)
             if all_files_saved:
-                delete_layer_by_uuid(publ_uuid)
+                delete_layer(layer)
                 num_chunks_saved = 0
             else:
                 num_chunks_saved = len(os.listdir(chunk_dir))

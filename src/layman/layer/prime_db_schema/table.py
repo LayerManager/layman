@@ -4,6 +4,7 @@ from layman.common.prime_db_schema import publications as pubs_util
 from layman.layer import LAYER_TYPE
 from layman import patch_mode, settings
 from layman.layer.db import DbNames
+from ..layer_class import Layer
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 get_metadata_comparison = empty_method_returns_dict
@@ -28,8 +29,8 @@ def get_layer_info(workspace, layername):
     return info
 
 
-def delete_layer(workspace, layer_name):
-    return pubs_util.delete_publication(workspace, LAYER_TYPE, layer_name)
+def delete_layer(layer: Layer):
+    return pubs_util.delete_publication(layer.workspace, layer.type, layer.name)
 
 
 def patch_layer(workspace,

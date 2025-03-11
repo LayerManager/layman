@@ -258,7 +258,7 @@ def delete(workspace):
                                             LAYER_TYPE,
                                             util.is_layer_chain_ready,
                                             util.abort_layer_chain,
-                                            util.delete_layer,
+                                            util.delete_layer_by_ws_name,
                                             request.method,
                                             'rest_workspace_layer.get',
                                             'layername',

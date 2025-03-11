@@ -10,6 +10,7 @@ from layman.common import empty_method, empty_method_returns_dict
 from layman.layer import LAYER_TYPE
 from layman.util import get_publication_uuid
 from . import input_file, util
+from ..layer_class import Layer
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 logger = logging.getLogger(__name__)
@@ -69,15 +70,9 @@ post_layer = empty_method
 patch_layer = empty_method
 
 
-def delete_layer(workspace, layername):
-    publ_uuid = get_publication_uuid(workspace, LAYER_TYPE, layername)
-    if publ_uuid:
-        delete_layer_by_uuid(publ_uuid)
-
-
-def delete_layer_by_uuid(publ_uuid):
+def delete_layer(layer: Layer):
     try:
-        shutil.rmtree(get_normalized_raster_layer_dir(publ_uuid))
+        shutil.rmtree(get_normalized_raster_layer_dir(layer.uuid))
     except FileNotFoundError:
         pass
 

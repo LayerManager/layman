@@ -23,12 +23,7 @@ def get_workspace_style_url(*, uuid):
     return gs_util.get_workspace_style_url(style_name.workspace, style_name.name) if uuid else None
 
 
-def delete_layer(workspace, layername):
-    layer = Layer(layer_tuple=(workspace, layername))
-    return delete_layer_by_class(layer=layer, )
-
-
-def delete_layer_by_class(*, layer: Layer):
+def delete_layer(layer: Layer):
     sld_stream = None
     if layer:
         gs_style_name = layer.gs_names.sld

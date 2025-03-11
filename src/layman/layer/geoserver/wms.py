@@ -78,7 +78,7 @@ def patch_layer(workspace, layername, *, uuid, title, description, original_data
                         )
 
 
-def delete_layer_by_class(*, layer: Layer):
+def delete_layer(layer: Layer):
     db_store_name = DEFAULT_INTERNAL_DB_STORE
     gs_layername = layer.gs_names.wms
     gs_util.delete_feature_type(gs_layername.workspace, gs_layername.name, settings.LAYMAN_GS_AUTH, store=db_store_name)
@@ -93,11 +93,6 @@ def delete_layer_by_class(*, layer: Layer):
     gs_util.delete_security_roles(f"{gs_layername.workspace}.{gs_layername.name}.r", settings.LAYMAN_GS_AUTH)
     gs_util.delete_security_roles(f"{gs_layername.workspace}.{gs_layername.name}.w", settings.LAYMAN_GS_AUTH)
     return {}
-
-
-def delete_layer(workspace, layername):
-    layer = Layer(layer_tuple=(workspace, layername))
-    return delete_layer_by_class(layer=layer)
 
 
 def get_wms_url(external_url=False, *, x_forwarded_items=None):

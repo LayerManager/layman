@@ -217,7 +217,7 @@ def patch(workspace, layername):
                                       )
 
     if delete_from is not None:
-        deleted = util.delete_layer(workspace, layername, source=delete_from, http_method=request_method)
+        deleted = util.delete_layer(layer, source=delete_from, http_method=request_method)
         if style_file is None:
             try:
                 style_file = deleted['style']['file']
@@ -227,7 +227,7 @@ def patch(workspace, layername):
         kwargs['style_type'] = style_type
         kwargs['store_in_geoserver'] = style_type.store_in_geoserver
         if style_file:
-            input_style.save_layer_file(info['uuid'], style_file, style_type, )
+            input_style.save_layer_file(layer.uuid, style_file, style_type, )
 
         kwargs.update({
             'crs_id': crs_id,
@@ -275,10 +275,11 @@ def delete_layer(workspace, layername):
     x_forwarded_items = layman_util.get_x_forwarded_items(request.headers)
 
     info = util.get_complete_layer_info(workspace, layername, x_forwarded_items=x_forwarded_items)
+    layer = Layer(uuid=info['uuid'])
 
     util.abort_layer_chain(workspace, layername)
 
-    util.delete_layer(workspace, layername)
+    util.delete_layer(layer)
 
     app.logger.info('DELETE Layer done')
 

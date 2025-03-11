@@ -97,12 +97,7 @@ def patch_layer_by_class(publication: Layer, *, metadata_properties_to_refresh, 
     return muuid
 
 
-def delete_layer(workspace, layername, *, backup_uuid=None):
-    layer = Layer(layer_tuple=(workspace, layername))
-    return delete_layer_by_class(layer, backup_uuid=backup_uuid)
-
-
-def delete_layer_by_class(publication: Layer, *, backup_uuid=None):
+def delete_layer(publication: Layer, *, backup_uuid=None):
     uuid = publication.uuid or backup_uuid
     if backup_uuid and uuid:
         assert backup_uuid == uuid

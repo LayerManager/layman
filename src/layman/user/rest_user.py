@@ -33,7 +33,7 @@ def delete(username):
         LAYER_TYPE,
         layer_util.is_layer_chain_ready,
         layer_util.abort_layer_chain,
-        layer_util.delete_layer,
+        layer_util.delete_layer_by_ws_name,
         request.method,
         'rest_workspace_layer.get',
         'layername',

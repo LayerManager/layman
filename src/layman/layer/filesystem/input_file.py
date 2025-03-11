@@ -13,6 +13,7 @@ from layman.common import empty_method, empty_method_returns_dict
 from layman.common.filesystem import input_file as common
 from . import util, gdal as fs_gdal
 from .. import LAYER_TYPE
+from ..layer_class import Layer
 from ...util import get_publication_uuid
 
 LAYER_SUBDIR = __name__.rsplit('.', maxsplit=1)[-1]
@@ -38,10 +39,8 @@ def ensure_layer_input_file_dir(publ_uuid):
     return input_file_dir
 
 
-def delete_layer(workspace, layername):
-    publ_uuid = get_publication_uuid(workspace, LAYER_TYPE, layername)
-    if publ_uuid:
-        delete_layer_by_uuid(publ_uuid)
+def delete_layer(layer: Layer):
+    delete_layer_by_uuid(layer.uuid)
 
 
 def delete_layer_by_uuid(publ_uuid):

@@ -70,12 +70,7 @@ def get_layer_info(workspace, layername,):
     return result
 
 
-def delete_layer(workspace, layername):
-    layer = Layer(layer_tuple=(workspace, layername))
-    delete_layer_by_class(layer=layer)
-
-
-def delete_layer_by_class(*, layer: Layer):
+def delete_layer(layer: Layer):
     """Deletes table from internal DB only"""
     query = sql.SQL("""
     DROP TABLE IF EXISTS {table} CASCADE

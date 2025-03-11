@@ -8,7 +8,7 @@ from flask import current_app, request
 from db import TableUri, util as db_util
 from layman import LaymanError, patch_mode, util as layman_util, settings
 from layman.util import call_modules_fn, get_providers_from_source_names, get_internal_sources, \
-    to_safe_name, url_for, get_publication_uuid
+    to_safe_name, url_for
 from layman import celery as celery_util, common
 from layman.common import redis as redis_util, tasks as tasks_util, metadata as metadata_common
 from layman.common.prime_db_schema import publications
@@ -176,8 +176,12 @@ def patch_after_feature_change(workspace, layername, **kwargs):
     layman_util.patch_after_feature_change(workspace, LAYER_TYPE, layername, **kwargs)
 
 
-def delete_layer(workspace, layername, source=None, http_method='delete'):
-    publ_uuid = get_publication_uuid(workspace, LAYER_TYPE, layername)
+def delete_layer_by_ws_name(workspace, layername, source=None, http_method='delete'):
+    layer = Layer(layer_tuple=(workspace, layername))
+    delete_layer(layer, source=source, http_method=http_method)
+
+
+def delete_layer(layer: Layer, source=None, http_method='delete'):
     sources = get_sources()
     source_idx = next((
         idx for idx, m in enumerate(sources) if m.__name__ == source
@@ -192,13 +196,13 @@ def delete_layer(workspace, layername, source=None, http_method='delete'):
     # print(f"delete_layer {username}.{layername} using {len(sources)} sources: {[s.__name__ for s in sources]}")
 
     result = {}
-    results = call_modules_fn(sources, 'delete_layer', [workspace, layername])
+    results = call_modules_fn(sources, 'delete_layer', [layer])
     for partial_result in results.values():
         if partial_result is not None:
             result.update(partial_result)
     if source is None:
-        delete_publication_uuid_from_redis(workspace, LAYER_TYPE, layername, publ_uuid)
-    celery_util.delete_publication(workspace, LAYER_TYPE, layername)
+        delete_publication_uuid_from_redis(layer.workspace, layer.type, layer.name, layer.uuid)
+    celery_util.delete_publication(layer.workspace, layer.type, layer.name)
     return result
 
 
