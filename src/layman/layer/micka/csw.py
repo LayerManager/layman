@@ -359,16 +359,11 @@ METADATA_PROPERTIES = {
 }
 
 
-def get_metadata_comparison(workspace, layername):
-    layer = Layer(layer_tuple=(workspace, layername))
-    return get_metadata_comparison_by_class(layer)
-
-
-def get_metadata_comparison_by_class(publication: Layer):
+def get_metadata_comparison(layer: Layer):
     csw = common_util.create_csw()
-    if publication.uuid is None or csw is None:
+    if layer.uuid is None or csw is None:
         return {}
-    muuid = common_util.get_metadata_uuid(publication.uuid)
+    muuid = common_util.get_metadata_uuid(layer.uuid)
     element = common_util.get_record_element_by_id(csw, muuid)
     if element is None:
         return {}
