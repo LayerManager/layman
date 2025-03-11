@@ -5,6 +5,7 @@ from layman import app, settings
 from layman.common.prime_db_schema import publications
 from layman.http import LaymanError
 from test_tools import process_client, assert_util, data as test_data
+from test_tools.mock.layman_classes import LayerMock
 from . import wfs, wms, tasks
 
 
@@ -49,6 +50,7 @@ def test_geoserver_bbox():
 
     response = process_client.publish_workspace_layer(workspace, layer, style_file='sample/style/small_layer.qml')
     uuid = response['uuid']
+    layer_class = LayerMock(uuid=uuid, layer_tuple=(workspace, layer))
 
     assert_util.assert_wfs_bbox(uuid, expected_bbox_1)
     assert_util.assert_wms_bbox(uuid, expected_bbox_1)
@@ -65,9 +67,9 @@ def test_geoserver_bbox():
     # test WFS
     for bbox, expected_bbox in expected_bboxes:
         with app.app_context():
-            wfs.delete_layer(workspace, layer)
+            wfs.delete_layer(layer_class)
             publications.set_bbox(workspace, process_client.LAYER_TYPE, layer, bbox, crs, )
-            wfs.delete_layer(workspace, layer)
+            wfs.delete_layer(layer_class)
             tasks.refresh_wfs.apply(args=[workspace, layer],
                                     kwargs=kwargs,
                                     )
@@ -76,7 +78,7 @@ def test_geoserver_bbox():
     # test WMS
     for bbox, expected_bbox in expected_bboxes:
         with app.app_context():
-            wms.delete_layer(workspace, layer)
+            wms.delete_layer(layer_class)
             publications.set_bbox(workspace, process_client.LAYER_TYPE, layer, bbox, crs, )
             tasks.refresh_wms.apply(args=[workspace, layer],
                                     kwargs=wms_kwargs,
@@ -86,9 +88,9 @@ def test_geoserver_bbox():
     # test cascade WMS from QGIS
     for bbox, expected_bbox in expected_bboxes:
         with app.app_context():
-            wms.delete_layer(workspace, layer)
+            wms.delete_layer(layer_class)
             publications.set_bbox(workspace, process_client.LAYER_TYPE, layer, bbox, crs, )
-            wms.delete_layer(workspace, layer)
+            wms.delete_layer(layer_class)
             tasks.refresh_wms.apply(args=[workspace, layer],
                                     kwargs=wms_kwargs,
                                     )

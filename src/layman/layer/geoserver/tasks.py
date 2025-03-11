@@ -105,7 +105,7 @@ def refresh_wms(
     wms.clear_cache()
 
     if self.is_aborted():
-        wms.delete_layer_by_class(layer=layer)
+        wms.delete_layer(layer=layer)
         raise AbortedException
 
 
@@ -155,7 +155,7 @@ def refresh_wfs(
     wfs.clear_cache()
 
     if self.is_aborted():
-        wfs.delete_layer_by_class(layer=layer)
+        wfs.delete_layer(layer=layer)
         raise AbortedException
 
 
@@ -174,5 +174,5 @@ def refresh_sld(self, workspace, layername, store_in_geoserver, *, uuid):
         sld.create_layer_style(layer=layer)
 
     if self.is_aborted():
-        sld.delete_layer_by_class(layer=layer)
+        sld.delete_layer(layer=layer)
         raise AbortedException
