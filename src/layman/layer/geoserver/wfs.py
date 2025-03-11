@@ -175,19 +175,12 @@ def get_layer_info_by_uuid(*, uuid, x_forwarded_items=None):
     }
 
 
-def get_metadata_comparison(workspace, layername):
-    uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layername)
-    return get_metadata_comparison_by_uuid(uuid=uuid)
-
-
-def get_metadata_comparison_by_uuid(*, uuid):
-    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['geodata_type', ]})
-    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wfs
-    geodata_type = info['geodata_type']
-    if geodata_type in (settings.GEODATA_TYPE_RASTER, settings.GEODATA_TYPE_UNKNOWN):
+def get_metadata_comparison(layer: Layer):
+    gs_layername = layer.gs_names.wfs
+    if layer.geodata_type in (settings.GEODATA_TYPE_RASTER, settings.GEODATA_TYPE_UNKNOWN):
         return {}
-    if geodata_type != settings.GEODATA_TYPE_VECTOR:
-        raise NotImplementedError(f"Unknown geodata type: {geodata_type}")
+    if layer.geodata_type != settings.GEODATA_TYPE_VECTOR:
+        raise NotImplementedError(f"Unknown geodata type: {layer.geodata_type}")
 
     wfs = get_wfs_direct()
     if wfs is None:
