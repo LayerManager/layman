@@ -381,13 +381,8 @@ METADATA_PROPERTIES = {
 }
 
 
-def get_metadata_comparison(workspace, mapname):
-    publication = Map(map_tuple=(workspace, mapname))
-    return get_metadata_comparison_by_class(publication)
-
-
-def get_metadata_comparison_by_class(publication: Map):
-    uuid = publication.uuid
+def get_metadata_comparison(map: Map):
+    uuid = map.uuid
     csw = common_util.create_csw()
     if uuid is None or csw is None:
         return {}

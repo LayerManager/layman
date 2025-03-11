@@ -231,13 +231,8 @@ def get_layer_info_by_uuid(*, uuid, x_forwarded_items=None):
     return result
 
 
-def get_metadata_comparison(workspace, layername):
-    uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layername)
-    return get_metadata_comparison_by_uuid(uuid=uuid)
-
-
-def get_metadata_comparison_by_uuid(*, uuid):
-    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wms
+def get_metadata_comparison(layer: Layer):
+    gs_layername = layer.gs_names.wms
     wms = get_wms_direct()
     if wms is None:
         return {}
