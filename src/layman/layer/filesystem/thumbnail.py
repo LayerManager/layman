@@ -7,6 +7,7 @@ from layman.util import url_for, get_publication_info_by_uuid, get_publication_u
 from layman.common import empty_method, empty_method_returns_dict, bbox as bbox_util
 from . import util
 from .. import LAYER_TYPE
+from ..layer_class import Layer
 
 LAYER_SUBDIR = __name__.rsplit('.', maxsplit=1)[-1]
 
@@ -52,14 +53,8 @@ def get_layer_info_by_uuid(publ_uuid, *, workspace, layername, x_forwarded_items
     return {}
 
 
-def delete_layer(workspace, layername):
-    publ_uuid = get_publication_uuid(workspace, LAYER_TYPE, layername)
-    if publ_uuid:
-        delete_layer_by_uuid(publ_uuid)
-
-
-def delete_layer_by_uuid(publ_uuid):
-    util.delete_layer_subdir(publ_uuid, LAYER_SUBDIR)
+def delete_layer(layer: Layer):
+    util.delete_layer_subdir(layer.uuid, LAYER_SUBDIR)
 
 
 def get_layer_thumbnail_path(publ_uuid):

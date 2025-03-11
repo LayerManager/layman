@@ -12,6 +12,7 @@ from layman.layer.filesystem import input_chunk, util as fs_util
 from layman import celery as celery_util
 from layman.common import tasks as tasks_util
 from test_tools import flask_client
+from test_tools.mock.layman_classes import LayerMock
 
 MIN_GEOJSON = """
 {
@@ -75,7 +76,8 @@ def test_single_abortable_task():
     # first one is failure, because it throws AbortedException
     assert results[0].state == results_copy[0].state == 'FAILURE'
     with app.app_context():
-        input_chunk.delete_layer_by_uuid(publ_uuid)
+        layer = LayerMock(uuid=publ_uuid, layer_tuple=(workspace, layername))
+        input_chunk.delete_layer(layer)
 
 
 @pytest.mark.usefixtures('client')
@@ -141,4 +143,5 @@ def test_abortable_task_chain():
     assert results[1].state == results_copy[1].state == 'FAILURE'
     assert results[2].state == results_copy[2].state == 'FAILURE'
     with app.app_context():
-        input_chunk.delete_layer_by_uuid(publ_uuid)
+        layer = LayerMock(uuid=publ_uuid, layer_tuple=(workspace, layername))
+        input_chunk.delete_layer(layer)

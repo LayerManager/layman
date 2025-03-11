@@ -71,7 +71,7 @@ def refresh_table(
             for proc in processes:
                 proc.terminate()
             logger.info(f'deleting {layer.workspace} {layer.name}')
-            table.delete_layer_by_class(layer=layer)
+            table.delete_layer(layer=layer)
             raise AbortedException
         if return_code != 0 or stdout or stderr:
             info = table.get_layer_info(layer.workspace, layer.name)

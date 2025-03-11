@@ -4,6 +4,7 @@ from layman import celery_app
 from layman.common import empty_method_returns_true
 from layman.celery import AbortedException
 from . import wms
+from ..layer_class import Layer
 
 
 logger = get_task_logger(__name__)
@@ -26,10 +27,11 @@ def refresh_wms(
 ):
     if self.is_aborted():
         raise AbortedException
+    layer = Layer(uuid=uuid)
 
     if not store_in_geoserver:
-        wms.save_qgs_file(uuid)
+        wms.save_qgs_file(layer.uuid)
 
     if self.is_aborted():
-        wms.delete_layer_by_uuid(uuid)
+        wms.delete_layer(layer)
         raise AbortedException

@@ -36,5 +36,5 @@ def refresh_soap(self, username, layername, http_method=common.REQUEST_METHOD_PO
                                               )
 
     if self.is_aborted():
-        csw.delete_layer_by_class(layer)
+        csw.delete_layer(layer)
         raise AbortedException
