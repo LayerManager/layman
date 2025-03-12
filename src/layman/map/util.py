@@ -111,18 +111,18 @@ def post_map(workspace, mapname, task_options, start_at):
     celery_util.set_publication_chain_info(workspace, MAP_TYPE, mapname, post_tasks, res)
 
 
-def patch_map(workspace, mapname, task_options, start_at):
+def patch_map(map: Map, task_options, start_at):
     # sync processing
     sources = get_sources()
-    call_modules_fn(sources, 'patch_map', [workspace, mapname], kwargs=task_options)
+    call_modules_fn(sources, 'patch_map', [map.workspace, map.name], kwargs=task_options)
 
     # async processing
-    patch_tasks = tasks_util.get_task_methods(get_map_type_def(), workspace, mapname, task_options, start_at)
-    patch_chain = tasks_util.get_chain_of_methods(workspace, mapname, patch_tasks, task_options, 'mapname')
+    patch_tasks = tasks_util.get_task_methods(get_map_type_def(), map.workspace, map.name, task_options, start_at)
+    patch_chain = tasks_util.get_chain_of_methods(map.workspace, map.name, patch_tasks, task_options, 'mapname')
     # res = patch_chain.apply_async()
     res = patch_chain()
 
-    celery_util.set_publication_chain_info(workspace, MAP_TYPE, mapname, patch_tasks, res)
+    celery_util.set_publication_chain_info(map.workspace, MAP_TYPE, map.name, patch_tasks, res)
 
 
 def delete_map_ws_name(workspace, mapname, kwargs=None):

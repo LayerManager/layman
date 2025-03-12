@@ -99,8 +99,7 @@ def patch(workspace, mapname):
         input_file.save_map_files(info['uuid'], [file])
 
     util.patch_map(
-        workspace,
-        mapname,
+        map,
         kwargs,
         'layman.map.filesystem.input_file' if file_changed else None
     )
