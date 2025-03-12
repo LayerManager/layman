@@ -67,6 +67,7 @@
   - body parameter `sld` was removed from [POST Workspace Publications](doc/rest.md#post-workspace-layers) and [PATCH Workspace Publication](doc/rest.md#patch-workspace-layer)
   - workspace-related endpoints which did not include `/workspaces` in their path were removed 
 - [#701](https://github.com/LayerManager/layman/pull/701) Check bounding bbox of normalized raster before posting to GeoServer. Stop checking that Layer is available in WMS/WFS GetCapabilities after publishing to GeoServer.
+- Output from `make upgrade-demo` and `make upgrade-demo-full` are saved to `tmp/logs/demo_upgrade_${date -u +"%FT%H%MZ"}.log` at the same time as to standard output.
 - Add forgotten `thumbnail.path` attributes to documentation of GET Workspace [Layer](doc/rest.md#get-workspace-layer)/[Map](doc/rest.md#get-workspace-map) responses.
 - [#1028](https://github.com/LayerManager/layman/issues/1028) Upgrade Node.js of Laymen Test Client from v18 to v22 and dependencies:
   - eslint-config-next 13 -> 14
