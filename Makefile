@@ -34,19 +34,21 @@ build-demo:
 
 upgrade-demo:
 	mkdir -p layman_data deps/qgis/data
+	mkdir -p tmp/logs
 	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client timgen
 	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d postgresql
 	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps -u root layman bash -c "cd src && python3 -B setup_geoserver.py"
 	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate --no-deps qgis geoserver redis timgen layman_client nginx
-	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps layman bash -c "cd src && python3 layman_flush_redis.py && python3 wait_for_deps.py && python3 standalone_upgrade.py"
+	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps layman bash -c "cd src && python3 layman_flush_redis.py && python3 wait_for_deps.py && python3 standalone_upgrade.py" 2>&1 | tee "tmp/logs/demo_upgrade_$(shell date -u +""%FT%H%MZ"").log"
 
 upgrade-demo-full:
 	mkdir -p layman_data deps/qgis/data
+	mkdir -p tmp/logs
 	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml build layman layman_client timgen
 	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d postgresql
 	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps -u root layman bash -c "cd src && python3 -B setup_geoserver.py"
 	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml up -d --force-recreate --no-deps qgis geoserver redis timgen layman_client micka nginx
-	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps layman bash -c "cd src && python3 layman_flush_redis.py && python3 wait_for_deps.py && python3 standalone_upgrade.py"
+	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps layman bash -c "cd src && python3 layman_flush_redis.py && python3 wait_for_deps.py && python3 standalone_upgrade.py" 2>&1 | tee "tmp/logs/demo_upgrade_$(shell date -u +""%FT%H%MZ"").log"
 
 upgrade-after-timeout:
 	docker compose -f docker-compose.deps.demo.yml -f docker-compose.demo.yml run --rm --no-deps layman bash -c "cd src && python3 layman_flush_redis.py && python3 wait_for_deps.py && python3 standalone_upgrade.py"
