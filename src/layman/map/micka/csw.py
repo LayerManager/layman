@@ -56,15 +56,8 @@ def delete_map(publication: Map):
     micka_requests.csw_delete(muuid)
 
 
-def patch_map(workspace, mapname, metadata_properties_to_refresh=None, actor_name=None, create_if_not_exists=True,
-              timeout=None):
-    publication = Map(map_tuple=(workspace, mapname))
-    return patch_map_by_class(publication, metadata_properties_to_refresh=metadata_properties_to_refresh,
-                              actor_name=actor_name, create_if_not_exists=create_if_not_exists, timeout=timeout)
-
-
-def patch_map_by_class(publication: Map, metadata_properties_to_refresh=None, actor_name=None,
-                       create_if_not_exists=True, timeout=None):
+def patch_map(publication: Map, metadata_properties_to_refresh=None, actor_name=None,
+              create_if_not_exists=True, timeout=None):
     timeout = timeout or settings.DEFAULT_CONNECTION_TIMEOUT
     # current_app.logger.info(f"patch_map metadata_properties_to_refresh={metadata_properties_to_refresh}")
     metadata_properties_to_refresh = metadata_properties_to_refresh or []

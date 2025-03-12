@@ -12,18 +12,13 @@ get_metadata_comparison = csw.get_metadata_comparison
 delete_map = csw.delete_map
 
 
-def patch_map(workspace, mapname, metadata_properties_to_refresh=None, access_rights=None, actor_name=None):
-    publication = Map(map_tuple=(workspace, mapname))
-    return patch_map_by_class(publication, metadata_properties_to_refresh=metadata_properties_to_refresh,
-                              access_rights=access_rights, actor_name=actor_name)
-
-
-def patch_map_by_class(publication: Map, *, metadata_properties_to_refresh=None, access_rights=None, actor_name=None):
-    common_util.patch_publication_by_soap(publication,
+def patch_map(publication: Map, *, metadata_properties_to_refresh=None, access_rights=None, actor_name=None):
+    publication_updated = Map(uuid=publication.uuid)
+    common_util.patch_publication_by_soap(publication_updated,
                                           metadata_properties_to_refresh=metadata_properties_to_refresh,
                                           actor_name=actor_name,
                                           access_rights=access_rights,
-                                          csw_patch_method=csw.patch_map_by_class,
+                                          csw_patch_method=csw.patch_map,
                                           soap_insert_method=soap_insert,
                                           )
 
