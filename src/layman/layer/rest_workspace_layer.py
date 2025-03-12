@@ -199,8 +199,8 @@ def patch(workspace, layername):
     kwargs['enable_more_main_files'] = enable_more_main_files
     request_method = request.method.lower()
     kwargs['http_method'] = request_method
-    layer = Layer(layer_tuple=(workspace, layername))
-    props_to_refresh = util.get_same_or_missing_prop_names(layer)
+    old_layer = Layer(layer_tuple=(workspace, layername))
+    props_to_refresh = util.get_same_or_missing_prop_names(old_layer)
     kwargs['metadata_properties_to_refresh'] = props_to_refresh
 
     kwargs['external_table_uri'] = external_table_uri
@@ -217,7 +217,7 @@ def patch(workspace, layername):
                                       )
 
     if delete_from is not None:
-        deleted = util.delete_layer(layer, source=delete_from, http_method=request_method)
+        deleted = util.delete_layer(old_layer, source=delete_from, http_method=request_method)
         if style_file is None:
             try:
                 style_file = deleted['style']['file']
@@ -227,7 +227,7 @@ def patch(workspace, layername):
         kwargs['style_type'] = style_type
         kwargs['store_in_geoserver'] = style_type.store_in_geoserver
         if style_file:
-            input_style.save_layer_file(layer.uuid, style_file, style_type, )
+            input_style.save_layer_file(old_layer.uuid, style_file, style_type, )
 
         kwargs.update({
             'crs_id': crs_id,
@@ -250,9 +250,18 @@ def patch(workspace, layername):
     else:
         delete_from = 'layman.layer.micka.soap'
 
+    new_layer_values = {
+        k: v for k, v in kwargs.items()
+        if k in {'title', 'description', 'access_rights', 'style_type', 'geodata_type', 'image_mosaic',
+                 'original_data_source'}
+    }
+    if new_layer_values.get('style_type'):
+        new_layer_values['style_type'] = new_layer_values['style_type'].code
+    if kwargs['external_table_uri']:
+        new_layer_values['table_uri'] = kwargs['external_table_uri']
+    new_layer = old_layer.replace(**new_layer_values)
     util.patch_layer(
-        workspace,
-        layername,
+        new_layer,
         kwargs,
         delete_from,
         'layman.layer.filesystem.input_chunk' if use_chunk_upload else delete_from
