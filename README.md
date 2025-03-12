@@ -160,7 +160,7 @@ General steps to upgrade layman to MINOR or PATCH version:
       - `make wagtail-build`
       - `make micka-build`
       - `make qgis-build`
-1. If you are expecting long-running upgrade, run **standalone upgrade**, otherwise Gunicorn could time out. The command depends on how you are starting Layman.
+1. If you are expecting long-running upgrade, run **standalone upgrade**, otherwise Gunicorn could time out. The command depends on how you are starting Layman. Both standard and error output from **standalone upgrade** are saved to `tmp/logs/demo_upgrade_${date -u +"%FT%H%MZ"}.log` at the same time as to standard output.
    - If you are starting Layman with `make start-demo`, run `make upgrade-demo`.
    - If you are starting Layman with `make start-demo-full` or `make start-demo-full-with-optional-deps`, run `make upgrade-demo-full`.
    - If you are starting Layman with `make start-dev`, you don't need to run standalone migration.
