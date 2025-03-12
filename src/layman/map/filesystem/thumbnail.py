@@ -21,6 +21,7 @@ MAP_SUBDIR = __name__.rsplit('.', maxsplit=1)[-1]
 get_metadata_comparison = empty_method_returns_dict
 pre_publication_action_check = empty_method
 post_map = empty_method
+patch_map = empty_method
 
 
 def get_map_thumbnail_dir(publ_uuid):
@@ -54,11 +55,6 @@ def get_map_info_by_uuid(publ_uuid, *, workspace, mapname, x_forwarded_items=Non
             },
         }
     return {}
-
-
-def patch_map(workspace, mapname, *, uuid, file_changed=True):
-    if file_changed or not get_map_info_by_uuid(uuid, workspace=workspace, mapname=mapname):
-        post_map(workspace, mapname)
 
 
 def delete_map(map: Map):
