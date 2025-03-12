@@ -251,8 +251,7 @@ def patch(workspace, layername):
         delete_from = 'layman.layer.micka.soap'
 
     util.patch_layer(
-        workspace,
-        layername,
+        layer,
         kwargs,
         delete_from,
         'layman.layer.filesystem.input_chunk' if use_chunk_upload else delete_from
