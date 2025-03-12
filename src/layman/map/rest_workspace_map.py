@@ -43,7 +43,7 @@ def patch(workspace, mapname):
 
     x_forwarded_items = layman_util.get_x_forwarded_items(request.headers)
     info = util.get_complete_map_info(workspace, mapname)
-    map = Map(uuid=info['uuid'])
+    old_map = Map(uuid=info['uuid'])
 
     # FILE
     file = None
@@ -91,16 +91,16 @@ def patch(workspace, mapname):
                                       )
 
     if file is not None:
-        thumbnail.delete_map(map)
+        thumbnail.delete_map(old_map)
         file = FileStorage(
             io.BytesIO(json.dumps(file_json).encode()),
             file.filename
         )
         input_file.save_map_files(info['uuid'], [file])
 
+    new_map = old_map.replace(**{k: v for k, v in kwargs.items() if k in {'title', 'description', 'access_rights'}})
     util.patch_map(
-        workspace,
-        mapname,
+        new_map,
         kwargs,
         'layman.map.filesystem.input_file' if file_changed else None
     )
