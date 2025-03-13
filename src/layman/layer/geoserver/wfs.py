@@ -27,16 +27,16 @@ def get_flask_proxy_key():
     return FLASK_PROXY_KEY.format(workspace=workspace)
 
 
-def patch_layer_by_uuid(*, uuid, title, description, original_data_source, access_rights=None):
-    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wfs
-    if not get_layer_info_by_uuid(uuid=uuid):
+def patch_layer(layer: Layer, *, title, description, original_data_source, access_rights=None):
+    gs_layername = layer.gs_names.wfs
+    if not get_layer_info_by_uuid(uuid=layer.uuid):
         return
-    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['geodata_type', ]})
+    info = layman_util.get_publication_info_by_uuid(layer.uuid, context={'keys': ['geodata_type', ]})
     geodata_type = info['geodata_type']
     if geodata_type != settings.GEODATA_TYPE_VECTOR:
         raise NotImplementedError(f"Unknown geodata type: {geodata_type}")
 
-    store_name = get_db_store_name(uuid=uuid, original_data_source=original_data_source)
+    store_name = get_db_store_name(uuid=layer.uuid, original_data_source=original_data_source)
     gs_util.patch_feature_type(gs_layername.workspace, gs_layername.name, store_name=store_name, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
     clear_cache()
 
@@ -47,16 +47,6 @@ def patch_layer_by_uuid(*, uuid, title, description, original_data_source, acces
     if access_rights and access_rights.get('write'):
         security_write_roles = gs_common.layman_users_and_roles_to_geoserver_roles(access_rights['write'])
         gs_util.ensure_layer_security_roles(gs_layername.workspace, gs_layername.name, security_write_roles, 'w', settings.LAYMAN_GS_AUTH)
-
-
-# pylint: disable=unused-argument
-def patch_layer(workspace, layername, *, uuid, title, description, original_data_source, access_rights=None):
-    patch_layer_by_uuid(uuid=uuid,
-                        title=title,
-                        description=description,
-                        original_data_source=original_data_source,
-                        access_rights=access_rights,
-                        )
 
 
 def delete_layer(layer: Layer):

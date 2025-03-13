@@ -150,7 +150,7 @@ def patch_layer(layer: Layer, task_options, stop_sync_at, start_async_at):
     sources = get_sources()
     stop_idx = next((idx for idx, s in enumerate(sources) if s.__name__ == stop_sync_at), len(sources))
     sources = sources[:stop_idx]
-    call_modules_fn(sources, 'patch_layer', [layer.workspace, layer.name], kwargs=task_options)
+    call_modules_fn(sources, 'patch_layer', [layer], kwargs=task_options)
 
     patch_tasks = tasks_util.get_task_methods(get_layer_type_def(), layer.workspace, layer.name, task_options, start_async_at)
     patch_chain = tasks_util.get_chain_of_methods(layer.workspace, layer.name, patch_tasks, task_options, 'layername')

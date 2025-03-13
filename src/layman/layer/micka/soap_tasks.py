@@ -27,7 +27,7 @@ def patch_after_feature_change(
                                          metadata_properties_to_refresh=['extent'],
                                          actor_name=None,
                                          access_rights=None,
-                                         csw_patch_method=csw.patch_layer_by_class,
+                                         csw_patch_method=csw.patch_layer,
                                          soap_insert_method=soap.soap_insert,
                                          )
 
