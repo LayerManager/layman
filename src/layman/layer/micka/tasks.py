@@ -31,7 +31,7 @@ def refresh_soap(self, username, layername, http_method=common.REQUEST_METHOD_PO
                                               metadata_properties_to_refresh=metadata_properties_to_refresh,
                                               actor_name=None,
                                               access_rights=access_rights,
-                                              csw_patch_method=csw.patch_layer_by_class,
+                                              csw_patch_method=csw.patch_layer,
                                               soap_insert_method=soap.soap_insert,
                                               )
 

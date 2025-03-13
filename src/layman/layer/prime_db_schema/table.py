@@ -33,8 +33,7 @@ def delete_layer(layer: Layer):
     return pubs_util.delete_publication(layer.workspace, layer.type, layer.name)
 
 
-def patch_layer(workspace,
-                layername,
+def patch_layer(layer: Layer,
                 actor_name,
                 external_table_uri,
                 style_type=None,
@@ -44,10 +43,10 @@ def patch_layer(workspace,
                 image_mosaic=None,
                 geodata_type=None,
                 ):
-    db_info = {"name": layername,
+    db_info = {"name": layer.name,
                "title": title,
                "description": description,
-               "publ_type_name": LAYER_TYPE,
+               "publ_type_name": layer.type,
                "actor_name": actor_name,
                'image_mosaic': image_mosaic,
                'external_table_uri': external_table_uri,
@@ -57,7 +56,7 @@ def patch_layer(workspace,
         db_info['style_type'] = style_type.code
     if access_rights:
         db_info['access_rights'] = access_rights
-    pubs_util.update_publication(workspace, db_info)
+    pubs_util.update_publication(layer.workspace, db_info)
 
 
 def pre_publication_action_check(workspace,
