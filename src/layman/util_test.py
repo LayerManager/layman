@@ -35,6 +35,22 @@ def assert_module_methods(module, methods):
                 f'Module {module.__name__} does not have {method} method.')
 
 
+@pytest.mark.parametrize('method', [
+    'abort_{name}_chain',
+    'delete_{name}',
+    'is_{name}_chain_ready',
+])
+@pytest.mark.parametrize('publication_type', settings.PUBLICATION_MODULES)
+def test_publication_type_interface_methods(publication_type, method):
+    with app.app_context():
+        publ_type_dict = util.get_publication_types()[publication_type]
+        module_name = f'{publ_type_dict["module"]}.util'
+        module = importlib.import_module(module_name)
+        method_name = method.format(name=publ_type_dict["name"])
+        method = getattr(module, method_name, None)
+        assert method is not None
+
+
 @pytest.mark.usefixtures('ensure_layman')
 def test_publication_interface_methods():
     publication_source_methods = {

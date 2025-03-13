@@ -1,10 +1,10 @@
 from flask import g
 from layman import LaymanError, authn
 from layman.authn import get_open_id_claims, get_iss_id, get_sub, is_user_with_name
-from layman.util import slugify, to_safe_names, check_workspace_name, get_workspaces, ensure_whole_user, delete_whole_user, delete_publications, get_publication_infos, patch_publication
+from layman.util import slugify, to_safe_names, check_workspace_name, get_workspaces, ensure_whole_user, delete_whole_user, get_publication_infos, patch_publication, delete_workspace_publication
 from layman.authn import redis as authn_redis, prime_db_schema as authn_prime_db_schema
 from layman.layer import LAYER_TYPE, util as layer_util
-from layman.map import MAP_TYPE, util as map_util
+from layman.map import util as map_util
 from layman.authz import is_user
 from layman_settings import RIGHTS_EVERYONE_ROLE
 
@@ -121,8 +121,7 @@ def delete_user_public_publications(username):
         return all(not is_user(u) and u != RIGHTS_EVERYONE_ROLE for u in user_list)
 
     skipped_publications = []
-    layers_to_be_deleted = []
-    maps_to_be_deleted = []
+    publications_to_be_deleted = []
     publications_to_be_patched = []
     result = get_publication_infos(
         context={
@@ -140,13 +139,7 @@ def delete_user_public_publications(username):
         uuid = pubinfo["uuid"]
 
         if is_public and is_only_rw:
-            if publication_type == LAYER_TYPE:
-                layers_to_be_deleted.append(((workspace, publication_type, publication_name), pubinfo))
-            elif publication_type == MAP_TYPE:
-                maps_to_be_deleted.append(((workspace, publication_type, publication_name), pubinfo))
-            else:
-                raise NotImplementedError(f"Unknown publication_type: {publication_type}")
-
+            publications_to_be_deleted.append((workspace, publication_type, publication_name))
         elif is_public and not is_only_rw:
             new_read = [u for u in access_rights['read'] if u != username]
             new_write = [u for u in access_rights['write'] if u != username]
@@ -205,31 +198,7 @@ def delete_user_public_publications(username):
             }
         )
 
-    if layers_to_be_deleted:
-        delete_publications(
-            None,
-            None,
-            layer_util.is_layer_chain_ready,
-            layer_util.abort_layer_chain,
-            layer_util.delete_layer,
-            'delete',
-            'rest_workspace_layer.get',
-            'layername',
-            actor_name=username,
-            publications=layers_to_be_deleted
-        )
-    if maps_to_be_deleted:
-        delete_publications(
-            None,
-            None,
-            map_util.is_map_chain_ready,
-            map_util.abort_map_chain,
-            map_util.delete_map,
-            'delete',
-            'rest_workspace_map.get',
-            'mapname',
-            actor_name=username,
-            publications=maps_to_be_deleted
-        )
+    for workspace, publication_type, publication_name in publications_to_be_deleted:
+        delete_workspace_publication(workspace=workspace, publication_type=publication_type, publication_name=publication_name, method='delete')
 
     return skipped_publications

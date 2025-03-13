@@ -33,7 +33,8 @@ def get_layer_patch_keys():
     return get_layer_type_def()['patch_keys']
 
 
-LAYER_REST_PATH_NAME = "layers"
+PUBLICATION_TYPE_NAME = __name__.split('.', maxsplit=1)[-1]
+LAYER_REST_PATH_NAME = f"{PUBLICATION_TYPE_NAME}s"
 
 
 from ..common import InternalSourceTypeDef
@@ -49,6 +50,7 @@ PUBLICATION_TYPES = {
     f'{LAYER_TYPE}': {
         'type': LAYER_TYPE,  # unique type name, same as dict key
         'module': __name__,  # name of module that defines the type
+        'name': PUBLICATION_TYPE_NAME,
         'rest_path_name': LAYER_REST_PATH_NAME,
         'workspace_blueprints': [  # blueprints to register
             workspace_layers_bp,
@@ -90,10 +92,10 @@ PUBLICATION_TYPES = {
             'layman.layer.micka.tasks',
         },
         'layman.common.filesystem': {
-            'publications_dir': 'layers'
+            'publications_dir': f"{PUBLICATION_TYPE_NAME}s"
         },
         'layman.layer.qgis': {
-            'publications_dir': 'layers'
+            'publications_dir': f"{PUBLICATION_TYPE_NAME}s"
         },
         'layman.common.metadata': {
             'syncable_properties': {

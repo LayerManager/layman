@@ -505,16 +505,29 @@ def get_publication_infos_with_metainfo(workspace=None, publ_type=None, context=
     return infos
 
 
-def delete_workspace_publication(workspace, publication_type, publication):
-    from layman.layer import LAYER_TYPE, util as layer_util
-    from layman.map import MAP_TYPE, util as map_util
+def delete_workspace_publication(workspace, publication_type, publication_name, *, method):
+    publ_type_module = get_publication_types()[publication_type]
 
-    delete_method = {
-        LAYER_TYPE: layer_util.delete_layer,
-        MAP_TYPE: map_util.delete_map,
-    }[publication_type]
+    module_name = f'{publ_type_module["module"]}.util'
+    module = importlib.import_module(module_name)
+    abort_publication_fn = getattr(module, f'abort_{publ_type_module["name"]}_chain', None)
+    delete_publication_fn = getattr(module, f'delete_{publ_type_module["name"]}', None)
+    is_chain_ready_fn = getattr(module, f'is_{publ_type_module["name"]}_chain_ready', None)
 
-    delete_method(workspace, publication)
+    redis.create_lock(workspace, publication_type, publication_name, method)
+    try:
+        abort_publication_fn(workspace, publication_name)
+        result = delete_publication_fn(workspace, publication_name)
+        if is_chain_ready_fn(workspace, publication_name):
+            redis.unlock_publication(workspace, publication_type, publication_name)
+    except Exception as exc:
+        try:
+            if is_chain_ready_fn(workspace, publication_name):
+                redis.unlock_publication(workspace, publication_type, publication_name)
+        finally:
+            redis.unlock_publication(workspace, publication_type, publication_name)
+        raise exc
+    return result
 
 
 def patch_publication(workspace, publication, publ_type, patch_publication_fn, is_chain_ready_fn, task_options, patch_options):
@@ -535,47 +548,21 @@ def patch_publication(workspace, publication, publ_type, patch_publication_fn, i
 
 def delete_publications(workspace,
                         publ_type,
-                        is_chain_ready_fn,
-                        abort_publication_fn,
-                        delete_publication_fn,
                         method,
                         url_path,
                         publ_param,
                         x_forwarded_items=None,
                         actor_name=None,
-                        publications=None,
                         ):
     from layman import authn
-    if (workspace is None or publ_type is None) and not publications:
-        raise ValueError(
-            "Unable call delete_publications without workspace and publ_type, with empty publications")
-    if workspace is not None and publ_type is not None and publications:
-        raise ValueError(
-            "Unable to call delete_publications with both workspace & publ_type set and non-empty publications. "
-            "Use either workspace and publ_type or publications, not both.")
     if not actor_name:
         actor_name = authn.get_authn_username()
-    if publications is None:
-        whole_infos = get_publication_infos(workspace,
-                                            publ_type,
-                                            {'actor_name': actor_name,
-                                             'access_type': 'write'})
-    else:
-        whole_infos = dict(publications)
+    whole_infos = get_publication_infos(workspace,
+                                        publ_type,
+                                        {'actor_name': actor_name,
+                                         'access_type': 'write'})
     for (publication_workspace, publication_type, publication_name) in whole_infos:
-        redis.create_lock(publication_workspace, publication_type, publication_name, method)
-        try:
-            abort_publication_fn(publication_workspace, publication_name)
-            delete_publication_fn(publication_workspace, publication_name)
-            if is_chain_ready_fn(publication_workspace, publication_name):
-                redis.unlock_publication(publication_workspace, publication_type, publication_name)
-        except Exception as exc:
-            try:
-                if is_chain_ready_fn(publication_workspace, publication_name):
-                    redis.unlock_publication(publication_workspace, publication_type, publication_name)
-            finally:
-                redis.unlock_publication(publication_workspace, publication_type, publication_name)
-            raise exc
+        delete_workspace_publication(publication_workspace, publication_type, publication_name, method=method)
 
     infos = [
         {
