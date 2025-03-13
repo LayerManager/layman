@@ -256,9 +256,6 @@ def delete(workspace):
     x_forwarded_items = layman_util.get_x_forwarded_items(request.headers)
     infos = layman_util.delete_publications(workspace,
                                             LAYER_TYPE,
-                                            util.is_layer_chain_ready,
-                                            util.abort_layer_chain,
-                                            util.delete_layer,
                                             request.method,
                                             'rest_workspace_layer.get',
                                             'layername',
