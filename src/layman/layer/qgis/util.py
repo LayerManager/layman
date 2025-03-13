@@ -57,7 +57,7 @@ def get_layer_original_style_stream(publ_uuid):
     return result
 
 
-def fill_layer_template(qgis_layer_name, qgis_layer_id, native_bbox, crs, qml_xml, source_type, attrs_to_ensure, table_uri, column_srid, db_types):
+def fill_layer_template(qgis_layer_name, qgis_layer_id, title, native_bbox, crs, qml_xml, source_type, attrs_to_ensure, table_uri, column_srid, db_types):
     db_schema = table_uri.schema
     table_name = table_uri.table
     geo_column = table_uri.geo_column
@@ -80,6 +80,7 @@ def fill_layer_template(qgis_layer_name, qgis_layer_id, native_bbox, crs, qml_xm
         geo_column=geo_column,
         qgis_layer_name=qgis_layer_name,
         qgis_layer_id=qgis_layer_id,
+        layer_title=title,
         wkb_type=wkb_type,
         qml_geometry=qml_geometry,
         extent=extent_to_xml_string(native_bbox),

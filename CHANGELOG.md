@@ -51,6 +51,7 @@
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Information about layer WFS (e.g. key `wfs` in [GET Workspace Layer](doc/rest.md#get-workspace-layer)) is obtained from GeoServer REST API instead of WFS GetCapabilities to improve speed.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Layer in map JSON file is considered [internal](doc/models.md#internal-map-layer) if named `l_<UUID>` and is in GeoServer workspace `layman` or `layman_wms`. 
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Metadata properties [wfs_url](doc/metadata.md#wfs_url) and [wms_url](doc/metadata.md#wms_url) contain new layer names `l_<UUID>`.
+- [#1048](https://github.com/LayerManager/layman/issues/1048) Layers with QML style are named in graphical legend by their title.
 - [#1064](https://github.com/LayerManager/layman/issues/1064) New method [DELETE User](doc/rest.md#delete-user) allows users to delete only their own account.
 - [#942](https://github.com/LayerManager/layman/issues/942) New key `used_in_maps` was added to responses of requests [GET Publications](doc/rest.md#get-publications), [GET Layers](doc/rest.md#get-layers), [GET Workspace Layers](doc/rest.md#get-workspace-layers), and [GET Workspace Layer](doc/rest.md#get-workspace-layer).
 - [#909](https://github.com/LayerManager/layman/issues/909) Upgrade QGIS Server from v3.32.2 to v3.40.4. Also use docker hub repo [layermanager/qgis-server](https://hub.docker.com/r/layermanager/qgis-server) instead of jirikcz/qgis-server,

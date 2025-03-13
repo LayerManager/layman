@@ -38,7 +38,7 @@ class Layer(Publication):
 
     @property
     def qgis_names(self):
-        return QgisNames(id=f'l_{self.uuid}', name=self.name)
+        return QgisNames(id=f'l_{self.uuid}', name=f'l_{self.uuid}')
 
     @property
     def internal_db_names(self):
