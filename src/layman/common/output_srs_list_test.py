@@ -69,7 +69,7 @@ def test_custom_srs_list(ensure_layer):
         assert_gs_wms_output_srs_list(wfs_name_qgis1.workspace, wfs_name_qgis1.name, settings.LAYMAN_OUTPUT_SRS_LIST)
         assert_wfs_output_srs_list(wfs_name_qgis1.workspace, wfs_name_qgis1.name, init_output_epsg_codes_set)
         assert_qgis_output_srs_list(uuid_qgis1, settings.LAYMAN_OUTPUT_SRS_LIST)
-        assert_qgis_wms_output_srs_list(name_qgis1, uuid_qgis1, settings.LAYMAN_OUTPUT_SRS_LIST)
+        assert_qgis_wms_output_srs_list(qgis1_layer.qgis_names.name, uuid_qgis1, settings.LAYMAN_OUTPUT_SRS_LIST)
 
     process.ensure_layman_function({
         'LAYMAN_OUTPUT_SRS_LIST': ','.join([str(code) for code in OUTPUT_SRS_LIST])
@@ -91,7 +91,7 @@ def test_custom_srs_list(ensure_layer):
             assert_gs_wms_output_srs_list(wfs_name_qgis.workspace, wfs_name_qgis.name, output_crs_list)
             assert_wfs_output_srs_list(wfs_name_qgis.workspace, wfs_name_qgis.name, output_epsg_codes_set)
             assert_qgis_output_srs_list(uuid_qgis1, output_crs_list)
-            assert_qgis_wms_output_srs_list(name_qgis1, uuid_qgis1, output_crs_list)
+            assert_qgis_wms_output_srs_list(qgis1_layer.qgis_names.name, uuid_qgis1, output_crs_list)
 
 
 def assert_gs_wms_output_srs_list(workspace, layername, expected_output_crs_list):
@@ -102,10 +102,10 @@ def assert_gs_wms_output_srs_list(workspace, layername, expected_output_crs_list
         assert expected_output_crs in wms_layer.crsOptions
 
 
-def assert_qgis_wms_output_srs_list(layer, publ_uuid, expected_output_srs_list):
+def assert_qgis_wms_output_srs_list(qgis_layername, publ_uuid, expected_output_srs_list):
     wms = qgis_wms.get_wms_capabilities(publ_uuid)
-    assert layer in wms.contents
-    wms_layer = wms.contents[layer]
+    assert qgis_layername in wms.contents
+    wms_layer = wms.contents[qgis_layername]
     for expected_output_srs in expected_output_srs_list:
         assert expected_output_srs in wms_layer.crsOptions
 
