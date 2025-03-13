@@ -51,7 +51,6 @@ def test_publication_type_interface_methods(publication_type, method):
         assert method is not None
 
 
-@pytest.mark.usefixtures('ensure_layman')
 def test_publication_interface_methods():
     publication_source_methods = {
         'get_metadata_comparison',
