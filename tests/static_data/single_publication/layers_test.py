@@ -220,7 +220,7 @@ def test_fill_project_template(workspace, publ_type, publication):
     with app.app_context():
         column_srid = layer_db.get_column_srid(layer.table_uri.schema, layer.table_uri.table, layer.table_uri.geo_column)
     with app.app_context():
-        layer_qml_str = qgis_util.fill_layer_template(layer.qgis_names.name, layer.qgis_names.id, layer_bbox,
+        layer_qml_str = qgis_util.fill_layer_template(layer.qgis_names.name, layer.qgis_names.id, layer.title, layer_bbox,
                                                       layer_crs, qml_xml,
                                                       source_type, db_cols, layer.table_uri, column_srid, db_types)
     layer_qml = ET.fromstring(layer_qml_str.encode('utf-8'), parser=parser)

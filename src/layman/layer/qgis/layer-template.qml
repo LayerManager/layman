@@ -11,6 +11,7 @@
         <value></value>
     </keywordList>
     <layername>{qgis_layer_name}</layername>
+    <title>{layer_title}</title>
     <srs>
         <spatialrefsys nativeFormat="Wkt">
             {qgis_template_spatialrefsys}
@@ -21,7 +22,7 @@
         <parentidentifier></parentidentifier>
         <language></language>
         <type>dataset</type>
-        <title></title>
+        <title>{layer_title}</title>
         <abstract></abstract>
         <contact>
             <name></name>
