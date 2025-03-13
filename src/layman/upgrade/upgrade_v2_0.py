@@ -12,6 +12,7 @@ from db import util as db_util
 from geoserver import util as gs_util
 from layman import settings, names
 from layman.common.micka import util as micka_util, requests as micka_requests
+from layman.common.prime_db_schema import publications
 from layman.layer import LAYER_TYPE, STYLE_TYPES_DEF, db as layer_db
 from layman.layer.db import table as layer_db_table
 from layman.layer.filesystem import input_file, util as layer_file_util, gdal
@@ -531,6 +532,7 @@ def migrate_layers():
                 util.run_task_sync(refresh_wfs, [workspace, layername], post_task_kwargs)
             except BaseException:
                 failed_steps.append('geoserver_wfs')
+                publications.set_wfs_wms_status(workspace, LAYER_TYPE, layername, settings.EnumWfsWmsStatus.NOT_AVAILABLE)
                 logger.error(f'    Fail to recreate layer in GeoServer WFS workspace: : \n{traceback.format_exc()}')
         else:
             logger.warning("      geoserver.wfs already exists!")
@@ -541,6 +543,7 @@ def migrate_layers():
                 util.run_task_sync(refresh_wms, [workspace, layername], post_task_kwargs)
             except BaseException:
                 failed_steps.append('geoserver_wms')
+                publications.set_wfs_wms_status(workspace, LAYER_TYPE, layername, settings.EnumWfsWmsStatus.NOT_AVAILABLE)
                 logger.error(f'    Fail to recreate layer in GeoServer WMS workspace: : \n{traceback.format_exc()}')
         else:
             logger.warning("      geoserver.wms already exists!")
@@ -551,6 +554,7 @@ def migrate_layers():
                 util.run_task_sync(refresh_sld, [workspace, layername], post_task_kwargs)
             except BaseException:
                 failed_steps.append('geoserver_sld')
+                publications.set_wfs_wms_status(workspace, LAYER_TYPE, layername, settings.EnumWfsWmsStatus.NOT_AVAILABLE)
                 logger.error(f'    Fail to recreate style in GeoServer: \n{traceback.format_exc()}')
         else:
             logger.warning("      geoserver.sld already exists!")
