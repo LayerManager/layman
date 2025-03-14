@@ -126,12 +126,25 @@ def patch_map(workspace, mapname, task_options, start_at, *, only_sync=False):
         celery_util.set_publication_chain_info(workspace, MAP_TYPE, mapname, patch_tasks, res)
 
 
-def delete_map(workspace, mapname, kwargs=None):
+def delete_map(workspace, mapname, kwargs=None, *, x_forwarded_items=None):
     publ_uuid = get_publication_uuid(workspace, MAP_TYPE, mapname)
     sources = get_sources()
-    call_modules_fn(sources[::-1], 'delete_map', [workspace, mapname], kwargs=kwargs)
+    delete_info = {}
+    results = call_modules_fn(sources[::-1], 'delete_map', [workspace, mapname], kwargs=kwargs)
+    for partial_result in results.values():
+        if partial_result is not None:
+            delete_info.update(partial_result)
     delete_publication_uuid_from_redis(workspace, MAP_TYPE, mapname, publ_uuid)
     celery_util.delete_publication(workspace, MAP_TYPE, mapname)
+    result = {
+        **delete_info,
+        'url': url_for(**{'endpoint': 'rest_workspace_map.get',
+                          'workspace': workspace,
+                          'mapname': mapname,
+                          'x_forwarded_items': x_forwarded_items
+                          }),
+    }
+    return result
 
 
 def clear_publication_info(layer_info):

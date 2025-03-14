@@ -139,8 +139,6 @@ def delete(workspace):
     infos = layman_util.delete_publications(workspace,
                                             MAP_TYPE,
                                             request.method,
-                                            'rest_workspace_map.get',
-                                            'mapname',
                                             x_forwarded_items=x_forwarded_items,
                                             )
 

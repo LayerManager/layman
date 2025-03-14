@@ -3,8 +3,6 @@ from layman.authn import authenticate, get_authn_username
 from layman.authz import is_allowed_to_delete_user
 from layman import util as layman_util, LaymanError
 from layman.common.prime_db_schema.users import get_user_infos
-from layman.layer import LAYER_TYPE
-from layman.map import MAP_TYPE
 from .util import delete_user, delete_user_public_publications
 
 
@@ -32,19 +30,8 @@ def delete(username):
 
     layman_util.delete_publications(
         username,
-        LAYER_TYPE,
-        request.method,
-        'rest_workspace_layer.get',
-        'layername',
-        x_forwarded_items=x_forwarded_items,
-        actor_name=username,
-    )
-    layman_util.delete_publications(
-        username,
-        MAP_TYPE,
-        request.method,
-        'rest_workspace_map.get',
-        'mapname',
+        publ_type=None,
+        method=request.method,
         x_forwarded_items=x_forwarded_items,
         actor_name=username,
     )

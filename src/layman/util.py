@@ -505,7 +505,7 @@ def get_publication_infos_with_metainfo(workspace=None, publ_type=None, context=
     return infos
 
 
-def delete_workspace_publication(workspace, publication_type, publication_name, *, method):
+def delete_workspace_publication(workspace, publication_type, publication_name, *, method, x_forwarded_items=None):
     publ_type_module = get_publication_types()[publication_type]
 
     module_name = f'{publ_type_module["module"]}.util'
@@ -517,9 +517,16 @@ def delete_workspace_publication(workspace, publication_type, publication_name, 
     redis.create_lock(workspace, publication_type, publication_name, method)
     try:
         abort_publication_fn(workspace, publication_name)
-        result = delete_publication_fn(workspace, publication_name)
+        delete_info = delete_publication_fn(workspace, publication_name, x_forwarded_items=x_forwarded_items)
         if is_chain_ready_fn(workspace, publication_name):
             redis.unlock_publication(workspace, publication_type, publication_name)
+        result = {
+            'name': delete_info["name"],
+            'title': delete_info["title"],
+            'url': delete_info["url"],
+            'uuid': delete_info["uuid"],
+            'access_rights': delete_info['access_rights'],
+        }
     except Exception as exc:
         try:
             if is_chain_ready_fn(workspace, publication_name):
@@ -549,8 +556,6 @@ def patch_publication(workspace, publication, publ_type, patch_publication_fn, i
 def delete_publications(workspace,
                         publ_type,
                         method,
-                        url_path,
-                        publ_param,
                         x_forwarded_items=None,
                         actor_name=None,
                         ):
@@ -561,19 +566,14 @@ def delete_publications(workspace,
                                         publ_type,
                                         {'actor_name': actor_name,
                                          'access_type': 'write'})
+    infos = []
     for (publication_workspace, publication_type, publication_name) in whole_infos:
-        delete_workspace_publication(publication_workspace, publication_type, publication_name, method=method)
-
-    infos = [
-        {
-            'name': info["name"],
-            'title': info.get("title", None),
-            'url': url_for(**{'endpoint': url_path, publ_param: publication[2], 'workspace': publication[0], 'x_forwarded_items': x_forwarded_items}),
-            'uuid': info["uuid"],
-            'access_rights': info['access_rights'],
-        }
-        for (publication, info) in whole_infos.items()
-    ]
+        delete_info = delete_workspace_publication(publication_workspace,
+                                                   publication_type,
+                                                   publication_name,
+                                                   method=method,
+                                                   x_forwarded_items=x_forwarded_items,)
+        infos.append(delete_info)
     return jsonify(infos)
 
 

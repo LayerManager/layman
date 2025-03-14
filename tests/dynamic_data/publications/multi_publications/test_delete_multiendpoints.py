@@ -29,17 +29,24 @@ class TestDeletePublicationsClass:
                      after_delete_publications,
                      remaining_publications,
                      publ_type,
+                     info_response,
                      ):
         delete_json = process_client.delete_workspace_publications(publ_type, self.owner, actor_name=actor_name)
         publication_set = {publication['name'] for publication in delete_json}
         assert after_delete_publications == publication_set
+        exp_response_keys = {'name', 'title', 'uuid', 'access_rights', 'url'}
+        for delete_json_item in delete_json:
+            assert set(delete_json_item.keys()) == exp_response_keys, f'{delete_json_item=}\n{exp_response_keys=}'
+            publ_info_response = next(iter(info for info in info_response if info['name'] == delete_json_item['name']))
+            for key in exp_response_keys:
+                assert delete_json_item[key] == publ_info_response[key]
 
         get_json = process_client.get_publications(publ_type, workspace=self.owner,
                                                    actor_name=self.owner)
         publication_set = {publication['name'] for publication in get_json}
         assert remaining_publications == publication_set
 
-    publ_types_for_test_type = [process_client.LAYER_TYPE]
+    publ_types_for_test_type = [process_client.LAYER_TYPE, process_client.MAP_TYPE]
     available_write_rights_for_test_type = [
         pytest.param(f'{owner},{deleter}', id='access_by_user'),
         pytest.param(f'{owner},{ROLE}', id='access_by_role'),
@@ -64,7 +71,8 @@ class TestDeletePublicationsClass:
                         ]
 
         for (name, access_rights) in publications:
-            process_client.publish_workspace_publication(publ_type, owner, name, access_rights=access_rights,
+            process_client.publish_workspace_publication(publ_type, owner, name,
+                                                         access_rights=access_rights,
                                                          actor_name=owner)
 
         response = process_client.get_publications(publ_type, workspace=owner, actor_name=owner)
@@ -75,6 +83,7 @@ class TestDeletePublicationsClass:
                           {publication_b, },
                           {publication_a, },
                           publ_type,
+                          response,
                           )
 
         # Delete by owner, everything is deleted
@@ -82,4 +91,5 @@ class TestDeletePublicationsClass:
                           {publication_a, },
                           set(),
                           publ_type,
+                          response,
                           )
