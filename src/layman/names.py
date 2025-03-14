@@ -1,14 +1,14 @@
 from .layer import LAYER_TYPE
 from . import uuid as uuid_module
-from .layer.geoserver import GEOSERVER_WFS_WORKSPACE, GEOSERVER_WMS_WORKSPACE, GEOSERVER_NAME_PREFIX, NameForSource, Names
+from .layer.geoserver import GEOSERVER_WFS_WORKSPACE, GEOSERVER_WMS_WORKSPACE, GEOSERVER_NAME_PREFIX, GeoserverNameForSource, GeoserverNames
 
 
 def get_names_by_source(*, uuid, publication_type):
     assert publication_type == LAYER_TYPE
-    return Names(
-        wfs=NameForSource(workspace=GEOSERVER_WFS_WORKSPACE, name=f'{GEOSERVER_NAME_PREFIX}{uuid}'),
-        wms=NameForSource(workspace=GEOSERVER_WMS_WORKSPACE, name=f'{GEOSERVER_NAME_PREFIX}{uuid}'),
-        sld=NameForSource(workspace=GEOSERVER_WMS_WORKSPACE, name=uuid),
+    return GeoserverNames(
+        wfs=GeoserverNameForSource(workspace=GEOSERVER_WFS_WORKSPACE, name=f'{GEOSERVER_NAME_PREFIX}{uuid}'),
+        wms=GeoserverNameForSource(workspace=GEOSERVER_WMS_WORKSPACE, name=f'{GEOSERVER_NAME_PREFIX}{uuid}'),
+        sld=GeoserverNameForSource(workspace=GEOSERVER_WMS_WORKSPACE, name=uuid),
     )
 
 
