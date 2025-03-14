@@ -1,11 +1,5 @@
-from .layer import LAYER_TYPE
 from . import uuid as uuid_module
-from .layer.geoserver import GEOSERVER_WFS_WORKSPACE, GEOSERVER_WMS_WORKSPACE, GEOSERVER_NAME_PREFIX, GeoserverNames
-
-
-def get_names_by_source(*, uuid, publication_type):
-    assert publication_type == LAYER_TYPE
-    return GeoserverNames(uuid = uuid)
+from .layer.geoserver import GEOSERVER_WFS_WORKSPACE, GEOSERVER_WMS_WORKSPACE, GEOSERVER_NAME_PREFIX
 
 
 def geoserver_layername_to_uuid(*, geoserver_workspace, geoserver_name):
