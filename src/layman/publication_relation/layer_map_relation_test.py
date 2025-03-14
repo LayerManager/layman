@@ -1,7 +1,8 @@
 import pytest
 
-from layman import app, names
+from layman import app
 from layman.map.filesystem import thumbnail
+from layman.layer.geoserver import GeoserverNames
 from test_tools import process_client, util as test_util
 from test_tools.data import map as map_data, wfs as data_wfs
 
@@ -32,7 +33,7 @@ def test_map_refresh_after_layer_change():
     assert_map_thumbnail(workspace, map, publ_uuid, f'/code/test_tools/data/thumbnail/map_with_internal_layer_basic.png')
 
     # Test refresh map thumbnail after layer WFS-T query
-    gs_layername = names.get_layer_names_by_source(uuid=layer_uuid).wfs
+    gs_layername = GeoserverNames(uuid=layer_uuid).wfs
     data_xml = data_wfs.get_wfs20_insert_points(gs_layername.workspace, gs_layername.name, )
     process_client.post_wfst(data_xml)
     process_client.wait_for_publication_status(workspace, process_client.LAYER_TYPE, layer)
