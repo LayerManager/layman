@@ -138,12 +138,7 @@ def delete(workspace):
     x_forwarded_items = layman_util.get_x_forwarded_items(request.headers)
     infos = layman_util.delete_publications(workspace,
                                             MAP_TYPE,
-                                            util.is_map_chain_ready,
-                                            util.abort_map_chain,
-                                            util.delete_map,
                                             request.method,
-                                            'rest_workspace_map.get',
-                                            'mapname',
                                             x_forwarded_items=x_forwarded_items,
                                             )
 

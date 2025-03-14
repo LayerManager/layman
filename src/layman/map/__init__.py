@@ -23,7 +23,8 @@ def get_map_patch_keys():
     return get_map_type_def()['patch_keys']
 
 
-MAP_REST_PATH_NAME = "maps"
+PUBLICATION_TYPE_NAME = __name__.split('.', maxsplit=1)[-1]
+MAP_REST_PATH_NAME = f"{PUBLICATION_TYPE_NAME}s"
 
 
 from .rest_workspace_maps import bp as workspace_maps_bp
@@ -37,6 +38,7 @@ PUBLICATION_TYPES = {
     f'{MAP_TYPE}': {
         'type': MAP_TYPE,
         'module': __name__,
+        'name': PUBLICATION_TYPE_NAME,
         'rest_path_name': MAP_REST_PATH_NAME,
         'workspace_blueprints': [
             workspace_maps_bp,
@@ -53,7 +55,7 @@ PUBLICATION_TYPES = {
             ('layman.map.prime_db_schema.table', InternalSourceTypeDef(info_items=['access_rights', 'name', 'workspace', 'title', 'description', 'uuid',
                                                                                    'bounding_box', 'native_crs', 'native_bounding_box',
                                                                                    'updated_at', 'type', 'id', 'image_mosaic',
-                                                                                   'map_layers', 'created_at']),),
+                                                                                   'map_layers', 'created_at', 'is_public_workspace',]),),
             ('layman.map.filesystem.input_file', InternalSourceTypeDef(info_items=['file']),),
             ('layman.map.prime_db_schema.file_data', InternalSourceTypeDef(info_items=[]),),
             ('layman.map.filesystem.thumbnail', InternalSourceTypeDef(info_items=['thumbnail', ]),),
@@ -65,7 +67,7 @@ PUBLICATION_TYPES = {
             'layman.map.prime_db_schema.tasks',
         },
         'layman.common.filesystem': {
-            'publications_dir': 'maps'
+            'publications_dir': f"{PUBLICATION_TYPE_NAME}s"
         },
         'layman.common.metadata': {
             'syncable_properties': {

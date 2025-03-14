@@ -57,5 +57,6 @@ ERROR_LIST = {
     54: (400, 'Wrong header value'),
     55: (400, 'Publication is not complete'),  # raised by process_client only
     56: (403, 'Username or workspace name is too long. Maximum is 59 characters.'),
-    57: (404, 'User was not found')
+    57: (404, 'User was not found.'),
+    58: (403, 'User cannot be removed.')
 }

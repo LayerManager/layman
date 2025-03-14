@@ -16,9 +16,10 @@ from flask import current_app, request, jsonify
 from unidecode import unidecode
 
 from layman import settings, celery as celery_util, common
-from layman.common import tasks as tasks_util, redis
+from layman.common import tasks as tasks_util, redis, PUBLICATION_LOCK_PATCH
 from layman.http import LaymanError
 from layman.publication_class import Publication
+
 
 logger = logging.getLogger(__name__)
 
@@ -482,7 +483,6 @@ def get_publication_infos_with_metainfo(workspace=None, publ_type=None, context=
     from layman.authz.role_service import get_user_roles
     from layman.common.prime_db_schema import publications
     context = context or {}
-
     reader = (context.get('actor_name') or settings.ANONYM_USER) if context.get('access_type') == 'read' else None
     writer = (context.get('actor_name') or settings.ANONYM_USER) if context.get('access_type') == 'write' else None
     reader_roles = list(get_user_roles(username=reader)) if reader and reader != settings.ANONYM_USER else None
@@ -505,58 +505,75 @@ def get_publication_infos_with_metainfo(workspace=None, publ_type=None, context=
     return infos
 
 
-def delete_workspace_publication(workspace, publication_type, publication):
-    from layman.layer import LAYER_TYPE, util as layer_util
-    from layman.map import MAP_TYPE, util as map_util
+def delete_workspace_publication(workspace, publication_type, publication_name, *, method, x_forwarded_items=None):
+    publ_type_module = get_publication_types()[publication_type]
 
-    delete_method = {
-        LAYER_TYPE: layer_util.delete_layer,
-        MAP_TYPE: map_util.delete_map,
-    }[publication_type]
+    module_name = f'{publ_type_module["module"]}.util'
+    module = importlib.import_module(module_name)
+    abort_publication_fn = getattr(module, f'abort_{publ_type_module["name"]}_chain', None)
+    delete_publication_fn = getattr(module, f'delete_{publ_type_module["name"]}', None)
+    is_chain_ready_fn = getattr(module, f'is_{publ_type_module["name"]}_chain_ready', None)
 
-    delete_method(workspace, publication)
+    redis.create_lock(workspace, publication_type, publication_name, method)
+    try:
+        abort_publication_fn(workspace, publication_name)
+        delete_info = delete_publication_fn(workspace, publication_name, x_forwarded_items=x_forwarded_items)
+        if is_chain_ready_fn(workspace, publication_name):
+            redis.unlock_publication(workspace, publication_type, publication_name)
+        result = {
+            'name': delete_info["name"],
+            'title': delete_info["title"],
+            'url': delete_info["url"],
+            'uuid': delete_info["uuid"],
+            'access_rights': delete_info['access_rights'],
+        }
+    except Exception as exc:
+        try:
+            if is_chain_ready_fn(workspace, publication_name):
+                redis.unlock_publication(workspace, publication_type, publication_name)
+        finally:
+            redis.unlock_publication(workspace, publication_type, publication_name)
+        raise exc
+    return result
+
+
+def patch_publication(workspace, publication, publ_type, patch_publication_fn, is_chain_ready_fn, task_options, patch_options):
+    redis.create_lock(workspace, publ_type, publication, PUBLICATION_LOCK_PATCH)
+
+    try:
+        patch_publication_fn(workspace, publication, task_options=task_options, **patch_options)
+        if is_chain_ready_fn(workspace, publication):
+            redis.unlock_publication(workspace, publ_type, publication)
+    except Exception as exc:
+        try:
+            if is_chain_ready_fn(workspace, publication):
+                redis.unlock_publication(workspace, publ_type, publication)
+        finally:
+            redis.unlock_publication(workspace, publ_type, publication)
+        raise exc
 
 
 def delete_publications(workspace,
                         publ_type,
-                        is_chain_ready_fn,
-                        abort_publication_fn,
-                        delete_publication_fn,
                         method,
-                        url_path,
-                        publ_param,
                         x_forwarded_items=None,
                         actor_name=None,
                         ):
     from layman import authn
     if not actor_name:
         actor_name = authn.get_authn_username()
-    whole_infos = get_publication_infos(workspace, publ_type, {'actor_name': actor_name, 'access_type': 'write'})
-    for (_, _, publication) in whole_infos.keys():
-        redis.create_lock(workspace, publ_type, publication, method)
-        try:
-            abort_publication_fn(workspace, publication)
-            delete_publication_fn(workspace, publication)
-            if is_chain_ready_fn(workspace, publication):
-                redis.unlock_publication(workspace, publ_type, publication)
-        except Exception as exc:
-            try:
-                if is_chain_ready_fn(workspace, publication):
-                    redis.unlock_publication(workspace, publ_type, publication)
-            finally:
-                redis.unlock_publication(workspace, publ_type, publication)
-            raise exc
-
-    infos = [
-        {
-            'name': info["name"],
-            'title': info.get("title", None),
-            'url': url_for(**{'endpoint': url_path, publ_param: publication[2], 'workspace': publication[0], 'x_forwarded_items': x_forwarded_items}),
-            'uuid': info["uuid"],
-            'access_rights': info['access_rights'],
-        }
-        for (publication, info) in whole_infos.items()
-    ]
+    whole_infos = get_publication_infos(workspace,
+                                        publ_type,
+                                        {'actor_name': actor_name,
+                                         'access_type': 'write'})
+    infos = []
+    for (publication_workspace, publication_type, publication_name) in whole_infos:
+        delete_info = delete_workspace_publication(publication_workspace,
+                                                   publication_type,
+                                                   publication_name,
+                                                   method=method,
+                                                   x_forwarded_items=x_forwarded_items,)
+        infos.append(delete_info)
     return jsonify(infos)
 
 
