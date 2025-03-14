@@ -2,11 +2,12 @@ from dataclasses import dataclass
 from typing import Tuple, Literal
 
 from db import TableUri
-from layman import names, settings
+from layman import settings
 from layman.publication_class import Publication
 
 from . import LAYER_TYPE
 from .db import DbNames
+from .geoserver import GeoserverNames
 from .qgis import QgisNames
 
 
@@ -29,7 +30,7 @@ class Layer(Publication):
 
     @property
     def gs_names(self):
-        return names.get_names_by_source(uuid=self.uuid, publication_type=self.type)
+        return GeoserverNames(uuid=self.uuid)
 
     @property
     def qgis_names(self):
