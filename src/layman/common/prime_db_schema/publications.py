@@ -618,19 +618,27 @@ returning id
 
 def delete_publication(workspace_name, type, name):
     workspace_info = workspaces.get_workspace_infos(workspace_name).get(workspace_name)
+    result = {}
     if workspace_info:
-        id_publication = get_publication_infos(workspace_name, type).get((workspace_name, type, name), {}).get("id")
-        if id_publication:
-            rights.delete_rights_for_publication(id_publication)
+        publ_info = get_publication_infos(workspace_name, type).get((workspace_name, type, name), {})
+        if publ_info:
+            rights.delete_rights_for_publication(publ_info["id"])
             id_workspace = workspace_info["id"]
             sql = f"""delete from {DB_SCHEMA}.publications p where p.id_workspace = %s and p.name = %s and p.type = %s;"""
             db_util.run_statement(sql, (id_workspace,
                                         name,
                                         type,))
+            result = {
+                'name': publ_info["name"],
+                'title': publ_info.get("title", None),
+                'uuid': publ_info["uuid"],
+                'access_rights': publ_info['access_rights'],
+            }
         else:
             logger.warning(f'Deleting NON existing publication. workspace_name={workspace_name}, type={type}, pub_name={name}')
     else:
         logger.warning(f'Deleting publication for NON existing workspace. workspace_name={workspace_name}, type={type}, pub_name={name}')
+    return result
 
 
 def set_bbox(workspace, publication_type, publication, bbox, crs, ):

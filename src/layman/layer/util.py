@@ -176,7 +176,7 @@ def patch_after_feature_change(workspace, layername, **kwargs):
     layman_util.patch_after_feature_change(workspace, LAYER_TYPE, layername, **kwargs)
 
 
-def delete_layer(workspace, layername, source=None, http_method='delete'):
+def delete_layer(workspace, layername, source=None, http_method='delete', *, x_forwarded_items=None):
     publ_uuid = get_publication_uuid(workspace, LAYER_TYPE, layername)
     sources = get_sources()
     source_idx = next((
@@ -191,14 +191,22 @@ def delete_layer(workspace, layername, source=None, http_method='delete'):
         ]
     # print(f"delete_layer {username}.{layername} using {len(sources)} sources: {[s.__name__ for s in sources]}")
 
-    result = {}
+    delete_info = {}
     results = call_modules_fn(sources, 'delete_layer', [workspace, layername])
     for partial_result in results.values():
         if partial_result is not None:
-            result.update(partial_result)
+            delete_info.update(partial_result)
     if source is None:
         delete_publication_uuid_from_redis(workspace, LAYER_TYPE, layername, publ_uuid)
     celery_util.delete_publication(workspace, LAYER_TYPE, layername)
+    result = {
+        **delete_info,
+        'url': url_for(**{'endpoint': 'rest_workspace_layer.get',
+                          'workspace': workspace,
+                          'layername': layername,
+                          'x_forwarded_items': x_forwarded_items
+                          }),
+    }
     return result
 
 
