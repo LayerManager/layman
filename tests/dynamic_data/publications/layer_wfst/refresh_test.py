@@ -1,5 +1,5 @@
 import pytest
-from layman import names
+from layman.layer.geoserver import GeoserverNames
 from test_tools import process_client, assert_util, external_db
 from test_tools.data import wfs as data_wfs, SMALL_LAYER_NATIVE_CRS, SMALL_LAYER_BBOX, SMALL_LAYER_NATIVE_BBOX
 from tests import Publication4Test, EnumTestTypes
@@ -80,7 +80,7 @@ class TestRefresh(base_test.TestSingleRestPublication):
             (data_wfs.get_wfs20_insert_points, expected_bbox, exp_native_bbox, '_bigger'),
             (data_wfs.get_wfs20_delete_point, SMALL_LAYER_BBOX, SMALL_LAYER_NATIVE_BBOX, ''),
         ]
-        wfs_names = names.get_layer_names_by_source(uuid=layer_uuid).wfs
+        wfs_names = GeoserverNames(uuid=layer_uuid).wfs
 
         for wfs_method, exp_bbox, exp_native_bbox, thumbnail_bbox_postfix in wfst_actions:
             data_xml = wfs_method(wfs_names.workspace, wfs_names.name, )

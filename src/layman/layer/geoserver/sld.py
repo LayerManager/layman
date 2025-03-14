@@ -1,10 +1,11 @@
 import os
 from geoserver import util as gs_util
-from layman import settings, patch_mode, util as layman_util, names
+from layman import settings, patch_mode, util as layman_util
 from layman.common import empty_method, empty_method_returns_dict
 from layman.common.db import launder_attribute_name
 from layman.layer.layer_class import Layer
 from layman.layer.filesystem import input_style
+from layman.layer.geoserver import GeoserverNames
 from layman.util import url_for, get_publication_info_by_class
 from . import wms
 from .. import LAYER_TYPE
@@ -19,7 +20,7 @@ patch_layer = empty_method
 
 
 def get_workspace_style_url(*, uuid):
-    style_name = names.get_layer_names_by_source(uuid=uuid).sld
+    style_name = GeoserverNames(uuid=uuid).sld
     return gs_util.get_workspace_style_url(style_name.workspace, style_name.name) if uuid else None
 
 
@@ -115,6 +116,6 @@ def create_layer_style(*, layer: Layer):
 
 
 def get_style_response(*, uuid, headers=None, auth=None):
-    gs_style_name = names.get_layer_names_by_source(uuid=uuid).sld
+    gs_style_name = GeoserverNames(uuid=uuid).sld
     return gs_util.get_workspace_style_response(gs_style_name.workspace, gs_style_name.name, headers, auth) \
         if uuid else None

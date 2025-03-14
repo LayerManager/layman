@@ -5,7 +5,7 @@ import crs as crs_def
 from geoserver import util as gs_util
 from layman import app, settings, util as layman_util, names
 from layman.common import bbox as bbox_util
-from layman.layer.geoserver import wfs, wms, GEOSERVER_WMS_WORKSPACE, GEOSERVER_WFS_WORKSPACE
+from layman.layer.geoserver import wfs, wms, GEOSERVER_WMS_WORKSPACE, GEOSERVER_WFS_WORKSPACE, GeoserverNames
 from test_tools import geoserver_client, process_client, assert_util
 from . import geoserver_util
 
@@ -36,7 +36,7 @@ def wms_spatial_precision(workspace, publ_type, name, *, crs, extent, img_size, 
                                                                                            'file', 'uuid']})
     native_crs = publ_info['native_crs']
     style_type = publ_info['_style_type']
-    wms_layername = names.get_layer_names_by_source(uuid=publ_info['uuid'], ).wms
+    wms_layername = GeoserverNames(uuid=publ_info['uuid'], ).wms
 
     query_params = {
         'SERVICE': 'WMS',

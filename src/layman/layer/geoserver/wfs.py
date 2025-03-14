@@ -2,10 +2,10 @@ from urllib.parse import urljoin
 from flask import current_app
 
 from geoserver import util as gs_util
-from layman import settings, patch_mode, names
+from layman import settings, patch_mode
 from layman.cache import mem_redis
 from layman.common import geoserver as gs_common, empty_method
-from layman.layer.geoserver import GEOSERVER_WFS_WORKSPACE
+from layman.layer.geoserver import GEOSERVER_WFS_WORKSPACE, GeoserverNames
 from layman.layer.util import is_layer_chain_ready
 from layman import util as layman_util
 from layman.layer import LAYER_TYPE
@@ -29,7 +29,7 @@ def get_flask_proxy_key():
 
 
 def patch_layer_by_uuid(*, uuid, title, description, original_data_source, access_rights=None):
-    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wfs
+    gs_layername = GeoserverNames(uuid=uuid, ).wfs
     if not get_layer_info_by_uuid(uuid=uuid):
         return
     info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['geodata_type', ]})
@@ -150,7 +150,7 @@ def get_layer_info(workspace, layername, *, x_forwarded_items=None):
 
 
 def get_layer_info_by_uuid(*, uuid, x_forwarded_items=None):
-    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wfs
+    gs_layername = GeoserverNames(uuid=uuid, ).wfs
     if uuid is None:
         return {}
     wfs_proxy_url = get_wfs_url(external_url=True, x_forwarded_items=x_forwarded_items)
