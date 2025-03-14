@@ -12,6 +12,7 @@ from layman import settings, app, util as layman_util, names
 from layman.common import bbox as bbox_util
 from layman.common.micka import util as micka_common_util
 from layman.layer import util as layer_util, db as layer_db, get_layer_info_keys
+from layman.layer.geoserver import GEOSERVER_WMS_WORKSPACE, GEOSERVER_WFS_WORKSPACE
 from layman.layer.geoserver.wms import DEFAULT_WMS_QGIS_STORE_PREFIX, VERSION
 from layman.layer.layer_class import Layer
 from layman.layer.micka import csw
@@ -34,8 +35,8 @@ headers_sld = {
 @pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman')
 def test_info(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
-    wms_url = f"http://localhost:8000/geoserver/{names.GEOSERVER_WMS_WORKSPACE}/ows"
-    wfs_url = f"http://localhost:8000/geoserver/{names.GEOSERVER_WFS_WORKSPACE}/wfs"
+    wms_url = f"http://localhost:8000/geoserver/{GEOSERVER_WMS_WORKSPACE}/ows"
+    wfs_url = f"http://localhost:8000/geoserver/{GEOSERVER_WFS_WORKSPACE}/wfs"
     headers = data.HEADERS.get(data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_write', [None])[0])
     style = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA]['style_type']
 

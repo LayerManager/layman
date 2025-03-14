@@ -1,12 +1,8 @@
 from dataclasses import dataclass
 
 from .layer import LAYER_TYPE
-from . import settings, uuid as uuid_module
-
-
-GEOSERVER_WFS_WORKSPACE = 'layman'
-GEOSERVER_WMS_WORKSPACE = f'{GEOSERVER_WFS_WORKSPACE}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}'
-GEOSERVER_NAME_PREFIX = 'l_'
+from . import uuid as uuid_module
+from .layer.geoserver import GEOSERVER_WFS_WORKSPACE, GEOSERVER_WMS_WORKSPACE, GEOSERVER_NAME_PREFIX
 
 
 @dataclass(frozen=True)

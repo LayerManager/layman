@@ -11,9 +11,10 @@ import pytest
 
 del sys.modules['layman']
 
-from layman import app, settings, uuid, celery as celery_util, names
+from layman import app, settings, uuid, celery as celery_util
 from layman.common.micka import util as micka_common_util
 from layman.common.metadata import prop_equals_strict, PROPERTIES
+from layman.layer.geoserver import GEOSERVER_WMS_WORKSPACE
 from layman.map.map_class import Map
 from layman.util import SimpleCounter, get_publication_uuid
 from test_tools import flask_client
@@ -670,7 +671,7 @@ def test_map_composed_from_local_layers(client):
     assert num_attempts < max_attempts, f"Max attempts reached, layer2info={layer_info}"
     wms_url2 = layer_info['wms']['url']
 
-    expected_url = f'http://localhost:8000/geoserver/{names.GEOSERVER_WMS_WORKSPACE}/ows'
+    expected_url = f'http://localhost:8000/geoserver/{GEOSERVER_WMS_WORKSPACE}/ows'
     assert wms_url1 == expected_url
     assert wms_url2 == expected_url
 
