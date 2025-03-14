@@ -1,4 +1,4 @@
-from layman import app, settings, util as layman_util, names
+from layman import app, settings, util as layman_util
 from layman.layer.geoserver import util as gs_util, GeoserverNames
 from layman.util import XForwardedClass
 from test_tools import util as test_util, process_client, geoserver_client
@@ -41,7 +41,7 @@ def workspace_wfs_2_0_0_capabilities_available_if_vector(workspace, publ_type, n
         file_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['geodata_type']})
     geodata_type = file_info['geodata_type']
     if geodata_type == settings.GEODATA_TYPE_VECTOR:
-        gs_layername = names.get_names_by_source(uuid=uuid, publication_type=publ_type).wfs
+        gs_layername = GeoserverNames(uuid=uuid).wfs
         with app.app_context():
             internal_wfs_url = test_util.url_for('geoserver_proxy_bp.proxy', subpath=gs_layername.workspace + '/wfs')
         wfs_inst = gs_util.wfs_proxy(wfs_url=internal_wfs_url, version='2.0.0', headers=headers)
