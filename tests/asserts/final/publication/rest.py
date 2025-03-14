@@ -1,7 +1,9 @@
 import copy
 
 from celery import states
-from layman import settings, names
+
+from layman import settings
+from layman.layer.geoserver import GEOSERVER_WMS_WORKSPACE, GEOSERVER_WFS_WORKSPACE
 from layman.util import XForwardedClass
 from test_tools import process_client, util as test_util, assert_util
 
@@ -27,14 +29,14 @@ def get_expected_urls_in_rest_response(workspace, publ_type, name, *, rest_metho
         }
         if publ_type == process_client.LAYER_TYPE:
             result['wms'] = {
-                'url': f'{proxy_proto}://{proxy_host}{proxy_prefix}/geoserver/{names.GEOSERVER_WMS_WORKSPACE}/ows',
+                'url': f'{proxy_proto}://{proxy_host}{proxy_prefix}/geoserver/{GEOSERVER_WMS_WORKSPACE}/ows',
             }
             result['style'] = {
                 'url': f'{proxy_proto}://{proxy_host}{proxy_prefix}/rest/workspaces/{workspace}/{publ_type_directory}/{name}/style',
             }
             if geodata_type == settings.GEODATA_TYPE_VECTOR:
                 result['wfs'] = {
-                    'url': f'{proxy_proto}://{proxy_host}{proxy_prefix}/geoserver/{names.GEOSERVER_WFS_WORKSPACE}/wfs'
+                    'url': f'{proxy_proto}://{proxy_host}{proxy_prefix}/geoserver/{GEOSERVER_WFS_WORKSPACE}/wfs'
                 }
         else:
             result['file'] = {

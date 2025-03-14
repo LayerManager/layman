@@ -5,7 +5,7 @@ import crs as crs_def
 from geoserver import util as gs_util
 from layman import app, settings, util as layman_util, names
 from layman.common import bbox as bbox_util
-from layman.layer.geoserver import wfs, wms
+from layman.layer.geoserver import wfs, wms, GEOSERVER_WMS_WORKSPACE, GEOSERVER_WFS_WORKSPACE
 from test_tools import geoserver_client, process_client, assert_util
 from . import geoserver_util
 
@@ -156,7 +156,7 @@ def assert_workspace_stores(workspace, *, exp_stores=None, exp_existing_stores=N
 
 def assert_stores(exp_wfs_stores=None, exp_existing_wfs_stores=None, exp_deleted_wfs_stores=None,
                   exp_wms_stores=None, exp_existing_wms_stores=None, exp_deleted_wms_stores=None,):
-    assert_workspace_stores(workspace=names.GEOSERVER_WFS_WORKSPACE, exp_stores=exp_wfs_stores,
+    assert_workspace_stores(workspace=GEOSERVER_WFS_WORKSPACE, exp_stores=exp_wfs_stores,
                             exp_existing_stores=exp_existing_wfs_stores, exp_deleted_stores=exp_deleted_wfs_stores)
-    assert_workspace_stores(workspace=names.GEOSERVER_WMS_WORKSPACE, exp_stores=exp_wms_stores,
+    assert_workspace_stores(workspace=GEOSERVER_WMS_WORKSPACE, exp_stores=exp_wms_stores,
                             exp_existing_stores=exp_existing_wms_stores, exp_deleted_stores=exp_deleted_wms_stores)

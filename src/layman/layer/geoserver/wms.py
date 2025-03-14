@@ -6,6 +6,7 @@ import logging
 import os
 from flask import current_app
 
+import layman.layer.geoserver
 from geoserver import util as gs_util
 from layman import settings, patch_mode, util as layman_util, names
 from layman.cache import mem_redis
@@ -32,7 +33,7 @@ post_layer = empty_method
 
 
 def get_flask_proxy_key():
-    workspace = names.GEOSERVER_WMS_WORKSPACE
+    workspace = layman.layer.geoserver.GEOSERVER_WMS_WORKSPACE
     return FLASK_PROXY_KEY.format(workspace=workspace)
 
 
@@ -96,7 +97,7 @@ def delete_layer(layer: Layer):
 
 
 def get_wms_url(external_url=False, *, x_forwarded_items=None):
-    workspace = names.GEOSERVER_WMS_WORKSPACE
+    workspace = layman.layer.geoserver.GEOSERVER_WMS_WORKSPACE
     assert external_url or not x_forwarded_items
     base_url = get_gs_proxy_server_url(x_forwarded_items=x_forwarded_items) + settings.LAYMAN_GS_PATH \
         if external_url else settings.LAYMAN_GS_URL

@@ -3,6 +3,7 @@ import pytest
 from geoserver.error import Error
 from test_tools import process_client
 from layman import names
+from layman.layer.geoserver import GEOSERVER_WFS_WORKSPACE
 
 
 @pytest.mark.usefixtures('ensure_layman_module', 'oauth2_provider_mock')
@@ -60,7 +61,7 @@ def test_issue_1081():
     with pytest.raises(Error):
         process_client.post_wfst(
             wfst_data,
-            workspace=names.GEOSERVER_WFS_WORKSPACE,
+            workspace=GEOSERVER_WFS_WORKSPACE,
         )
 
     process_client.delete_workspace_layers(workspace=workspace)
