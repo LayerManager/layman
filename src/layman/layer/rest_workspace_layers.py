@@ -257,8 +257,6 @@ def delete(workspace):
     infos = layman_util.delete_publications(workspace,
                                             LAYER_TYPE,
                                             request.method,
-                                            'rest_workspace_layer.get',
-                                            'layername',
                                             x_forwarded_items=x_forwarded_items,
                                             )
     return infos, 200
