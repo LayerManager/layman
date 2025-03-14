@@ -10,13 +10,13 @@ from psycopg2 import sql
 
 from db import util as db_util
 from geoserver import util as gs_util
-from layman import settings, names, common
+from layman import settings, common
 from layman.common.micka import util as micka_util, requests as micka_requests
 from layman.common.prime_db_schema import publications
 from layman.layer import LAYER_TYPE, STYLE_TYPES_DEF, db as layer_db
 from layman.layer.db import table as layer_db_table
 from layman.layer.filesystem import input_file, util as layer_file_util, gdal
-from layman.layer.geoserver import wfs, wms as gs_wms, sld
+from layman.layer.geoserver import wfs, wms as gs_wms, sld, GEOSERVER_WMS_WORKSPACE, GEOSERVER_WFS_WORKSPACE
 from layman.layer.geoserver.tasks import refresh_wms, refresh_wfs, refresh_sld
 from layman.layer.geoserver.util import DEFAULT_INTERNAL_DB_STORE
 from layman.layer.geoserver.wms import get_timeregex_props
@@ -193,14 +193,14 @@ def ensure_layers_db_schema():
 def ensure_gs_workspaces_and_stores():
     logger.info(f'    Ensure GS workspaces and data stores')
     all_gs_workspaces = gs_util.get_all_workspaces(auth=settings.LAYMAN_GS_AUTH)
-    assert names.GEOSERVER_WFS_WORKSPACE not in all_gs_workspaces
-    assert names.GEOSERVER_WMS_WORKSPACE not in all_gs_workspaces
-    gs_util.ensure_workspace(names.GEOSERVER_WFS_WORKSPACE, auth=settings.LAYMAN_GS_AUTH)
-    gs_util.ensure_workspace(names.GEOSERVER_WMS_WORKSPACE, auth=settings.LAYMAN_GS_AUTH)
+    assert GEOSERVER_WFS_WORKSPACE not in all_gs_workspaces
+    assert GEOSERVER_WMS_WORKSPACE not in all_gs_workspaces
+    gs_util.ensure_workspace(GEOSERVER_WFS_WORKSPACE, auth=settings.LAYMAN_GS_AUTH)
+    gs_util.ensure_workspace(GEOSERVER_WMS_WORKSPACE, auth=settings.LAYMAN_GS_AUTH)
 
-    gs_util.ensure_db_store(names.GEOSERVER_WFS_WORKSPACE, db_schema=layer_db.LAYERS_SCHEMA, pg_conn=settings.PG_CONN,
+    gs_util.ensure_db_store(GEOSERVER_WFS_WORKSPACE, db_schema=layer_db.LAYERS_SCHEMA, pg_conn=settings.PG_CONN,
                             name=DEFAULT_INTERNAL_DB_STORE, auth=settings.LAYMAN_GS_AUTH)
-    gs_util.ensure_db_store(names.GEOSERVER_WMS_WORKSPACE, db_schema=layer_db.LAYERS_SCHEMA, pg_conn=settings.PG_CONN,
+    gs_util.ensure_db_store(GEOSERVER_WMS_WORKSPACE, db_schema=layer_db.LAYERS_SCHEMA, pg_conn=settings.PG_CONN,
                             name=DEFAULT_INTERNAL_DB_STORE, auth=settings.LAYMAN_GS_AUTH)
 
 

@@ -5,6 +5,7 @@ from geoserver import util as gs_util
 from layman import settings, patch_mode, names
 from layman.cache import mem_redis
 from layman.common import geoserver as gs_common, empty_method
+from layman.layer.geoserver import GEOSERVER_WFS_WORKSPACE
 from layman.layer.util import is_layer_chain_ready
 from layman import util as layman_util
 from layman.layer import LAYER_TYPE
@@ -23,7 +24,7 @@ post_layer = empty_method
 
 
 def get_flask_proxy_key():
-    workspace = names.GEOSERVER_WFS_WORKSPACE
+    workspace = GEOSERVER_WFS_WORKSPACE
     return FLASK_PROXY_KEY.format(workspace=workspace)
 
 
@@ -74,7 +75,7 @@ def delete_layer(layer: Layer):
 
 def get_wfs_url(external_url=False, *, x_forwarded_items=None):
     assert external_url or not x_forwarded_items
-    workspace = names.GEOSERVER_WFS_WORKSPACE
+    workspace = GEOSERVER_WFS_WORKSPACE
     base_url = get_gs_proxy_server_url(x_forwarded_items=x_forwarded_items) + settings.LAYMAN_GS_PATH \
         if external_url else settings.LAYMAN_GS_URL
     return urljoin(base_url, workspace + '/wfs')
@@ -93,7 +94,7 @@ def get_wfs_direct():
 
 
 def get_wfs_proxy():
-    workspace = names.GEOSERVER_WFS_WORKSPACE
+    workspace = GEOSERVER_WFS_WORKSPACE
     headers = {
         settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE: settings.LAYMAN_GS_USER,
         'X-Forwarded-Proto': settings.LAYMAN_PUBLIC_URL_SCHEME,

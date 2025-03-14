@@ -13,6 +13,10 @@ from ..layer_class import Layer
 logger = logging.getLogger(__name__)
 FLASK_RULES_KEY = f"{__name__}:RULES"
 
+GEOSERVER_NAME_PREFIX = 'l_'
+GEOSERVER_WFS_WORKSPACE = 'layman'
+GEOSERVER_WMS_WORKSPACE = f'{GEOSERVER_WFS_WORKSPACE}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}'
+
 
 def ensure_whole_user(username, auth=settings.LAYMAN_GS_AUTH):
     gs_util.ensure_user(username, None, auth)

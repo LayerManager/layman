@@ -1,5 +1,6 @@
 from geoserver.error import Error as gs_error
-from layman import settings, names
+from layman import settings
+from layman.layer.geoserver import GEOSERVER_WFS_WORKSPACE
 from tests.asserts.final import publication
 from tests.asserts import processing
 from test_tools import process_client, wfs_client
@@ -61,7 +62,7 @@ def generate(workspace):
                     }),
                 ],
             },
-            wfst_insert_action(workspace=names.GEOSERVER_WFS_WORKSPACE),
+            wfst_insert_action(workspace=GEOSERVER_WFS_WORKSPACE),
             wfst_insert_action(),
         ],
         Publication4Test(workspace, consts.LAYER_TYPE, 'layer_wfs_proxy_authz'): [
@@ -105,17 +106,17 @@ def generate(workspace):
                     }),
                 ],
             },
-            wfst_insert_action(workspace=names.GEOSERVER_WFS_WORKSPACE,
+            wfst_insert_action(workspace=GEOSERVER_WFS_WORKSPACE,
                                headers=process_client.get_authz_headers(username=username)),
             wfst_insert_action(headers=process_client.get_authz_headers(username=username)),
-            wfst_insert_action(workspace=names.GEOSERVER_WFS_WORKSPACE,
+            wfst_insert_action(workspace=GEOSERVER_WFS_WORKSPACE,
                                headers=process_client.get_authz_headers(username=username_2),
                                wrong_input=True,
                                ),
             wfst_insert_action(headers=process_client.get_authz_headers(username=username_2),
                                wrong_input=True,
                                ),
-            wfst_insert_action(workspace=names.GEOSERVER_WFS_WORKSPACE,
+            wfst_insert_action(workspace=GEOSERVER_WFS_WORKSPACE,
                                wrong_input=True,
                                ),
             # Test fraud header, that it is deleted by Layman Proxy

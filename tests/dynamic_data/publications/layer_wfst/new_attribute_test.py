@@ -5,7 +5,7 @@ import pytest
 
 from layman import app, settings, names
 from layman.layer import db
-from layman.layer.geoserver import wfs as geoserver_wfs
+from layman.layer.geoserver import wfs as geoserver_wfs, GEOSERVER_WFS_WORKSPACE
 from layman.layer.qgis import util as qgis_util, wms as qgis_wms
 from layman.util import get_publication_info, get_publication_uuid
 from test_tools.data import wfs as data_wfs
@@ -298,7 +298,7 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
                            for attr_name in attr_names), (attr_names, old_qgis_attributes)
 
         # make WFS-T request
-        process_client.post_wfst(wfst_data, headers=AUTHN_HEADERS, workspace=names.GEOSERVER_WFS_WORKSPACE)
+        process_client.post_wfst(wfst_data, headers=AUTHN_HEADERS, workspace=GEOSERVER_WFS_WORKSPACE)
         for layer_name, _ in new_attributes:
             process_client.wait_for_publication_status(workspace, self.publication_type, layer_name,
                                                        headers=AUTHN_HEADERS)
