@@ -8,7 +8,7 @@ from flask import current_app
 
 import layman.layer.geoserver
 from geoserver import util as gs_util
-from layman import settings, patch_mode, util as layman_util, names
+from layman import settings, patch_mode, util as layman_util
 from layman.cache import mem_redis
 from layman.common import geoserver as gs_common, empty_method
 from layman.layer.util import is_layer_chain_ready
@@ -16,6 +16,7 @@ from layman.layer import LAYER_TYPE
 from layman.layer.filesystem import gdal
 from layman.layer.layer_class import Layer
 import requests_util.retry
+from . import GeoserverNames
 from .util import get_gs_proxy_server_url, get_external_db_store_name, image_mosaic_granules_to_wms_time_key, \
     get_db_store_name, DEFAULT_INTERNAL_DB_STORE
 
@@ -38,7 +39,7 @@ def get_flask_proxy_key():
 
 
 def patch_layer_by_uuid(*, uuid, original_data_source, title, description, access_rights=None):
-    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wms
+    gs_layername = GeoserverNames(uuid=uuid, ).wms
     if not get_layer_info_by_uuid(uuid=uuid):
         return
     info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['style_type', 'geodata_type', 'image_mosaic'], })
@@ -191,7 +192,7 @@ def get_layer_info(workspace, layername, *, x_forwarded_items=None):
 
 
 def get_layer_info_by_uuid(*, uuid, x_forwarded_items=None):
-    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wms
+    gs_layername = GeoserverNames(uuid=uuid, ).wms
     if uuid is None:
         return {}
     time_info = None

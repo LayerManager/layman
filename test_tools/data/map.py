@@ -2,9 +2,9 @@ import json
 import os
 from pathlib import Path
 import crs as crs_def
-from layman import util as layman_util, app, settings, names
+from layman import util as layman_util, app, settings
 from layman.common import bbox
-from layman.layer.geoserver import util as layer_gs_util
+from layman.layer.geoserver import util as layer_gs_util, GeoserverNames
 from .. import process_client
 
 
@@ -58,7 +58,7 @@ def get_map_with_internal_layers_json(layers, *, native_extent=None, native_crs=
     for workspace, layer in layers:
         with app.app_context():
             uuid = layman_util.get_publication_uuid(workspace, process_client.LAYER_TYPE, layer)
-        wms_layer = names.get_layer_names_by_source(uuid=uuid).wms
+        wms_layer = GeoserverNames(uuid=uuid).wms
         map_json['layers'].append({
             "metadata": {},
             "visibility": True,

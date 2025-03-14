@@ -8,11 +8,11 @@ import pytest
 
 import crs as crs_def
 from geoserver import GS_REST_WORKSPACES, GS_REST, GS_AUTH, util as gs_util
-from layman import settings, app, util as layman_util, names
+from layman import settings, app, util as layman_util
 from layman.common import bbox as bbox_util
 from layman.common.micka import util as micka_common_util
 from layman.layer import util as layer_util, db as layer_db, get_layer_info_keys
-from layman.layer.geoserver import GEOSERVER_WMS_WORKSPACE, GEOSERVER_WFS_WORKSPACE
+from layman.layer.geoserver import GEOSERVER_WMS_WORKSPACE, GEOSERVER_WFS_WORKSPACE, GeoserverNames
 from layman.layer.geoserver.wms import DEFAULT_WMS_QGIS_STORE_PREFIX, VERSION
 from layman.layer.layer_class import Layer
 from layman.layer.micka import csw
@@ -111,7 +111,7 @@ def test_wms_layer(workspace, publ_type, publication):
         uuid = layman_util.get_publication_uuid(workspace, process_client.LAYER_TYPE, publication)
     expected_style_file = f'/layman_data_test/layers/{uuid}/input_style/{uuid}'
     expected_qgis_file = f'/qgis/data/test/layers/{uuid}/{uuid}.qgis'
-    wms_layername = names.get_layer_names_by_source(uuid=uuid, ).wms
+    wms_layername = GeoserverNames(uuid=uuid, ).wms
     wms_stores_url = urljoin(GS_REST_WORKSPACES, f'{wms_layername.workspace}/wmsstores/')
     wms_layers_url = urljoin(GS_REST_WORKSPACES, f'{wms_layername.workspace}/wmslayers/')
 
