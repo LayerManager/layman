@@ -1,6 +1,7 @@
 from enum import Enum
 
 from layman import names, util, app
+from layman.layer.geoserver import NameForSource
 from test_tools.data import wfs as data_wfs
 from . import process_client
 
@@ -31,7 +32,7 @@ def post_wfst(workspace, publ_type, name,
     with app.app_context():
         uuid = util.get_publication_uuid(workspace=workspace, publ_type=publ_type, publ_name=name)
 
-    wfs_layer = names.get_names_by_source(uuid=uuid, publication_type=publ_type).wfs or names.NameForSource(workspace=workspace, name=name)
+    wfs_layer = names.get_names_by_source(uuid=uuid, publication_type=publ_type).wfs or NameForSource(workspace=workspace, name=name)
     data_xml = WfstOperationDef[(operation, version)](wfs_layer.workspace, wfs_layer.name)
 
     process_client.post_wfst(data_xml, headers=request_headers, url=request_url, workspace=request_workspace)

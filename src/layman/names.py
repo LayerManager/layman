@@ -1,21 +1,6 @@
-from dataclasses import dataclass
-
 from .layer import LAYER_TYPE
 from . import uuid as uuid_module
-from .layer.geoserver import GEOSERVER_WFS_WORKSPACE, GEOSERVER_WMS_WORKSPACE, GEOSERVER_NAME_PREFIX
-
-
-@dataclass(frozen=True)
-class NameForSource:
-    workspace: str
-    name: str
-
-
-@dataclass(frozen=True)
-class Names:
-    wfs: NameForSource
-    wms: NameForSource
-    sld: NameForSource
+from .layer.geoserver import GEOSERVER_WFS_WORKSPACE, GEOSERVER_WMS_WORKSPACE, GEOSERVER_NAME_PREFIX, NameForSource, Names
 
 
 def get_names_by_source(*, uuid, publication_type):

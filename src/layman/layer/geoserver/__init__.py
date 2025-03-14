@@ -1,4 +1,6 @@
 import logging
+from dataclasses import dataclass
+
 from flask import g
 
 import crs as crs_def
@@ -16,6 +18,19 @@ FLASK_RULES_KEY = f"{__name__}:RULES"
 GEOSERVER_NAME_PREFIX = 'l_'
 GEOSERVER_WFS_WORKSPACE = 'layman'
 GEOSERVER_WMS_WORKSPACE = f'{GEOSERVER_WFS_WORKSPACE}{settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX}'
+
+
+@dataclass(frozen=True)
+class NameForSource:
+    workspace: str
+    name: str
+
+
+@dataclass(frozen=True)
+class Names:
+    wfs: NameForSource
+    wms: NameForSource
+    sld: NameForSource
 
 
 def ensure_whole_user(username, auth=settings.LAYMAN_GS_AUTH):
