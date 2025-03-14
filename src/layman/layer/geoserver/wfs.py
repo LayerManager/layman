@@ -31,8 +31,7 @@ def patch_layer(layer: Layer, *, title, description, original_data_source, acces
     gs_layername = layer.gs_names.wfs
     if not get_layer_info_by_uuid(uuid=layer.uuid):
         return
-    info = layman_util.get_publication_info_by_uuid(layer.uuid, context={'keys': ['geodata_type', ]})
-    geodata_type = info['geodata_type']
+    geodata_type = layer.geodata_type
     if geodata_type != settings.GEODATA_TYPE_VECTOR:
         raise NotImplementedError(f"Unknown geodata type: {geodata_type}")
 

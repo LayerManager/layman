@@ -40,16 +40,15 @@ def patch_layer(layer: Layer, *, original_data_source, title, description, acces
     gs_layername = layer.gs_names.wms
     if not get_layer_info_by_uuid(uuid=layer.uuid):
         return
-    info = layman_util.get_publication_info_by_uuid(layer.uuid, context={'keys': ['style_type', 'geodata_type', 'image_mosaic'], })
-    geodata_type = info['geodata_type']
+    geodata_type = layer.geodata_type
     if geodata_type == settings.GEODATA_TYPE_VECTOR:
-        if info['_style_type'] == 'sld':
+        if layer.style_type == 'sld':
             store_name = get_db_store_name(uuid=layer.uuid, original_data_source=original_data_source)
             gs_util.patch_feature_type(gs_layername.workspace, gs_layername.name, store_name=store_name, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
-        if info['_style_type'] == 'qml':
+        if layer.style_type == 'qml':
             gs_util.patch_wms_layer(gs_layername.workspace, gs_layername.name, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
     elif geodata_type == settings.GEODATA_TYPE_RASTER:
-        image_mosaic = info['image_mosaic']
+        image_mosaic = layer.image_mosaic
         if image_mosaic:
             store = get_image_mosaic_store_name(uuid=layer.uuid)
         else:

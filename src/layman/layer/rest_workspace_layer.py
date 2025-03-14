@@ -48,6 +48,7 @@ def patch(workspace, layername):
     info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername,
                                             context={'keys': ['title', 'name', 'description', 'table_uri', 'geodata_type', 'style_type',
                                                               'original_data_source', 'uuid']})
+    layer = Layer(layer_tuple=(workspace, layername))
     kwargs = {
         'title': info.get('title', info['name']) or '',
         'description': info.get('description'),
@@ -194,12 +195,13 @@ def patch(workspace, layername):
     kwargs['slugified_time_regex'] = slugified_time_regex
     kwargs['slugified_time_regex_format'] = slugified_time_regex_format
     kwargs['image_mosaic'] = time_regex is not None if delete_from == 'layman.layer.filesystem.input_file' else None
+    if kwargs['image_mosaic'] is not None:
+        layer.set_image_mosaic(kwargs['image_mosaic'])
     kwargs['name_normalized_tif_by_layer'] = name_normalized_tif_by_layer
     kwargs['name_input_file_by_layer'] = name_input_file_by_layer
     kwargs['enable_more_main_files'] = enable_more_main_files
     request_method = request.method.lower()
     kwargs['http_method'] = request_method
-    layer = Layer(layer_tuple=(workspace, layername))
     props_to_refresh = util.get_same_or_missing_prop_names(layer)
     kwargs['metadata_properties_to_refresh'] = props_to_refresh
 
@@ -224,6 +226,7 @@ def patch(workspace, layername):
             except KeyError:
                 pass
         style_type = input_style.get_style_type_from_file_storage(style_file)
+        layer.set_style_type(style_type)
         kwargs['style_type'] = style_type
         kwargs['store_in_geoserver'] = style_type.store_in_geoserver
         if style_file:
@@ -250,6 +253,7 @@ def patch(workspace, layername):
     else:
         delete_from = 'layman.layer.micka.soap'
 
+    layer.set_geodata_type(geodata_type)
     util.patch_layer(
         layer,
         kwargs,
