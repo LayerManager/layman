@@ -3,7 +3,7 @@ from urllib import parse
 
 import crs as crs_def
 from geoserver import util as gs_util
-from layman import app, settings, util as layman_util, names
+from layman import app, settings, util as layman_util
 from layman.common import bbox as bbox_util
 from layman.layer.geoserver import wfs, wms, GEOSERVER_WMS_WORKSPACE, GEOSERVER_WFS_WORKSPACE, GeoserverNames
 from test_tools import geoserver_client, process_client, assert_util
@@ -14,7 +14,7 @@ def feature_spatial_precision(workspace, publ_type, name, *, feature_id, crs, ex
     assert publ_type == process_client.LAYER_TYPE
     with app.app_context():
         uuid = layman_util.get_publication_uuid(workspace, publ_type, name)
-    gs_layername = names.get_names_by_source(uuid=uuid, publication_type=publ_type).wfs
+    gs_layername = GeoserverNames(uuid=uuid).wfs
 
     feature_collection = geoserver_client.get_features(gs_layername.workspace, gs_layername.name, crs=crs)
     feature = next(f for f in feature_collection['features'] if f['properties']['point_id'] == feature_id)
@@ -79,7 +79,7 @@ def wfs_bbox(workspace, publ_type, name, *, exp_bbox, precision=0.00001):
     assert publ_type == process_client.LAYER_TYPE
     with app.app_context():
         uuid = layman_util.get_publication_uuid(workspace, publ_type, name)
-        gs_layername = names.get_names_by_source(uuid=uuid, publication_type=publ_type).wfs
+        gs_layername = GeoserverNames(uuid=uuid).wfs
         wfs_inst = wfs.get_wfs_proxy()
     wfs_layer = f"{gs_layername.workspace}:{gs_layername.name}"
 
@@ -93,7 +93,7 @@ def wms_geographic_bbox(workspace, publ_type, name, *, exp_bbox, precision=0.000
 
     with app.app_context():
         uuid = layman_util.get_publication_uuid(workspace, process_client.LAYER_TYPE, name)
-        gs_layername = names.get_names_by_source(uuid=uuid, publication_type=publ_type).wms
+        gs_layername = GeoserverNames(uuid=uuid).wms
         wms_inst = wms.get_wms_proxy()
     wms_layer = wms_inst.contents[gs_layername.name]
     bbox = wms_layer.boundingBoxWGS84
@@ -107,7 +107,7 @@ def wms_bbox(workspace, publ_type, name, *, exp_bbox, crs, precision=0.00001, co
 
     with app.app_context():
         uuid = layman_util.get_publication_uuid(workspace, process_client.LAYER_TYPE, name)
-        gs_layername = names.get_names_by_source(uuid=uuid, publication_type=publ_type).wms
+        gs_layername = GeoserverNames(uuid=uuid).wms
         wms_inst = wms.get_wms_proxy()
     wms_layer = wms_inst.contents[gs_layername.name]
     bbox = next(bbox[:4] for bbox in wms_layer.crs_list if bbox[4] == crs)
@@ -121,7 +121,7 @@ def wms_legend(workspace, publ_type, name, *, exp_legend, obtained_file_path):
 
     with app.app_context():
         uuid = layman_util.get_publication_uuid(workspace, process_client.LAYER_TYPE, name)
-        gs_layername = names.get_names_by_source(uuid=uuid, publication_type=publ_type).wms
+        gs_layername = GeoserverNames(uuid=uuid).wms
         wms_inst = wms.get_wms_proxy()
     wms_layer = wms_inst.contents[gs_layername.name]
     legend_url = next(iter(wms_layer.styles.values()))['legend']
@@ -133,7 +133,7 @@ def is_complete_in_internal_workspace_wms(workspace, publ_type, name):
 
     with app.app_context():
         uuid = layman_util.get_publication_uuid(workspace, process_client.LAYER_TYPE, name)
-    gs_layername = names.get_names_by_source(uuid=uuid, publication_type=publ_type).wms
+    gs_layername = GeoserverNames(uuid=uuid).wms
     wms_inst = wms.get_wms_proxy()
 
     geoserver_util.is_complete_in_workspace_wms_instance(wms_inst, gs_layername.name, validate_metadata_url=False)
