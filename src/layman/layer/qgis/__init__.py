@@ -2,6 +2,7 @@ import os
 import pathlib
 import shutil
 from functools import partial
+from dataclasses import dataclass
 
 from layman import settings
 from layman.common import empty_method
@@ -15,6 +16,16 @@ ensure_whole_user = empty_method
 delete_whole_user = empty_method
 ensure_workspace = empty_method
 delete_workspace = empty_method
+
+
+@dataclass(frozen=True)
+class QgisNames:
+    id: str  # pylint: disable=invalid-name
+    name: str
+
+    def __init__(self, *, uuid: str):
+        object.__setattr__(self, 'id', f'l_{uuid}')
+        object.__setattr__(self, 'name', f'l_{uuid}')
 
 
 def get_usernames():
