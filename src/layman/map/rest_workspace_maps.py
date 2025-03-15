@@ -49,7 +49,7 @@ def post(workspace):
         file = request.files["file"]
     else:
         raise LaymanError(1, {'parameter': 'file'})
-    file_json = util.check_file(file)
+    file_json = util.check_file(file, x_forwarded_items=x_forwarded_items)
 
     # NAME
     unsafe_mapname = request.form.get('name', '')
