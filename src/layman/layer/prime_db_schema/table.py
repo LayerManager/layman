@@ -4,6 +4,7 @@ from layman.common.prime_db_schema import publications as pubs_util
 from layman.layer import LAYER_TYPE
 from layman import patch_mode, settings
 from layman.layer.db import DbNames
+from ..layer_class import Layer
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 get_metadata_comparison = empty_method_returns_dict
@@ -28,12 +29,11 @@ def get_layer_info(workspace, layername):
     return info
 
 
-def delete_layer(workspace, layer_name):
-    return pubs_util.delete_publication(workspace, LAYER_TYPE, layer_name)
+def delete_layer(layer: Layer):
+    return pubs_util.delete_publication(layer.workspace, layer.type, layer.name)
 
 
-def patch_layer(workspace,
-                layername,
+def patch_layer(layer: Layer,
                 actor_name,
                 external_table_uri,
                 style_type=None,
@@ -43,10 +43,10 @@ def patch_layer(workspace,
                 image_mosaic=None,
                 geodata_type=None,
                 ):
-    db_info = {"name": layername,
+    db_info = {"name": layer.name,
                "title": title,
                "description": description,
-               "publ_type_name": LAYER_TYPE,
+               "publ_type_name": layer.type,
                "actor_name": actor_name,
                'image_mosaic': image_mosaic,
                'external_table_uri': external_table_uri,
@@ -56,7 +56,7 @@ def patch_layer(workspace,
         db_info['style_type'] = style_type.code
     if access_rights:
         db_info['access_rights'] = access_rights
-    pubs_util.update_publication(workspace, db_info)
+    pubs_util.update_publication(layer.workspace, db_info)
 
 
 def pre_publication_action_check(workspace,

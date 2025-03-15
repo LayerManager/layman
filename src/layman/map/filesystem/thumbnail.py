@@ -15,11 +15,13 @@ from layman.common import empty_method, empty_method_returns_dict
 from layman.util import url_for, get_publication_uuid, get_publication_info_by_uuid
 from . import util
 from .. import MAP_TYPE
+from ..map_class import Map
 
 MAP_SUBDIR = __name__.rsplit('.', maxsplit=1)[-1]
 get_metadata_comparison = empty_method_returns_dict
 pre_publication_action_check = empty_method
 post_map = empty_method
+patch_map = empty_method
 
 
 def get_map_thumbnail_dir(publ_uuid):
@@ -55,19 +57,8 @@ def get_map_info_by_uuid(publ_uuid, *, workspace, mapname, x_forwarded_items=Non
     return {}
 
 
-def patch_map(workspace, mapname, *, uuid, file_changed=True):
-    if file_changed or not get_map_info_by_uuid(uuid, workspace=workspace, mapname=mapname):
-        post_map(workspace, mapname)
-
-
-def delete_map(workspace, mapname):
-    publ_uuid = get_publication_uuid(workspace, MAP_TYPE, mapname)
-    if publ_uuid:
-        delete_map_by_uuid(publ_uuid)
-
-
-def delete_map_by_uuid(publ_uuid):
-    util.delete_map_subdir(publ_uuid, MAP_SUBDIR)
+def delete_map(map: Map):
+    util.delete_map_subdir(map.uuid, MAP_SUBDIR)
 
 
 def get_map_thumbnail_path(publ_uuid):

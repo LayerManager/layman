@@ -49,27 +49,15 @@ def get_map_info(workspace, mapname, *, x_forwarded_items=None):
     return {}
 
 
-def delete_map(workspace, mapname):
-    publication = Map(map_tuple=(workspace, mapname))
-    return delete_map_by_class(publication)
-
-
-def delete_map_by_class(publication: Map):
+def delete_map(publication: Map):
     muuid = common_util.get_metadata_uuid(publication.uuid)
     if muuid is None:
         return
     micka_requests.csw_delete(muuid)
 
 
-def patch_map(workspace, mapname, metadata_properties_to_refresh=None, actor_name=None, create_if_not_exists=True,
-              timeout=None):
-    publication = Map(map_tuple=(workspace, mapname))
-    return patch_map_by_class(publication, metadata_properties_to_refresh=metadata_properties_to_refresh,
-                              actor_name=actor_name, create_if_not_exists=create_if_not_exists, timeout=timeout)
-
-
-def patch_map_by_class(publication: Map, metadata_properties_to_refresh=None, actor_name=None,
-                       create_if_not_exists=True, timeout=None):
+def patch_map(publication: Map, metadata_properties_to_refresh=None, actor_name=None,
+              create_if_not_exists=True, timeout=None):
     timeout = timeout or settings.DEFAULT_CONNECTION_TIMEOUT
     # current_app.logger.info(f"patch_map metadata_properties_to_refresh={metadata_properties_to_refresh}")
     metadata_properties_to_refresh = metadata_properties_to_refresh or []
@@ -381,13 +369,8 @@ METADATA_PROPERTIES = {
 }
 
 
-def get_metadata_comparison(workspace, mapname):
-    publication = Map(map_tuple=(workspace, mapname))
-    return get_metadata_comparison_by_class(publication)
-
-
-def get_metadata_comparison_by_class(publication: Map):
-    uuid = publication.uuid
+def get_metadata_comparison(map: Map):
+    uuid = map.uuid
     csw = common_util.create_csw()
     if uuid is None or csw is None:
         return {}

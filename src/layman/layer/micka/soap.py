@@ -11,7 +11,6 @@ post_layer = empty_method
 
 get_layer_info = csw.get_layer_info
 delete_layer = csw.delete_layer
-delete_layer_by_class = csw.delete_layer_by_class
 get_metadata_comparison = csw.get_metadata_comparison
 patch_layer = empty_method
 

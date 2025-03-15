@@ -55,15 +55,9 @@ def get_layer_info(workspace, layername, *, x_forwarded_items=None):
     return {}
 
 
-def patch_layer(workspace, layername, metadata_properties_to_refresh, _actor_name=None, create_if_not_exists=True, timeout=None):
-    layer = Layer(layer_tuple=(workspace, layername))
-    return patch_layer_by_class(layer, metadata_properties_to_refresh=metadata_properties_to_refresh,
-                                actor_name=_actor_name, create_if_not_exists=create_if_not_exists, timeout=timeout)
-
-
 # pylint: disable=unused-argument
-def patch_layer_by_class(publication: Layer, *, metadata_properties_to_refresh, actor_name=None,
-                         create_if_not_exists=True, timeout=None):
+def patch_layer(publication: Layer, *, metadata_properties_to_refresh, actor_name=None,
+                create_if_not_exists=True, timeout=None):
     timeout = timeout or settings.DEFAULT_CONNECTION_TIMEOUT
     # current_app.logger.info(f"patch_layer metadata_properties_to_refresh={metadata_properties_to_refresh}")
     if len(metadata_properties_to_refresh) == 0:
@@ -97,12 +91,7 @@ def patch_layer_by_class(publication: Layer, *, metadata_properties_to_refresh, 
     return muuid
 
 
-def delete_layer(workspace, layername, *, backup_uuid=None):
-    layer = Layer(layer_tuple=(workspace, layername))
-    return delete_layer_by_class(layer, backup_uuid=backup_uuid)
-
-
-def delete_layer_by_class(publication: Layer, *, backup_uuid=None):
+def delete_layer(publication: Layer, *, backup_uuid=None):
     uuid = publication.uuid or backup_uuid
     if backup_uuid and uuid:
         assert backup_uuid == uuid
@@ -359,16 +348,11 @@ METADATA_PROPERTIES = {
 }
 
 
-def get_metadata_comparison(workspace, layername):
-    layer = Layer(layer_tuple=(workspace, layername))
-    return get_metadata_comparison_by_class(layer)
-
-
-def get_metadata_comparison_by_class(publication: Layer):
+def get_metadata_comparison(layer: Layer):
     csw = common_util.create_csw()
-    if publication.uuid is None or csw is None:
+    if layer.uuid is None or csw is None:
         return {}
-    muuid = common_util.get_metadata_uuid(publication.uuid)
+    muuid = common_util.get_metadata_uuid(layer.uuid)
     element = common_util.get_record_element_by_id(csw, muuid)
     if element is None:
         return {}

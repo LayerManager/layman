@@ -7,11 +7,14 @@ from celery.contrib.abortable import AbortableAsyncResult
 
 del sys.modules['layman']
 
-from layman import app, celery_app
+from layman import app, celery_app, settings
+from layman.layer import NO_STYLE_DEF
 from layman.layer.filesystem import input_chunk, util as fs_util
+from layman.layer.prime_db_schema import table
 from layman import celery as celery_util
 from layman.common import tasks as tasks_util
 from test_tools import flask_client
+from test_tools.mock.layman_classes import LayerMock
 
 MIN_GEOJSON = """
 {
@@ -39,10 +42,11 @@ def test_single_abortable_task():
     ]
     check_crs = False
     publ_uuid = '956fc92b-4247-4ea9-a014-59d8b09acd0a'
+    title = 'bla'
     task_options = {
         'crs_id': 'EPSG:4326',
-        'description': 'bla',
-        'title': 'bla',
+        'description': title,
+        'title': title,
         'check_crs': check_crs,
         'uuid': publ_uuid,
     }
@@ -51,6 +55,17 @@ def test_single_abortable_task():
     layername = 'test_abort_layer'
     with app.app_context():
         input_chunk.save_layer_files_str(publ_uuid, filenames, check_crs)
+        table.post_layer(workspace, layername,
+                         access_rights={'read': [settings.RIGHTS_EVERYONE_ROLE], 'write': [settings.RIGHTS_EVERYONE_ROLE]},
+                         title=title,
+                         description=title,
+                         uuid=publ_uuid,
+                         actor_name=settings.ANONYM_USER,
+                         geodata_type=settings.GEODATA_TYPE_VECTOR,
+                         image_mosaic=False,
+                         external_table_uri=None,
+                         style_type=NO_STYLE_DEF,
+                         )
     task_chain = chain(*[
         tasks_util.get_task_signature(workspace, layername, t, task_options, 'layername')
         for t in tasks
@@ -64,7 +79,7 @@ def test_single_abortable_task():
     ]
 
     i = 1
-    while i <= 50 and not results[0].state == results_copy[0].state == 'STARTED':
+    while i <= 50 and results[0].state == results_copy[0].state == 'PENDING':
         print(f"results[0].state={results[0].state}, results_copy[0].state={results_copy[0].state}")
         time.sleep(0.1)
         i += 1
@@ -75,7 +90,9 @@ def test_single_abortable_task():
     # first one is failure, because it throws AbortedException
     assert results[0].state == results_copy[0].state == 'FAILURE'
     with app.app_context():
-        input_chunk.delete_layer_by_uuid(publ_uuid)
+        layer = LayerMock(uuid=publ_uuid, layer_tuple=(workspace, layername))
+        input_chunk.delete_layer(layer)
+        table.delete_layer(layer)
 
 
 @pytest.mark.usefixtures('client')
@@ -93,10 +110,11 @@ def test_abortable_task_chain():
     ]
     check_crs = False
     publ_uuid = '6658cfe1-4090-4f0a-949b-a0891bec2ef4'
+    title = 'bla'
     task_options = {
         'crs_id': 'EPSG:4326',
-        'description': 'bla',
-        'title': 'bla',
+        'description': title,
+        'title': title,
         'check_crs': check_crs,
         'uuid': publ_uuid,
     }
@@ -105,6 +123,18 @@ def test_abortable_task_chain():
     layername = 'test_abort_layer2'
     with app.app_context():
         input_chunk.save_layer_files_str(publ_uuid, filenames, check_crs)
+        table.post_layer(workspace, layername,
+                         access_rights={'read': [settings.RIGHTS_EVERYONE_ROLE], 'write': [settings.RIGHTS_EVERYONE_ROLE]},
+                         title=title,
+                         description=title,
+                         uuid=publ_uuid,
+                         actor_name=settings.ANONYM_USER,
+                         geodata_type=settings.GEODATA_TYPE_VECTOR,
+                         image_mosaic=False,
+                         external_table_uri=None,
+                         style_type=NO_STYLE_DEF,
+                         )
+
     task_chain = chain(*[
         tasks_util.get_task_signature(workspace, layername, t, task_options, 'layername')
         for t in tasks
@@ -123,7 +153,11 @@ def test_abortable_task_chain():
         for task_result in results
     ]
 
-    time.sleep(1)
+    i = 1
+    while i <= 50 and results[0].state == results_copy[0].state == 'PENDING':
+        print(f"results[0].state={results[0].state}, results_copy[0].state={results_copy[0].state}")
+        time.sleep(0.1)
+        i += 1
 
     assert results[0].state == results_copy[0].state == 'STARTED'
     assert results[1].state == results_copy[1].state == 'PENDING'
@@ -137,4 +171,6 @@ def test_abortable_task_chain():
     assert results[1].state == results_copy[1].state == 'FAILURE'
     assert results[2].state == results_copy[2].state == 'FAILURE'
     with app.app_context():
-        input_chunk.delete_layer_by_uuid(publ_uuid)
+        layer = LayerMock(uuid=publ_uuid, layer_tuple=(workspace, layername))
+        input_chunk.delete_layer(layer)
+        table.delete_layer(layer)

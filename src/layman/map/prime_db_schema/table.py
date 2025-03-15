@@ -2,6 +2,7 @@ from layman.common import empty_method_returns_dict
 from . import util
 from ...common.prime_db_schema import publications as pubs_util
 from .. import MAP_TYPE
+from ..map_class import Map
 
 get_metadata_comparison = empty_method_returns_dict
 
@@ -18,13 +19,12 @@ def get_map_info(workspace, mapname):
     return info
 
 
-def patch_map(workspace,
-              mapname,
+def patch_map(map: Map,
               actor_name,
               title=None,
               description=None,
               access_rights=None):
-    db_info = {"name": mapname,
+    db_info = {"name": map.name,
                "title": title,
                "description": description,
                "publ_type_name": MAP_TYPE,
@@ -32,7 +32,7 @@ def patch_map(workspace,
                }
     if access_rights:
         db_info['access_rights'] = access_rights
-    pubs_util.update_publication(workspace, db_info)
+    pubs_util.update_publication(map.workspace, db_info)
 
 
 def pre_publication_action_check(workspace,
@@ -75,6 +75,6 @@ def post_map(workspace,
     pubs_util.insert_publication(workspace, db_info)
 
 
-def delete_map(workspace, map_name):
-    util.delete_internal_layer_relations(workspace, map_name, )
-    return pubs_util.delete_publication(workspace, MAP_TYPE, map_name)
+def delete_map(map: Map):
+    util.delete_internal_layer_relations(map.workspace, map.name, )
+    return pubs_util.delete_publication(map.workspace, map.type, map.name)

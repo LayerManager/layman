@@ -36,24 +36,23 @@ def get_flask_proxy_key():
     return FLASK_PROXY_KEY.format(workspace=workspace)
 
 
-def patch_layer_by_uuid(*, uuid, original_data_source, title, description, access_rights=None):
-    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wms
-    if not get_layer_info_by_uuid(uuid=uuid):
+def patch_layer(layer: Layer, *, original_data_source, title, description, access_rights=None):
+    gs_layername = layer.gs_names.wms
+    if not get_layer_info_by_uuid(uuid=layer.uuid):
         return
-    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['style_type', 'geodata_type', 'image_mosaic'], })
-    geodata_type = info['geodata_type']
+    geodata_type = layer.geodata_type
     if geodata_type == settings.GEODATA_TYPE_VECTOR:
-        if info['_style_type'] == 'sld':
-            store_name = get_db_store_name(uuid=uuid, original_data_source=original_data_source)
+        if layer.style_type == 'sld':
+            store_name = get_db_store_name(uuid=layer.uuid, original_data_source=original_data_source)
             gs_util.patch_feature_type(gs_layername.workspace, gs_layername.name, store_name=store_name, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
-        if info['_style_type'] == 'qml':
+        if layer.style_type == 'qml':
             gs_util.patch_wms_layer(gs_layername.workspace, gs_layername.name, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
     elif geodata_type == settings.GEODATA_TYPE_RASTER:
-        image_mosaic = info['image_mosaic']
+        image_mosaic = layer.image_mosaic
         if image_mosaic:
-            store = get_image_mosaic_store_name(uuid=uuid)
+            store = get_image_mosaic_store_name(uuid=layer.uuid)
         else:
-            store = get_geotiff_store_name(uuid=uuid)
+            store = get_geotiff_store_name(uuid=layer.uuid)
         gs_util.patch_coverage(gs_layername.workspace, gs_layername.name, store, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
     else:
         raise NotImplementedError(f"Unknown geodata type: {geodata_type}")
@@ -68,17 +67,7 @@ def patch_layer_by_uuid(*, uuid, original_data_source, title, description, acces
         gs_util.ensure_layer_security_roles(gs_layername.workspace, gs_layername.name, security_write_roles, 'w', settings.LAYMAN_GS_AUTH)
 
 
-# pylint: disable=unused-argument
-def patch_layer(workspace, layername, *, uuid, title, description, original_data_source, access_rights=None):
-    patch_layer_by_uuid(uuid=uuid,
-                        title=title,
-                        description=description,
-                        original_data_source=original_data_source,
-                        access_rights=access_rights,
-                        )
-
-
-def delete_layer_by_class(*, layer: Layer):
+def delete_layer(layer: Layer):
     db_store_name = DEFAULT_INTERNAL_DB_STORE
     gs_layername = layer.gs_names.wms
     gs_util.delete_feature_type(gs_layername.workspace, gs_layername.name, settings.LAYMAN_GS_AUTH, store=db_store_name)
@@ -93,11 +82,6 @@ def delete_layer_by_class(*, layer: Layer):
     gs_util.delete_security_roles(f"{gs_layername.workspace}.{gs_layername.name}.r", settings.LAYMAN_GS_AUTH)
     gs_util.delete_security_roles(f"{gs_layername.workspace}.{gs_layername.name}.w", settings.LAYMAN_GS_AUTH)
     return {}
-
-
-def delete_layer(workspace, layername):
-    layer = Layer(layer_tuple=(workspace, layername))
-    return delete_layer_by_class(layer=layer)
 
 
 def get_wms_url(external_url=False, *, x_forwarded_items=None):
@@ -231,13 +215,8 @@ def get_layer_info_by_uuid(*, uuid, x_forwarded_items=None):
     return result
 
 
-def get_metadata_comparison(workspace, layername):
-    uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layername)
-    return get_metadata_comparison_by_uuid(uuid=uuid)
-
-
-def get_metadata_comparison_by_uuid(*, uuid):
-    gs_layername = names.get_layer_names_by_source(uuid=uuid, ).wms
+def get_metadata_comparison(layer: Layer):
+    gs_layername = layer.gs_names.wms
     wms = get_wms_direct()
     if wms is None:
         return {}

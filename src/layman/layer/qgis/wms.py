@@ -41,15 +41,8 @@ def get_layer_info_by_uuid(publ_uuid, *, workspace, layername, x_forwarded_items
     return result
 
 
-def delete_layer(workspace, layername):
-    publ_uuid = get_publication_uuid(workspace, LAYER_TYPE, layername)
-    if publ_uuid:
-        return delete_layer_by_uuid(publ_uuid)
-    return {}
-
-
-def delete_layer_by_uuid(publ_uuid):
-    style_stream = util.get_layer_original_style_stream(publ_uuid)
+def delete_layer(layer: Layer):
+    style_stream = util.get_layer_original_style_stream(layer.uuid)
     if style_stream:
         result = {
             'style': {
@@ -58,7 +51,7 @@ def delete_layer_by_uuid(publ_uuid):
         }
     else:
         result = {}
-    qgis.delete_layer_dir(publ_uuid)
+    qgis.delete_layer_dir(layer.uuid)
     return result
 
 

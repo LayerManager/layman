@@ -10,6 +10,7 @@ from layman.common import empty_method_returns_true
 from layman.http import LaymanError
 from . import input_file, input_chunk, thumbnail, gdal
 from .. import LAYER_TYPE
+from ..layer_class import Layer
 
 logger = get_task_logger(__name__)
 
@@ -29,6 +30,7 @@ def refresh_input_chunk(self, workspace, layername, *, uuid, check_crs=True, ove
     assert (time_regex is None) == (slugified_time_regex is None)
     if self.is_aborted():
         raise AbortedException
+    layer = Layer(uuid=uuid)
     last_change = time.time()
     num_files_saved = 0
     num_chunks_saved = 0
@@ -39,12 +41,12 @@ def refresh_input_chunk(self, workspace, layername, *, uuid, check_crs=True, ove
         if time.time() - last_change > settings.UPLOAD_MAX_INACTIVITY_TIME:
             logger.info(
                 f'UPLOAD_MAX_INACTIVITY_TIME reached {workspace}.{layername}')
-            input_file.delete_layer_by_uuid(uuid)
+            input_file.delete_layer(layer)
             raise LaymanError(22)
         time.sleep(0.5)
         if self.is_aborted():
             logger.info(f'Aborting for layer {workspace}.{layername}')
-            input_file.delete_layer_by_uuid(uuid)
+            input_file.delete_layer(layer)
             logger.info(f'Aborted for layer {workspace}.{layername}')
             raise AbortedException
 
@@ -95,7 +97,7 @@ def refresh_gdal(self, workspace, layername,
             logger.info(f'terminating GDAL process workspace.layer={workspace}.{layername}')
             process.terminate()
             logger.info(f'terminated GDAL process workspace.layer={workspace}.{layername}')
-            gdal.delete_layer_by_uuid(uuid)
+            gdal.delete_layer(layer)
             raise AbortedException
         return_code = process.poll()
         if return_code != 0:
@@ -107,6 +109,7 @@ def refresh_gdal(self, workspace, layername,
         raise AbortedException
     if original_data_source == settings.EnumOriginalDataSource.TABLE.value:
         return
+    layer = Layer(uuid=uuid)
     layer_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file']})
     file_type = layer_info['_file']['file_type']
     if file_type != settings.GEODATA_TYPE_RASTER:
@@ -174,8 +177,9 @@ def refresh_gdal(self, workspace, layername,
 def refresh_thumbnail(self, workspace, layername, *, uuid):
     if self.is_aborted():
         raise AbortedException
+    layer = Layer(uuid=uuid)
     thumbnail.generate_layer_thumbnail(uuid)
 
     if self.is_aborted():
-        thumbnail.delete_layer_by_uuid(uuid)
+        thumbnail.delete_layer(layer)
         raise AbortedException

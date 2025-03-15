@@ -40,7 +40,7 @@ def post_layer(workspace, layername, file_path):
     yield layer.table_uri
 
     with layman.app_context():
-        table_util.delete_layer_by_class(layer=layer)
+        table_util.delete_layer(layer=layer)
         publications.delete_publication(workspace, LAYER_TYPE, layername)
 
 

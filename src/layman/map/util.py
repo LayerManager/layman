@@ -16,7 +16,7 @@ from layman.common import redis as redis_util, tasks as tasks_util, metadata as 
 from layman.common.util import PUBLICATION_NAME_PATTERN, PUBLICATION_MAX_LENGTH, clear_publication_info as common_clear_publication_info
 from layman.layer.geoserver.util import get_gs_proxy_server_url
 from layman.util import call_modules_fn, get_providers_from_source_names, get_internal_sources, \
-    to_safe_name, url_for, WORKSPACE_NAME_PATTERN, XForwardedClass, get_publication_uuid
+    to_safe_name, url_for, WORKSPACE_NAME_PATTERN, XForwardedClass
 from . import get_map_sources, MAP_TYPE, get_map_type_def, get_map_info_keys
 from .filesystem import input_file
 from .map_class import Map
@@ -111,26 +111,30 @@ def post_map(workspace, mapname, task_options, start_at):
     celery_util.set_publication_chain_info(workspace, MAP_TYPE, mapname, post_tasks, res)
 
 
-def patch_map(workspace, mapname, task_options, start_at):
+def patch_map(map: Map, task_options, start_at):
     # sync processing
     sources = get_sources()
-    call_modules_fn(sources, 'patch_map', [workspace, mapname], kwargs=task_options)
+    call_modules_fn(sources, 'patch_map', [map], kwargs=task_options)
 
     # async processing
-    patch_tasks = tasks_util.get_task_methods(get_map_type_def(), workspace, mapname, task_options, start_at)
-    patch_chain = tasks_util.get_chain_of_methods(workspace, mapname, patch_tasks, task_options, 'mapname')
+    patch_tasks = tasks_util.get_task_methods(get_map_type_def(), map.workspace, map.name, task_options, start_at)
+    patch_chain = tasks_util.get_chain_of_methods(map.workspace, map.name, patch_tasks, task_options, 'mapname')
     # res = patch_chain.apply_async()
     res = patch_chain()
 
-    celery_util.set_publication_chain_info(workspace, MAP_TYPE, mapname, patch_tasks, res)
+    celery_util.set_publication_chain_info(map.workspace, MAP_TYPE, map.name, patch_tasks, res)
 
 
-def delete_map(workspace, mapname, kwargs=None):
-    publ_uuid = get_publication_uuid(workspace, MAP_TYPE, mapname)
+def delete_map_ws_name(workspace, mapname, kwargs=None):
+    map = Map(map_tuple=(workspace, mapname))
+    delete_map(map, kwargs=kwargs)
+
+
+def delete_map(map: Map, kwargs=None):
     sources = get_sources()
-    call_modules_fn(sources[::-1], 'delete_map', [workspace, mapname], kwargs=kwargs)
-    delete_publication_uuid_from_redis(workspace, MAP_TYPE, mapname, publ_uuid)
-    celery_util.delete_publication(workspace, MAP_TYPE, mapname)
+    call_modules_fn(sources[::-1], 'delete_map', [map], kwargs=kwargs)
+    delete_publication_uuid_from_redis(map.workspace, MAP_TYPE, map.name, map.uuid)
+    celery_util.delete_publication(map.workspace, MAP_TYPE, map.name)
 
 
 def clear_publication_info(layer_info):
@@ -331,7 +335,7 @@ def get_metadata_comparison(publication: Map):
         f"{layman_props['map_endpoint']}": layman_props,
     }
     sources = get_sources()
-    partial_infos = call_modules_fn(sources, 'get_metadata_comparison', [publication.workspace, publication.name])
+    partial_infos = call_modules_fn(sources, 'get_metadata_comparison', [publication])
     for partial_info in partial_infos.values():
         if partial_info is not None:
             all_props.update(partial_info)

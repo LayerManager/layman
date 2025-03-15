@@ -27,7 +27,7 @@ def patch_after_feature_change(
                                          metadata_properties_to_refresh=['extent'],
                                          actor_name=None,
                                          access_rights=None,
-                                         csw_patch_method=csw.patch_layer_by_class,
+                                         csw_patch_method=csw.patch_layer,
                                          soap_insert_method=soap.soap_insert,
                                          )
 
@@ -38,7 +38,7 @@ def patch_after_feature_change(
     if not info:
         logger.warning(f"layman.layer.micka.soap.patch_after_feature_change: workspace={publication.workspace}, "
                        f"layer={publication.name}, uuid={publication.uuid} Publication does not exist, so we delete it")
-        soap.delete_layer_by_class(publication, backup_uuid=publication.uuid)
+        soap.delete_layer(publication, backup_uuid=publication.uuid)
 
     if self.is_aborted():
         raise AbortedException
