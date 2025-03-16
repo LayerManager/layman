@@ -62,16 +62,19 @@ def _setup_role(request):
 
 
 @pytest.mark.parametrize('setup_users_and_role', [
-    ("test_delete_user", "test_delete_user", None),
-    ("test_delete_user", "test_delete_user2", None),
-    ("test_delete_user", "test_delete_user2", "ADMIN"),
+    pytest.param(("test_delete_user", "test_delete_user", None), id="self_delete"),
+    pytest.param(("test_delete_user", "test_delete_user2", None), id="different_actor"),
+    pytest.param(("test_delete_user", "test_delete_user2", "ADMIN"), id="actor_with_role"),
 ], indirect=True)
-@pytest.mark.parametrize('workspace', [lambda username: f"{username}", "public_workspace", ])
+@pytest.mark.parametrize('workspace', [
+    pytest.param(lambda username: f"{username}", id="user_workspace"),
+    pytest.param("public_workspace", id="public_workspace"),
+])
 @pytest.mark.parametrize(
     '_setup_role, access_rights',
     [
-        (None, lambda username: {"read": username, "write": username}),
-        ("TEST_ROLE", lambda username: {"read": f"{username},TEST_ROLE", "write": username}),
+        pytest.param(None, lambda username: {"read": username, "write": username}, id="only_owner_permissions"),
+        pytest.param("TEST_ROLE", lambda username: {"read": f"{username},TEST_ROLE", "write": username}, id="shared_with_role"),
     ],
     indirect=["_setup_role"]
 )
@@ -118,11 +121,11 @@ def test_delete_user(setup_users_and_role, publication_type, workspace, _setup_r
 
 
 @pytest.mark.parametrize('setup_users_for_testing_errors', [
-    ('non_existing_user', 'test_delete_user_negative2', 404, 57),
-    ('test_delete_user_negative', 'test_delete_user_negative2', 403, 30),
-    ('', 'test_delete_user_negative2', 404, None),
-    (ANONYM_USER, 'test_delete_user_negative2', 404, 57),
-    (NONAME_USER, 'test_delete_user_negative2', 404, 57),
+    pytest.param(('non_existing_user', 'test_delete_user_negative2', 404, 57), id="non_existing_user"),
+    pytest.param(('test_delete_user_negative', 'test_delete_user_negative2', 403, 30), id="forbidden_deletion"),
+    pytest.param(('', 'test_delete_user_negative2', 404, None), id="empty_username"),
+    pytest.param((ANONYM_USER, 'test_delete_user_negative2', 404, 57), id="deletion_by_anonym"),
+    pytest.param((NONAME_USER, 'test_delete_user_negative2', 404, 57), id="deletion_by_noname"),
 ], indirect=True)
 @pytest.mark.usefixtures('ensure_layman_module', 'oauth2_provider_mock')
 def test_delete_user_negative(setup_users_for_testing_errors):
@@ -139,12 +142,15 @@ def test_delete_user_negative(setup_users_for_testing_errors):
 
 
 @pytest.mark.parametrize('publication_type', process_client.PUBLICATION_TYPES)
-@pytest.mark.parametrize('workspace', ["public_workspace", lambda username: f"{username}"])
+@pytest.mark.parametrize('workspace', [
+    pytest.param(lambda username: f"{username}", id="user_workspace"),
+    pytest.param("public_workspace", id="public_workspace"),
+])
 @pytest.mark.parametrize(
     '_setup_role, access_rights',
     [
-        (None, lambda username: {"read": username, "write": username}),
-        ("TEST_ROLE", lambda username: {"read": f"{username},TEST_ROLE", "write": username}),
+        pytest.param(None, lambda username: {"read": username, "write": username}, id="only_owner_permissions"),
+        pytest.param("TEST_ROLE", lambda username: {"read": f"{username},TEST_ROLE", "write": username}, id="shared_with_role"),
     ],
     indirect=["_setup_role"]
 )
@@ -194,8 +200,8 @@ def test_delete_user_with_undeletable_publications(publication_type):
 
 
 @pytest.mark.parametrize('setup_user_or_everyone', [
-    ('test_delete_owner_reader', 'test_delete_reader', 'test_delete_user_publication_reader'),
-    ('test_delete_owner_reader', RIGHTS_EVERYONE_ROLE, 'test_delete_user_publication_everyone'),
+    pytest.param(('test_delete_owner_reader', 'test_delete_reader', 'test_delete_user_publication_reader'), id="reader_user"),
+    pytest.param(('test_delete_owner_reader', RIGHTS_EVERYONE_ROLE, 'test_delete_user_publication_everyone'), id="reader_everyone"),
 ], indirect=True)
 @pytest.mark.parametrize('publication_type', process_client.PUBLICATION_TYPES)
 @pytest.mark.usefixtures('ensure_layman_module', 'oauth2_provider_mock')
