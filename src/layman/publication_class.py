@@ -22,18 +22,41 @@ class Publication:
 
     def __init__(self, *, uuid: str = None, publ_tuple: Tuple[str, str, str] = None):
         assert uuid is not None or publ_tuple is not None
+        if uuid is not None:
+            object.__setattr__(self, 'uuid', uuid)
+        if publ_tuple is not None:
+            object.__setattr__(self, 'workspace', publ_tuple[0])
+            object.__setattr__(self, 'type', publ_tuple[1])
+            object.__setattr__(self, 'name', publ_tuple[2])
 
+        self.load()
+
+    def load(self):
         context = {'keys': ['id']}
-        info = util.get_publication_info(*publ_tuple, context=context) if publ_tuple is not None else util.get_publication_info_by_uuid(uuid=uuid, context=context)
+        if hasattr(self, 'uuid'):
+            info = util.get_publication_info_by_uuid(uuid=self.uuid, context=context)
+        else:
+            info = util.get_publication_info(self.workspace, self.type, self.name, context=context)
 
-        object.__setattr__(self, 'uuid', info['uuid'])
-        object.__setattr__(self, 'workspace', info['_workspace'])
-        object.__setattr__(self, 'type', info['type'])
-        object.__setattr__(self, 'name', info['name'])
-        object.__setattr__(self, 'access_rights', info['access_rights'])
-        object.__setattr__(self, 'description', info['description'])
-        object.__setattr__(self, 'title', info['title'])
-        object.__setattr__(self, 'created_at', info['_created_at'])
-        object.__setattr__(self, 'native_bounding_box', info['native_bounding_box'])
-        object.__setattr__(self, 'native_crs', info['native_crs'])
+        if info:
+            object.__setattr__(self, 'uuid', info['uuid'])
+            object.__setattr__(self, 'workspace', info['_workspace'])
+            object.__setattr__(self, 'type', info['type'])
+            object.__setattr__(self, 'name', info['name'])
+            object.__setattr__(self, 'access_rights', info['access_rights'])
+            object.__setattr__(self, 'description', info['description'])
+            object.__setattr__(self, 'title', info['title'])
+            object.__setattr__(self, 'created_at', info['_created_at'])
+            object.__setattr__(self, 'native_bounding_box', info['native_bounding_box'])
+            object.__setattr__(self, 'native_crs', info['native_crs'])
+
         object.__setattr__(self, '_info', info)
+
+    @property
+    def exists(self):
+        if not hasattr(self, '_info'):
+            self.load()
+        return bool(self._info)
+
+    def __bool__(self):
+        return self.exists

@@ -25,12 +25,16 @@ class Layer(Publication):
     def __init__(self, *, uuid: str = None, layer_tuple: Tuple[str, str] = None):
         publ_tuple = (layer_tuple[0], LAYER_TYPE, layer_tuple[1]) if layer_tuple else None
         super().__init__(uuid=uuid, publ_tuple=publ_tuple)
+
+    def load(self):
+        super().load()
         info = self._info
-        object.__setattr__(self, 'geodata_type', info['geodata_type'])
-        object.__setattr__(self, 'style_type', info['_style_type'])
-        object.__setattr__(self, 'original_data_source',
-                           settings.EnumOriginalDataSource(info['original_data_source']))
-        object.__setattr__(self, 'table_uri', info['_table_uri'])
+        if info:
+            object.__setattr__(self, 'geodata_type', info['geodata_type'])
+            object.__setattr__(self, 'style_type', info['_style_type'])
+            object.__setattr__(self, 'original_data_source',
+                               settings.EnumOriginalDataSource(info['original_data_source']))
+            object.__setattr__(self, 'table_uri', info['_table_uri'])
 
     @property
     def gs_names(self):

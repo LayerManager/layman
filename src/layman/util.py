@@ -403,14 +403,16 @@ def get_publication_uuid(workspace, publ_type, publ_name):
 def _get_publication_by_uuid(uuid):
     from layman.common.prime_db_schema.publications import get_publication_infos as prime_db_schema_get_publication_infos
     prime_db_schema_info = prime_db_schema_get_publication_infos(uuid=uuid)
-    assert len(prime_db_schema_info) == 1
-    return list(prime_db_schema_info.keys())[0]
+    return list(prime_db_schema_info.keys())[0] if prime_db_schema_info else None
 
 
 def get_publication_info_by_uuid(uuid, context=None):
     if uuid is None:
         return {}
-    workspace, publ_type, name = _get_publication_by_uuid(uuid)
+    maybe_tuple = _get_publication_by_uuid(uuid)
+    if maybe_tuple is None:
+        return {}
+    workspace, publ_type, name = maybe_tuple
     return get_publication_info(workspace=workspace, publ_type=publ_type, publ_name=name, context=context)
 
 
