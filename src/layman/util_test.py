@@ -44,10 +44,10 @@ def assert_module_methods(module, methods):
 def test_publication_type_interface_methods(publication_type, method):
     with app.app_context():
         publ_type_dict = util.get_publication_types()[publication_type]
-        module_name = f'{publ_type_dict["module"]}.util'
-        module = importlib.import_module(module_name)
+        util_module_name = f'{publ_type_dict["module"]}.util'
+        util_module = importlib.import_module(util_module_name)
         method_name = method.format(name=publ_type_dict["name"])
-        method = getattr(module, method_name, None)
+        method = getattr(util_module, method_name, None)
         assert method is not None
 
 
