@@ -14,6 +14,7 @@ from geoserver.util import reset as gs_reset
 from layman import authn, authz, settings, util as layman_util, LaymanError, names
 from layman.authn import authenticate, is_user_with_name
 from layman.layer import db
+from layman.layer.layer_class import Layer
 from layman.layer.qgis import wms as qgis_wms
 from layman.layer.util import patch_after_feature_change
 from layman.util import WORKSPACE_NAME_ONLY_PATTERN
@@ -291,11 +292,10 @@ def proxy(subpath):
 
     if response.status_code == 200:
         for layer_uuid in wfs_t_layers:
-            geodata_type = layman_util.get_publication_info_by_uuid(layer_uuid, context={'keys': ['geodata_type']})['geodata_type']
+            layer = Layer(uuid=layer_uuid)
             # pylint: disable=protected-access
-            if authz.can_i_edit(uuid=layer_uuid) and geodata_type == settings.GEODATA_TYPE_VECTOR:
-                workspace, _, layername = layman_util._get_publication_by_uuid(layer_uuid)
-                patch_after_feature_change(workspace, layername)
+            if authz.can_i_edit(uuid=layer_uuid) and layer.geodata_type == settings.GEODATA_TYPE_VECTOR:
+                patch_after_feature_change(layer.workspace, layer.name)
 
     excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
     headers = {key: value for (key, value) in response.headers.items() if key.lower() not in excluded_headers}
