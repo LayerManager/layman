@@ -809,7 +809,11 @@ JSON array of objects representing users of Layman with following structure:
    - The username of the user to be deleted.
 
 ### DELETE User
-Delete a user account including his [personal workspace](models.md#personal-workspace) and all publications in this workspace (layers and maps). Publications in the public workspace are also removed if the user is the only one with both read and write permissions. If another user has write access, only the owner's permissions are removed. If any user has read access, the deletion is aborted. Rights to delete other user account can be granted with [GRANT_DELETE_OTHER_USER](env-settings.md#GRANT_DELETE_OTHER_USER).
+Delete a user account including his [personal workspace](models.md#personal-workspace) and all publications in this workspace (layers and maps).
+
+Publications in the public workspace are also removed if the user is the only one with both read and write permissions. If another user has write access, only the owner's permissions are removed. If any user has read access, the deletion of the whole user account is not allowed.
+
+Rights to delete other user account can be granted with [GRANT_DELETE_OTHER_USER](env-settings.md#GRANT_DELETE_OTHER_USER).
 
 #### Request
 No request parameters.
