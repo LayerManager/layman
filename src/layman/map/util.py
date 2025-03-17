@@ -9,11 +9,12 @@ from jsonschema import validate, Draft7Validator
 from flask import current_app, request
 
 import layman_settings
-from layman import LaymanError, util as layman_util, celery as celery_util, settings, names
+from layman import LaymanError, util as layman_util, celery as celery_util, settings
 from layman.authn.prime_db_schema import get_authn_info
 from layman.common.micka import util as micka_util
 from layman.common import redis as redis_util, tasks as tasks_util, metadata as metadata_common
 from layman.common.util import PUBLICATION_NAME_PATTERN, PUBLICATION_MAX_LENGTH, clear_publication_info as common_clear_publication_info
+from layman.layer.geoserver import geoserver_layername_to_uuid
 from layman.layer.geoserver.util import get_gs_proxy_server_url
 from layman.util import call_modules_fn, get_providers_from_source_names, get_internal_sources, \
     to_safe_name, url_for, WORKSPACE_NAME_PATTERN, XForwardedClass
@@ -511,8 +512,8 @@ def get_layers_from_json(map_json, *, x_forwarded_items=None):
     found_gs_layer = get_internal_gs_layers_from_json(map_json, x_forwarded_items=x_forwarded_items)
     found_layers = []
     for layer_idx, gs_workspace, gs_layer in found_gs_layer:
-        layer_uuid = names.geoserver_layername_to_uuid(geoserver_workspace=gs_workspace,
-                                                       geoserver_name=gs_layer)
+        layer_uuid = geoserver_layername_to_uuid(geoserver_workspace=gs_workspace,
+                                                 geoserver_name=gs_layer)
         if layer_uuid:
             layer_def = (layer_uuid, layer_idx)
             if layer_def not in found_layers:
