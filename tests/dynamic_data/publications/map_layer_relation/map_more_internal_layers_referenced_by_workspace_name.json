@@ -107,6 +107,19 @@
       "title": "Mista",
       "visibility": false,
       "wmsMaxScale": 0
+    },
+    {
+      "metadata": {},
+      "visibility": true,
+      "opacity": 1,
+      "title": "Nonexistent layer",
+      "className": "HSLayers.Layer.WMS",
+      "singleTile": true,
+      "url": "http://localhost:8000/geoserver/test_map_internal_layer_by_ws_name_wms/ows",
+      "params": {
+        "LAYERS": "nonexistent_layer",
+        "FORMAT": "image\/png"
+      }
     }
   ]
 }
