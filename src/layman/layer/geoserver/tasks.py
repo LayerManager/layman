@@ -9,8 +9,7 @@ from layman import celery_app, settings, util as layman_util
 from layman.common import empty_method_returns_true, bbox as bbox_util
 from layman.common.micka import util as micka_util
 from . import wms, wfs, sld
-from .util import DEFAULT_INTERNAL_DB_STORE
-from .. import geoserver
+from .util import DEFAULT_INTERNAL_DB_STORE, create_external_db_store, publish_layer_from_db, publish_layer_from_qgis, set_security_rules
 from ..layer_class import Layer
 
 logger = get_task_logger(__name__)
@@ -53,21 +52,21 @@ def refresh_wms(
     if layer.geodata_type == settings.GEODATA_TYPE_VECTOR:
         if store_in_geoserver:
             if layer.original_data_source == settings.EnumOriginalDataSource.TABLE:
-                store_name = geoserver.create_external_db_store(workspace=gs_layername.workspace,
-                                                                uuid=uuid,
-                                                                table_uri=layer.table_uri,
-                                                                )
+                store_name = create_external_db_store(workspace=gs_layername.workspace,
+                                                      uuid=uuid,
+                                                      table_uri=layer.table_uri,
+                                                      )
             else:
                 store_name = DEFAULT_INTERNAL_DB_STORE
-            geoserver.publish_layer_from_db(layer=layer,
-                                            gs_names=gs_layername,
-                                            metadata_url=metadata_url,
-                                            store_name=store_name)
+            publish_layer_from_db(layer=layer,
+                                  gs_names=gs_layername,
+                                  metadata_url=metadata_url,
+                                  store_name=store_name)
         else:
-            geoserver.publish_layer_from_qgis(layer=layer,
-                                              gs_names=gs_layername,
-                                              metadata_url=metadata_url,
-                                              )
+            publish_layer_from_qgis(layer=layer,
+                                    gs_names=gs_layername,
+                                    metadata_url=metadata_url,
+                                    )
     elif layer.geodata_type == settings.GEODATA_TYPE_RASTER:
         file_paths = next(iter(info['_file']['paths'].values()))
         gs_file_path = file_paths['normalized_geoserver']
@@ -96,11 +95,11 @@ def refresh_wms(
     else:
         raise NotImplementedError(f"Unknown geodata type: {layer.geodata_type}")
 
-    geoserver.set_security_rules(layer=layer,
-                                 gs_names=gs_layername,
-                                 access_rights=access_rights,
-                                 auth=settings.LAYMAN_GS_AUTH,
-                                 )
+    set_security_rules(layer=layer,
+                       gs_names=gs_layername,
+                       access_rights=access_rights,
+                       auth=settings.LAYMAN_GS_AUTH,
+                       )
 
     wms.clear_cache()
 
@@ -136,22 +135,22 @@ def refresh_wfs(
     if self.is_aborted():
         raise AbortedException
     if original_data_source == settings.EnumOriginalDataSource.TABLE.value:
-        store_name = geoserver.create_external_db_store(workspace=gs_layername.workspace,
-                                                        uuid=uuid,
-                                                        table_uri=layer.table_uri,
-                                                        )
+        store_name = create_external_db_store(workspace=gs_layername.workspace,
+                                              uuid=uuid,
+                                              table_uri=layer.table_uri,
+                                              )
     else:
         store_name = DEFAULT_INTERNAL_DB_STORE
     metadata_url = micka_util.get_metadata_url(uuid, url_type=micka_util.RecordUrlType.XML)
-    geoserver.publish_layer_from_db(layer=layer,
-                                    gs_names=gs_layername,
-                                    metadata_url=metadata_url,
-                                    store_name=store_name)
-    geoserver.set_security_rules(layer=layer,
-                                 gs_names=gs_layername,
-                                 access_rights=access_rights,
-                                 auth=settings.LAYMAN_GS_AUTH,
-                                 )
+    publish_layer_from_db(layer=layer,
+                          gs_names=gs_layername,
+                          metadata_url=metadata_url,
+                          store_name=store_name)
+    set_security_rules(layer=layer,
+                       gs_names=gs_layername,
+                       access_rights=access_rights,
+                       auth=settings.LAYMAN_GS_AUTH,
+                       )
     wfs.clear_cache()
 
     if self.is_aborted():

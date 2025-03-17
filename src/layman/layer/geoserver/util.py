@@ -1,8 +1,13 @@
 import logging
 from urllib.parse import urlparse
-from layman import settings
+
+import crs as crs_def
+from geoserver import util as gs_util
+from layman import settings, util as layman_util
+from layman.common import bbox as bbox_util, geoserver as gs_common
+from layman.layer.geoserver import wms
+from layman.layer.layer_class import Layer
 from layman.util import XForwardedClass
-from geoserver.util import wms_direct, wfs_direct
 
 logger = logging.getLogger(__name__)
 CACHE_GS_PROXY_BASE_URL_KEY = f'{__name__}:GS_PROXY_BASE_URL'
@@ -24,7 +29,7 @@ def wms_proxy(wms_url, xml=None, version=None, headers=None):
     version = version or VERSION
     wms_url_path = urlparse(wms_url).path
     # current_app.logger.info(f"xml=\n{xml}")
-    wms = wms_direct(wms_url, xml=xml, version=version, headers=headers)
+    wms = gs_util.wms_direct(wms_url, xml=xml, version=version, headers=headers)
     if wms:
         for operation in wms.operations:
             # app.logger.info(operation.name)
@@ -43,7 +48,7 @@ def wfs_proxy(wfs_url, xml=None, version=None, headers=None):
     from layman.layer.geoserver.wfs import VERSION
     version = version or VERSION
     wfs_url_path = urlparse(wfs_url).path
-    wfs = wfs_direct(wfs_url, xml=xml, version=version, headers=headers)
+    wfs = gs_util.wfs_direct(wfs_url, xml=xml, version=version, headers=headers)
     for operation in wfs.operations:
         # app.logger.info(operation.name)
         for method in operation.methods:
@@ -73,3 +78,58 @@ def image_mosaic_granules_to_wms_time_key(granules_json):
         'values': values,
         'default': max(values),
     }
+
+
+def publish_layer_from_qgis(*, layer: Layer, gs_names, metadata_url, ):
+    store_name = wms.get_qgis_store_name(uuid=layer.uuid)
+    info = layman_util.get_publication_info_by_class(layer, context={'keys': ['wms', ]})
+    layer_capabilities_url = info['_wms']['qgis_capabilities_url']
+    gs_util.create_wms_store(gs_names.workspace,
+                             settings.LAYMAN_GS_AUTH,
+                             store_name,
+                             layer_capabilities_url)
+    bbox = get_layer_bbox(layer=layer)
+    lat_lon_bbox = bbox_util.transform(bbox, layer.native_crs, crs_def.EPSG_4326)
+    gs_util.post_wms_layer(gs_names.workspace, gs_names.name, layer.qgis_names.name, store_name, layer.title, layer.description, bbox, layer.native_crs, settings.LAYMAN_GS_AUTH,
+                           lat_lon_bbox=lat_lon_bbox, metadata_url=metadata_url)
+
+
+def create_external_db_store(workspace, *, uuid, table_uri, auth=settings.LAYMAN_GS_AUTH):
+    pg_conn = {
+        'host': table_uri.hostname,
+        'port': table_uri.port,
+        'dbname': table_uri.db_name,
+        'user': table_uri.username,
+        'password': table_uri.password,
+    }
+    store_name = get_external_db_store_name(uuid=uuid)
+    gs_util.create_db_store(workspace,
+                            auth,
+                            db_schema=table_uri.schema,
+                            pg_conn=pg_conn,
+                            name=store_name,
+                            )
+    return store_name
+
+
+def set_security_rules(*, layer: Layer, gs_names, access_rights, auth, ):
+    read_roles = access_rights.get('read') if access_rights and access_rights.get('read') else layer.access_rights['read']
+    write_roles = access_rights.get('write') if access_rights and access_rights.get('write') else layer.access_rights['write']
+
+    security_read_roles = gs_common.layman_users_and_roles_to_geoserver_roles(read_roles)
+    gs_util.ensure_layer_security_roles(gs_names.workspace, gs_names.name, security_read_roles, 'r', auth)
+
+    security_write_roles = gs_common.layman_users_and_roles_to_geoserver_roles(write_roles)
+    gs_util.ensure_layer_security_roles(gs_names.workspace, gs_names.name, security_write_roles, 'w', auth)
+
+
+def get_layer_bbox(*, layer: Layer):
+    # GeoServer is not working good with degradeted bbox
+    result = bbox_util.get_bbox_to_publish(layer.native_bounding_box, layer.native_crs)
+    return result
+
+
+def publish_layer_from_db(*, layer: Layer, gs_names, metadata_url, store_name=None):
+    bbox = get_layer_bbox(layer=layer)
+    lat_lon_bbox = bbox_util.transform(bbox, layer.native_crs, crs_def.EPSG_4326)
+    gs_util.post_feature_type(gs_names.workspace, gs_names.name, layer.description, layer.title, bbox, layer.native_crs, settings.LAYMAN_GS_AUTH, lat_lon_bbox=lat_lon_bbox, table_name=layer.table_uri.table, metadata_url=metadata_url, store_name=store_name)
