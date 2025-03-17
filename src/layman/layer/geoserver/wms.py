@@ -110,7 +110,7 @@ def get_wms_direct():
         settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE: settings.LAYMAN_GS_USER,
     }
     ows_url = get_wms_url()
-    from .util import wms_direct
+    from geoserver.util import wms_direct
     key = get_flask_proxy_key()
     redis_obj = settings.LAYMAN_REDIS.hgetall(key)
     string_value = redis_obj['value'] if redis_obj else None

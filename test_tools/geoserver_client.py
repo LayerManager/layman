@@ -1,8 +1,8 @@
 import requests
 
 import crs as crs_def
+from geoserver.util import wfs_direct, wms_direct
 from layman import app, settings
-from layman.layer.geoserver.util import wfs_direct, wms_direct
 from layman.layer.geoserver import wfs
 from .util import url_for
 
