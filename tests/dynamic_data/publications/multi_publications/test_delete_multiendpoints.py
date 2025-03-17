@@ -29,7 +29,7 @@ class TestDeletePublicationsClass:
                      after_delete_publications,
                      remaining_publications,
                      publ_type,
-                     info_response,
+                     get_publications_response,
                      ):
         delete_json = process_client.delete_workspace_publications(publ_type, self.owner, actor_name=actor_name)
         publication_set = {publication['name'] for publication in delete_json}
@@ -37,7 +37,7 @@ class TestDeletePublicationsClass:
         exp_response_keys = {'name', 'title', 'uuid', 'access_rights', 'url'}
         for delete_json_item in delete_json:
             assert set(delete_json_item.keys()) == exp_response_keys, f'{delete_json_item=}\n{exp_response_keys=}'
-            publ_info_response = next(iter(info for info in info_response if info['name'] == delete_json_item['name']))
+            publ_info_response = next(iter(info for info in get_publications_response if info['name'] == delete_json_item['name']))
             for key in exp_response_keys:
                 assert delete_json_item[key] == publ_info_response[key]
 

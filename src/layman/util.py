@@ -508,11 +508,11 @@ def get_publication_infos_with_metainfo(workspace=None, publ_type=None, context=
 def delete_workspace_publication(workspace, publication_type, publication_name, *, method, x_forwarded_items=None):
     publ_type_module = get_publication_types()[publication_type]
 
-    module_name = f'{publ_type_module["module"]}.util'
-    module = importlib.import_module(module_name)
-    abort_publication_fn = getattr(module, f'abort_{publ_type_module["name"]}_chain', None)
-    delete_publication_fn = getattr(module, f'delete_{publ_type_module["name"]}', None)
-    is_chain_ready_fn = getattr(module, f'is_{publ_type_module["name"]}_chain_ready', None)
+    util_module_name = f'{publ_type_module["module"]}.util'
+    util_module = importlib.import_module(util_module_name)
+    abort_publication_fn = getattr(util_module, f'abort_{publ_type_module["name"]}_chain', None)
+    delete_publication_fn = getattr(util_module, f'delete_{publ_type_module["name"]}', None)
+    is_chain_ready_fn = getattr(util_module, f'is_{publ_type_module["name"]}_chain_ready', None)
 
     redis.create_lock(workspace, publication_type, publication_name, method)
     try:
