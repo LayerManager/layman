@@ -5,7 +5,7 @@ from flask import g
 
 from geoserver import util as gs_util
 from layman.http import LaymanError
-from layman import settings
+from layman import settings, uuid as uuid_module
 from layman.common import empty_method
 
 logger = logging.getLogger(__name__)
@@ -77,4 +77,13 @@ def get_usernames():
 def get_workspaces():
     all_workspaces = gs_util.get_all_workspaces(settings.LAYMAN_GS_AUTH)
     result = [workspace for workspace in all_workspaces if not workspace.endswith(settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX)]
+    return result
+
+
+def geoserver_layername_to_uuid(*, geoserver_workspace, geoserver_name):
+    result = None
+    if geoserver_workspace in [GEOSERVER_WFS_WORKSPACE, GEOSERVER_WMS_WORKSPACE] and geoserver_name.startswith(GEOSERVER_NAME_PREFIX):
+        possible_uuid = geoserver_name[len(GEOSERVER_NAME_PREFIX):]
+        if uuid_module.is_valid_uuid(maybe_uuid_str=possible_uuid):
+            result = possible_uuid
     return result

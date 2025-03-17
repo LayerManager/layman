@@ -10,14 +10,15 @@ def update_related_publications_after_change(workspace, publication_type, public
 
 
 def check_no_internal_workspace_name_layer(map_json, *, x_forwarded_items):
-    from layman import names, LaymanError
+    from layman.layer.geoserver import geoserver_layername_to_uuid
+    from layman import LaymanError
     from layman.layer.layer_class import Layer
     from layman.map.util import get_internal_gs_layers_from_json
     found_gs_layer = get_internal_gs_layers_from_json(map_json, x_forwarded_items=x_forwarded_items)
     found_layers = []
     for layer_idx, gs_workspace, gs_layer in found_gs_layer:
-        layer_uuid = names.geoserver_layername_to_uuid(geoserver_workspace=gs_workspace,
-                                                       geoserver_name=gs_layer)
+        layer_uuid = geoserver_layername_to_uuid(geoserver_workspace=gs_workspace,
+                                                 geoserver_name=gs_layer)
         if not layer_uuid:
             workspace = gs_workspace[:-4] if gs_workspace.endswith('_wms') else gs_workspace
             layer = Layer(layer_tuple=(workspace, gs_layer))

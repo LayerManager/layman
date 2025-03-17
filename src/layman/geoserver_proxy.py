@@ -11,10 +11,11 @@ from flask import Blueprint, g, current_app as app, request, Response
 
 import crs as crs_def
 from geoserver.util import reset as gs_reset
-from layman import authn, authz, settings, util as layman_util, LaymanError, names
+from layman import authn, authz, settings, util as layman_util, LaymanError
 from layman.authn import authenticate, is_user_with_name
 from layman.layer import db
 from layman.layer.layer_class import Layer
+from layman.layer.geoserver import geoserver_layername_to_uuid
 from layman.layer.qgis import wms as qgis_wms
 from layman.layer.util import patch_after_feature_change
 from layman.util import WORKSPACE_NAME_ONLY_PATTERN
@@ -131,7 +132,7 @@ def extract_layer_info_from_wfs_t_update_delete(action):
                 f"WFS Proxy: wrong namespace name. Namespace={ws_namespace}, action={ET.QName(action)}")
         return result
     gs_layer_name = layer_qname[1]
-    layer_uuid = names.geoserver_layername_to_uuid(geoserver_workspace=ws_name, geoserver_name=gs_layer_name)
+    layer_uuid = geoserver_layername_to_uuid(geoserver_workspace=ws_name, geoserver_name=gs_layer_name)
     if not layer_uuid:
         app.logger.warning(f"WFS Proxy: wrong layer name. Layer name={gs_layer_name}")
         return result
@@ -182,7 +183,7 @@ def extract_attributes_from_wfs_t_insert_replace(action):
                 app.logger.warning(f"WFS Proxy: skipping due to wrong namespace name. Namespace={ws_namespace}, action={ET.QName(action)}")
             continue
         gs_layer_name = layer_qname.localname
-        layer_uuid = names.geoserver_layername_to_uuid(geoserver_workspace=ws_name, geoserver_name=gs_layer_name)
+        layer_uuid = geoserver_layername_to_uuid(geoserver_workspace=ws_name, geoserver_name=gs_layer_name)
         if not layer_uuid:
             app.logger.warning(f"WFS Proxy: skipping due to wrong layer name. Layer name={gs_layer_name}")
             continue
@@ -258,7 +259,7 @@ def proxy(subpath):
         layers = [layer if len(layer) == 2 else [url_workspace] + layer for layer in layers]
         fix_params = False
         for geoserver_workspace, layer in layers:
-            uuid = names.geoserver_layername_to_uuid(geoserver_workspace=geoserver_workspace, geoserver_name=layer)
+            uuid = geoserver_layername_to_uuid(geoserver_workspace=geoserver_workspace, geoserver_name=layer)
             publ_info = layman_util.get_publication_info_by_uuid(uuid=uuid, context={'keys': ['native_crs',
                                                                                               'style_type']})
             if publ_info and publ_info.get('native_crs') == crs_def.EPSG_5514 and publ_info.get('_style_type') == 'sld':
