@@ -38,7 +38,7 @@ def patch_after_feature_change(
     if not info:
         logger.warning(f"layman.layer.micka.soap.patch_after_feature_change: workspace={publication.workspace}, "
                        f"layer={publication.name}, uuid={publication.uuid} Publication does not exist, so we delete it")
-        soap.delete_layer(publication, backup_uuid=publication.uuid)
+        soap.delete_layer(publication)
 
     if self.is_aborted():
         raise AbortedException
