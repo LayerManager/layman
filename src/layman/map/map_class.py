@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Tuple
+from typing import Tuple, ClassVar
 
 from layman.publication_class import Publication
 
@@ -8,6 +8,9 @@ from . import MAP_TYPE
 
 @dataclass(frozen=True, )
 class Map(Publication):
+    _class_publication_type: ClassVar[str] = MAP_TYPE
+    _class_init_tuple_name: ClassVar[str] = 'map_tuple'
+
     map_layers: list
 
     def __init__(self, *, uuid: str = None, map_tuple: Tuple[str, str] = None):
