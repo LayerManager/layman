@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class MickaIds:
-    metadata_uuid: str
+    id: str  # # pylint: disable=invalid-name
 
     def __init__(self, *, uuid: str):
-        object.__setattr__(self, 'metadata_uuid', f"m-{uuid}")
+        object.__setattr__(self, 'id', f"m-{uuid}")

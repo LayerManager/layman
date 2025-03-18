@@ -166,7 +166,7 @@ def test_patch_layer_without_metadata(client, provide_layer):
 
 @pytest.mark.usefixtures('ensure_layman', 'provide_layer')
 def test_public_metadata(provide_layer):
-    muuid = provide_layer.micka_ids.metadata_uuid
+    muuid = provide_layer.micka_ids.id
     micka_url = urljoin(settings.CSW_URL, "./")
     response = requests.get(micka_url, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
     response.raise_for_status()

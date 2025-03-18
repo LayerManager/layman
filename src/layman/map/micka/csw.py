@@ -24,7 +24,7 @@ def get_map_info(workspace, mapname, *, x_forwarded_items=None):
         csw = common_util.create_csw()
         if not publication or csw is None:
             return {}
-        muuid = publication.micka_ids.metadata_uuid
+        muuid = publication.micka_ids.id
         csw.getrecordbyid(id=[muuid], esn='brief')
     except HTTPError as exc:
         current_app.logger.info(f'traceback={traceback.format_exc()},\n'
@@ -50,7 +50,7 @@ def get_map_info(workspace, mapname, *, x_forwarded_items=None):
 def delete_map(map: Map):
     if not map:
         return
-    muuid = map.micka_ids.metadata_uuid
+    muuid = map.micka_ids.id
     micka_requests.csw_delete(muuid)
 
 
@@ -71,7 +71,7 @@ def patch_map_by_class(publication: Map, metadata_properties_to_refresh=None, ac
     csw = common_util.create_csw()
     if publication.uuid is None or csw is None:
         return None
-    muuid = publication.micka_ids.metadata_uuid
+    muuid = publication.micka_ids.id
     element = common_util.get_record_element_by_id(csw, muuid)
     if element is None:
         if create_if_not_exists:
@@ -130,7 +130,7 @@ def map_to_operates_on(publication: Map, operates_on_muuids_filter=None, editor=
     for internal_layer in operates_on_layers:
         layer_workspace = internal_layer['workspace']
         layername = internal_layer['name']
-        layer_muuid = MickaIds(uuid=internal_layer['uuid']).metadata_uuid
+        layer_muuid = MickaIds(uuid=internal_layer['uuid']).id
         context = {'keys': ['title']}
         if operates_on_muuids_filter is not None:
             if layer_muuid not in operates_on_muuids_filter:
@@ -223,7 +223,7 @@ def _get_property_values(
     ]
 
     result = {
-        'md_file_identifier': MickaIds(uuid=uuid).metadata_uuid,
+        'md_file_identifier': MickaIds(uuid=uuid).id,
         'md_language': md_language,
         'md_date_stamp': md_date_stamp,
         'reference_system': crs_list,
@@ -378,7 +378,7 @@ def get_metadata_comparison(map: Map):
     csw = common_util.create_csw()
     if not map or csw is None:
         return {}
-    muuid = map.micka_ids.metadata_uuid
+    muuid = map.micka_ids.id
     element = common_util.get_record_element_by_id(csw, muuid)
     if element is None:
         return {}

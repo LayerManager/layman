@@ -219,7 +219,7 @@ def delete_layers_without_wfs_wms_available():
         logger.info(f'    Delete layer {workspace}.{layername}')
 
         # micka
-        muuid = MickaIds(uuid=layer_uuid).metadata_uuid
+        muuid = MickaIds(uuid=layer_uuid).id
         micka_requests.csw_delete(muuid)
 
         # geoserver
