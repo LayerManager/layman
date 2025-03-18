@@ -9,6 +9,7 @@ from . import LAYER_TYPE
 from .db import DbNames
 from .geoserver import GeoserverNames
 from .qgis import QgisNames
+from ..common.micka import MickaNames
 
 
 @dataclass(frozen=True, )
@@ -46,3 +47,7 @@ class Layer(Publication):
     @property
     def internal_db_names(self):
         return DbNames(uuid=self.uuid)
+
+    @property
+    def micka_names(self):
+        return MickaNames(uuid=self.uuid)

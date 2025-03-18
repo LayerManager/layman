@@ -16,10 +16,8 @@ from layman.layer.filesystem import gdal
 from layman.layer import db
 from layman.layer.geoserver import wms
 from layman.layer.geoserver import wfs
-from layman.layer import LAYER_TYPE
 from layman import settings, patch_mode, LaymanError, common
 from layman.util import url_for, get_publication_info_by_class
-from layman import util as layman_util
 
 logger = logging.getLogger(__name__)
 PATCH_MODE = patch_mode.NO_DELETE
@@ -27,12 +25,12 @@ post_layer = empty_method
 
 
 def get_layer_info(workspace, layername, *, x_forwarded_items=None):
-    uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layername)
+    layer = Layer(layer_tuple=(workspace, layername))
     try:
         csw = common_util.create_csw()
-        if uuid is None or csw is None:
+        if not layer or csw is None:
             return {}
-        muuid = common_util.get_metadata_uuid(uuid)
+        muuid = layer.micka_names.metadata_uuid
         csw.getrecordbyid(id=[muuid], esn='brief')
     except HTTPError as exc:
         current_app.logger.info(f'traceback={traceback.format_exc()},\n'
@@ -47,7 +45,7 @@ def get_layer_info(workspace, layername, *, x_forwarded_items=None):
             'metadata': {
                 'identifier': muuid,
                 'csw_url': settings.CSW_PROXY_URL,
-                'record_url': common_util.get_metadata_url(uuid, url_type=common_util.RecordUrlType.BASIC),
+                'record_url': common_util.get_metadata_url(layer.uuid, url_type=common_util.RecordUrlType.BASIC),
                 'comparison_url': url_for('rest_workspace_layer_metadata_comparison.get', workspace=workspace, layername=layername,
                                           x_forwarded_items=x_forwarded_items),
             }
@@ -71,7 +69,7 @@ def patch_layer_by_class(publication: Layer, *, metadata_properties_to_refresh, 
     csw = common_util.create_csw()
     if publication.uuid is None or csw is None:
         return None
-    muuid = common_util.get_metadata_uuid(publication.uuid)
+    muuid = publication.micka_names.metadata_uuid
     element = common_util.get_record_element_by_id(csw, muuid)
     if element is None:
         if create_if_not_exists:
@@ -101,7 +99,7 @@ def delete_layer(layer: Layer, *, backup_uuid=None):
     uuid = layer.uuid or backup_uuid
     if backup_uuid and uuid:
         assert backup_uuid == uuid
-    muuid = common_util.get_metadata_uuid(uuid)
+    muuid = layer.micka_names.metadata_uuid
     if muuid is None:
         return
     micka_requests.csw_delete(muuid)
@@ -177,7 +175,7 @@ def get_template_path_and_values(publication: Layer, *, http_method):
     wfs_name = publication.gs_names.wfs.name
     wms_name = publication.gs_names.wms.name
     prop_values = {
-        'md_file_identifier': common_util.get_metadata_uuid(publication.uuid),
+        'md_file_identifier': publication.micka_names.metadata_uuid,
         'md_language': md_language,
         'md_date_stamp': date.today().strftime('%Y-%m-%d'),
         'reference_system': settings.LAYMAN_OUTPUT_SRS_LIST,
@@ -356,9 +354,9 @@ METADATA_PROPERTIES = {
 
 def get_metadata_comparison(layer: Layer):
     csw = common_util.create_csw()
-    if layer.uuid is None or csw is None:
+    if not layer or csw is None:
         return {}
-    muuid = common_util.get_metadata_uuid(layer.uuid)
+    muuid = layer.micka_names.metadata_uuid
     element = common_util.get_record_element_by_id(csw, muuid)
     if element is None:
         return {}

@@ -16,6 +16,7 @@ from layman.common.metadata import PROPERTIES as COMMON_PROPERTIES
 from micka import NAMESPACES
 from .requests import base_insert, csw_delete, fill_template_as_str
 from ...publication_class import Publication
+from . import MickaNames
 
 logger = logging.getLogger(__name__)
 
@@ -29,12 +30,8 @@ for k, v in NAMESPACES.items():
     ET.register_namespace(k, v)
 
 
-def get_metadata_uuid(uuid):
-    return f"m-{uuid}" if uuid is not None else None
-
-
 def get_metadata_url(uuid, *, url_type: RecordUrlType):
-    muuid = get_metadata_uuid(uuid)
+    muuid = MickaNames(uuid=uuid).metadata_uuid
     server_url = settings.CSW_PROXY_URL[:-3]
     result = f'{server_url}record/{url_type.value}/{muuid}'
     return result
@@ -672,7 +669,7 @@ def patch_publication_by_soap(publication: Publication,
     csw_instance = create_csw()
     if uuid is None or csw_instance is None:
         return
-    muuid = get_metadata_uuid(uuid)
+    muuid = MickaNames(uuid=uuid).metadata_uuid
     num_records = get_number_of_records(muuid, True)
     if num_records == 0:
         full_access_rights = authz.complete_access_rights(access_rights, publication.access_rights)

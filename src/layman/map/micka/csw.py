@@ -8,12 +8,10 @@ from requests.exceptions import HTTPError, ConnectionError
 from flask import current_app
 
 import crs as crs_def
-from layman import common, settings, util as layman_util
+from layman import common, settings
 from layman.common import language as common_language, empty_method, bbox as bbox_util
-from layman.common.micka import util as common_util, requests as micka_requests
-from layman.common.micka.util import get_metadata_uuid
+from layman.common.micka import util as common_util, requests as micka_requests, MickaNames
 from layman.layer import LAYER_TYPE
-from layman.map import MAP_TYPE
 from layman.map.map_class import Map
 from layman.util import url_for, get_publication_info
 
@@ -21,12 +19,12 @@ post_map = empty_method
 
 
 def get_map_info(workspace, mapname, *, x_forwarded_items=None):
-    uuid = layman_util.get_publication_uuid(workspace, MAP_TYPE, mapname)
+    publication = Map(map_tuple=(workspace, mapname))
     try:
         csw = common_util.create_csw()
-        if uuid is None or csw is None:
+        if not publication or csw is None:
             return {}
-        muuid = common_util.get_metadata_uuid(uuid)
+        muuid = publication.micka_names.metadata_uuid
         csw.getrecordbyid(id=[muuid], esn='brief')
     except HTTPError as exc:
         current_app.logger.info(f'traceback={traceback.format_exc()},\n'
@@ -41,7 +39,7 @@ def get_map_info(workspace, mapname, *, x_forwarded_items=None):
             'metadata': {
                 'identifier': muuid,
                 'csw_url': settings.CSW_PROXY_URL,
-                'record_url': common_util.get_metadata_url(uuid, url_type=common_util.RecordUrlType.BASIC),
+                'record_url': common_util.get_metadata_url(publication.uuid, url_type=common_util.RecordUrlType.BASIC),
                 'comparison_url': url_for('rest_workspace_map_metadata_comparison.get', workspace=workspace, mapname=mapname,
                                           x_forwarded_items=x_forwarded_items),
             }
@@ -50,9 +48,9 @@ def get_map_info(workspace, mapname, *, x_forwarded_items=None):
 
 
 def delete_map(map: Map):
-    muuid = common_util.get_metadata_uuid(map.uuid)
-    if muuid is None:
+    if not map:
         return
+    muuid = map.micka_names.metadata_uuid
     micka_requests.csw_delete(muuid)
 
 
@@ -73,7 +71,7 @@ def patch_map_by_class(publication: Map, metadata_properties_to_refresh=None, ac
     csw = common_util.create_csw()
     if publication.uuid is None or csw is None:
         return None
-    muuid = common_util.get_metadata_uuid(publication.uuid)
+    muuid = publication.micka_names.metadata_uuid
     element = common_util.get_record_element_by_id(csw, muuid)
     if element is None:
         if create_if_not_exists:
@@ -132,7 +130,7 @@ def map_to_operates_on(publication: Map, operates_on_muuids_filter=None, editor=
     for internal_layer in operates_on_layers:
         layer_workspace = internal_layer['workspace']
         layername = internal_layer['name']
-        layer_muuid = get_metadata_uuid(internal_layer['uuid'])
+        layer_muuid = MickaNames(uuid=internal_layer['uuid']).metadata_uuid
         context = {'keys': ['title']}
         if operates_on_muuids_filter is not None:
             if layer_muuid not in operates_on_muuids_filter:
@@ -225,7 +223,7 @@ def _get_property_values(
     ]
 
     result = {
-        'md_file_identifier': common_util.get_metadata_uuid(uuid),
+        'md_file_identifier': MickaNames(uuid=uuid).metadata_uuid,
         'md_language': md_language,
         'md_date_stamp': md_date_stamp,
         'reference_system': crs_list,
@@ -377,11 +375,10 @@ METADATA_PROPERTIES = {
 
 
 def get_metadata_comparison(map: Map):
-    uuid = map.uuid
     csw = common_util.create_csw()
-    if uuid is None or csw is None:
+    if not map or csw is None:
         return {}
-    muuid = common_util.get_metadata_uuid(uuid)
+    muuid = map.micka_names.metadata_uuid
     element = common_util.get_record_element_by_id(csw, muuid)
     if element is None:
         return {}

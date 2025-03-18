@@ -11,7 +11,7 @@ from psycopg2 import sql
 from db import util as db_util
 from geoserver import util as gs_util
 from layman import settings, common
-from layman.common.micka import util as micka_util, requests as micka_requests
+from layman.common.micka import requests as micka_requests, MickaNames
 from layman.common.prime_db_schema import publications
 from layman.layer import LAYER_TYPE, STYLE_TYPES_DEF, db as layer_db
 from layman.layer.db import table as layer_db_table
@@ -219,7 +219,7 @@ def delete_layers_without_wfs_wms_available():
         logger.info(f'    Delete layer {workspace}.{layername}')
 
         # micka
-        muuid = micka_util.get_metadata_uuid(layer_uuid)
+        muuid = MickaNames(uuid=layer_uuid).metadata_uuid
         micka_requests.csw_delete(muuid)
 
         # geoserver

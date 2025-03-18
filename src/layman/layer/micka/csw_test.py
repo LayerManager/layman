@@ -12,7 +12,6 @@ sys.modules.pop('layman', None)
 
 from layman import app, LaymanError
 from layman import settings
-from layman.common.micka import util as common_util
 from layman.layer.layer_class import Layer
 from test_tools import flask_client
 from test_tools.mock.micka import run
@@ -167,8 +166,7 @@ def test_patch_layer_without_metadata(client, provide_layer):
 
 @pytest.mark.usefixtures('ensure_layman', 'provide_layer')
 def test_public_metadata(provide_layer):
-    uuid = provide_layer.uuid
-    muuid = common_util.get_metadata_uuid(uuid)
+    muuid = provide_layer.micka_names.metadata_uuid
     micka_url = urljoin(settings.CSW_URL, "./")
     response = requests.get(micka_url, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
     response.raise_for_status()
