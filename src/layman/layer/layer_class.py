@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Tuple, Literal
+from typing import Tuple, Literal, ClassVar
 
 from db import TableUri
 from layman import names, settings
@@ -17,6 +17,9 @@ class QgisNames:
 
 @dataclass(frozen=True, )
 class Layer(Publication):
+    _class_publication_type: ClassVar[str] = LAYER_TYPE
+    _class_init_tuple_name: ClassVar[str] = 'layer_tuple'
+
     geodata_type: Literal["vector", "raster", "unknown"]
     style_type: str
     original_data_source: settings.EnumOriginalDataSource

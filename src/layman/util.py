@@ -516,10 +516,12 @@ def delete_workspace_publication(workspace, publication_type, publication_name, 
     delete_publication_fn = getattr(util_module, f'delete_{publ_type_module["name"]}', None)
     is_chain_ready_fn = getattr(util_module, f'is_{publ_type_module["name"]}_chain_ready', None)
 
+    publication = Publication.create(publ_tuple=(workspace, publication_type, publication_name))
+
     redis.create_lock(workspace, publication_type, publication_name, method)
     try:
         abort_publication_fn(workspace, publication_name)
-        delete_info = delete_publication_fn(workspace, publication_name, x_forwarded_items=x_forwarded_items)
+        delete_info = delete_publication_fn(publication, x_forwarded_items=x_forwarded_items)
         if is_chain_ready_fn(workspace, publication_name):
             redis.unlock_publication(workspace, publication_type, publication_name)
         result = {

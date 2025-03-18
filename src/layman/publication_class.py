@@ -1,7 +1,8 @@
+from __future__ import annotations
 from abc import ABC
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Tuple, Dict, Any, List
+from typing import Tuple, Dict, Any, List, ClassVar, Type
 
 from layman import util
 
@@ -9,6 +10,10 @@ from layman import util
 @dataclass(frozen=True, )
 # pylint: disable=too-many-instance-attributes
 class Publication(ABC):
+    _subclasses: ClassVar[Dict[str, Type[Publication]]] = {}
+    _class_publication_type: ClassVar[str]
+    _class_init_tuple_name: ClassVar[str]
+
     workspace: str
     type: str
     name: str
@@ -20,6 +25,12 @@ class Publication(ABC):
     native_bounding_box: List[float]
     native_crs: str
     _info: Dict[str, Any]
+
+    def __init_subclass__(cls):
+        if hasattr(cls, '_class_publication_type'):
+            cls_publication_type = getattr(cls, '_class_publication_type')
+            assert cls_publication_type not in Publication._subclasses
+            Publication._subclasses[cls_publication_type] = cls
 
     def __init__(self, *, uuid: str = None, publ_tuple: Tuple[str, str, str] = None):
         assert uuid is not None or publ_tuple is not None
@@ -61,3 +72,11 @@ class Publication(ABC):
 
     def __bool__(self):
         return self.exists
+
+    @classmethod
+    def create(cls, *, publ_tuple: Tuple[str, str, str] = None) -> Publication:
+        sub_class = cls._subclasses[publ_tuple[1]]
+        return sub_class(**{
+            # pylint: disable=protected-access
+            sub_class._class_init_tuple_name: (publ_tuple[0], publ_tuple[2])
+        })
