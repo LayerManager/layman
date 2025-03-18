@@ -1,3 +1,4 @@
+from abc import ABC
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Tuple, Dict, Any, List
@@ -7,7 +8,7 @@ from layman import util
 
 @dataclass(frozen=True, )
 # pylint: disable=too-many-instance-attributes
-class Publication:
+class Publication(ABC):
     workspace: str
     type: str
     name: str
