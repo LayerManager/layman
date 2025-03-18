@@ -293,7 +293,6 @@ def proxy(subpath):
     if response.status_code == 200:
         for layer_uuid in wfs_t_layers:
             layer = Layer(uuid=layer_uuid)
-            # pylint: disable=protected-access
             if authz.can_i_edit(uuid=layer_uuid) and layer.geodata_type == settings.GEODATA_TYPE_VECTOR:
                 patch_after_feature_change(layer.workspace, layer.name)
 
