@@ -123,7 +123,11 @@ def test_abortable_task_chain():
         for task_result in results
     ]
 
-    time.sleep(1)
+    i = 1
+    while i <= 50 and not results[0].state == results_copy[0].state == 'STARTED':
+        print(f"results[0].state={results[0].state}, results_copy[0].state={results_copy[0].state}")
+        time.sleep(0.1)
+        i += 1
 
     assert results[0].state == results_copy[0].state == 'STARTED'
     assert results[1].state == results_copy[1].state == 'PENDING'
