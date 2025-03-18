@@ -49,8 +49,8 @@ def get_map_info(workspace, mapname, *, x_forwarded_items=None):
     return {}
 
 
-def delete_map(publication: Map):
-    muuid = common_util.get_metadata_uuid(publication.uuid)
+def delete_map(map: Map):
+    muuid = common_util.get_metadata_uuid(map.uuid)
     if muuid is None:
         return
     micka_requests.csw_delete(muuid)

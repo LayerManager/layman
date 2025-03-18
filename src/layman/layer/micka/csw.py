@@ -97,8 +97,8 @@ def patch_layer_by_class(publication: Layer, *, metadata_properties_to_refresh, 
     return muuid
 
 
-def delete_layer(publication: Layer, *, backup_uuid=None):
-    uuid = publication.uuid or backup_uuid
+def delete_layer(layer: Layer, *, backup_uuid=None):
+    uuid = layer.uuid or backup_uuid
     if backup_uuid and uuid:
         assert backup_uuid == uuid
     muuid = common_util.get_metadata_uuid(uuid)
