@@ -57,8 +57,8 @@ def test_custom_srs_list(ensure_layer):
     sld1_layer = LayerMock(uuid=uuid_sld1, layer_tuple=(workspace, name_sld1))
     qgis1_layer = LayerMock(uuid=uuid_qgis1, layer_tuple=(workspace, name_qgis1))
 
-    wfs_name_sld1 = sld1_layer.gs_names.wfs
-    wfs_name_qgis1 = qgis1_layer.gs_names.wfs
+    wfs_name_sld1 = sld1_layer.gs_ids.wfs
+    wfs_name_qgis1 = qgis1_layer.gs_ids.wfs
 
     with app.app_context():
         init_output_epsg_codes_set = {crs.replace(':', '::') for crs in settings.LAYMAN_OUTPUT_SRS_LIST}
@@ -69,7 +69,7 @@ def test_custom_srs_list(ensure_layer):
         assert_gs_wms_output_srs_list(wfs_name_qgis1.workspace, wfs_name_qgis1.name, settings.LAYMAN_OUTPUT_SRS_LIST)
         assert_wfs_output_srs_list(wfs_name_qgis1.workspace, wfs_name_qgis1.name, init_output_epsg_codes_set)
         assert_qgis_output_srs_list(uuid_qgis1, settings.LAYMAN_OUTPUT_SRS_LIST)
-        assert_qgis_wms_output_srs_list(qgis1_layer.qgis_names.name, uuid_qgis1, settings.LAYMAN_OUTPUT_SRS_LIST)
+        assert_qgis_wms_output_srs_list(qgis1_layer.qgis_ids.name, uuid_qgis1, settings.LAYMAN_OUTPUT_SRS_LIST)
 
     process.ensure_layman_function({
         'LAYMAN_OUTPUT_SRS_LIST': ','.join([str(code) for code in OUTPUT_SRS_LIST])
@@ -82,16 +82,16 @@ def test_custom_srs_list(ensure_layer):
     output_epsg_codes_set = {crs.replace(':', '::') for crs in output_crs_list}
     with app.app_context():
         for sld_layer in [sld1_layer, sld2_layer, ]:
-            wfs_name_sld = sld_layer.gs_names.wfs
+            wfs_name_sld = sld_layer.gs_ids.wfs
             assert_gs_wms_output_srs_list(wfs_name_sld.workspace, wfs_name_sld.name, output_crs_list)
             assert_wfs_output_srs_list(wfs_name_sld.workspace, wfs_name_sld.name, output_epsg_codes_set)
             assert not qgis_wms.get_layer_info(workspace, sld_layer.name)
         for qgis2_layer in [qgis1_layer, qgis2_layer, ]:
-            wfs_name_qgis = qgis2_layer.gs_names.wfs
+            wfs_name_qgis = qgis2_layer.gs_ids.wfs
             assert_gs_wms_output_srs_list(wfs_name_qgis.workspace, wfs_name_qgis.name, output_crs_list)
             assert_wfs_output_srs_list(wfs_name_qgis.workspace, wfs_name_qgis.name, output_epsg_codes_set)
             assert_qgis_output_srs_list(uuid_qgis1, output_crs_list)
-            assert_qgis_wms_output_srs_list(qgis1_layer.qgis_names.name, uuid_qgis1, output_crs_list)
+            assert_qgis_wms_output_srs_list(qgis1_layer.qgis_ids.name, uuid_qgis1, output_crs_list)
 
 
 def assert_gs_wms_output_srs_list(workspace, layername, expected_output_crs_list):

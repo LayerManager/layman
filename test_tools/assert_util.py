@@ -5,7 +5,7 @@ import requests
 import crs as crs_def
 from layman import app, util as layman_util, settings
 from layman.common import bbox as bbox_util
-from layman.layer.geoserver import wfs, wms, GeoserverNames
+from layman.layer.geoserver import wfs, wms, GeoserverIds
 from .process_client import LAYER_TYPE, get_workspace_layer_metadata_comparison, get_source_key_from_metadata_comparison
 from .util import compare_images
 
@@ -35,7 +35,7 @@ def assert_same_bboxes(bbox1, bbox2, precision):
 
 
 def assert_wfs_bbox(uuid, expected_bbox, *, expected_bbox_crs='EPSG:3857'):
-    gs_layername = GeoserverNames(uuid=uuid, ).wfs
+    gs_layername = GeoserverIds(uuid=uuid, ).wfs
     with app.app_context():
         wfs_inst = wfs.get_wfs_proxy()
     wfs_layer = f"{gs_layername.workspace}:{gs_layername.name}"
@@ -46,7 +46,7 @@ def assert_wfs_bbox(uuid, expected_bbox, *, expected_bbox_crs='EPSG:3857'):
 
 
 def assert_wms_bbox(uuid, expected_bbox, *, expected_bbox_crs='EPSG:3857'):
-    wms_layername = GeoserverNames(uuid=uuid, ).wms
+    wms_layername = GeoserverIds(uuid=uuid, ).wms
     with app.app_context():
         wms_inst = wms.get_wms_proxy()
     wms_layer = wms_inst.contents[wms_layername.name]

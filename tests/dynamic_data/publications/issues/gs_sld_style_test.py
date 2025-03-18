@@ -18,7 +18,7 @@ def test_issue_738():
                                            )
     with app.app_context():
         layer = Layer(layer_tuple=(workspace, layername))
-    style_name = layer.gs_names.sld
+    style_name = layer.gs_ids.sld
 
     response = gs_util.get_workspace_style_response(geoserver_workspace=style_name.workspace,
                                                     stylename=style_name.name,

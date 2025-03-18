@@ -19,7 +19,7 @@ delete_workspace = empty_method
 
 
 @dataclass(frozen=True)
-class QgisNames:
+class QgisIds:
     id: str  # pylint: disable=invalid-name
     name: str
 

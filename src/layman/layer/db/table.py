@@ -75,7 +75,7 @@ def delete_layer(layer: Layer):
     query = sql.SQL("""
     DROP TABLE IF EXISTS {table} CASCADE
     """).format(
-        table=sql.Identifier(layer.internal_db_names.schema, layer.internal_db_names.table),
+        table=sql.Identifier(layer.internal_db_ids.schema, layer.internal_db_ids.table),
     )
     try:
         db_util.run_statement(query)

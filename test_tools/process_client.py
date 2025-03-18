@@ -13,7 +13,7 @@ import requests
 
 from geoserver import error as gs_error
 from layman import app, settings, util as layman_util
-from layman.layer.geoserver import wfs, wms, GeoserverNames
+from layman.layer.geoserver import wfs, wms, GeoserverIds
 from layman.http import LaymanError
 from test_tools.data import map as map_data
 from . import util
@@ -728,7 +728,7 @@ def post_wfst_with_xml_getter(workspace, layer, *, xml_getter, actor_name=None, 
 
     with app.app_context():
         uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layer)
-    gs_layername = GeoserverNames(uuid=uuid, ).wfs
+    gs_layername = GeoserverIds(uuid=uuid, ).wfs
 
     xml = xml_getter(geoserver_workspace=gs_layername.workspace, geoserver_layername=gs_layername.name, **xml_getter_params)
     post_wfst(xml, headers=headers, workspace=gs_layername.workspace)

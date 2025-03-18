@@ -3,7 +3,7 @@ import pytest
 from geoserver import util as gs_util
 from layman import app, settings, util as layman_util
 from layman.common import geoserver as gs_common
-from layman.layer.geoserver import GeoserverNames
+from layman.layer.geoserver import GeoserverIds
 from test_tools import process_client, role_service
 from tests import EnumTestTypes, Publication4Test
 from tests.asserts.final.publication import util as assert_util
@@ -88,7 +88,7 @@ class TestPublication(base_test.TestSingleRestPublication):
                 geodata_type = internal_info['geodata_type']
                 gs_workspace = internal_info['_wms']['workspace']
 
-                all_names = GeoserverNames(uuid=uuid, )
+                all_names = GeoserverIds(uuid=uuid, )
                 workspaces_and_layers = [(all_names.wfs.workspace, all_names.wfs.name), (all_names.wms.workspace, all_names.wms.name)] if geodata_type != settings.GEODATA_TYPE_RASTER else [(gs_workspace, all_names.wms.name)]
                 for gs_wspace, gs_layername in workspaces_and_layers:
                     gs_expected_roles = gs_common.layman_users_and_roles_to_geoserver_roles(exp_rights)

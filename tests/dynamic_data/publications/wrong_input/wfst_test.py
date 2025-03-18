@@ -3,7 +3,7 @@ import pytest
 
 from geoserver.error import Error as GsError
 from layman import LaymanError
-from layman.layer.geoserver import GeoserverNames
+from layman.layer.geoserver import GeoserverIds
 from test_tools import process_client, external_db
 from test_tools.data import wfs as wfs_data
 from test_tools.util import assert_error
@@ -95,7 +95,7 @@ class TestWfst(base_test.TestSingleRestPublication):
 
     def test_proxy_raises(self, layer: Publication4Test, params):
         layer_uuid = self.publ_uuids[layer]
-        gs_layer_wfs = GeoserverNames(uuid=layer_uuid, ).wfs
+        gs_layer_wfs = GeoserverIds(uuid=layer_uuid, ).wfs
         data_xml = params['wfst_data_method'](gs_layer_wfs.workspace, gs_layer_wfs.name, *params['wfst_data_args'])
 
         exp_exception = params['exp_exception']

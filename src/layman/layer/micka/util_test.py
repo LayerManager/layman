@@ -7,7 +7,7 @@ import pytest
 del sys.modules['layman']
 
 from layman import app, settings, util as layman_util
-from layman.common.micka import util as common_util, MickaNames
+from layman.common.micka import util as common_util, MickaIds
 from layman.common.metadata import PROPERTIES as COMMON_PROPERTIES, prop_equals
 from layman.layer.geoserver import wms, wfs
 from test_tools.util import url_for
@@ -45,7 +45,7 @@ def test_fill_template():
     layer_uuid = 'ca238200-8200-1a23-9399-42c9fca53542'
     file_object = common_util.fill_xml_template_as_pretty_file_object('src/layman/layer/micka/record-template.xml',
                                                                       {
-                                                                          'md_file_identifier': MickaNames(uuid=layer_uuid).metadata_uuid,
+                                                                          'md_file_identifier': MickaIds(uuid=layer_uuid).metadata_uuid,
                                                                           'md_language': None,
                                                                           'md_date_stamp': '2007-05-25',
                                                                           'reference_system': ['EPSG:3857', 'EPSG:4326'],

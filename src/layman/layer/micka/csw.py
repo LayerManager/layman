@@ -30,7 +30,7 @@ def get_layer_info(workspace, layername, *, x_forwarded_items=None):
         csw = common_util.create_csw()
         if not layer or csw is None:
             return {}
-        muuid = layer.micka_names.metadata_uuid
+        muuid = layer.micka_ids.metadata_uuid
         csw.getrecordbyid(id=[muuid], esn='brief')
     except HTTPError as exc:
         current_app.logger.info(f'traceback={traceback.format_exc()},\n'
@@ -69,7 +69,7 @@ def patch_layer_by_class(publication: Layer, *, metadata_properties_to_refresh, 
     csw = common_util.create_csw()
     if publication.uuid is None or csw is None:
         return None
-    muuid = publication.micka_names.metadata_uuid
+    muuid = publication.micka_ids.metadata_uuid
     element = common_util.get_record_element_by_id(csw, muuid)
     if element is None:
         if create_if_not_exists:
@@ -99,7 +99,7 @@ def delete_layer(layer: Layer, *, backup_uuid=None):
     uuid = layer.uuid or backup_uuid
     if backup_uuid and uuid:
         assert backup_uuid == uuid
-    muuid = layer.micka_names.metadata_uuid
+    muuid = layer.micka_ids.metadata_uuid
     if muuid is None:
         return
     micka_requests.csw_delete(muuid)
@@ -172,10 +172,10 @@ def get_template_path_and_values(publication: Layer, *, http_method):
     extent = [max(west, -180), max(south, -90), min(east, 180), min(north, 90)]
     languages = languages or []
 
-    wfs_name = publication.gs_names.wfs.name
-    wms_name = publication.gs_names.wms.name
+    wfs_name = publication.gs_ids.wfs.name
+    wms_name = publication.gs_ids.wms.name
     prop_values = {
-        'md_file_identifier': publication.micka_names.metadata_uuid,
+        'md_file_identifier': publication.micka_ids.metadata_uuid,
         'md_language': md_language,
         'md_date_stamp': date.today().strftime('%Y-%m-%d'),
         'reference_system': settings.LAYMAN_OUTPUT_SRS_LIST,
@@ -356,7 +356,7 @@ def get_metadata_comparison(layer: Layer):
     csw = common_util.create_csw()
     if not layer or csw is None:
         return {}
-    muuid = layer.micka_names.metadata_uuid
+    muuid = layer.micka_ids.metadata_uuid
     element = common_util.get_record_element_by_id(csw, muuid)
     if element is None:
         return {}

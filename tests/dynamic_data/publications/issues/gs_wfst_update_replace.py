@@ -2,7 +2,7 @@ import pytest
 
 from geoserver.error import Error
 from test_tools import process_client
-from layman.layer.geoserver import GEOSERVER_WFS_WORKSPACE, GeoserverNames
+from layman.layer.geoserver import GEOSERVER_WFS_WORKSPACE, GeoserverIds
 
 
 @pytest.mark.usefixtures('ensure_layman_module', 'oauth2_provider_mock')
@@ -21,8 +21,8 @@ def test_issue_1081():
                                            name=layer2,
                                            uuid=layer2_uuid,
                                            )
-    wfs_layer1 = GeoserverNames(uuid=layer1_uuid).wfs
-    wfs_layer2 = GeoserverNames(uuid=layer2_uuid).wfs
+    wfs_layer1 = GeoserverIds(uuid=layer1_uuid).wfs
+    wfs_layer2 = GeoserverIds(uuid=layer2_uuid).wfs
 
     wfst_data = f'''<?xml version="1.0"?>
 <wfs:Transaction version="2.0.0" service="WFS" xmlns:layman="http://layman" xmlns:fes="http://www.opengis.net/fes/2.0"

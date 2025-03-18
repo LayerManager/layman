@@ -17,21 +17,21 @@ GEOSERVER_WMS_WORKSPACE = f'{GEOSERVER_WFS_WORKSPACE}{settings.LAYMAN_GS_WMS_WOR
 
 
 @dataclass(frozen=True)
-class GeoserverNameForSource:
+class GeoserverIdsForSource:
     workspace: str
     name: str
 
 
 @dataclass(frozen=True)
-class GeoserverNames:
-    wfs: GeoserverNameForSource
-    wms: GeoserverNameForSource
-    sld: GeoserverNameForSource
+class GeoserverIds:
+    wfs: GeoserverIdsForSource
+    wms: GeoserverIdsForSource
+    sld: GeoserverIdsForSource
 
     def __init__(self, *, uuid: str):
-        object.__setattr__(self, 'wfs', GeoserverNameForSource(workspace=GEOSERVER_WFS_WORKSPACE, name=f'{GEOSERVER_NAME_PREFIX}{uuid}'))
-        object.__setattr__(self, 'wms', GeoserverNameForSource(workspace=GEOSERVER_WMS_WORKSPACE, name=f'{GEOSERVER_NAME_PREFIX}{uuid}'))
-        object.__setattr__(self, 'sld', GeoserverNameForSource(workspace=GEOSERVER_WMS_WORKSPACE, name=uuid))
+        object.__setattr__(self, 'wfs', GeoserverIdsForSource(workspace=GEOSERVER_WFS_WORKSPACE, name=f'{GEOSERVER_NAME_PREFIX}{uuid}'))
+        object.__setattr__(self, 'wms', GeoserverIdsForSource(workspace=GEOSERVER_WMS_WORKSPACE, name=f'{GEOSERVER_NAME_PREFIX}{uuid}'))
+        object.__setattr__(self, 'sld', GeoserverIdsForSource(workspace=GEOSERVER_WMS_WORKSPACE, name=uuid))
 
 
 def ensure_whole_user(username, auth=settings.LAYMAN_GS_AUTH):

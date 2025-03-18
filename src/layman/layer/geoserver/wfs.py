@@ -5,7 +5,7 @@ from geoserver import util as gs_util
 from layman import settings, patch_mode
 from layman.cache import mem_redis
 from layman.common import geoserver as gs_common, empty_method
-from layman.layer.geoserver import GEOSERVER_WFS_WORKSPACE, GeoserverNames
+from layman.layer.geoserver import GEOSERVER_WFS_WORKSPACE, GeoserverIds
 from layman.layer.util import is_layer_chain_ready
 from layman import util as layman_util
 from layman.layer import LAYER_TYPE
@@ -29,7 +29,7 @@ def get_flask_proxy_key():
 
 
 def patch_layer_by_uuid(*, uuid, title, description, original_data_source, access_rights=None):
-    gs_layername = GeoserverNames(uuid=uuid, ).wfs
+    gs_layername = GeoserverIds(uuid=uuid, ).wfs
     if not get_layer_info_by_uuid(uuid=uuid):
         return
     info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['geodata_type', ]})
@@ -62,7 +62,7 @@ def patch_layer(workspace, layername, *, uuid, title, description, original_data
 
 def delete_layer(layer: Layer):
     db_store_name = DEFAULT_INTERNAL_DB_STORE
-    gs_layername = layer.gs_names.wfs
+    gs_layername = layer.gs_ids.wfs
     gs_util.delete_feature_type(gs_layername.workspace, gs_layername.name, settings.LAYMAN_GS_AUTH, store=db_store_name)
     gs_util.delete_feature_type(gs_layername.workspace, gs_layername.name, settings.LAYMAN_GS_AUTH, store=get_external_db_store_name(uuid=layer.uuid))
     gs_util.delete_db_store(gs_layername.workspace, settings.LAYMAN_GS_AUTH, store_name=get_external_db_store_name(uuid=layer.uuid))
@@ -150,7 +150,7 @@ def get_layer_info(workspace, layername, *, x_forwarded_items=None):
 
 
 def get_layer_info_by_uuid(*, uuid, x_forwarded_items=None):
-    gs_layername = GeoserverNames(uuid=uuid, ).wfs
+    gs_layername = GeoserverIds(uuid=uuid, ).wfs
     if uuid is None:
         return {}
     wfs_proxy_url = get_wfs_url(external_url=True, x_forwarded_items=x_forwarded_items)
@@ -172,7 +172,7 @@ def get_layer_info_by_uuid(*, uuid, x_forwarded_items=None):
 
 
 def get_metadata_comparison(layer: Layer):
-    gs_layername = layer.gs_names.wfs
+    gs_layername = layer.gs_ids.wfs
     if layer.geodata_type in (settings.GEODATA_TYPE_RASTER, settings.GEODATA_TYPE_UNKNOWN):
         return {}
     if layer.geodata_type != settings.GEODATA_TYPE_VECTOR:

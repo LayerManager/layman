@@ -182,7 +182,7 @@ def test_patch_map_without_metadata(client, provide_map):
 
 @pytest.mark.usefixtures('ensure_layman')
 def test_public_metadata(provide_map):
-    muuid = provide_map.micka_names.metadata_uuid
+    muuid = provide_map.micka_ids.metadata_uuid
     micka_url = urljoin(settings.CSW_URL, "./")
     response = requests.get(micka_url, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
     response.raise_for_status()

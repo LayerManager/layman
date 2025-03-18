@@ -27,7 +27,7 @@ def patch_after_feature_change(
 
     if layer_data.geodata_type == settings.GEODATA_TYPE_VECTOR:
         bbox = get_layer_bbox(layer=layer_data)
-        wms_layername = layer_data.gs_names.wms
+        wms_layername = layer_data.gs_ids.wms
         lat_lon_bbox = bbox_util.transform(bbox, layer_data.native_crs, crs_def.EPSG_4326)
         if layer_data.style_type == 'sld':
             store_name = get_db_store_name(uuid=layer_data.uuid,

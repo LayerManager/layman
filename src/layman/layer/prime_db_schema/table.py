@@ -3,7 +3,7 @@ from layman.common import empty_method_returns_dict
 from layman.common.prime_db_schema import publications as pubs_util
 from layman.layer import LAYER_TYPE
 from layman import patch_mode, settings
-from layman.layer.db import DbNames
+from layman.layer.db import DbIds
 from ..layer_class import Layer
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
@@ -15,7 +15,7 @@ def get_layer_info(workspace, layername):
     info = layers.get((workspace, LAYER_TYPE, layername), {})
     if info:
         uuid = info['uuid']
-        db_names = DbNames(uuid=uuid)
+        db_names = DbIds(uuid=uuid)
         info['_table_uri'] = TableUri(
             db_uri_str=settings.PG_URI_STR,
             schema=db_names.schema,

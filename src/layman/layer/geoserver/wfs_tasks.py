@@ -30,7 +30,7 @@ def patch_after_feature_change(
 
     bbox = get_layer_bbox(layer=layer_data)
     store_name = get_db_store_name(uuid=layer_data.uuid, original_data_source=layer_data.original_data_source.value)
-    gs_layername = layer_data.gs_names.wfs
+    gs_layername = layer_data.gs_ids.wfs
     gs_util.patch_feature_type(gs_layername.workspace, gs_layername.name, auth=settings.LAYMAN_GS_AUTH, bbox=bbox, crs=layer_data.native_crs,
                                store_name=store_name)
     wfs.clear_cache()
