@@ -22,7 +22,7 @@ def assert_non_empty_bbox(bbox):
 
 def assert_wms_layer(uuid, exp_title):
     layer = LayerMock(uuid=uuid, layer_tuple=None)
-    gs_layername = layer.gs_names.wms
+    gs_layername = layer.gs_ids.wms
     wms = WebMapService(gs_wms.get_wms_url(), gs_wms.VERSION)
     assert gs_layername.name in wms.contents
     wms_layer = wms[gs_layername.name]
@@ -34,7 +34,7 @@ def assert_wms_layer(uuid, exp_title):
 
 def wfs_t_insert_point(*, uuid):
     layer = LayerMock(uuid=uuid, layer_tuple=None)
-    gs_layername = layer.gs_names.wfs
+    gs_layername = layer.gs_ids.wfs
     wfs_t_data = wfs_data_util.get_wfs20_insert_points(gs_layername.workspace, gs_layername.name)
     process_client.post_wfst(wfs_t_data, workspace=gs_layername.workspace)
 

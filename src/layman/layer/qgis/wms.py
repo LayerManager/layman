@@ -80,9 +80,9 @@ def save_qgs_file(publ_uuid):
     ]
     source_type = util.get_source_type(db_types, qml_geometry)
     column_srid = db.get_column_srid(db_schema, table_name, table_uri.geo_column, uri_str=table_uri.db_uri_str)
-    layer_qml = util.fill_layer_template(layer.qgis_names.name, layer.qgis_names.id, layer.title, layer_bbox, layer.native_crs, qml,
+    layer_qml = util.fill_layer_template(layer.qgis_ids.name, layer.qgis_ids.id, layer.title, layer_bbox, layer.native_crs, qml,
                                          source_type, db_cols, table_uri, column_srid, db_types)
-    qgs_str = util.fill_project_template(layer.qgis_names.name, layer.qgis_names.id, layer_qml, layer.native_crs,
+    qgs_str = util.fill_project_template(layer.qgis_ids.name, layer.qgis_ids.id, layer_qml, layer.native_crs,
                                          settings.LAYMAN_OUTPUT_SRS_LIST, layer_bbox, source_type, table_uri, column_srid)
     with open(get_layer_file_path(publ_uuid), "w", encoding="utf-8") as qgs_file:
         print(qgs_str, file=qgs_file)

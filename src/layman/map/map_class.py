@@ -4,7 +4,7 @@ from typing import Tuple, ClassVar
 from layman.publication_class import Publication
 
 from . import MAP_TYPE
-from ..common.micka import MickaNames
+from ..common.micka import MickaIds
 
 
 @dataclass(frozen=True, )
@@ -25,5 +25,5 @@ class Map(Publication):
             object.__setattr__(self, 'map_layers', info['_map_layers'])
 
     @property
-    def micka_names(self):
-        return MickaNames(uuid=self.uuid)
+    def micka_ids(self):
+        return MickaIds(uuid=self.uuid)

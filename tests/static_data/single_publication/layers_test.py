@@ -12,7 +12,7 @@ from layman import settings, app, util as layman_util
 from layman.common import bbox as bbox_util
 from layman.common.micka import util as micka_common_util
 from layman.layer import util as layer_util, db as layer_db, get_layer_info_keys
-from layman.layer.geoserver import GEOSERVER_WMS_WORKSPACE, GEOSERVER_WFS_WORKSPACE, GeoserverNames
+from layman.layer.geoserver import GEOSERVER_WMS_WORKSPACE, GEOSERVER_WFS_WORKSPACE, GeoserverIds
 from layman.layer.geoserver.wms import DEFAULT_WMS_QGIS_STORE_PREFIX, VERSION
 from layman.layer.layer_class import Layer
 from layman.layer.micka import csw
@@ -111,7 +111,7 @@ def test_wms_layer(workspace, publ_type, publication):
         uuid = layman_util.get_publication_uuid(workspace, process_client.LAYER_TYPE, publication)
     expected_style_file = f'/layman_data_test/layers/{uuid}/input_style/{uuid}'
     expected_qgis_file = f'/qgis/data/test/layers/{uuid}/{uuid}.qgis'
-    wms_layername = GeoserverNames(uuid=uuid, ).wms
+    wms_layername = GeoserverIds(uuid=uuid, ).wms
     wms_stores_url = urljoin(GS_REST_WORKSPACES, f'{wms_layername.workspace}/wmsstores/')
     wms_layers_url = urljoin(GS_REST_WORKSPACES, f'{wms_layername.workspace}/wmslayers/')
 
@@ -221,22 +221,22 @@ def test_fill_project_template(workspace, publ_type, publication):
     with app.app_context():
         column_srid = layer_db.get_column_srid(layer.table_uri.schema, layer.table_uri.table, layer.table_uri.geo_column)
     with app.app_context():
-        layer_qml_str = qgis_util.fill_layer_template(layer.qgis_names.name, layer.qgis_names.id, layer.title, layer_bbox,
+        layer_qml_str = qgis_util.fill_layer_template(layer.qgis_ids.name, layer.qgis_ids.id, layer.title, layer_bbox,
                                                       layer_crs, qml_xml,
                                                       source_type, db_cols, layer.table_uri, column_srid, db_types)
     layer_qml = ET.fromstring(layer_qml_str.encode('utf-8'), parser=parser)
     if exp_min_scale is not None:
         assert layer_qml.attrib['minScale'] == exp_min_scale
     with app.app_context():
-        qgs_str = qgis_util.fill_project_template(layer.qgis_names.name, layer.qgis_names.id, layer_qml_str, layer_crs,
+        qgs_str = qgis_util.fill_project_template(layer.qgis_ids.name, layer.qgis_ids.id, layer_qml_str, layer_crs,
                                                   settings.LAYMAN_OUTPUT_SRS_LIST, layer_bbox, source_type, layer.table_uri,
                                                   column_srid)
     with open(qgs_path, "w", encoding="utf-8") as qgs_file:
         print(qgs_str, file=qgs_file)
 
     wmsi = WebMapService(wms_url, version=wms_version)
-    assert layer.qgis_names.name in wmsi.contents
-    wms_layer = wmsi.contents[layer.qgis_names.name]
+    assert layer.qgis_ids.name in wmsi.contents
+    wms_layer = wmsi.contents[layer.qgis_ids.name]
     exp_output_srs = set(settings.LAYMAN_OUTPUT_SRS_LIST)
     assert exp_output_srs.issubset(set(wms_layer.crsOptions))
     wms_layer_bbox = next((tuple(bbox_crs[:4]) for bbox_crs in wms_layer.crs_list if bbox_crs[4] == layer_crs))

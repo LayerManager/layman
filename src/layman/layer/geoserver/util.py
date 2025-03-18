@@ -90,7 +90,7 @@ def publish_layer_from_qgis(*, layer: Layer, gs_names, metadata_url, ):
                              layer_capabilities_url)
     bbox = get_layer_bbox(layer=layer)
     lat_lon_bbox = bbox_util.transform(bbox, layer.native_crs, crs_def.EPSG_4326)
-    gs_util.post_wms_layer(gs_names.workspace, gs_names.name, layer.qgis_names.name, store_name, layer.title, layer.description, bbox, layer.native_crs, settings.LAYMAN_GS_AUTH,
+    gs_util.post_wms_layer(gs_names.workspace, gs_names.name, layer.qgis_ids.name, store_name, layer.title, layer.description, bbox, layer.native_crs, settings.LAYMAN_GS_AUTH,
                            lat_lon_bbox=lat_lon_bbox, metadata_url=metadata_url)
 
 

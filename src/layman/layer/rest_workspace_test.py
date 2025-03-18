@@ -18,7 +18,7 @@ from layman import app
 from layman import settings
 from layman.layer.filesystem.thumbnail import get_layer_thumbnail_path
 from layman import uuid
-from layman.layer.geoserver import wms as geoserver_wms, sld as geoserver_sld, GeoserverNames
+from layman.layer.geoserver import wms as geoserver_wms, sld as geoserver_sld, GeoserverIds
 from layman import celery as celery_util
 from layman.common.metadata import prop_equals_strict, PROPERTIES
 from layman.util import SimpleCounter, get_publication_uuid
@@ -216,7 +216,7 @@ def test_post_layers_simple(client):
                 or 'status' not in layer_info[key_to_check]
 
         layeruuid = layer_info['uuid']
-        wms_layername = GeoserverNames(uuid=layeruuid).wms
+        wms_layername = GeoserverIds(uuid=layeruuid).wms
         wms_url = geoserver_wms.get_wms_url()
         wms = wms_proxy(wms_url)
         assert wms_layername.name in wms.contents
@@ -368,7 +368,7 @@ def test_post_layers_shp(client):
     flask_client.wait_till_layer_ready(workspace, layername)
     # last_task['last'].get()
 
-    wms_layername = GeoserverNames(uuid=layeruuid).wms
+    wms_layername = GeoserverIds(uuid=layeruuid).wms
     wms_url = geoserver_wms.get_wms_url()
     wms = wms_proxy(wms_url)
     assert wms_layername.name in wms.contents
@@ -436,7 +436,7 @@ def test_post_layers_complex(client):
         # last_task['last'].get()
         assert celery_util.is_chain_ready(chain_info)
 
-        all_names = GeoserverNames(uuid=layeruuid)
+        all_names = GeoserverIds(uuid=layeruuid)
         wms_layername = all_names.wms
         wms_url = geoserver_wms.get_wms_url()
         wms = wms_proxy(wms_url)
@@ -559,7 +559,7 @@ def test_uppercase_attr(client):
             assert 'status' not in resp_json[source], f"{source}: {resp_json[source]}"
 
         layeruuid = resp_json['uuid']
-        gs_layername = GeoserverNames(uuid=layeruuid, ).wfs
+        gs_layername = GeoserverIds(uuid=layeruuid, ).wfs
         db_store = DEFAULT_INTERNAL_DB_STORE
         feature_type = get_feature_type(gs_layername.workspace, db_store, gs_layername.name)
         attributes = feature_type['attributes']['attribute']
@@ -695,7 +695,7 @@ def test_patch_layer_style(client):
         get_json = client.get(rest_path).get_json()
         assert get_json['title'] == "countries in blue"
 
-        all_names = GeoserverNames(uuid=layeruuid)
+        all_names = GeoserverIds(uuid=layeruuid)
         wms_layername = all_names.wms
         wms_url = geoserver_wms.get_wms_url()
         wms = wms_proxy(wms_url)
@@ -765,7 +765,7 @@ def test_patch_layer_data(client):
 
         resp_json = response.get_json()
         assert resp_json['title'] == "populated places"
-        gs_layername = GeoserverNames(uuid=layeruuid, ).wfs
+        gs_layername = GeoserverIds(uuid=layeruuid, ).wfs
         db_store = DEFAULT_INTERNAL_DB_STORE
         feature_type = get_feature_type(gs_layername.workspace, db_store, gs_layername.name)
         attributes = feature_type['attributes']['attribute']
@@ -987,7 +987,7 @@ def test_layer_with_different_geometry():
         'Content-type': 'text/xml',
     }
 
-    gs_layername = GeoserverNames(uuid=layeruuid, ).wfs
+    gs_layername = GeoserverIds(uuid=layeruuid, ).wfs
     data_xml = data_wfs.get_wfs20_insert_points(gs_layername.workspace, gs_layername.name)
 
     response = requests.post(url_path_ows,

@@ -5,7 +5,7 @@ import pytest
 
 from layman import app, settings
 from layman.layer import db
-from layman.layer.geoserver import wfs as geoserver_wfs, GEOSERVER_WFS_WORKSPACE, GeoserverNames
+from layman.layer.geoserver import wfs as geoserver_wfs, GEOSERVER_WFS_WORKSPACE, GeoserverIds
 from layman.layer.qgis import util as qgis_util, wms as qgis_wms
 from layman.util import get_publication_info, get_publication_uuid
 from test_tools.data import wfs as data_wfs
@@ -281,7 +281,7 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
             # assert that all attr_names are not yet presented in WFS feature type
             with app.app_context():
                 layer_uuid = get_publication_uuid(workspace, self.publication_type, layer_name)
-            gs_layer = GeoserverNames(uuid=layer_uuid).wfs
+            gs_layer = GeoserverIds(uuid=layer_uuid).wfs
             layer_schema = get_wfs_schema(wfs_url, typename=f"{gs_layer.workspace}:{gs_layer.name}",
                                           version=geoserver_wfs.VERSION, headers=AUTHN_HEADERS)
             old_wfs_properties[layer_name] = sorted(layer_schema['properties'].keys())
@@ -306,7 +306,7 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
             # assert that exactly all attr_names were created in DB table
             with app.app_context():
                 layer_uuid = get_publication_uuid(workspace, self.publication_type, layer_name)
-            gs_layer = GeoserverNames(uuid=layer_uuid).wfs
+            gs_layer = GeoserverIds(uuid=layer_uuid).wfs
             table_uri = table_uris[layer_name]
             db_attributes = db.get_all_table_column_names(table_uri.schema, table_uri.table, uri_str=table_uri.db_uri_str)
             for attr_name in attr_names:
@@ -336,8 +336,8 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
     @staticmethod
     def prepare_wfst_data_and_new_attributes(layer, layer2, params):
         data_method = params['data_method']
-        gs_layer = GeoserverNames(uuid=layer.uuid).wfs
-        gs_layer2 = GeoserverNames(uuid=layer2.uuid).wfs
+        gs_layer = GeoserverIds(uuid=layer.uuid).wfs
+        gs_layer2 = GeoserverIds(uuid=layer2.uuid).wfs
         if params['simple']:
             attr_args_per_layer = params['attr_args_per_layer']
             assert len(attr_args_per_layer) == 1

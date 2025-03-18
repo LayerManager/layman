@@ -40,7 +40,7 @@ def refresh_wms(
         slugified_time_regex_format=None,
 ):
     layer = Layer(uuid=uuid)
-    gs_layername = layer.gs_names.wms
+    gs_layername = layer.gs_ids.wms
     info = layman_util.get_publication_info_by_class(layer, context={'keys': ['file']})
 
     assert layer.title is not None
@@ -124,7 +124,7 @@ def refresh_wfs(
         original_data_source=settings.EnumOriginalDataSource.FILE.value,
 ):
     layer = Layer(uuid=uuid)
-    gs_layername = layer.gs_names.wfs
+    gs_layername = layer.gs_ids.wfs
     if layer.geodata_type == settings.GEODATA_TYPE_RASTER:
         return
     if layer.geodata_type != settings.GEODATA_TYPE_VECTOR:

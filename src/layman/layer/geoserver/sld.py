@@ -5,7 +5,7 @@ from layman.common import empty_method, empty_method_returns_dict
 from layman.common.db import launder_attribute_name
 from layman.layer.layer_class import Layer
 from layman.layer.filesystem import input_style
-from layman.layer.geoserver import GeoserverNames
+from layman.layer.geoserver import GeoserverIds
 from layman.util import url_for, get_publication_info_by_class
 from . import wms
 from .. import LAYER_TYPE
@@ -20,14 +20,14 @@ patch_layer = empty_method
 
 
 def get_workspace_style_url(*, uuid):
-    style_name = GeoserverNames(uuid=uuid).sld
+    style_name = GeoserverIds(uuid=uuid).sld
     return gs_util.get_workspace_style_url(style_name.workspace, style_name.name) if uuid else None
 
 
 def delete_layer(layer: Layer):
     sld_stream = None
     if layer:
-        gs_style_name = layer.gs_names.sld
+        gs_style_name = layer.gs_ids.sld
         sld_stream = gs_util.delete_workspace_style(gs_style_name.workspace, gs_style_name.name, auth=settings.LAYMAN_GS_AUTH)
         wms.clear_cache()
     if sld_stream:
@@ -106,9 +106,9 @@ def create_customized_grayscale_sld(*, file_path, min_value, max_value, nodata_v
 
 def create_layer_style(*, layer: Layer):
     style_file = input_style.get_layer_file(layer.uuid)
-    gs_util.post_workspace_sld_style(layer.gs_names.sld.workspace,
-                                     layer.gs_names.wms.name,
-                                     layer.gs_names.sld.name,
+    gs_util.post_workspace_sld_style(layer.gs_ids.sld.workspace,
+                                     layer.gs_ids.wms.name,
+                                     layer.gs_ids.sld.name,
                                      style_file,
                                      launder_attribute_name,
                                      )
@@ -116,6 +116,6 @@ def create_layer_style(*, layer: Layer):
 
 
 def get_style_response(*, uuid, headers=None, auth=None):
-    gs_style_name = GeoserverNames(uuid=uuid).sld
+    gs_style_name = GeoserverIds(uuid=uuid).sld
     return gs_util.get_workspace_style_response(gs_style_name.workspace, gs_style_name.name, headers, auth) \
         if uuid else None

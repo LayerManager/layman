@@ -31,7 +31,7 @@ delete_whole_user = empty_method
 
 
 @dataclass(frozen=True)
-class DbNames:
+class DbIds:
     schema: str
     table: str
 

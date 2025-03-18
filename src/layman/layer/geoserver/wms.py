@@ -16,7 +16,7 @@ from layman.layer import LAYER_TYPE
 from layman.layer.filesystem import gdal
 from layman.layer.layer_class import Layer
 import requests_util.retry
-from . import GeoserverNames
+from . import GeoserverIds
 from .util import get_gs_proxy_server_url, get_external_db_store_name, image_mosaic_granules_to_wms_time_key, \
     get_db_store_name, DEFAULT_INTERNAL_DB_STORE
 
@@ -39,7 +39,7 @@ def get_flask_proxy_key():
 
 
 def patch_layer_by_uuid(*, uuid, original_data_source, title, description, access_rights=None):
-    gs_layername = GeoserverNames(uuid=uuid, ).wms
+    gs_layername = GeoserverIds(uuid=uuid, ).wms
     if not get_layer_info_by_uuid(uuid=uuid):
         return
     info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['style_type', 'geodata_type', 'image_mosaic'], })
@@ -82,7 +82,7 @@ def patch_layer(workspace, layername, *, uuid, title, description, original_data
 
 def delete_layer(layer: Layer):
     db_store_name = DEFAULT_INTERNAL_DB_STORE
-    gs_layername = layer.gs_names.wms
+    gs_layername = layer.gs_ids.wms
     gs_util.delete_feature_type(gs_layername.workspace, gs_layername.name, settings.LAYMAN_GS_AUTH, store=db_store_name)
     gs_util.delete_feature_type(gs_layername.workspace, gs_layername.name, settings.LAYMAN_GS_AUTH, store=get_external_db_store_name(uuid=layer.uuid))
     gs_util.delete_wms_layer(gs_layername.workspace, gs_layername.name, settings.LAYMAN_GS_AUTH)
@@ -192,7 +192,7 @@ def get_layer_info(workspace, layername, *, x_forwarded_items=None):
 
 
 def get_layer_info_by_uuid(*, uuid, x_forwarded_items=None):
-    gs_layername = GeoserverNames(uuid=uuid, ).wms
+    gs_layername = GeoserverIds(uuid=uuid, ).wms
     if uuid is None:
         return {}
     time_info = None
@@ -229,7 +229,7 @@ def get_layer_info_by_uuid(*, uuid, x_forwarded_items=None):
 
 
 def get_metadata_comparison(layer: Layer):
-    gs_layername = layer.gs_names.wms
+    gs_layername = layer.gs_ids.wms
     wms = get_wms_direct()
     if wms is None:
         return {}

@@ -6,10 +6,10 @@ from layman import settings
 from layman.publication_class import Publication
 
 from . import LAYER_TYPE
-from .db import DbNames
-from .geoserver import GeoserverNames
-from .qgis import QgisNames
-from ..common.micka import MickaNames
+from .db import DbIds
+from .geoserver import GeoserverIds
+from .qgis import QgisIds
+from ..common.micka import MickaIds
 
 
 @dataclass(frozen=True, )
@@ -37,17 +37,17 @@ class Layer(Publication):
             object.__setattr__(self, 'table_uri', info['_table_uri'])
 
     @property
-    def gs_names(self):
-        return GeoserverNames(uuid=self.uuid)
+    def gs_ids(self):
+        return GeoserverIds(uuid=self.uuid)
 
     @property
-    def qgis_names(self):
-        return QgisNames(uuid=self.uuid)
+    def qgis_ids(self):
+        return QgisIds(uuid=self.uuid)
 
     @property
-    def internal_db_names(self):
-        return DbNames(uuid=self.uuid)
+    def internal_db_ids(self):
+        return DbIds(uuid=self.uuid)
 
     @property
-    def micka_names(self):
-        return MickaNames(uuid=self.uuid)
+    def micka_ids(self):
+        return MickaIds(uuid=self.uuid)
