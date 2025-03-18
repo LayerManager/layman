@@ -17,7 +17,7 @@ class QgisNames:
 
 @dataclass(frozen=True, )
 class Layer(Publication):
-    _class_publication_type: ClassVar[str] = LAYER_TYPE
+    _class_publication_type_for_create: ClassVar[str] = LAYER_TYPE
     _class_init_tuple_name: ClassVar[str] = 'layer_tuple'
 
     geodata_type: Literal["vector", "raster", "unknown"]
@@ -25,9 +25,9 @@ class Layer(Publication):
     original_data_source: settings.EnumOriginalDataSource
     table_uri: TableUri
 
-    def __init__(self, *, uuid: str = None, layer_tuple: Tuple[str, str] = None):
+    def __init__(self, *, uuid: str = None, layer_tuple: Tuple[str, str] = None, load: bool = True):
         publ_tuple = (layer_tuple[0], LAYER_TYPE, layer_tuple[1]) if layer_tuple else None
-        super().__init__(uuid=uuid, publ_tuple=publ_tuple)
+        super().__init__(uuid=uuid, publ_tuple=publ_tuple, load=load)
 
     def load(self):
         super().load()

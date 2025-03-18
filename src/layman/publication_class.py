@@ -11,7 +11,7 @@ from layman import util
 # pylint: disable=too-many-instance-attributes
 class Publication(ABC):
     _subclasses: ClassVar[Dict[str, Type[Publication]]] = {}
-    _class_publication_type: ClassVar[str]
+    _class_publication_type_for_create: ClassVar[str]
     _class_init_tuple_name: ClassVar[str]
 
     workspace: str
@@ -27,12 +27,13 @@ class Publication(ABC):
     _info: Dict[str, Any]
 
     def __init_subclass__(cls):
-        if hasattr(cls, '_class_publication_type'):
-            cls_publication_type = getattr(cls, '_class_publication_type')
-            assert cls_publication_type not in Publication._subclasses
-            Publication._subclasses[cls_publication_type] = cls
+        if hasattr(cls, '_class_publication_type_for_create'):
+            cls_publication_type = getattr(cls, '_class_publication_type_for_create')
+            if cls_publication_type:
+                assert cls_publication_type not in Publication._subclasses
+                Publication._subclasses[cls_publication_type] = cls
 
-    def __init__(self, *, uuid: str = None, publ_tuple: Tuple[str, str, str] = None):
+    def __init__(self, *, uuid: str = None, publ_tuple: Tuple[str, str, str] = None, load: bool = True):
         assert uuid is not None or publ_tuple is not None
         if uuid is not None:
             object.__setattr__(self, 'uuid', uuid)
@@ -41,7 +42,8 @@ class Publication(ABC):
             object.__setattr__(self, 'type', publ_tuple[1])
             object.__setattr__(self, 'name', publ_tuple[2])
 
-        self.load()
+        if load:
+            self.load()
 
     def load(self):
         context = {'keys': ['id']}
