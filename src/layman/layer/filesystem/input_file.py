@@ -40,11 +40,7 @@ def ensure_layer_input_file_dir(publ_uuid):
 
 
 def delete_layer(layer: Layer):
-    delete_layer_by_uuid(layer.uuid)
-
-
-def delete_layer_by_uuid(publ_uuid):
-    util.delete_layer_subdir(publ_uuid, LAYER_SUBDIR)
+    util.delete_layer_subdir(layer.uuid, LAYER_SUBDIR)
 
 
 def get_compressed_main_file_extension(filepath):

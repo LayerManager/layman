@@ -39,10 +39,6 @@ def delete_layer(layer: Layer):
     util.delete_layer_subdir(layer.uuid, LAYER_SUBDIR)
 
 
-def delete_layer_by_uuid(publ_uuid):
-    util.delete_layer_subdir(publ_uuid, LAYER_SUBDIR)
-
-
 def get_file_path(publ_uuid, *, with_extension=True):
     input_style_dir = get_layer_input_style_dir(publ_uuid)
     style_files = glob.glob(os.path.join(input_style_dir, publ_uuid + '.*'))
@@ -54,7 +50,8 @@ def get_file_path(publ_uuid, *, with_extension=True):
 
 
 def save_layer_file(publ_uuid, style_file, style_type):
-    delete_layer_by_uuid(publ_uuid)
+    simple_layer = Layer(uuid=publ_uuid, load=False)
+    delete_layer(simple_layer)
     if style_file:
         style_path_clear = get_file_path(publ_uuid, with_extension=False)
         style_path = style_path_clear + '.' + style_type.extension

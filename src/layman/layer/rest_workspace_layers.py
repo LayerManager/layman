@@ -10,6 +10,7 @@ from layman.common import redis as redis_util, rest as rest_common
 from layman.uuid import register_publication_uuid_to_redis, delete_publication_uuid_from_redis
 from . import util, LAYER_TYPE, LAYER_REST_PATH_NAME
 from .filesystem import input_file, input_style, input_chunk, util as fs_util
+from .layer_class import Layer
 
 bp = Blueprint('rest_workspace_layers', __name__)
 
@@ -228,7 +229,8 @@ def post(workspace):
                 input_file.save_layer_files(uuid_str, input_files, check_crs, overview_resampling, name_input_file_by_layer=name_input_file_by_layer)
             except BaseException as exc:
                 delete_publication_uuid_from_redis(workspace, LAYER_TYPE, layername, uuid_str)
-                input_file.delete_layer_by_uuid(uuid_str)
+                simple_layer = Layer(uuid=uuid_str, load=False)
+                input_file.delete_layer(simple_layer)
                 raise exc
 
         util.post_layer(
