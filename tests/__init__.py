@@ -22,6 +22,11 @@ class Publication4Test:
     def __iter__(self):
         return iter([self.workspace, self.type, self.name])
 
+    def set_uuid(self, uuid):
+        assert uuid is not None
+        assert self.uuid is None
+        object.__setattr__(self, 'uuid', uuid)
+
 
 @dataclass(frozen=True)
 class TestPublicationValues:

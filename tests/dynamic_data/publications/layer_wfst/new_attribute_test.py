@@ -246,11 +246,8 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
         workspace = self.workspace
 
         # ensure layers
-        rest_args1 = {
-            **rest_args,
-            'uuid': params['uuid'],
-        }
-        self.ensure_publication(layer, args=rest_args1, scope='class')
+        layer.set_uuid(params['uuid'])
+        self.ensure_publication(layer, args=rest_args, scope='class')
         layer2 = Publication4Test(name=f"{layer.name}_2", workspace=workspace, type=layer.type, uuid=params['uuid2'])
         rest_args2 = copy.deepcopy(rest_args) if 'external_table_uri' not in rest_args else {
             **rest_args,
