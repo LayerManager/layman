@@ -31,7 +31,7 @@ for k, v in NAMESPACES.items():
 
 
 def get_metadata_url(uuid, *, url_type: RecordUrlType):
-    muuid = MickaIds(uuid=uuid).metadata_uuid
+    muuid = MickaIds(uuid=uuid).id
     server_url = settings.CSW_PROXY_URL[:-3]
     result = f'{server_url}record/{url_type.value}/{muuid}'
     return result
@@ -669,7 +669,7 @@ def patch_publication_by_soap(publication: Publication,
     csw_instance = create_csw()
     if uuid is None or csw_instance is None:
         return
-    muuid = MickaIds(uuid=uuid).metadata_uuid
+    muuid = MickaIds(uuid=uuid).id
     num_records = get_number_of_records(muuid, True)
     if num_records == 0:
         full_access_rights = authz.complete_access_rights(access_rights, publication.access_rights)
