@@ -25,7 +25,7 @@ def refresh_soap(self, workspace, mapname, http_method=common.REQUEST_METHOD_POS
         soap.soap_insert(publication, access_rights=access_rights, actor_name=actor_name)
     else:
         soap.patch_map(publication, metadata_properties_to_refresh=metadata_properties_to_refresh,
-                       actor_name=actor_name, access_rights=access_rights)
+                       actor_name=actor_name)
 
     if self.is_aborted():
         csw.delete_map(publication)
