@@ -17,8 +17,8 @@ def delete_layer(layer: Layer):
         publications.set_geodata_type(layer.workspace, layer.type, layer.name, settings.GEODATA_TYPE_UNKNOWN, )
 
 
-def patch_layer(workspace, layername, *, geodata_type):
-    publications.set_geodata_type(workspace, LAYER_TYPE, layername, geodata_type, )
+def patch_layer(layer: Layer, *, geodata_type):
+    publications.set_geodata_type(layer.workspace, layer.type, layer.name, geodata_type, )
 
 
 def post_layer(workspace, layername, *, geodata_type):
