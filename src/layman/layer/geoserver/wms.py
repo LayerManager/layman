@@ -38,34 +38,34 @@ def get_flask_proxy_key():
     return FLASK_PROXY_KEY.format(workspace=workspace)
 
 
-def patch_layer(layer: Layer, *, original_data_source, title, description, access_rights=None):
+def patch_layer(layer: Layer):
     gs_layer_ids = layer.gs_ids.wms
     if not get_layer_info_by_uuid(uuid=layer.uuid):
         return
     geodata_type = layer.geodata_type
     if geodata_type == settings.GEODATA_TYPE_VECTOR:
         if layer.style_type == 'sld':
-            store_name = get_db_store_name(uuid=layer.uuid, original_data_source=original_data_source)
-            gs_util.patch_feature_type(gs_layer_ids.workspace, gs_layer_ids.name, store_name=store_name, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
+            store_name = get_db_store_name(uuid=layer.uuid, original_data_source=layer.original_data_source)
+            gs_util.patch_feature_type(gs_layer_ids.workspace, gs_layer_ids.name, store_name=store_name, title=layer.title, description=layer.description, auth=settings.LAYMAN_GS_AUTH)
         if layer.style_type == 'qml':
-            gs_util.patch_wms_layer(gs_layer_ids.workspace, gs_layer_ids.name, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
+            gs_util.patch_wms_layer(gs_layer_ids.workspace, gs_layer_ids.name, title=layer.title, description=layer.description, auth=settings.LAYMAN_GS_AUTH)
     elif geodata_type == settings.GEODATA_TYPE_RASTER:
         image_mosaic = layer.image_mosaic
         if image_mosaic:
             store = get_image_mosaic_store_name(uuid=layer.uuid)
         else:
             store = get_geotiff_store_name(uuid=layer.uuid)
-        gs_util.patch_coverage(gs_layer_ids.workspace, gs_layer_ids.name, store, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
+        gs_util.patch_coverage(gs_layer_ids.workspace, gs_layer_ids.name, store, title=layer.title, description=layer.description, auth=settings.LAYMAN_GS_AUTH)
     else:
         raise NotImplementedError(f"Unknown geodata type: {geodata_type}")
     clear_cache()
 
-    if access_rights and access_rights.get('read'):
-        security_read_roles = gs_common.layman_users_and_roles_to_geoserver_roles(access_rights['read'])
+    if layer.access_rights and layer.access_rights.get('read'):
+        security_read_roles = gs_common.layman_users_and_roles_to_geoserver_roles(layer.access_rights['read'])
         gs_util.ensure_layer_security_roles(gs_layer_ids.workspace, gs_layer_ids.name, security_read_roles, 'r', settings.LAYMAN_GS_AUTH)
 
-    if access_rights and access_rights.get('write'):
-        security_write_roles = gs_common.layman_users_and_roles_to_geoserver_roles(access_rights['write'])
+    if layer.access_rights and layer.access_rights.get('write'):
+        security_write_roles = gs_common.layman_users_and_roles_to_geoserver_roles(layer.access_rights['write'])
         gs_util.ensure_layer_security_roles(gs_layer_ids.workspace, gs_layer_ids.name, security_write_roles, 'w', settings.LAYMAN_GS_AUTH)
 
 
