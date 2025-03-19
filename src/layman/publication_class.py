@@ -1,5 +1,5 @@
 from __future__ import annotations
-from abc import ABC
+from abc import abstractmethod, ABC
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Tuple, Dict, Any, List, ClassVar, Type
@@ -74,6 +74,10 @@ class Publication(ABC):
 
     def __bool__(self):
         return self.exists
+
+    @abstractmethod
+    def replace(self, **kwargs) -> Publication:
+        raise NotImplementedError
 
     @classmethod
     def create(cls, *, publ_tuple: Tuple[str, str, str] = None) -> Publication:
