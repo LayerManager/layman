@@ -1,4 +1,5 @@
-from dataclasses import dataclass
+from __future__ import annotations
+from dataclasses import dataclass, fields
 from typing import Tuple, ClassVar
 
 from layman.publication_class import Publication
@@ -27,3 +28,11 @@ class Map(Publication):
     @property
     def micka_ids(self):
         return MickaIds(uuid=self.uuid)
+
+    def replace(self, **kwargs) -> Map:
+        other_map = Map(uuid=self.uuid, map_tuple=(self.workspace, self.name), load=False)
+        all_fields = [f.name for f in fields(Map)]
+        assert set(kwargs) <= set(all_fields)
+        for k in all_fields:
+            object.__setattr__(other_map, k, kwargs.get(k, getattr(self, k)))
+        return other_map

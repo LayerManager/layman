@@ -1,4 +1,5 @@
-from dataclasses import dataclass
+from __future__ import annotations
+from dataclasses import dataclass, fields
 from typing import Tuple, Literal, ClassVar
 
 from db import TableUri
@@ -51,3 +52,11 @@ class Layer(Publication):
     @property
     def micka_ids(self):
         return MickaIds(uuid=self.uuid)
+
+    def replace(self, **kwargs) -> Layer:
+        other_layer = Layer(uuid=self.uuid, layer_tuple=(self.workspace, self.name), load=False)
+        all_fields = [f.name for f in fields(Layer)]
+        assert set(kwargs) <= set(all_fields)
+        for k in all_fields:
+            object.__setattr__(other_layer, k, kwargs.get(k, getattr(self, k)))
+        return other_layer
