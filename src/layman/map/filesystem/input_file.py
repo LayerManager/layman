@@ -127,4 +127,5 @@ def post_map(workspace, mapname, uuid, description, title):
         json.dump(map_json, map_file, indent=4)
 
 
-patch_map = post_map
+def patch_map(map: Map, description, title):
+    post_map(map.workspace, map.name, map.uuid, description, title)

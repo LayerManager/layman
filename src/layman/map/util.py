@@ -115,7 +115,7 @@ def post_map(workspace, mapname, task_options, start_at):
 def patch_map(map: Map, task_options, start_at, *, only_sync=False):
     # sync processing
     sources = get_sources()
-    call_modules_fn(sources, 'patch_map', [map.workspace, map.name], kwargs=task_options)
+    call_modules_fn(sources, 'patch_map', [map], kwargs=task_options)
 
     if not only_sync:
         # async processing
