@@ -12,11 +12,11 @@ get_metadata_comparison = csw.get_metadata_comparison
 delete_map = csw.delete_map
 
 
-def patch_map(publication: Map, *, metadata_properties_to_refresh=None, access_rights=None, actor_name=None):
+def patch_map(publication: Map, *, metadata_properties_to_refresh=None, actor_name=None):
     common_util.patch_publication_by_soap(publication,
                                           metadata_properties_to_refresh=metadata_properties_to_refresh,
                                           actor_name=actor_name,
-                                          access_rights=access_rights,
+                                          access_rights=publication.access_rights,
                                           csw_patch_method=csw.patch_map,
                                           soap_insert_method=soap_insert,
                                           )
