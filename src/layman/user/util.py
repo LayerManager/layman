@@ -1,6 +1,7 @@
 from flask import g
 from layman import LaymanError, authn
 from layman.authn import get_open_id_claims, get_iss_id, get_sub, is_user_with_name
+from layman.publication_class import Publication
 from layman.util import slugify, to_safe_names, check_workspace_name, get_workspaces, ensure_whole_user, delete_whole_user, get_publication_infos, patch_publication, delete_workspace_publication
 from layman.authn import redis as authn_redis, prime_db_schema as authn_prime_db_schema
 from layman.layer import LAYER_TYPE, util as layer_util
@@ -181,10 +182,10 @@ def delete_user_public_publications(username):
             "is_part_of_user_delete": True,
         }
 
+        old_publication = Publication.create(publ_tuple=(workspace, publication_type, publication_name))
+        new_publication = old_publication.replace(access_rights=kwargs['access_rights'])
         patch_publication(
-            workspace,
-            publication_name,
-            publication_type,
+            new_publication,
             layer_util.patch_layer if publication_type == LAYER_TYPE else map_util.patch_map,
             layer_util.is_layer_chain_ready if publication_type == LAYER_TYPE else map_util.is_map_chain_ready,
             kwargs,
