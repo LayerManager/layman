@@ -31,14 +31,14 @@ services:
         - postgresql
 
    geoserver:
-      image: docker.osgeo.org/geoserver:2.21.2
+      image: docker.osgeo.org/geoserver:2.21.4
       extra_hosts:
          - "host.docker.internal:host-gateway"
       volumes:
         - ./deps/geoserver/data:/opt/geoserver_data/
       restart: on-failure
       environment:
-        - GS_VERSION=2.21.2
+        - GS_VERSION=2.21.4
         - SKIP_DEMO_DATA=true
         - GEOSERVER_CSRF_WHITELIST=${LAYMAN_PROXY_SERVER_NAME}
       depends_on:
