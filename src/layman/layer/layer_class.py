@@ -22,6 +22,7 @@ class Layer(Publication):
     style_type: str
     original_data_source: settings.EnumOriginalDataSource
     table_uri: TableUri
+    image_mosaic: bool
 
     def __init__(self, *, uuid: str = None, layer_tuple: Tuple[str, str] = None, load: bool = True):
         publ_tuple = (layer_tuple[0], LAYER_TYPE, layer_tuple[1]) if layer_tuple else None
@@ -36,6 +37,7 @@ class Layer(Publication):
             object.__setattr__(self, 'original_data_source',
                                settings.EnumOriginalDataSource(info['original_data_source']))
             object.__setattr__(self, 'table_uri', info['_table_uri'])
+            object.__setattr__(self, 'image_mosaic', info['image_mosaic'])
 
     @property
     def gs_ids(self):
