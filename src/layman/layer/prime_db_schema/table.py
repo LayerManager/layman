@@ -36,27 +36,21 @@ def delete_layer(layer: Layer):
 def patch_layer(layer: Layer,
                 actor_name,
                 external_table_uri,
-                style_type=None,
-                title=None,
-                description=None,
-                access_rights=None,
-                image_mosaic=None,
-                geodata_type=None,
                 is_part_of_user_delete=False,
                 ):
     db_info = {"name": layer.name,
-               "title": title,
-               "description": description,
+               "title": layer.title,
+               "description": layer.description,
                "publ_type_name": layer.type,
                "actor_name": actor_name,
-               'image_mosaic': image_mosaic,
+               'image_mosaic': layer.image_mosaic,
                'external_table_uri': external_table_uri,
-               'geodata_type': geodata_type,
+               'geodata_type': layer.geodata_type,
                }
-    if style_type:
-        db_info['style_type'] = style_type.code
-    if access_rights:
-        db_info['access_rights'] = access_rights
+    if layer.style_type:
+        db_info['style_type'] = layer.style_type
+    if layer.access_rights:
+        db_info['access_rights'] = layer.access_rights
     pubs_util.update_publication(layer.workspace, db_info, is_part_of_user_delete)
 
 

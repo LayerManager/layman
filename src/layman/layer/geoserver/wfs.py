@@ -28,7 +28,7 @@ def get_flask_proxy_key():
     return FLASK_PROXY_KEY.format(workspace=workspace)
 
 
-def patch_layer(layer: Layer, *, title, description, original_data_source, access_rights=None):
+def patch_layer(layer: Layer):
     gs_layer_ids = layer.gs_ids.wfs
     if not get_layer_info_by_uuid(uuid=layer.uuid):
         return
@@ -36,16 +36,16 @@ def patch_layer(layer: Layer, *, title, description, original_data_source, acces
     if geodata_type != settings.GEODATA_TYPE_VECTOR:
         raise NotImplementedError(f"Unknown geodata type: {geodata_type}")
 
-    store_name = get_db_store_name(uuid=layer.uuid, original_data_source=original_data_source)
-    gs_util.patch_feature_type(gs_layer_ids.workspace, gs_layer_ids.name, store_name=store_name, title=title, description=description, auth=settings.LAYMAN_GS_AUTH)
+    store_name = get_db_store_name(uuid=layer.uuid, original_data_source=layer.original_data_source)
+    gs_util.patch_feature_type(gs_layer_ids.workspace, gs_layer_ids.name, store_name=store_name, title=layer.title, description=layer.description, auth=settings.LAYMAN_GS_AUTH)
     clear_cache()
 
-    if access_rights and access_rights.get('read'):
-        security_read_roles = gs_common.layman_users_and_roles_to_geoserver_roles(access_rights['read'])
+    if layer.access_rights and layer.access_rights.get('read'):
+        security_read_roles = gs_common.layman_users_and_roles_to_geoserver_roles(layer.access_rights['read'])
         gs_util.ensure_layer_security_roles(gs_layer_ids.workspace, gs_layer_ids.name, security_read_roles, 'r', settings.LAYMAN_GS_AUTH)
 
-    if access_rights and access_rights.get('write'):
-        security_write_roles = gs_common.layman_users_and_roles_to_geoserver_roles(access_rights['write'])
+    if layer.access_rights and layer.access_rights.get('write'):
+        security_write_roles = gs_common.layman_users_and_roles_to_geoserver_roles(layer.access_rights['write'])
         gs_util.ensure_layer_security_roles(gs_layer_ids.workspace, gs_layer_ids.name, security_write_roles, 'w', settings.LAYMAN_GS_AUTH)
 
 
