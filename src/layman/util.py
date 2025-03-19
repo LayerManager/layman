@@ -541,19 +541,19 @@ def delete_workspace_publication(workspace, publication_type, publication_name, 
     return result
 
 
-def patch_publication(workspace, publication, publ_type, patch_publication_fn, is_chain_ready_fn, task_options, patch_options):
-    redis.create_lock(workspace, publ_type, publication, PUBLICATION_LOCK_PATCH)
+def patch_publication(publication: Publication, patch_publication_fn, is_chain_ready_fn, task_options, patch_options):
+    redis.create_lock(publication.workspace, publication.type, publication.name, PUBLICATION_LOCK_PATCH)
 
     try:
-        patch_publication_fn(workspace, publication, task_options=task_options, **patch_options)
-        if is_chain_ready_fn(workspace, publication):
-            redis.unlock_publication(workspace, publ_type, publication)
+        patch_publication_fn(publication, task_options=task_options, **patch_options)
+        if is_chain_ready_fn(publication.workspace, publication.name):
+            redis.unlock_publication(publication.workspace, publication.type, publication.name)
     except Exception as exc:
         try:
-            if is_chain_ready_fn(workspace, publication):
-                redis.unlock_publication(workspace, publ_type, publication)
+            if is_chain_ready_fn(publication.workspace, publication):
+                redis.unlock_publication(publication.workspace, publication.type, publication.name)
         finally:
-            redis.unlock_publication(workspace, publ_type, publication)
+            redis.unlock_publication(publication.workspace, publication.type, publication.name)
         raise exc
 
 
