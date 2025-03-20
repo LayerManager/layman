@@ -27,7 +27,6 @@ WORKSPACE = 'db_testuser'
 def post_layer(workspace, layername, file_path):
     publ_uuid = str(uuid.uuid4())
     with layman.app_context():
-        db.ensure_workspace(workspace)
         prime_db_schema_client.post_workspace_publication(LAYER_TYPE, workspace, layername,
                                                           geodata_type=settings.GEODATA_TYPE_VECTOR,
                                                           wfs_wms_status=settings.EnumWfsWmsStatus.AVAILABLE.value,

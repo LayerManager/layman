@@ -29,7 +29,6 @@ def refresh_table(
         uuid=None,
 ):
     layer = Layer(uuid=uuid)
-    db.ensure_workspace(layer.workspace)
     if self.is_aborted():
         raise AbortedException
 

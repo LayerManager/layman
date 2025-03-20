@@ -42,10 +42,6 @@ def delete_whole_user(username, auth=settings.LAYMAN_GS_AUTH):
     gs_util.delete_user(username, auth)
 
 
-ensure_workspace = empty_method
-delete_workspace = empty_method
-
-
 def get_all_rules(auth):
     key = FLASK_RULES_KEY
     if key not in g:
