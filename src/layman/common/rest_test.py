@@ -5,21 +5,15 @@ from .rest import parse_request_path, get_integer_from_param, get_bbox_from_para
 
 
 @pytest.mark.parametrize('request_path', [
-    f'/rest/{settings.REST_WORKSPACES_PREFIX}/layers',
-    f'/rest/{settings.REST_WORKSPACES_PREFIX}/layers/abc',
     f'/rest/{settings.REST_WORKSPACES_PREFIX}/username/abc',
     f'/rest/{settings.REST_WORKSPACES_PREFIX}/username/publications',
     f'/rest/{settings.REST_WORKSPACES_PREFIX}/username/publications/blablabla',
     f'/rest/{settings.REST_WORKSPACES_PREFIX}/username/publications/blablabla/da',
-    f'/rest/{settings.REST_WORKSPACES_PREFIX}/users/layers',
-    f'/rest/{settings.REST_WORKSPACES_PREFIX}/users/maps/map',
     f'/rest/layers/abc',
     f'/rest/username/abc',
     f'/rest/username/publications',
     f'/rest/username/publications/blablabla',
     f'/rest/username/publications/blablabla/da',
-    f'/rest/users/layers',
-    f'/rest/users/maps/map',
 ])
 def test_parse_wrong_request_path(request_path):
     with app.app_context():

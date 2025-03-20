@@ -72,10 +72,6 @@ def parse_request_path(request_path):
         publication_name = match.groupdict().get('publication_name', None)
     if publication_type_url_prefix:
         publication_type = get_url_name_to_publication_type()[publication_type_url_prefix]['type']
-    if workspace in settings.RESERVED_WORKSPACE_NAMES:
-        workspace = None
-        publication_type = None
-        publication_name = None
     return workspace, publication_type, publication_name
 
 
