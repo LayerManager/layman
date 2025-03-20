@@ -26,7 +26,7 @@ When user [reserves his username](rest.md#patch-current-user), names, contacts a
 Information about [layers](models.md#layer) includes vector or raster data and visualization.
 
 When user [publishes new layer](rest.md#post-workspace-layers)
-- UUID and name is saved to [Redis](#redis) and [filesystem](#filesystem),
+- UUID and name is saved to [Redis](#redis),
 - UUID, name, title, description and access rights are to [PostgreSQL](#postgresql),
 - data files and visualization file is saved to [filesystem](#filesystem) (if uploaded [synchronously](async-file-upload.md)),
 - and asynchronous [tasks](#tasks) are saved in [Redis](#redis).
@@ -50,7 +50,7 @@ When user [patches existing layer](rest.md#patch-workspace-layer), data is saved
 Information about [maps](models.md#map) includes JSON definition.
 
 When user [publishes new map](rest.md#post-workspace-maps)
-- UUID and name is saved to [Redis](#redis) and [filesystem](#filesystem),
+- UUID and name is saved to [Redis](#redis),
 - UUID, name, title, description and access rights are saved to [PostgreSQL](#postgresql),
 - JSON file is saved to [filesystem](#filesystem),
 - and asynchronous [tasks](#tasks) are saved in [Redis](#redis).

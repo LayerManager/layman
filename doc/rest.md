@@ -138,6 +138,7 @@ Body parameters:
 - *uuid*, string, e.g. `959c95fb-ab54-47a6-9694-402926b8fd29`
    - layer primary key
    - used if specified, otherwise generated
+   - it's meant mostly for testing purposes
 - *file*, file(s) or file name(s)
    - exactly one of `file` or `external_table_uri` must be set
    - one of following options is expected:

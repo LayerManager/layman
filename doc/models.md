@@ -93,7 +93,7 @@
 - Workspace is folder for [publications](#publication).
 - Each workspace is identified by name that is unique among all workspaces.
 - The name is lower-case, maximum length is 59 characters.
-- Workspace name is sometimes used for structuring publication-related data. For example, it's part of REST API URL (`/rest/workspaces/<workspace_name>/...`), directory names (`<LAYMAN_DATA_DIR>/workspaces/<workspace_name>/...`) and DB schemas.
+- Workspace name is sometimes used for structuring publication-related data. For example, it's part of REST API URL (`/rest/workspaces/<workspace_name>/...`).
 - Workspace's REST API consists of all [map and layer endpoints](rest.md) endpoints.
 - There are following types of workspaces:
    - [Personal workspace](#personal-workspace)
