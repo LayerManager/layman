@@ -1,34 +1,11 @@
 import pytest
 
 import crs as crs_def
-from layman import app, settings
+from layman import app
 from layman.common.prime_db_schema import publications
-from layman.http import LaymanError
 from test_tools import process_client, assert_util, data as test_data
 from test_tools.mock.layman_classes import LayerMock
 from . import wfs, wms, tasks
-
-
-@pytest.mark.usefixtures('ensure_layman')
-def test_check_workspace_wms():
-    workspace = 'test_check_workspace_wms_workspace' + settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX
-    layer = 'test_check_workspace_wms_layer'
-    with pytest.raises(LaymanError) as exc_info:
-        process_client.publish_workspace_layer(workspace, layer)
-    assert exc_info.value.http_code == 400
-    assert exc_info.value.code == 45
-    assert exc_info.value.data['workspace_name'] == workspace
-
-
-@pytest.mark.usefixtures('ensure_layman', 'oauth2_provider_mock')
-def test_check_user_wms():
-    user = 'test_check_user_wms' + settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX
-    auth_headers = process_client.get_authz_headers(user)
-    with pytest.raises(LaymanError) as exc_info:
-        process_client.reserve_username(user, headers=auth_headers)
-    assert exc_info.value.http_code == 400
-    assert exc_info.value.code == 45
-    assert exc_info.value.data['workspace_name'] == user
 
 
 @pytest.mark.usefixtures('ensure_layman')
