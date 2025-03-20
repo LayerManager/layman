@@ -168,17 +168,11 @@ def check_workspace_name_decorator(func):
     return decorated_function
 
 
-def check_reserved_workspace_names(workspace_name):
-    if workspace_name in settings.RESERVED_WORKSPACE_NAMES:
-        raise LaymanError(35, {'reserved_by': 'RESERVED_WORKSPACE_NAMES', 'workspace': workspace_name})
-
-
 def check_workspace_name(workspace, pattern_only=False):
     if not re.match(WORKSPACE_NAME_PATTERN, workspace):
         raise LaymanError(2, {'parameter': 'workspace', 'expected': WORKSPACE_NAME_PATTERN})
     if pattern_only:
         return
-    check_reserved_workspace_names(workspace)
     providers = get_internal_providers()
     call_modules_fn(providers, 'check_workspace_name', [workspace])
 

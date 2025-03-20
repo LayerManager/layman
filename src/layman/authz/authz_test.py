@@ -11,22 +11,16 @@ def mock_method():
 
 
 @pytest.mark.parametrize('request_path', [
-    f'/rest/{settings.REST_WORKSPACES_PREFIX}/layers',
-    f'/rest/{settings.REST_WORKSPACES_PREFIX}/layers/abc',
     f'/rest/{settings.REST_WORKSPACES_PREFIX}/username/abc',
     f'/rest/{settings.REST_WORKSPACES_PREFIX}/username/publications',
     f'/rest/{settings.REST_WORKSPACES_PREFIX}/username/publications/blablabla',
     f'/rest/{settings.REST_WORKSPACES_PREFIX}/username/publications/blablabla/da',
-    f'/rest/{settings.REST_WORKSPACES_PREFIX}/users/layers',
-    f'/rest/{settings.REST_WORKSPACES_PREFIX}/users/maps/map',
     f'/rest/layers',
     f'/rest/layers/abc',
     f'/rest/username/abc',
     f'/rest/username/publications',
     f'/rest/username/publications/blablabla',
     f'/rest/username/publications/blablabla/da',
-    f'/rest/users/layers',
-    f'/rest/users/maps/map',
 ])
 def test_authorize_publications_decorator_does_not_accept_path(request_path):
     with app.test_request_context(request_path):

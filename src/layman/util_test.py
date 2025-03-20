@@ -17,15 +17,6 @@ def test_slugify(unsafe_input, exp_output):
     assert util.slugify(unsafe_input) == exp_output
 
 
-@pytest.mark.parametrize('workspace', settings.RESERVED_WORKSPACE_NAMES)
-def test_check_reserved_workspace_names(workspace):
-    with app.app_context():
-        with pytest.raises(LaymanError) as exc_info:
-            util.check_reserved_workspace_names(workspace)
-        assert exc_info.value.code == 35
-        assert exc_info.value.data['reserved_by'] == 'RESERVED_WORKSPACE_NAMES'
-
-
 def assert_module_methods(module, methods):
     for method in methods:
         # print(f'test_module_methods: module={module.__name__}, method={method}')
