@@ -200,20 +200,9 @@ def get_usernames(use_cache=True, skip_modules=None):
     return usernames
 
 
-def get_workspaces(use_cache=True, skip_modules=None):
-    skip_modules = skip_modules or set()
-    if use_cache:
-        providers = get_internal_providers()
-    else:
-        all_sources = []
-        for type_def in get_publication_types(use_cache=False).values():
-            all_sources += type_def['internal_sources']
-        providers = get_providers_from_source_names(all_sources, skip_modules)
-    results = call_modules_fn(providers, 'get_workspaces')
-    workspaces = []
-    for response in results.values():
-        workspaces += response
-    workspaces = list(set(workspaces))
+def get_workspaces():
+    from layman.common.prime_db_schema.workspaces import get_workspace_names
+    workspaces = get_workspace_names()
     return workspaces
 
 

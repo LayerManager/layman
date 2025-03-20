@@ -70,12 +70,6 @@ def get_usernames():
     return gs_util.get_usernames_by_role(settings.LAYMAN_GS_ROLE, settings.LAYMAN_GS_AUTH, [settings.LAYMAN_GS_USER])
 
 
-def get_workspaces():
-    all_workspaces = gs_util.get_all_workspaces(settings.LAYMAN_GS_AUTH)
-    result = [workspace for workspace in all_workspaces if not workspace.endswith(settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX)]
-    return result
-
-
 def geoserver_layername_to_uuid(*, geoserver_workspace, geoserver_name):
     result = None
     if geoserver_workspace in [GEOSERVER_WFS_WORKSPACE, GEOSERVER_WMS_WORKSPACE] and geoserver_name.startswith(GEOSERVER_NAME_PREFIX):

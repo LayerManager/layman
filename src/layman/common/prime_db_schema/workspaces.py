@@ -44,4 +44,4 @@ def get_workspace_infos(name=None):
 
 
 def get_workspace_names():
-    return get_workspace_infos().keys()
+    return list(get_workspace_infos().keys())

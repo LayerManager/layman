@@ -7,6 +7,3 @@ check_workspace_name = empty_method
 
 def get_usernames():
     return []
-
-
-get_workspaces = get_usernames

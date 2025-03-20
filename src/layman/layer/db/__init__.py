@@ -38,10 +38,6 @@ class DbIds:
         object.__setattr__(self, 'table', f"layer_{uuid.replace('-', '_')}")
 
 
-def get_workspaces():
-    return []
-
-
 def get_usernames():
     return []
 

@@ -30,10 +30,6 @@ def get_usernames():
     return []
 
 
-def get_workspaces():
-    return []
-
-
 def get_publications_dir(publ_type):
     publ_types = get_publication_types()
     dirname = publ_types[publ_type][PUBL_TYPE_DEF_KEY]['publications_dir']
