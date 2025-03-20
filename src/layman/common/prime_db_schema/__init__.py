@@ -2,7 +2,6 @@ from layman.common.prime_db_schema import users as users_util, workspaces as wor
 from layman.http import LaymanError
 
 get_usernames = users_util.get_usernames
-get_workspaces = workspaces_util.get_workspace_names
 
 
 def delete_whole_user(username):

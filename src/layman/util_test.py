@@ -59,7 +59,6 @@ def test_publication_interface_methods():
 
     publication_provider_methods = {
         'get_usernames',
-        'get_workspaces',
         'check_workspace_name',
         'ensure_whole_user',
         'delete_whole_user',

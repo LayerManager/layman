@@ -241,7 +241,7 @@ def test_delete_shared_publications_with_readers(setup_user_or_everyone, publica
 
 def workspace_exists(workspace):
     with app.app_context():
-        return workspace in layman_util.get_workspaces(use_cache=False)
+        return workspace in layman_util.get_workspaces()
 
 
 def user_exists(username):

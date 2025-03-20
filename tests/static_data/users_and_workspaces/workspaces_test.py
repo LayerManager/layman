@@ -24,7 +24,7 @@ def test_user_workspace(workspace):
 
     with app.app_context():
         usernames = layman_util.get_usernames(use_cache=False)
-        workspaces = layman_util.get_workspaces(use_cache=False)
+        workspaces = layman_util.get_workspaces()
 
     if is_private_workspace:
         assert workspace in usernames
