@@ -593,7 +593,7 @@ def migrate_layers():
                 failed_steps.append('micka_soap')
                 logger.error(f'    Fail to refresh metadata od Micka: \n{traceback.format_exc()}')
 
-        # assert that source keys up to geoserver are OK
+        # assert that source keys are OK
         if not failed_steps:
             publ_info = get_complete_layer_info(workspace, layername)
             keys_to_check = ['wms', 'style']
@@ -757,7 +757,7 @@ def migrate_maps():
         else:
             util.safe_delete(f"{src_main_path}/thumbnail")
 
-        # assert that source keys up to geoserver are OK
+        # assert that source keys are OK
         if not failed_steps:
             publ_info = get_complete_map_info(workspace, mapname)
             keys_to_check = ['file']
