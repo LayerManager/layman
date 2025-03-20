@@ -1,5 +1,5 @@
 from __future__ import annotations
-from dataclasses import dataclass, fields
+from dataclasses import dataclass
 from typing import Tuple, ClassVar
 
 from layman.publication_class import Publication
@@ -31,8 +31,5 @@ class Map(Publication):
 
     def clone(self, **kwargs) -> Map:
         other_map = Map(uuid=self.uuid, map_tuple=(self.workspace, self.name), load=False)
-        all_fields = [f.name for f in fields(Map)]
-        assert set(kwargs) <= set(all_fields)
-        for k in all_fields:
-            object.__setattr__(other_map, k, kwargs.get(k, getattr(self, k)))
+        self._clone_values(other_map, **kwargs)
         return other_map
