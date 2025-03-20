@@ -1,6 +1,6 @@
 from __future__ import annotations
 from abc import abstractmethod, ABC
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 from datetime import datetime
 from typing import Tuple, Dict, Any, List, ClassVar, Type
 
@@ -78,6 +78,15 @@ class Publication(ABC):
     @abstractmethod
     def clone(self, **kwargs) -> Publication:
         raise NotImplementedError
+
+    def _clone_values(self, other_publication, **kwargs):
+        all_fields = [f.name for f in fields(other_publication)]
+        assert set(kwargs) <= set(all_fields), set(kwargs) - set(all_fields)
+        # assert we are not changing values of constant attributes
+        assert all(attr not in kwargs or kwargs[attr] == getattr(self, attr)
+                   for attr in ['type', 'uuid', 'workspace', 'name'])
+        for k in all_fields:
+            object.__setattr__(other_publication, k, kwargs.get(k, getattr(self, k)))
 
     @classmethod
     def create(cls, *, publ_tuple: Tuple[str, str, str] = None) -> Publication:
