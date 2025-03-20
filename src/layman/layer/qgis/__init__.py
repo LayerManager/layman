@@ -14,8 +14,6 @@ PUBL_TYPE_DEF_KEY = __name__
 check_workspace_name = empty_method
 ensure_whole_user = empty_method
 delete_whole_user = empty_method
-ensure_workspace = empty_method
-delete_workspace = empty_method
 
 
 @dataclass(frozen=True)

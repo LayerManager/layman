@@ -18,14 +18,6 @@ def ensure_whole_user(username, userinfo=None):
     return id_workspace, id_user
 
 
-def delete_workspace(workspace):
-    workspaces_util.delete_workspace(workspace)
-
-
-def ensure_workspace(workspace):
-    workspaces_util.ensure_workspace(workspace)
-
-
 def check_workspace_name(workspace):
     if len(workspace) > 59:
         raise LaymanError(56)

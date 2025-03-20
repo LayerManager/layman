@@ -7,5 +7,3 @@ get_usernames = common_util.get_usernames
 get_workspaces = common_util.get_workspaces
 ensure_whole_user = empty_method
 delete_whole_user = empty_method
-ensure_workspace = empty_method
-delete_workspace = empty_method

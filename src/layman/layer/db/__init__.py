@@ -24,9 +24,7 @@ ColumnInfo = namedtuple('ColumnInfo', 'name data_type')
 
 LAYERS_SCHEMA = 'layers'
 check_workspace_name = empty_method
-ensure_workspace = empty_method
 ensure_whole_user = empty_method
-delete_workspace = empty_method
 delete_whole_user = empty_method
 
 
