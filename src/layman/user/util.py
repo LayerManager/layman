@@ -183,7 +183,7 @@ def delete_user_public_publications(username):
         }
 
         old_publication = Publication.create(publ_tuple=(workspace, publication_type, publication_name))
-        new_publication = old_publication.replace(access_rights=kwargs['access_rights'])
+        new_publication = old_publication.clone(access_rights=kwargs['access_rights'])
         patch_publication(
             new_publication,
             layer_util.patch_layer if publication_type == LAYER_TYPE else map_util.patch_map,

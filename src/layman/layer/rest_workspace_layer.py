@@ -259,7 +259,7 @@ def patch(workspace, layername):
         new_layer_values['style_type'] = new_layer_values['style_type'].code
     if kwargs['external_table_uri']:
         new_layer_values['table_uri'] = kwargs['external_table_uri']
-    new_layer = old_layer.replace(**new_layer_values)
+    new_layer = old_layer.clone(**new_layer_values)
     util.patch_layer(
         new_layer,
         kwargs,

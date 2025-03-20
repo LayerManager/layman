@@ -76,7 +76,7 @@ class Publication(ABC):
         return self.exists
 
     @abstractmethod
-    def replace(self, **kwargs) -> Publication:
+    def clone(self, **kwargs) -> Publication:
         raise NotImplementedError
 
     @classmethod

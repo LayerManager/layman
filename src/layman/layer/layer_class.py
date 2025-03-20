@@ -55,7 +55,7 @@ class Layer(Publication):
     def micka_ids(self):
         return MickaIds(uuid=self.uuid)
 
-    def replace(self, **kwargs) -> Layer:
+    def clone(self, **kwargs) -> Layer:
         other_layer = Layer(uuid=self.uuid, layer_tuple=(self.workspace, self.name), load=False)
         all_fields = [f.name for f in fields(Layer)]
         assert set(kwargs) <= set(all_fields)
