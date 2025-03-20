@@ -62,7 +62,7 @@ def reserve_username(username, adjust=False):
             try:
                 check_workspace_name(suggestion)
             except LaymanError as exc:
-                if exc.code not in (2, 35, 41, 45):
+                if exc.code not in (2, 35, 41):
                     raise exc
                 continue
             if suggestion in workspaces:

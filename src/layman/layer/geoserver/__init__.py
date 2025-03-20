@@ -55,12 +55,6 @@ def check_workspace_name(workspace):
     if workspace == settings.LAYMAN_GS_USER:
         raise LaymanError(41, {'workspace': workspace})
 
-    if workspace in gs_util.RESERVED_WORKSPACE_NAMES:
-        raise LaymanError(35, {'reserved_by': __name__, 'workspace': workspace})
-
-    if workspace.endswith(settings.LAYMAN_GS_WMS_WORKSPACE_POSTFIX):
-        raise LaymanError(45, {'workspace_name': workspace})
-
     rolename = gs_util.username_to_rolename(workspace)
     if rolename in gs_util.RESERVED_ROLE_NAMES:
         raise LaymanError(35, {'reserved_by': __name__, 'role': rolename})
