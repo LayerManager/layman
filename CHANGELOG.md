@@ -8,8 +8,11 @@
   ```
   LAYMAN_CLIENT_VERSION=f6f79822de28f69dfe5c40e99e8b0fd603de9e78
   ```
-- Set new environment variable [GRANT_DELETE_OTHER_USER](doc/env-settings.md#GRANT_DELETE_OTHER_USER)  
-- In demo configuration, build QGIS v3.40.4 image using
+- Set new environment variable [GRANT_DELETE_OTHER_USER](doc/env-settings.md#GRANT_DELETE_OTHER_USER), e.g. to empty value:
+  ```
+  GRANT_DELETE_OTHER_USER=
+  ```
+- In demo configuration, build QGIS v3.40.4 image using command
   ```
   docker compose -f docker-compose.deps.demo.yml build qgis
   ```
@@ -21,15 +24,16 @@
 #### Data migrations
 - [#1009](https://github.com/LayerManager/layman/issues/1009) Fill column `description` in `publications` table in prime DB schema. Value is taken from GeoServer for layers and from filesystem for maps.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Fill column `created_at` in `publications` table in prime DB schema. Value is taken from filesystem `uuid.txt` file creation. `uuid.txt` file is subsequently deleted.
-- [#1048](https://github.com/LayerManager/layman/issues/1048) New workspaces [`layman` and `layman_wms`](doc/data-storage.md#geoserver) are created on GeoServer, each with PostgreSQL data store `postgresql`. 
 - [#1048](https://github.com/LayerManager/layman/issues/1048) New schema `layers` is created in [database](doc/data-storage.md#postgresql).
+- [#1048](https://github.com/LayerManager/layman/issues/1048) New workspaces [`layman` and `layman_wms`](doc/data-storage.md#geoserver) are created on GeoServer, each with PostgreSQL data store `postgresql`.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Layers, whose `wfs_wms_status` is not `AVAILABLE`, are deleted.
+- [#1048](https://github.com/LayerManager/layman/issues/1048) Relations in prime DB schema table `map_layer` are migrated from columns `layer_workspace` and `layer_name` into column `layer_uuid`. Columns  `layer_workspace` and `layer_name` are subsequently dropped and column `layer_uuid` is set to `NOT NULL`.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Most layer data is moved, renamed and/or re-created:
-  - layers files are moved to new paths derived from `uuid`
-  - internal layer tables are moved to database schema `layers`, index and sequence names are derived from `uuid` (table name already was)
-  - layers are re-created on GeoServer with new names derived from `uuid`.
-- [#1048](https://github.com/LayerManager/layman/issues/1048) Relations in prime DB schema table `map_layer` are migrated from columns `layer_workspace` and `layer_name` into column `layer_uuid`. Columns  `layer_workspace` and `layer_name` are subsequently dropped and column `layer_uuid` is set as NOT NULL.
-- [#1048](https://github.com/LayerManager/layman/issues/1048) Map files are moved to new path with new names derived from `uuid` and referenced internal layers' url and names are changed to the new ones.
+  - layers files are moved to [new paths](doc/data-storage.md#filesystem) derived from `uuid`
+  - internal layer tables are moved to [database schema `layers`](doc/data-storage.md#postgresql), index and sequence names are derived from `uuid` (table name already was)
+  - GeoServer layers are re-created with [new names](doc/data-storage.md#geoserver) derived from `uuid`
+  - WMS and WFS references are updated in existing CSW metadata records.
+- [#1048](https://github.com/LayerManager/layman/issues/1048) Map files are moved to [new paths](doc/data-storage.md#filesystem) with new names derived from `uuid` and referenced internal layers' url and names are changed to the new ones.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Some workspace-related data is removed:
   - GeoServer workspaces `<layman_workspace_name>` and `<layman_workspace_name>_wms` per each [Layman workspace](doc/models.md#workspace)
   - database schemas `<layman_workspace_name>` per each [Layman workspace](doc/models.md#workspace)
@@ -37,28 +41,27 @@
   - directory `LAYMAN_NORMALIZED_RASTER_DATA_DIR/workspaces`
   - directory `LAYMAN_DATA_DIR/workspaces`
 ### Changes
-- [#161](https://github.com/LayerManager/layman/issues/161) New method [DELETE User](doc/rest.md#delete-user) allows users to delete accounts.
-- [#1048](https://github.com/LayerManager/layman/issues/1048) Stop saving publication UUID to `uuid.txt` file.
-- [#1048](https://github.com/LayerManager/layman/issues/1048) New keys `wfs`.`name` and `wms`.`name` were added to [GET Workspace Layer](doc/rest.md#get-workspace-layer) response.
-- [#1048](https://github.com/LayerManager/layman/issues/1048) Names of [Feature types, Coverages, Layers and Styles in GeoServer WFS and WMS workspaces](doc/data-storage.md#geoserver) are derived from layer `uuid`. All GeoServer entities are created in two global workspaces (`layman` for WFS layers and `layman_wms` for WMS layers), instead of separate workspaces for each Layman workspace.
-- [#1048](https://github.com/LayerManager/layman/issues/1048) POST Workspace [Layers](doc/rest.md#post-workspace-layers)/[Maps](doc/rest.md#post-workspace-maps) accepts new body parameter *uuid*.
-- [#1048](https://github.com/LayerManager/layman/issues/1048) Names of all GeoServer per-layer stores are derived from layer's `uuid` (previously were derived from layer's `name`). 
-- [#1048](https://github.com/LayerManager/layman/issues/1048) Names of [files and directories](doc/data-storage.md#filesystem) are derived from publication`uuid`. Workspace directories are not used anymore.
-- [#1048](https://github.com/LayerManager/layman/issues/1048) All layer tables are stored in `layers` DB schema. Workspace schemas are not used anymore.
+- [#1048](https://github.com/LayerManager/layman/issues/1048) Many names, identifiers, and references of [layers](doc/models.md#layer) and [maps](doc/models.md#map) are now derived from `uuid` instead of Layman workspace and name. Entities that represented Layman workspaces are suppressed.
+  - Names of [files and directories](doc/data-storage.md#filesystem) are derived from publication `uuid`. Workspace directories are not used anymore.
+  - All layer tables are stored in [`layers` DB schema](doc/data-storage.md#postgresql). Workspace schemas are not used anymore.
+  - Names of [Feature types, Coverages, Layers and Styles in GeoServer WFS and WMS workspaces](doc/data-storage.md#geoserver) are derived from layer `uuid` (i.e. `l_<UUID>`). All GeoServer entities are created in two global workspaces (`layman` for WFS layers and `layman_wms` for WMS layers), instead of separate workspaces for each Layman workspace.
+  - Metadata properties [wfs_url](doc/metadata.md#wfs_url) and [wms_url](doc/metadata.md#wms_url) contain new layer names `l_<UUID>`.
+  - Layer in map JSON file is considered [internal](doc/models.md#internal-map-layer) if named `l_<UUID>` and located in GeoServer workspace `layman` or `layman_wms`.
+- [#1048](https://github.com/LayerManager/layman/issues/1048) New keys `wfs.name` and `wms.name` were added to [GET Workspace Layer](doc/rest.md#get-workspace-layer) response. Use values from these keys when communicating with WFS and WMS.
+- [#1048](https://github.com/LayerManager/layman/issues/1048) Actions [POST Workspace Maps](doc/rest.md#post-workspace-maps) and [PATCH Workspace Map](doc/rest.md#patch-workspace-map) raises error if there is internal layer referenced by its Layman name and Layman workspace instead of new GeoServer name `l_<UUID>` and new GeoServer workspace `layman` or `layman_wms`.
+- [#1048](https://github.com/LayerManager/layman/issues/1048) Layers with QML style are named by their title instead of name in WMS graphical legend.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Keys `file.paths`, `file.path` and `thumbnail.path` of GET Workspace [Layer](doc/rest.md#get-workspace-layer)/[Map](doc/rest.md#get-workspace-map) are relative to [LAYMAN_DATA_DIR](doc/env-settings.md#layman_data_dir) instead of workspace directory.
-- [#1048](https://github.com/LayerManager/layman/issues/1048) Information about layer WMS (e.g. key `wms` in [GET Workspace Layer](doc/rest.md#get-workspace-layer)) is obtained from GeoServer REST API instead of WMS GetCapabilities to improve speed.
-- [#1048](https://github.com/LayerManager/layman/issues/1048) Information about layer WFS (e.g. key `wfs` in [GET Workspace Layer](doc/rest.md#get-workspace-layer)) is obtained from GeoServer REST API instead of WFS GetCapabilities to improve speed.
-- [#1048](https://github.com/LayerManager/layman/issues/1048) Layer in map JSON file is considered [internal](doc/models.md#internal-map-layer) if named `l_<UUID>` and is in GeoServer workspace `layman` or `layman_wms`. If there is internal layer referenced by its name and Layman workspace, Layman error is raised.
-- [#1048](https://github.com/LayerManager/layman/issues/1048) Metadata properties [wfs_url](doc/metadata.md#wfs_url) and [wms_url](doc/metadata.md#wms_url) contain new layer names `l_<UUID>`.
-- [#1048](https://github.com/LayerManager/layman/issues/1048) Layers with QML style are named in graphical legend by their title.
-- [#1064](https://github.com/LayerManager/layman/issues/1064) New method [DELETE User](doc/rest.md#delete-user) allows users to delete only their own account.
-- [#942](https://github.com/LayerManager/layman/issues/942) New key `used_in_maps` was added to responses of requests [GET Publications](doc/rest.md#get-publications), [GET Layers](doc/rest.md#get-layers), [GET Workspace Layers](doc/rest.md#get-workspace-layers), and [GET Workspace Layer](doc/rest.md#get-workspace-layer).
-- [#909](https://github.com/LayerManager/layman/issues/909) Upgrade QGIS Server from v3.32.2 to v3.40.4. Also use docker hub repo [layermanager/qgis-server](https://hub.docker.com/r/layermanager/qgis-server) instead of jirikcz/qgis-server,
-- [#270](https://github.com/LayerManager/layman/issues/270) Precision error of EPSG:5514 in QGIS WMS GetMap was partially fixed with following exceptions: if data CRS is EPSG:5514 and WMS GetMap CRS is EPSG:4326 or CRS:84, or vice versa, the precision error is now about 3.2 m (it was 0.5 m in v3.32.2).
-  - QML styles up to v3.40.2 are supported.
+- [#1048](https://github.com/LayerManager/layman/issues/1048) Stop saving publication UUID to `uuid.txt` file.
+- [#1048](https://github.com/LayerManager/layman/issues/1048) Information about layer in WMS and WFS (e.g. keys `wms` and `wfs` in [GET Workspace Layer](doc/rest.md#get-workspace-layer)) is obtained from GeoServer REST API instead of WMS GetCapabilities to improve speed.
+- [#1048](https://github.com/LayerManager/layman/issues/1048) POST Workspace [Layers](doc/rest.md#post-workspace-layers)/[Maps](doc/rest.md#post-workspace-maps) accepts new optional body parameter `uuid`. It's meant mostly for testing purposes.
+- [#161](https://github.com/LayerManager/layman/issues/161) New method [DELETE User](doc/rest.md#delete-user) allows users to delete user accounts.
+- [#942](https://github.com/LayerManager/layman/issues/942) New key `used_in_maps` was added to responses of requests [GET Publications](doc/rest.md#get-publications), [GET Layers](doc/rest.md#get-layers), [GET Workspace Layers](doc/rest.md#get-workspace-layers), and [GET Workspace Layer](doc/rest.md#get-workspace-layer). It can be used to warn user before deleting layer that the layer is used in some maps.
 - [#1009](https://github.com/LayerManager/layman/issues/1009) PATCH Workspace [Layer](doc/rest.md#patch-workspace-layer)/[Map](doc/rest.md#patch-workspace-map) returns same response as POST Workspace [Layers](doc/rest.md#post-workspace-layers)/[Maps](doc/rest.md#post-workspace-maps) with only `name`, `uuid`, `url` and for Layer also optional `files_to_upload` keys.
 - [#1009](https://github.com/LayerManager/layman/issues/1009) Updating Micka record as part of PATCH Workspace [Layer](doc/rest.md#patch-workspace-layer) runs asynchronously to make PATCH request faster.
-- [#1009](https://github.com/LayerManager/layman/issues/1009) Deprecated endpoint, parameters and keys were removed:
+- [#909](https://github.com/LayerManager/layman/issues/909) Upgrade QGIS Server from v3.32.2 to v3.40.4. Also use docker hub repo [layermanager/qgis-server](https://hub.docker.com/r/layermanager/qgis-server) instead of jirikcz/qgis-server,
+  - QML styles up to v3.40.2 are supported.
+  - [#270](https://github.com/LayerManager/layman/issues/270) Precision error of EPSG:5514 in QGIS WMS GetMap was partially fixed with following exceptions: if data CRS is EPSG:5514 and WMS GetMap CRS is EPSG:4326 or CRS:84, or vice versa, the precision error is now about 3.2 m (it was 0.5 m in v3.32.2).
+- [#1039](https://github.com/LayerManager/layman/issues/1039) Deprecated endpoint, parameters and keys were removed:
   - key `file_type` was removed from endpoints GET [Publications](doc/rest.md#get-publications)/[Layers](doc/rest.md#get-layers)/[Workspace Layers](doc/rest.md#get-workspace-layers)/[Workspace Layer](doc/rest.md#get-workspace-layer) response
   - key `file`.`path` was removed from GET [Workspace Layer](doc/rest.md#get-workspace-layer) response
   - key `sld` was removed from GET [Workspace Layer](doc/rest.md#get-workspace-layer) response
@@ -67,7 +70,7 @@
   - body parameter `sld` was removed from [POST Workspace Publications](doc/rest.md#post-workspace-layers) and [PATCH Workspace Publication](doc/rest.md#patch-workspace-layer)
   - workspace-related endpoints which did not include `/workspaces` in their path were removed 
 - [#701](https://github.com/LayerManager/layman/pull/701) Check bounding bbox of normalized raster before posting to GeoServer. Stop checking that Layer is available in WMS/WFS GetCapabilities after publishing to GeoServer.
-- Output from `make upgrade-demo` and `make upgrade-demo-full` are saved to `tmp/logs/demo_upgrade_${date -u +"%FT%H%MZ"}.log` at the same time as to standard output.
+- Output from `make upgrade-demo` and `make upgrade-demo-full` is saved to `tmp/logs/demo_upgrade_${date -u +"%FT%H%MZ"}.log`. The output is also written to standard output.
 - Add forgotten `thumbnail.path` attributes to documentation of GET Workspace [Layer](doc/rest.md#get-workspace-layer)/[Map](doc/rest.md#get-workspace-map) responses.
 - Upgrade GeoServer to 2.21.4.
 - [#1028](https://github.com/LayerManager/layman/issues/1028) Upgrade Node.js of Laymen Test Client from v18 to v22 and dependencies:
@@ -93,7 +96,7 @@
   - urllib3 2.31.0 -> 2.32.0 (suggested by dependabot)
   - werkzeug 3.0.1 -> 3.0.6 (suggested by dependabot)
   - zipp 3.17.0 -> 3.19.1 (suggested by dependabot)
-- [#1028](https://github.com/LayerManager/layman/issues/1028) Upgrade Node.js of Timgen from v16 to v22 and dependencies:
+- [#798](https://github.com/LayerManager/layman/issues/798) Upgrade Node.js of Timgen from v16 to v22 and dependencies:
   - encodeurl 1 -> 2
   - express 4.18 -> 4.21
   - http-proxy-middleware 2.0.6 -> 2.0.7
