@@ -257,6 +257,8 @@ class TestSingleRestPublication:
         self.publications_to_cleanup_on_class_end.clear()
         cleanup.cleanup_external_tables(request, self.external_tables_to_cleanup_on_class_end)
         self.external_tables_to_cleanup_on_class_end.clear()
+        for username in self.usernames_to_reserve:
+            process_client.delete_user(username, actor_name=username)
 
     @pytest.fixture(scope='function', autouse=True)
     def function_cleanup(self, request):
