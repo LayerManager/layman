@@ -29,7 +29,7 @@ class Map(Publication):
     def micka_ids(self):
         return MickaIds(uuid=self.uuid)
 
-    def replace(self, **kwargs) -> Map:
+    def clone(self, **kwargs) -> Map:
         other_map = Map(uuid=self.uuid, map_tuple=(self.workspace, self.name), load=False)
         all_fields = [f.name for f in fields(Map)]
         assert set(kwargs) <= set(all_fields)

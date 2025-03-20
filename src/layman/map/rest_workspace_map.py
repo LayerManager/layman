@@ -98,7 +98,7 @@ def patch(workspace, mapname):
         )
         input_file.save_map_files(info['uuid'], [file])
 
-    new_map = old_map.replace(**{k: v for k, v in kwargs.items() if k in {'title', 'description', 'access_rights'}})
+    new_map = old_map.clone(**{k: v for k, v in kwargs.items() if k in {'title', 'description', 'access_rights'}})
     util.patch_map(
         new_map,
         kwargs,
