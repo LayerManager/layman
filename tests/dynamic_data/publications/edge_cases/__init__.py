@@ -80,6 +80,7 @@ TESTCASES = {
             ],
             'crs': 'EPSG:5514',
             'compress': False,
+            'with_chunks': False,
         },
         consts.KEY_FINAL_ASSERTS: [
             *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
