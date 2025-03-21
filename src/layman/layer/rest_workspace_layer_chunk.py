@@ -1,3 +1,5 @@
+import os
+
 from flask import Blueprint, jsonify, request, current_app as app, g
 
 from layman import LaymanError
@@ -37,6 +39,11 @@ def post(workspace, layername):
     parameter_name = request.form.get('layman_original_parameter', default='error',
                                       type=str)
     chunk = request.files['file']
+
+    # log chunk size https://stackoverflow.com/a/23601025/5259610
+    chunk_size = chunk.seek(0, os.SEEK_END)
+    chunk.seek(0, os.SEEK_SET)
+    app.logger.info(f"POST Layer Chunk, size = {chunk_size}")
 
     publ_uuid = get_publication_uuid(workspace, LAYER_TYPE, layername)
     input_chunk.save_layer_file_chunk(publ_uuid, parameter_name,
