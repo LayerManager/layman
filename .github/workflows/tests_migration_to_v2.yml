@@ -3,7 +3,8 @@ name: TestsMigrationV2
 on:
   push:
     branches:
-      - 1048-UUID-master
+      - master
+      - '2.*.x'
   pull_request:
   workflow_dispatch:
 

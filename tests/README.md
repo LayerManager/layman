@@ -30,7 +30,7 @@ Additional parameters for Make command
 
 
 ### Run special migration tests in `migration_to_v2_0_tests` folder
-This test should be run from branch `1048-UUID-master` or from any derived branches. It requires local python 3.8+ available as `python3` executable and appropriate `pip3`. First run takes longer, because it downloads v1.23 docker images and installs python packages in local virtual environment (`.venv` folder). Subsequent runs should be faster,
+This test requires local python 3.8+ available as `python3` executable and appropriate `pip3`. First run takes longer, because it downloads v1.23 docker images and installs python packages in local virtual environment (`.venv` folder). Subsequent runs should be faster,
 
 The test changes Layman version using `git checkout` and it clears current `git stash`. The test tries to keep uncommited changes using `git stash` and `git stash pop`. If you don't want to lose your changes, commit any crucial changes before run.
 ```bash
