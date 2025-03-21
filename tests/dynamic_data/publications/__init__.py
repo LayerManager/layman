@@ -352,7 +352,6 @@ PUBLICATIONS = {
             ],
         },
     ],
-    **edge_cases.generate(consts.COMMON_WORKSPACE + '_generated_edge_cases'),
     **celery.generate(consts.COMMON_WORKSPACE + '_celery'),
 }
 
