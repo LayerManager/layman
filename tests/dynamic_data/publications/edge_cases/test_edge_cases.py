@@ -90,7 +90,7 @@ TESTCASES = {
         Key.EXP_INFO: None,
         Key.EXP_THUMBNAIL: f'{DIRECTORY}/thumbnail_invalid_byte_sequence.png',
         Key.MANDATORY_CASES: {},
-        Key.RUN_ONLY_CASES: frozenset([RestMethod, WithChunksDomain, CompressDomain.FALSE]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod, WithChunksDomain, CompressDomain]),
     },
     'styled_raster_issue_681': {
         Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
