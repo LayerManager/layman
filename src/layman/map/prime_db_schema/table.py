@@ -21,15 +21,17 @@ def get_map_info(workspace, mapname):
 
 def patch_map(map: Map,
               actor_name,
-              is_part_of_user_delete=False):
+              is_part_of_user_delete=False,
+              access_rights=None,
+              ):
     db_info = {"name": map.name,
                "title": map.title,
                "description": map.description,
                "publ_type_name": MAP_TYPE,
                "actor_name": actor_name,
                }
-    if map.access_rights:
-        db_info['access_rights'] = map.access_rights
+    if access_rights:
+        db_info['access_rights'] = access_rights
     pubs_util.update_publication(map.workspace, db_info, is_part_of_user_delete)
 
 

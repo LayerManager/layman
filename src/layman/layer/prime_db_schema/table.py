@@ -37,6 +37,7 @@ def patch_layer(layer: Layer,
                 actor_name,
                 external_table_uri,
                 is_part_of_user_delete=False,
+                access_rights=None,
                 ):
     db_info = {"name": layer.name,
                "title": layer.title,
@@ -49,8 +50,8 @@ def patch_layer(layer: Layer,
                }
     if layer.style_type:
         db_info['style_type'] = layer.style_type
-    if layer.access_rights:
-        db_info['access_rights'] = layer.access_rights
+    if access_rights:
+        db_info['access_rights'] = access_rights
     pubs_util.update_publication(layer.workspace, db_info, is_part_of_user_delete)
 
 
