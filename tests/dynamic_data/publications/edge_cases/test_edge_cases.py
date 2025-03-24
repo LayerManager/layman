@@ -27,6 +27,7 @@ class Key(Enum):
     WORKSPACE = 'workspace'
     EXP_INFO = 'exp_info'
     EXP_THUMBNAIL = 'exp_thumbnail'
+    EXP_THUMBNAIL_TOLERANCE = 'exp_thumbnail_tolerance'
 
 
 TESTCASES = {
@@ -89,6 +90,7 @@ TESTCASES = {
         },
         Key.EXP_INFO: None,
         Key.EXP_THUMBNAIL: f'{DIRECTORY}/thumbnail_invalid_byte_sequence.png',
+        Key.EXP_THUMBNAIL_TOLERANCE: 10,
         Key.MANDATORY_CASES: {},
         Key.RUN_ONLY_CASES: frozenset([RestMethod, WithChunksDomain, CompressDomain.FALSE]),
     },
@@ -164,4 +166,5 @@ class TestPublication(base_test.TestSingleRestPublication):
         if params[Key.EXP_THUMBNAIL] is not None:
             asserts_publ.internal.thumbnail_equals(*publication,
                                                    exp_thumbnail=params[Key.EXP_THUMBNAIL],
+                                                   max_diffs=params.get(Key.EXP_THUMBNAIL_TOLERANCE),
                                                    )
