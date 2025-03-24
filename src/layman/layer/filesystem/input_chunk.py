@@ -4,6 +4,7 @@ import logging
 import datetime
 import os
 import pathlib
+import shutil
 
 from flask import current_app
 
@@ -115,10 +116,10 @@ def save_layer_file_chunk(publ_uuid, parameter_name, filename, chunk,
             target_filename = os.path.basename(file_info['target_file'])
             chunk_name = _get_chunk_name(target_filename, chunk_number)
             chunk_path = os.path.join(chunk_dir, chunk_name)
-            chunk.save(chunk_path)
-            current_app.logger.info('Resumable chunk saved to: %s',
-                                    chunk_path)
-
+            chunk_path_inter = chunk_path + '_part'
+            chunk.save(chunk_path_inter)
+            shutil.move(chunk_path_inter, chunk_path)
+            current_app.logger.info(f'Resumable chunk saved to: {chunk_path}')
     else:
         raise LaymanError(20)
 
