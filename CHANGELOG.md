@@ -1,7 +1,7 @@
 # Changelog
 
 ## v2.0.0
- {release-date}
+ 2025-03-26
 ### Upgrade requirements
 - Only versions 1.23.2 and newer can be upgraded to this version. For older versions, please upgrade to last 1.23.x first.
 - Change environment variable [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION):
