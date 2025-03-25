@@ -36,7 +36,7 @@ def patch_layer(layer: Layer):
     if geodata_type != settings.GEODATA_TYPE_VECTOR:
         raise NotImplementedError(f"Unknown geodata type: {geodata_type}")
 
-    store_name = get_db_store_name(uuid=layer.uuid, original_data_source=layer.original_data_source)
+    store_name = get_db_store_name(uuid=layer.uuid, original_data_source=layer.original_data_source.value)
     gs_util.patch_feature_type(gs_layer_ids.workspace, gs_layer_ids.name, store_name=store_name, title=layer.title, description=layer.description, auth=settings.LAYMAN_GS_AUTH)
     clear_cache()
 

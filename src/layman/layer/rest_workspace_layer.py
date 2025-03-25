@@ -252,7 +252,7 @@ def patch(workspace, layername):
 
     new_layer_values = {
         k: v for k, v in kwargs.items()
-        if k in {'title', 'description', 'access_rights', 'style_type', 'geodata_type', 'original_data_source'}
+        if k in {'title', 'description', 'access_rights', 'style_type', 'geodata_type'}
     }
     if new_layer_values.get('style_type'):
         new_layer_values['style_type'] = new_layer_values['style_type'].code
@@ -260,6 +260,7 @@ def patch(workspace, layername):
         new_layer_values['table_uri'] = kwargs['external_table_uri']
     if kwargs['image_mosaic'] is not None:
         new_layer_values['image_mosaic'] = kwargs['image_mosaic']
+    new_layer_values['original_data_source'] = settings.EnumOriginalDataSource(kwargs['original_data_source'])
     new_layer = old_layer.clone(**new_layer_values)
     util.patch_layer(
         new_layer,

@@ -13,7 +13,7 @@ get_metadata_comparison = empty_method_returns_dict
 
 def delete_layer(layer: Layer):
     publications.set_bbox(layer.workspace, layer.type, layer.name, bbox=(None, None, None, None, ), crs=None)
-    if layer.original_data_source == settings.EnumOriginalDataSource.FILE.value:
+    if layer.original_data_source == settings.EnumOriginalDataSource.FILE:
         publications.set_geodata_type(layer.workspace, layer.type, layer.name, settings.GEODATA_TYPE_UNKNOWN, )
 
 
