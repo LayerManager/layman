@@ -45,7 +45,7 @@ def patch_layer(layer: Layer):
     geodata_type = layer.geodata_type
     if geodata_type == settings.GEODATA_TYPE_VECTOR:
         if layer.style_type == 'sld':
-            store_name = get_db_store_name(uuid=layer.uuid, original_data_source=layer.original_data_source)
+            store_name = get_db_store_name(uuid=layer.uuid, original_data_source=layer.original_data_source.value)
             gs_util.patch_feature_type(gs_layer_ids.workspace, gs_layer_ids.name, store_name=store_name, title=layer.title, description=layer.description, auth=settings.LAYMAN_GS_AUTH)
         if layer.style_type == 'qml':
             gs_util.patch_wms_layer(gs_layer_ids.workspace, gs_layer_ids.name, title=layer.title, description=layer.description, auth=settings.LAYMAN_GS_AUTH)
