@@ -71,6 +71,8 @@ def oauth2_provider_mock():
                 'test_delete_user2': None,
                 'test_delete_user_negative': None,
                 'test_delete_user_negative2': None,
+                'test_delete_user_external_table_user': None,
+                'test_delete_user_external_table_user_reader': None,
                 'test_delete_owner_only': None,
                 'test_delete_writer': None,
                 'test_delete_owner_writer': None,

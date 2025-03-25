@@ -2,7 +2,7 @@ import pytest
 from layman import app, util as layman_util
 from layman.http import LaymanError
 from layman_settings import ANONYM_USER, NONAME_USER, RIGHTS_EVERYONE_ROLE
-from test_tools import process_client, role_service, process
+from test_tools import process_client, role_service, process, external_db
 
 
 @pytest.fixture(scope='module')
@@ -247,3 +247,34 @@ def workspace_exists(workspace):
 def user_exists(username):
     users = process_client.get_users()
     return any(user.get("username") == username for user in users)
+
+
+@pytest.mark.usefixtures('ensure_layman_module', 'oauth2_provider_mock', 'ensure_external_db')
+def test_layer_with_external_table():
+    username = 'test_delete_user_external_table_user'
+    username_2 = 'test_delete_user_external_table_user_reader'
+    workspace = 'test_delete_user_workspace'
+    layername = 'test_delete_user_external_table_layer'
+    process_client.reserve_username(username, actor_name=username)
+    process_client.reserve_username(username_2, actor_name=username_2)
+
+    external_db_table = 'small_layer'
+    external_db_schema = 'public'
+
+    external_db.import_table(input_file_path='sample/layman.layer/small_layer.geojson',
+                             schema=external_db_schema,
+                             table=external_db_table,
+                             )
+
+    process_client.publish_workspace_publication(process_client.LAYER_TYPE, workspace, layername,
+                                                 external_table_uri=f"{external_db.URI_STR}?schema={external_db_schema}&table={external_db_table}",
+                                                 actor_name=username,
+                                                 access_rights={'read': f"{username}, {username_2}",
+                                                                'write': f"{username}, {username_2}"
+                                                                })
+
+    process_client.delete_user(username, actor_name=username)
+    process_client.delete_user(username_2, actor_name=username_2)
+    # drop external table
+    external_db.drop_table(schema=external_db_schema,
+                           name=external_db_table)
