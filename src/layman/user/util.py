@@ -128,6 +128,7 @@ def delete_user_public_publications(username):
         context={
             'actor_name': username,
             'access_type': 'read',
+            'only_direct_access_rights': True,
         },
     )
 

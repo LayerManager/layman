@@ -247,3 +247,30 @@ def workspace_exists(workspace):
 def user_exists(username):
     users = process_client.get_users()
     return any(user.get("username") == username for user in users)
+
+
+@pytest.mark.usefixtures('ensure_layman_module', 'oauth2_provider_mock')
+def test_everyone_publication():
+    username = 'test_delete_user_user'
+    workspace = 'test_delete_user_workspace'
+    layername = 'test_delete_user_layer'
+    process_client.reserve_username(username, actor_name=username)
+
+    process_client.publish_workspace_publication(process_client.LAYER_TYPE, workspace, layername, actor_name=username,
+                                                 access_rights={
+                                                     'read': f"{RIGHTS_EVERYONE_ROLE}",
+                                                     'write': f"{RIGHTS_EVERYONE_ROLE}"
+                                                 })
+
+    publications = layman_util.get_publication_infos(
+        context={
+            'actor_name': username,
+            'access_type': 'read',
+            'only_direct_access_rights': True,
+        },
+    )
+
+    assert len(publications) == 0, publications
+
+    process_client.delete_user(username, actor_name=username)
+    process_client.delete_workspace_publication(process_client.LAYER_TYPE, workspace, layername, actor_name=username)

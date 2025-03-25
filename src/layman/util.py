@@ -468,15 +468,17 @@ def get_publication_infos_with_metainfo(workspace=None, publ_type=None, context=
     from layman.authz.role_service import get_user_roles
     from layman.common.prime_db_schema import publications
     context = context or {}
+    only_direct_access_rights = context.get('only_direct_access_rights', False)
     reader = (context.get('actor_name') or settings.ANONYM_USER) if context.get('access_type') == 'read' else None
     writer = (context.get('actor_name') or settings.ANONYM_USER) if context.get('access_type') == 'write' else None
-    reader_roles = list(get_user_roles(username=reader)) if reader and reader != settings.ANONYM_USER else None
-    writer_roles = list(get_user_roles(username=writer)) if writer and writer != settings.ANONYM_USER else None
+    reader_roles = list(get_user_roles(username=reader)) if reader and reader != settings.ANONYM_USER and not only_direct_access_rights else None
+    writer_roles = list(get_user_roles(username=writer)) if writer and writer != settings.ANONYM_USER and not only_direct_access_rights else None
 
     infos = publications.get_publication_infos_with_metainfo(workspace, publ_type,
                                                              style_type=style_type,
                                                              reader=reader, writer=writer,
                                                              reader_roles=reader_roles, writer_roles=writer_roles,
+                                                             only_direct_access_rights=only_direct_access_rights,
                                                              limit=limit, offset=offset,
                                                              full_text_filter=full_text_filter,
                                                              bbox_filter=bbox_filter,
