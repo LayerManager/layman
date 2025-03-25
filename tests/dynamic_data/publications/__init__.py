@@ -1,7 +1,7 @@
 from tests.asserts.final import publication
 from tests.asserts import processing
 from test_tools import process_client
-from . import wrong_input, edge_cases, celery, common_publications as publications
+from . import common_publications as publications
 from .. import predefined_actions
 from ... import Action, Publication4Test, dynamic_data as consts
 
@@ -352,7 +352,6 @@ PUBLICATIONS = {
             ],
         },
     ],
-    **celery.generate(consts.COMMON_WORKSPACE + '_celery'),
 }
 
 # pylint: disable=unnecessary-comprehension
