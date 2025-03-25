@@ -124,14 +124,19 @@ def delete_user_public_publications(username):
     skipped_publications = []
     publications_to_be_deleted = []
     publications_to_be_patched = []
-    result = get_publication_infos(
+    all_readable_publications = get_publication_infos(
         context={
             'actor_name': username,
             'access_type': 'read',
         },
     )
+    # get only publications with direct user access rights
+    direct_readable_publications = {
+        k: v for k, v in all_readable_publications.items()
+        if username in v['access_rights']['read']
+    }
 
-    for (workspace, publication_type, publication_name), pubinfo in result.items():
+    for (workspace, publication_type, publication_name), pubinfo in direct_readable_publications.items():
         is_public = pubinfo['_is_public_workspace']
         access_rights = pubinfo['access_rights']
         geodata_type = pubinfo['geodata_type']
