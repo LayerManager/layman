@@ -27,11 +27,13 @@ class CalculatedColumnType:
     params: tuple = tuple()
 
 
-def get_publication_infos(workspace_name=None, pub_type=None, *, style_type=None, uuid=None, ):
-    return get_publication_infos_with_metainfo(workspace_name, pub_type, style_type=style_type, uuid=uuid)['items']
+def get_publication_infos(workspace_name=None, pub_type=None, *, style_type=None, uuid=None, pub_name=None):
+    return get_publication_infos_with_metainfo(workspace_name, pub_type, style_type=style_type, uuid=uuid,
+                                               pub_name=pub_name)['items']
 
 
 def get_publication_infos_with_metainfo(workspace_name=None, pub_type=None, *,
+                                        pub_name=None,
                                         style_type=None,
                                         uuid=None,
                                         reader=None, writer=None,
@@ -60,6 +62,7 @@ def get_publication_infos_with_metainfo(workspace_name=None, pub_type=None, *,
     where_params_def = [
         (workspace_name, 'w.name = %s', (workspace_name,)),
         (pub_type, 'p.type = %s', (pub_type,)),
+        (pub_name, 'p.name = %s', (pub_name,)),
         (style_type, 'p.style_type::text = %s', (style_type,)),
         (uuid, 'p.uuid = %s', (uuid,)),
         (reader and not is_user_with_name(reader), 'p.everyone_can_read = TRUE', tuple()),
@@ -560,9 +563,10 @@ def update_publication(workspace_name, info, is_part_of_user_delete=False):
 
     if info.get("access_rights") and (info["access_rights"].get("read") or info["access_rights"].get("write")):
         info_old = get_publication_infos(workspace_name,
-                                         info["publ_type_name"])[(workspace_name,
-                                                                  info["publ_type_name"],
-                                                                  info["name"],)]
+                                         info["publ_type_name"],
+                                         pub_name=info["name"])[(workspace_name,
+                                                                 info["publ_type_name"],
+                                                                 info["name"],)]
         for right_type in right_type_list:
             access_rights_changes[right_type]['username_list_old'] = info_old["access_rights"][right_type]
             info["access_rights"][right_type + "_old"] = access_rights_changes[right_type]['username_list_old']
@@ -620,7 +624,7 @@ def delete_publication(workspace_name, type, name):
     workspace_info = workspaces.get_workspace_infos(workspace_name).get(workspace_name)
     result = {}
     if workspace_info:
-        publ_info = get_publication_infos(workspace_name, type).get((workspace_name, type, name), {})
+        publ_info = get_publication_infos(workspace_name, type, pub_name=name).get((workspace_name, type, name), {})
         if publ_info:
             rights.delete_rights_for_publication(publ_info["id"])
             id_workspace = workspace_info["id"]

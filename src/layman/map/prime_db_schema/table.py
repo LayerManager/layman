@@ -8,7 +8,7 @@ get_metadata_comparison = empty_method_returns_dict
 
 
 def get_map_info(workspace, mapname):
-    maps = pubs_util.get_publication_infos(workspace, MAP_TYPE)
+    maps = pubs_util.get_publication_infos(workspace, MAP_TYPE, pub_name=mapname)
     info = maps.get((workspace, MAP_TYPE, mapname), {})
     if info:
         info.pop('_table_uri', None)
