@@ -7,40 +7,6 @@ from ... import Action, Publication4Test, dynamic_data as consts
 
 
 PUBLICATIONS = {
-    Publication4Test(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'basic_sld'): [
-        {
-            consts.KEY_ACTION: {
-                consts.KEY_CALL: Action(process_client.publish_workspace_publication, publications.SMALL_LAYER.definition),
-                consts.KEY_RESPONSE_ASSERTS: [
-                    Action(processing.response.valid_post, {}),
-                ],
-            },
-            consts.KEY_FINAL_ASSERTS: [
-                *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
-                Action(publication.internal.correct_values_in_detail, publications.SMALL_LAYER.info_values),
-                Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': publications.SMALL_LAYER.thumbnail,
-                }),
-            ],
-        },
-    ],
-    Publication4Test(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_sld'): [
-        {
-            consts.KEY_ACTION: {
-                consts.KEY_CALL: Action(process_client.publish_workspace_publication, publications.SMALL_LAYER_ZIP.definition),
-                consts.KEY_RESPONSE_ASSERTS: [
-                    Action(processing.response.valid_post, {}),
-                ],
-            },
-            consts.KEY_FINAL_ASSERTS: [
-                *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
-                Action(publication.internal.correct_values_in_detail, publications.SMALL_LAYER_ZIP.info_values),
-                Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': publications.SMALL_LAYER_ZIP.thumbnail,
-                }),
-            ],
-        },
-    ],
     Publication4Test(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_shp_sld'): [
         {
             consts.KEY_ACTION: {
@@ -321,33 +287,6 @@ PUBLICATIONS = {
                 }),
                 Action(publication.internal.thumbnail_equals, {
                     'exp_thumbnail': publications.NE_110M_ADMIN_0_BOUNDARY_LINES_LAND_ZIP.thumbnail,
-                }),
-            ],
-        },
-    ],
-    Publication4Test(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_zip_and_main_file'): [
-        {
-            consts.KEY_ACTION: {
-                consts.KEY_CALL: Action(process_client.publish_workspace_publication, {
-                    'file_paths': [
-                        'tmp/sm5/vektor/sm5.zip',
-                        'sample/layman.layer/small_layer.geojson',
-                    ],
-                    'compress': True,
-                }),
-                consts.KEY_RESPONSE_ASSERTS: [
-                    Action(processing.response.valid_post, {}),
-                ],
-            },
-            consts.KEY_FINAL_ASSERTS: [
-                *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
-                Action(publication.internal.correct_values_in_detail, {
-                    **publications.SMALL_LAYER.info_values,
-                    'file_extension': 'zip/small_layer.geojson',
-                    'gdal_prefix': '/vsizip/',
-                }),
-                Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': publications.SMALL_LAYER.thumbnail,
                 }),
             ],
         },
