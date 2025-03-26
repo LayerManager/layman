@@ -88,13 +88,6 @@ def can_user_create_public_workspace(username):
     return is_user_in_access_rule(username, settings.GRANT_CREATE_PUBLIC_WORKSPACE)
 
 
-def can_user_read_publication(username, workspace, publication_type, publication_name):
-    publ_info = layman_util.get_publication_infos(workspace=workspace, publ_type=publication_type).get(
-        (workspace, publication_type, publication_name)
-    )
-    return publ_info and is_user_in_access_rule(username, publ_info['access_rights']['read'])
-
-
 def can_user_write_publication(*, username, uuid):
     publ_info = layman_util.get_publication_info_by_uuid(uuid=uuid, context={'keys': ['access_rights']})
     return publ_info and is_user_in_access_rule(username, publ_info['access_rights']['write'])
