@@ -11,7 +11,7 @@ get_metadata_comparison = empty_method_returns_dict
 
 
 def get_layer_info(workspace, layername):
-    layers = pubs_util.get_publication_infos(workspace, LAYER_TYPE)
+    layers = pubs_util.get_publication_infos(workspace, LAYER_TYPE, pub_name=layername)
     info = layers.get((workspace, LAYER_TYPE, layername), {})
     if info:
         uuid = info['uuid']
