@@ -105,6 +105,106 @@ TESTCASES = {
         Key.MANDATORY_CASES: frozenset([RestMethod.POST, WithChunksDomain.FALSE, CompressDomain.FALSE]),
         Key.RUN_ONLY_CASES: frozenset([RestMethod, WithChunksDomain, CompressDomain]),
     },
+    'zipped_sld': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {'file_paths': ['sample/layman.layer/small_layer.geojson']},
+        Key.EXP_INFO: {
+            **common_publications.SMALL_LAYER.info_values,
+            'file_extension': 'zip/small_layer.geojson',
+            'gdal_prefix': '/vsizip/',
+        },
+        Key.EXP_THUMBNAIL: common_publications.SMALL_LAYER.thumbnail,
+        Key.MANDATORY_CASES: frozenset([RestMethod.POST, WithChunksDomain.FALSE, CompressDomain.TRUE]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod, WithChunksDomain, CompressDomain.TRUE]),
+    },
+    'zipped_shp_sld': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            **common_publications.NE_110M_ADMIN_0_BOUNDARY_LINES_LAND.definition,
+            'compress_settings': process_client.CompressTypeDef(archive_name='ne_110m_admin_0_boundary lines land +ěščřžýáí',
+                                                                inner_directory='/ne_110m_admin_0_boundary lines land +ěščřžýáí/',
+                                                                file_name='ne_110m_admin_0_boundary_lines_land ížě',
+                                                                ),
+        },
+        Key.EXP_INFO: {
+            **common_publications.NE_110M_ADMIN_0_BOUNDARY_LINES_LAND.info_values,
+            'file_extension': 'zip/ne_110m_admin_0_boundary lines land +ěščřžýáí/ne_110m_admin_0_boundary_lines_land ížě.shp',
+            'gdal_prefix': '/vsizip/',
+        },
+        Key.EXP_THUMBNAIL: common_publications.NE_110M_ADMIN_0_BOUNDARY_LINES_LAND.thumbnail,
+        Key.MANDATORY_CASES: frozenset([RestMethod.POST, WithChunksDomain.FALSE, CompressDomain.TRUE]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod, WithChunksDomain, CompressDomain.TRUE]),
+    },
+    'zipped_tif_colortable_nodata_opaque': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            **common_publications.SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE.definition,
+            'compress_settings': process_client.CompressTypeDef(inner_directory='/sample_tif_colortable_nodata_opaque/', ),
+        },
+        Key.EXP_INFO: {
+            **common_publications.SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE.info_values,
+            'file_extension': 'zip/sample_tif_colortable_nodata_opaque/sample_tif_colortable_nodata_opaque.tif',
+            'gdal_prefix': '/vsizip/',
+        },
+        Key.EXP_THUMBNAIL: common_publications.SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE.thumbnail,
+        Key.MANDATORY_CASES: frozenset([RestMethod.POST, WithChunksDomain.FALSE, CompressDomain.TRUE]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod, WithChunksDomain, CompressDomain.TRUE]),
+    },
+    'zipped_shp_without_prj': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            'file_paths': [
+                'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.cpg',
+                'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.dbf',
+                'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.shp',
+                'tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.shx',
+            ],
+            'crs': 'EPSG:4326',
+        },
+        Key.EXP_INFO: {
+            **common_publications.NE_110M_ADMIN_0_BOUNDARY_LINES_LAND.info_values,
+            'file_extension': 'zip/ne_110m_admin_0_boundary_lines_land.shp',
+            'gdal_prefix': '/vsizip/',
+        },
+        Key.EXP_THUMBNAIL: common_publications.NE_110M_ADMIN_0_BOUNDARY_LINES_LAND.thumbnail,
+        Key.MANDATORY_CASES: frozenset([RestMethod.POST, WithChunksDomain.FALSE, CompressDomain.TRUE]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod, WithChunksDomain, CompressDomain.TRUE]),
+    },
+    'zipped_shp_with_diacritics_in_archive_name': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            **common_publications.NE_110M_ADMIN_0_BOUNDARY_LINES_LAND.definition,
+            'compress_settings': process_client.CompressTypeDef(archive_name='ne_110m_admin_0_boundary lines land +ěščřžýáí',
+                                                                inner_directory='/ne_110m_admin_0_boundary lines land +ěščřžýáí/',
+                                                                file_name='ne_110m_admin_0_boundary_lines_land ížě',
+                                                                ),
+        },
+        Key.EXP_INFO: {
+            **common_publications.NE_110M_ADMIN_0_BOUNDARY_LINES_LAND.info_values,
+            'file_extension': 'zip/ne_110m_admin_0_boundary lines land +ěščřžýáí/ne_110m_admin_0_boundary_lines_land ížě.shp',
+            'gdal_prefix': '/vsizip/',
+        },
+        Key.EXP_THUMBNAIL: common_publications.NE_110M_ADMIN_0_BOUNDARY_LINES_LAND.thumbnail,
+        Key.MANDATORY_CASES: frozenset([RestMethod.POST, WithChunksDomain.FALSE, CompressDomain.TRUE]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod, WithChunksDomain, CompressDomain.TRUE]),
+    },
+    'zipped_chunks_tif_colortable_nodata_opaque': {
+        Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,
+        Key.REST_ARGS: {
+            **common_publications.SAMPLE_TIF_TFW_RGBA_OPAQUE.definition,
+            'compress_settings': process_client.CompressTypeDef(
+                inner_directory='/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/',
+            ),
+        },
+        Key.EXP_INFO: {
+            **common_publications.SAMPLE_TIF_TFW_RGBA_OPAQUE.info_values,
+            'file_extension': 'zip/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque.tif',
+            'gdal_prefix': '/vsizip/',
+        },
+        Key.EXP_THUMBNAIL: common_publications.SAMPLE_TIF_TFW_RGBA_OPAQUE.thumbnail,
+        Key.MANDATORY_CASES: frozenset([RestMethod.POST, WithChunksDomain.FALSE, CompressDomain.TRUE]),
+        Key.RUN_ONLY_CASES: frozenset([RestMethod, WithChunksDomain, CompressDomain.TRUE]),
+    },
 }
 
 
