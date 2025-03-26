@@ -451,8 +451,8 @@ def get_publication_info(workspace, publ_type, publ_name, context=None):
     return result
 
 
-def get_publication_infos(workspace=None, publ_type=None, context=None, style_type=None,):
-    return get_publication_infos_with_metainfo(workspace=workspace, publ_type=publ_type, context=context, style_type=style_type)['items']
+def get_publication_infos(workspace=None, publ_type=None, context=None, style_type=None, *, publ_name=None):
+    return get_publication_infos_with_metainfo(workspace=workspace, publ_type=publ_type, context=context, style_type=style_type, publ_name=publ_name)['items']
 
 
 def get_publication_infos_with_metainfo(workspace=None, publ_type=None, context=None, style_type=None,
@@ -464,6 +464,8 @@ def get_publication_infos_with_metainfo(workspace=None, publ_type=None, context=
                                         ordering_full_text=None,
                                         ordering_bbox=None,
                                         ordering_bbox_crs=None,
+                                        *,
+                                        publ_name=None,
                                         ):
     from layman.authz.role_service import get_user_roles
     from layman.common.prime_db_schema import publications
@@ -474,6 +476,7 @@ def get_publication_infos_with_metainfo(workspace=None, publ_type=None, context=
     writer_roles = list(get_user_roles(username=writer)) if writer and writer != settings.ANONYM_USER else None
 
     infos = publications.get_publication_infos_with_metainfo(workspace, publ_type,
+                                                             pub_name=publ_name,
                                                              style_type=style_type,
                                                              reader=reader, writer=writer,
                                                              reader_roles=reader_roles, writer_roles=writer_roles,
