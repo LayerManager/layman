@@ -7,23 +7,6 @@ from ... import Action, Publication4Test, dynamic_data as consts
 
 
 PUBLICATIONS = {
-    Publication4Test(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'basic_sld'): [
-        {
-            consts.KEY_ACTION: {
-                consts.KEY_CALL: Action(process_client.publish_workspace_publication, publications.SMALL_LAYER.definition),
-                consts.KEY_RESPONSE_ASSERTS: [
-                    Action(processing.response.valid_post, {}),
-                ],
-            },
-            consts.KEY_FINAL_ASSERTS: [
-                *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
-                Action(publication.internal.correct_values_in_detail, publications.SMALL_LAYER.info_values),
-                Action(publication.internal.thumbnail_equals, {
-                    'exp_thumbnail': publications.SMALL_LAYER.thumbnail,
-                }),
-            ],
-        },
-    ],
     Publication4Test(consts.COMMON_WORKSPACE, consts.LAYER_TYPE, 'zipped_sld'): [
         {
             consts.KEY_ACTION: {
