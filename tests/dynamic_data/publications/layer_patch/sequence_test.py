@@ -106,7 +106,49 @@ TESTCASES = {
                 Key.EXP_THUMBNAIL: publications.SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE.thumbnail,
             },
         ]
-    }
+    },
+    'tif_type_change': {
+        Key.RUN_ONLY_CASES: frozenset([WithChunksDomain, CompressDomain.TRUE]),
+        Key.MANDATORY_CASES: frozenset([WithChunksDomain.TRUE, CompressDomain.TRUE]),
+        Key.ACTIONS: [
+            {
+                Key.ACTION_NAME: 'post-tif-rgba',
+                Key.REST_ARGS: {
+                    **publications.SAMPLE_TIF_TFW_RGBA_OPAQUE.definition,
+                },
+                Key.EXP_INFO: {
+                    **publications.SAMPLE_TIF_TFW_RGBA_OPAQUE.info_values,
+                    'file_extension': 'zip/sample_tif_tfw_rgba_opaque.tif',
+                    'gdal_prefix': '/vsizip/',
+                },
+                Key.EXP_THUMBNAIL: publications.SAMPLE_TIF_TFW_RGBA_OPAQUE.thumbnail,
+            },
+            {
+                Key.ACTION_NAME: 'patch-tif-rgba-to-tif-colortable',
+                Key.REST_ARGS: {
+                    **publications.SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE.definition,
+                },
+                Key.EXP_INFO: {
+                    **publications.SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE.info_values,
+                    'file_extension': 'zip/sample_tif_colortable_nodata_opaque.tif',
+                    'gdal_prefix': '/vsizip/',
+                },
+                Key.EXP_THUMBNAIL: publications.SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE.thumbnail,
+            },
+            {
+                Key.ACTION_NAME: 'patch-tif-colortable-to-tif-rgba',
+                Key.REST_ARGS: {
+                    **publications.SAMPLE_TIF_TFW_RGBA_OPAQUE.definition,
+                },
+                Key.EXP_INFO: {
+                    **publications.SAMPLE_TIF_TFW_RGBA_OPAQUE.info_values,
+                    'file_extension': 'zip/sample_tif_tfw_rgba_opaque.tif',
+                    'gdal_prefix': '/vsizip/',
+                },
+                Key.EXP_THUMBNAIL: publications.SAMPLE_TIF_TFW_RGBA_OPAQUE.thumbnail,
+            },
+        ],
+    },
 }
 
 
