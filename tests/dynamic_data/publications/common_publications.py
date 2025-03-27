@@ -1,9 +1,7 @@
 from db import TableUri
 from layman import settings
-from tests.asserts.final import publication
-from tests.asserts import processing
 from test_tools import process_client, external_db
-from ... import TestPublicationValues, dynamic_data as consts, Action
+from ... import TestPublicationValues
 
 SMALL_LAYER = TestPublicationValues(
     type=process_client.LAYER_TYPE,
@@ -76,24 +74,6 @@ NE_110M_ADMIN_0_BOUNDARY_LINES_LAND = TestPublicationValues(
     thumbnail='test_tools/data/thumbnail/ne_110m_admin_0_boundary_lines_land.png',
 )
 
-NE_110M_ADMIN_0_BOUNDARY_LINES_LAND_ZIP = TestPublicationValues(
-    type=process_client.LAYER_TYPE,
-    definition={
-        **NE_110M_ADMIN_0_BOUNDARY_LINES_LAND.definition,
-        'compress': True,
-        'compress_settings': process_client.CompressTypeDef(archive_name='ne_110m_admin_0_boundary lines land +ěščřžýáí',
-                                                            inner_directory='/ne_110m_admin_0_boundary lines land +ěščřžýáí/',
-                                                            file_name='ne_110m_admin_0_boundary_lines_land ížě',
-                                                            ),
-    },
-    info_values={
-        **NE_110M_ADMIN_0_BOUNDARY_LINES_LAND.info_values,
-        'file_extension': 'zip/ne_110m_admin_0_boundary lines land +ěščřžýáí/ne_110m_admin_0_boundary_lines_land ížě.shp',
-        'gdal_prefix': '/vsizip/',
-    },
-    thumbnail=NE_110M_ADMIN_0_BOUNDARY_LINES_LAND.thumbnail,
-)
-
 SAMPLE_TIF_TFW_RGBA_OPAQUE = TestPublicationValues(
     type=process_client.LAYER_TYPE,
     definition={
@@ -115,23 +95,6 @@ SAMPLE_TIF_TFW_RGBA_OPAQUE = TestPublicationValues(
     legend_image='tests/dynamic_data/publications/layer_by_used_servers/legend_raster.png',
 )
 
-SAMPLE_TIF_TFW_RGBA_OPAQUE_ZIP = TestPublicationValues(
-    type=process_client.LAYER_TYPE,
-    definition={
-        **SAMPLE_TIF_TFW_RGBA_OPAQUE.definition,
-        'compress': True,
-        'compress_settings': process_client.CompressTypeDef(
-            inner_directory='/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/',
-        ),
-    },
-    info_values={
-        **SAMPLE_TIF_TFW_RGBA_OPAQUE.info_values,
-        'file_extension': 'zip/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque/sample_tif_tfw_rgba_opaque.tif',
-        'gdal_prefix': '/vsizip/',
-    },
-    thumbnail=SAMPLE_TIF_TFW_RGBA_OPAQUE.thumbnail,
-)
-
 SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE = TestPublicationValues(
     type=process_client.LAYER_TYPE,
     definition={
@@ -149,21 +112,6 @@ SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE = TestPublicationValues(
         'publ_type_detail': ('raster', 'sld'),
     },
     thumbnail='test_tools/data/thumbnail/raster_layer_tif_colortable_nodata_opaque.png',
-)
-
-SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE_ZIP = TestPublicationValues(
-    type=process_client.LAYER_TYPE,
-    definition={
-        **SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE.definition,
-        'compress': True,
-        'compress_settings': process_client.CompressTypeDef(inner_directory='/sample_tif_colortable_nodata_opaque/', ),
-    },
-    info_values={
-        **SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE.info_values,
-        'file_extension': 'zip/sample_tif_colortable_nodata_opaque/sample_tif_colortable_nodata_opaque.tif',
-        'gdal_prefix': '/vsizip/',
-    },
-    thumbnail=SAMPLE_TIF_COLORTABLE_NODATA_OPAQUE.thumbnail,
 )
 
 EMPTY_MAP = TestPublicationValues(
@@ -232,40 +180,6 @@ LAYER_EXTERNAL_TABLE_QML = TestPublicationValues(
     thumbnail=None,
     legend_image=None,  # because layer name appears in the image
 )
-
-DEFAULT_POST = {
-    consts.KEY_ACTION: {
-        consts.KEY_CALL: Action(process_client.publish_workspace_publication,
-                                {}),
-        consts.KEY_RESPONSE_ASSERTS: [
-            Action(processing.response.valid_post, {}),
-        ],
-    },
-    consts.KEY_FINAL_ASSERTS: [
-        *publication.IS_LAYER_COMPLETE_AND_CONSISTENT,
-    ]
-}
-
-DEFAULT_POST_DICT = {
-    process_client.LAYER_TYPE: DEFAULT_POST,
-    process_client.MAP_TYPE: {
-        consts.KEY_ACTION: {
-            consts.KEY_CALL: Action(process_client.publish_workspace_publication,
-                                    {}),
-            consts.KEY_RESPONSE_ASSERTS: [
-                Action(processing.response.valid_post, {}),
-            ],
-        },
-        consts.KEY_FINAL_ASSERTS: [
-            *publication.IS_MAP_COMPLETE_AND_CONSISTENT,
-        ]
-    },
-}
-
-DEFAULT_ACTIONS = [
-    ('post', process_client.publish_workspace_publication, []),
-    ('patch', process_client.patch_workspace_publication, [DEFAULT_POST])
-]
 
 LAYER_VECTOR_SLD = SMALL_LAYER
 LAYER_VECTOR_QML = SMALL_LAYER_QML
