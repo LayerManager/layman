@@ -816,3 +816,9 @@ def delete_user(username, *, actor_name):
     if username != '':
         raise_layman_error(response)
     return response
+
+
+def ensure_workspace(workspace):
+    tmp_layername = 'tmp_layername'
+    publish_workspace_layer(workspace, tmp_layername)
+    delete_workspace_layer(workspace, tmp_layername)
