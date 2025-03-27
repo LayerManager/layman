@@ -5,10 +5,9 @@ import pytest
 
 from layman import app, util as layman_util
 from test_tools import process_client
-from tests import EnumTestTypes
+from tests import EnumTestTypes, Publication4Test
 from tests.asserts.final.publication import util as assert_util
 from tests.dynamic_data import base_test, base_test_classes
-from .. import Publication4Test
 
 
 @unique
