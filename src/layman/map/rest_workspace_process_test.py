@@ -240,3 +240,118 @@ def test_post_maps_simple():
             'title': "Administrativn\u00ed \u010dlen\u011bn\u00ed Libereck\u00e9ho kraje",
         }
     check_metadata(workspace, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
+
+
+@pytest.mark.usefixtures('ensure_layman_module')
+@pytest.mark.timeout(60)
+def test_post_maps_complex():
+    workspace = 'testuser1'
+    mapname = 'libe'
+    title = 'Liberecký kraj: Administrativní členění'
+    description = 'Libovolný popis'
+    post_resp = process_client.publish_workspace_map(workspace=workspace,
+                                                     name=mapname,
+                                                     title=title,
+                                                     description=description,
+                                                     file_paths=['sample/layman.map/full.json'],
+                                                     check_response_fn=empty_method_returns_true,
+                                                     raise_if_not_complete=False,
+                                                     )
+    assert post_resp['name'] == mapname
+    uuid_str = post_resp['uuid']
+    assert uuid.is_valid_uuid(uuid_str)
+
+    publication_counter.increase()
+    uuid.check_redis_consistency(expected_publ_num_by_type={
+        f'{MAP_TYPE}': publication_counter.get()
+    })
+
+    incomplete_get_resp = process_client.get_workspace_map(workspace=workspace,
+                                                           name=mapname,
+                                                           )
+    assert incomplete_get_resp['name'] == mapname
+    assert incomplete_get_resp['uuid'] == uuid_str
+    with app.app_context():
+        assert incomplete_get_resp['url'] == test_util.url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname)
+    assert incomplete_get_resp['title'] == title
+    assert incomplete_get_resp['description'] == description
+    map_file = incomplete_get_resp['file']
+    assert 'status' not in map_file
+    assert 'path' in map_file
+    with app.app_context():
+        assert map_file['url'] == test_util.url_for_external('rest_workspace_map_file.get', workspace=workspace, mapname=mapname)
+    thumbnail = incomplete_get_resp['thumbnail']
+    assert 'status' in thumbnail
+    assert thumbnail['status'] in ['PENDING', 'STARTED']
+
+    with pytest.raises(LaymanError) as exc_info:
+        process_client.patch_workspace_map(workspace=workspace,
+                                           name=mapname,
+                                           title='abcd',
+                                           check_response_fn=empty_method_returns_true,
+                                           raise_if_not_complete=False,
+                                           )
+    assert exc_info.value.http_code == 400
+    assert exc_info.value.code == 49
+
+    process_client.wait_for_publication_status(workspace, process_client.MAP_TYPE, mapname,
+                                               check_response_fn=lambda response: not (
+                                                   'status' in response.json()['thumbnail'] and response.json()['thumbnail']['status'] in [
+                                                       'PENDING', 'STARTED']),
+                                               raise_if_not_complete=False,
+                                               sleeping_time=0.1,
+                                               )
+
+    after_thumbnail_get_resp = process_client.get_workspace_map(workspace=workspace,
+                                                                name=mapname,
+                                                                )
+    thumbnail = after_thumbnail_get_resp['thumbnail']
+    assert 'status' not in thumbnail
+    assert 'path' in thumbnail
+    with app.app_context():
+        assert thumbnail['url'] == test_util.url_for_external('rest_workspace_map_thumbnail.get', workspace=workspace, mapname=mapname)
+
+    file_resp = process_client.get_workspace_map_file(process_client.MAP_TYPE, workspace, mapname)
+    assert file_resp['name'] == mapname
+    assert file_resp['title'] == title
+    assert file_resp['abstract'] == description
+    user_json = file_resp['user']
+    assert user_json['name'] == workspace
+    assert user_json['email'] == ''
+    assert len(user_json) == 2
+    assert 'groups' not in file_resp
+
+    process_client.wait_for_publication_status(workspace, process_client.MAP_TYPE, mapname,
+                                               check_response_fn=lambda response: not (
+                                                   'status' in response.json()['metadata'] and response.json()['metadata']['status'] in [
+                                                       'PENDING', 'STARTED']),
+                                               raise_if_not_complete=False,
+                                               sleeping_time=0.1,
+                                               )
+
+    with app.app_context():
+        expected_md_values = {
+            'abstract': "Libovoln\u00fd popis",
+            'extent': [
+                14.62,
+                50.58,
+                15.42,
+                50.82
+            ],
+            'graphic_url': test_util.url_for_external('rest_workspace_map_thumbnail.get', workspace=workspace, mapname=mapname),
+            'identifier': {
+                "identifier": test_util.url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname),
+                "label": "libe"
+            },
+            'map_endpoint': test_util.url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname),
+            'map_file_endpoint': test_util.url_for_external('rest_workspace_map_file.get', workspace=workspace, mapname=mapname),
+            'operates_on': [],
+            'organisation_name': None,
+            'publication_date': TODAY_DATE,
+            'reference_system': [
+                'EPSG:3857'
+            ],
+            'revision_date': None,
+            'title': "Libereck\u00fd kraj: Administrativn\u00ed \u010dlen\u011bn\u00ed",
+        }
+    check_metadata(workspace, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
