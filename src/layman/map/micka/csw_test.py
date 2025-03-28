@@ -10,14 +10,21 @@ import pytest
 
 sys.modules.pop('layman', None)
 
-from layman import app, LaymanError
+from layman import app, LaymanError, celery as celery_util
 from layman import settings
 from layman.map.map_class import Map
-from layman.map.rest_workspace_test import wait_till_ready
 from test_tools.mock.micka import run
 from .csw import get_map_info, map_layers_to_operates_on_layers, delete_map
+from .. import util
 
 MICKA_PORT = 8020
+
+
+def wait_till_ready(workspace, mapname):
+    chain_info = util.get_map_chain(workspace, mapname)
+    while chain_info is not None and not celery_util.is_chain_ready(chain_info):
+        time.sleep(0.1)
+        chain_info = util.get_map_chain(workspace, mapname)
 
 
 def create_server(port):
