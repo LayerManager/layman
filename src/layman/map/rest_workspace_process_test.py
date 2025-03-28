@@ -55,7 +55,13 @@ def check_metadata(workspace, mapname, props_equal, expected_values):
                 f"Property {key} has unexpected values {json.dumps(vals, indent=2)}"
 
 
-@pytest.mark.usefixtures('ensure_layman_module')
+@pytest.fixture(scope="module", autouse=True)
+# pylint: disable=unused-argument
+def delete_publications(ensure_layman_module):
+    yield
+    process_client.delete_workspace_map(USER, MAPNAME_2, )
+
+
 def test_get_maps_empty():
     workspace = USER
     process_client.ensure_workspace(workspace)
@@ -75,7 +81,6 @@ def test_get_maps_empty():
     ('?', ),
     ('ABC', ),
 ])
-@pytest.mark.usefixtures('ensure_layman_module')
 def test_wrong_value_of_mapname(mapname):
     workspace = USER
     with pytest.raises(LaymanError) as exc_info:
@@ -87,7 +92,6 @@ def test_wrong_value_of_mapname(mapname):
     assert exc_info.value.data['parameter'] == 'mapname'
 
 
-@pytest.mark.usefixtures('ensure_layman_module')
 def test_no_file():
     workspace = USER
     with pytest.raises(LaymanError) as exc_info:
@@ -100,7 +104,6 @@ def test_no_file():
     assert exc_info.value.data['parameter'] == 'file'
 
 
-@pytest.mark.usefixtures('ensure_layman_module')
 def test_post_maps_invalid_file():
     workspace = USER
     with pytest.raises(LaymanError) as exc_info:
@@ -116,7 +119,6 @@ def test_post_maps_invalid_file():
     assert exc_info.value.data['reason'] == 'Invalid JSON syntax'
 
 
-@pytest.mark.usefixtures('ensure_layman_module')
 def test_post_maps_invalid_json():
     workspace = USER
     with pytest.raises(LaymanError) as exc_info:
@@ -133,7 +135,6 @@ def test_post_maps_invalid_json():
     assert len(exc_info.value.data['validation-errors']) == 2
 
 
-@pytest.mark.usefixtures('ensure_layman_module')
 def test_post_maps_simple():
     workspace = USER
     expected_mapname = MAPNAME_1
@@ -245,7 +246,6 @@ def test_post_maps_simple():
     check_metadata(workspace, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
-@pytest.mark.usefixtures('ensure_layman_module')
 @pytest.mark.timeout(60)
 def test_post_maps_complex():
     workspace = USER
@@ -360,7 +360,6 @@ def test_post_maps_complex():
     check_metadata(workspace, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
-@pytest.mark.usefixtures('ensure_layman_module')
 def test_patch_map():
     workspace = USER
     mapname = MAPNAME_1
@@ -488,3 +487,34 @@ def test_patch_map():
             'title': "Nov\u00fd n\u00e1zev",
         }
     check_metadata(workspace, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
+
+
+def test_delete_map():
+    workspace = USER
+    mapname = MAPNAME_1
+
+    delete_response = process_client.delete_workspace_map(workspace=workspace,
+                                                          name=mapname,
+                                                          )
+    publication_counter.decrease()
+    uuid_str = delete_response['uuid']
+    md_record_url = f"http://micka:80/record/basic/m-{uuid_str}"
+    response = requests.get(md_record_url, auth=settings.CSW_BASIC_AUTHN,
+                            timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
+    response.raise_for_status()
+    assert 'Záznam nenalezen' in response.text
+    assert mapname not in response.text
+
+    uuid.check_redis_consistency(expected_publ_num_by_type={
+        f'{MAP_TYPE}': publication_counter.get()
+    })
+
+    with pytest.raises(LaymanError) as exc_info:
+        process_client.delete_workspace_map(workspace=workspace,
+                                            name=mapname,
+                                            )
+    assert exc_info.value.http_code == 404
+    assert exc_info.value.code == 26
+    uuid.check_redis_consistency(expected_publ_num_by_type={
+        f'{MAP_TYPE}': publication_counter.get()
+    })
