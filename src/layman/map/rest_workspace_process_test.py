@@ -11,6 +11,9 @@ from test_tools import process_client, util as test_util
 from . import MAP_TYPE
 
 TODAY_DATE = date.today().strftime('%Y-%m-%d')
+USER = 'testuser1'
+MAPNAME_1 = 'administrativni_cleneni_libereckeho_kraje'
+MAPNAME_2 = 'libe'
 
 METADATA_PROPERTIES = {
     'abstract',
@@ -54,7 +57,7 @@ def check_metadata(workspace, mapname, props_equal, expected_values):
 
 @pytest.mark.usefixtures('ensure_layman_module')
 def test_get_maps_empty():
-    workspace = 'testuser1'
+    workspace = USER
     process_client.ensure_workspace(workspace)
     resp_json = process_client.get_maps(workspace=workspace)
     assert len(resp_json) == 0
@@ -74,7 +77,7 @@ def test_get_maps_empty():
 ])
 @pytest.mark.usefixtures('ensure_layman_module')
 def test_wrong_value_of_mapname(mapname):
-    workspace = 'testuser1'
+    workspace = USER
     with pytest.raises(LaymanError) as exc_info:
         process_client.get_workspace_map(workspace=workspace,
                                          name=mapname,
@@ -86,7 +89,7 @@ def test_wrong_value_of_mapname(mapname):
 
 @pytest.mark.usefixtures('ensure_layman_module')
 def test_no_file():
-    workspace = 'testuser1'
+    workspace = USER
     with pytest.raises(LaymanError) as exc_info:
         process_client.publish_workspace_map(workspace=workspace,
                                              name='map_without_file',
@@ -99,7 +102,7 @@ def test_no_file():
 
 @pytest.mark.usefixtures('ensure_layman_module')
 def test_post_maps_invalid_file():
-    workspace = 'testuser1'
+    workspace = USER
     with pytest.raises(LaymanError) as exc_info:
         process_client.publish_workspace_map(workspace=workspace,
                                              name='map_invalid_file',
@@ -115,7 +118,7 @@ def test_post_maps_invalid_file():
 
 @pytest.mark.usefixtures('ensure_layman_module')
 def test_post_maps_invalid_json():
-    workspace = 'testuser1'
+    workspace = USER
     with pytest.raises(LaymanError) as exc_info:
         process_client.publish_workspace_map(workspace=workspace,
                                              name='map_invalid_json',
@@ -132,8 +135,8 @@ def test_post_maps_invalid_json():
 
 @pytest.mark.usefixtures('ensure_layman_module')
 def test_post_maps_simple():
-    workspace = 'testuser1'
-    expected_mapname = 'administrativni_cleneni_libereckeho_kraje'
+    workspace = USER
+    expected_mapname = MAPNAME_1
     post_resp = process_client.publish_workspace_map(workspace=workspace,
                                                      name=None,
                                                      file_paths=['sample/layman.map/full.json'],
@@ -226,7 +229,7 @@ def test_post_maps_simple():
             'graphic_url': test_util.url_for_external('rest_workspace_map_thumbnail.get', workspace=workspace, mapname=mapname),
             'identifier': {
                 "identifier": test_util.url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname),
-                "label": "administrativni_cleneni_libereckeho_kraje"
+                "label": mapname,
             },
             'map_endpoint': test_util.url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname),
             'map_file_endpoint': test_util.url_for_external('rest_workspace_map_file.get', workspace=workspace, mapname=mapname),
@@ -245,8 +248,8 @@ def test_post_maps_simple():
 @pytest.mark.usefixtures('ensure_layman_module')
 @pytest.mark.timeout(60)
 def test_post_maps_complex():
-    workspace = 'testuser1'
-    mapname = 'libe'
+    workspace = USER
+    mapname = MAPNAME_2
     title = 'Liberecký kraj: Administrativní členění'
     description = 'Libovolný popis'
     post_resp = process_client.publish_workspace_map(workspace=workspace,
@@ -341,7 +344,7 @@ def test_post_maps_complex():
             'graphic_url': test_util.url_for_external('rest_workspace_map_thumbnail.get', workspace=workspace, mapname=mapname),
             'identifier': {
                 "identifier": test_util.url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname),
-                "label": "libe"
+                "label": mapname
             },
             'map_endpoint': test_util.url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname),
             'map_file_endpoint': test_util.url_for_external('rest_workspace_map_file.get', workspace=workspace, mapname=mapname),
