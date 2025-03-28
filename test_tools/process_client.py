@@ -194,6 +194,7 @@ def patch_workspace_publication(publication_type,
                                 actor_name=None,
                                 access_rights=None,
                                 title=None,
+                                description=None,
                                 style_file=None,
                                 check_response_fn=None,
                                 raise_if_not_complete=True,
@@ -275,6 +276,8 @@ def patch_workspace_publication(publication_type,
             data["access_rights.write"] = access_rights['write']
         if title:
             data['title'] = title
+        if description:
+            data['description'] = description
         if style_file:
             files.append(('style', (os.path.basename(style_file), stack.enter_context(open(style_file, 'rb')))))
         if overview_resampling:
