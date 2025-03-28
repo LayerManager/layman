@@ -2,6 +2,7 @@ import io
 import time
 import os
 import logging
+import glob
 import json
 from contextlib import ExitStack
 from functools import partial
@@ -362,6 +363,7 @@ def publish_workspace_publication(publication_type,
                                   *,
                                   uuid=None,
                                   file_paths=None,
+                                  file_path_pattern=None,
                                   external_table_uri=None,
                                   headers=None,
                                   actor_name=None,
@@ -382,20 +384,22 @@ def publish_workspace_publication(publication_type,
                                   time_regex=None,
                                   time_regex_format=None,
                                   do_not_post_name=False,
+                                  do_not_post_title=False,
                                   ):
-    title = title or name
+    title = (title or name) if not do_not_post_title else None
     headers = headers or {}
     if actor_name:
         assert TOKEN_HEADER not in headers
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
 
-    assert not map_layers or not file_paths
+    assert not map_layers or not (file_paths or file_path_pattern)
     assert not map_layers or not external_table_uri
 
     assert not (not with_chunks and do_not_upload_chunks)
     assert not (check_response_fn and do_not_upload_chunks)  # because check_response_fn is not called when do_not_upload_chunks
     assert not (raise_if_not_complete and do_not_upload_chunks)
     assert not (check_response_fn and raise_if_not_complete)
+    assert not (file_paths and file_path_pattern)
 
     file_paths = [publication_type_def.source_path] if file_paths is None and external_table_uri is None and not map_layers else file_paths
 
@@ -427,6 +431,9 @@ def publish_workspace_publication(publication_type,
         map_data.create_map_with_internal_layers_file(map_layers, file_path=file_path, native_extent=native_extent,
                                                       native_crs=crs)
         file_paths = [file_path]
+
+    if file_path_pattern:
+        file_paths = glob.glob(file_path_pattern)
 
     files = []
     with ExitStack() as stack:

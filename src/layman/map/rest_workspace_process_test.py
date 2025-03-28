@@ -1,19 +1,27 @@
 from datetime import date
 import json
+import time
+import difflib
 import requests
 import pytest
 
 from layman import app, uuid, LaymanError, settings
 from layman.common import empty_method_returns_true
 from layman.common.metadata import prop_equals_strict, PROPERTIES
+from layman.common.micka import util as micka_common_util
+from layman.map.map_class import Map
 from layman.util import SimpleCounter, get_publication_uuid
 from test_tools import process_client, util as test_util
 from . import MAP_TYPE
+from .micka import csw
 
 TODAY_DATE = date.today().strftime('%Y-%m-%d')
 USER = 'testuser1'
 MAPNAME_1 = 'administrativni_cleneni_libereckeho_kraje'
 MAPNAME_2 = 'libe'
+MAPNAME_3 = 'svet'
+LAYERNAME_1 = 'mista'
+LAYERNAME_2 = 'hranice'
 
 METADATA_PROPERTIES = {
     'abstract',
@@ -57,9 +65,8 @@ def check_metadata(workspace, mapname, props_equal, expected_values):
 
 @pytest.fixture(scope="module", autouse=True)
 # pylint: disable=unused-argument
-def delete_publications(ensure_layman_module):
+def ensure_layman(ensure_layman_module):
     yield
-    process_client.delete_workspace_map(USER, MAPNAME_2, )
 
 
 def test_get_maps_empty():
@@ -131,7 +138,8 @@ def test_post_maps_invalid_json():
     assert exc_info.value.http_code == 400
     assert exc_info.value.code == 2
     assert exc_info.value.data['parameter'] == 'file'
-    assert exc_info.value.data['reason'] == 'JSON not valid against schema https://raw.githubusercontent.com/hslayers/map-compositions/2.0.0/schema.json'
+    assert exc_info.value.data[
+        'reason'] == 'JSON not valid against schema https://raw.githubusercontent.com/hslayers/map-compositions/2.0.0/schema.json'
     assert len(exc_info.value.data['validation-errors']) == 2
 
 
@@ -178,7 +186,8 @@ def test_post_maps_simple():
 
     process_client.wait_for_publication_status(workspace, process_client.MAP_TYPE, mapname,
                                                check_response_fn=lambda response: not (
-                                                   'status' in response.json()['thumbnail'] and response.json()['thumbnail']['status'] in [
+                                                   'status' in response.json()['thumbnail'] and response.json()['thumbnail'][
+                                                       'status'] in [
                                                        'PENDING', 'STARTED']),
                                                raise_if_not_complete=False,
                                                sleeping_time=0.1,
@@ -198,7 +207,8 @@ def test_post_maps_simple():
 
     process_client.wait_for_publication_status(workspace, process_client.MAP_TYPE, mapname,
                                                check_response_fn=lambda response: not (
-                                                   'status' in response.json()['metadata'] and response.json()['metadata']['status'] in [
+                                                   'status' in response.json()['metadata'] and response.json()['metadata'][
+                                                       'status'] in [
                                                        'PENDING', 'STARTED']),
                                                raise_if_not_complete=False,
                                                sleeping_time=0.1,
@@ -299,7 +309,8 @@ def test_post_maps_complex():
 
     process_client.wait_for_publication_status(workspace, process_client.MAP_TYPE, mapname,
                                                check_response_fn=lambda response: not (
-                                                   'status' in response.json()['thumbnail'] and response.json()['thumbnail']['status'] in [
+                                                   'status' in response.json()['thumbnail'] and response.json()['thumbnail'][
+                                                       'status'] in [
                                                        'PENDING', 'STARTED']),
                                                raise_if_not_complete=False,
                                                sleeping_time=0.1,
@@ -326,7 +337,8 @@ def test_post_maps_complex():
 
     process_client.wait_for_publication_status(workspace, process_client.MAP_TYPE, mapname,
                                                check_response_fn=lambda response: not (
-                                                   'status' in response.json()['metadata'] and response.json()['metadata']['status'] in [
+                                                   'status' in response.json()['metadata'] and response.json()['metadata'][
+                                                       'status'] in [
                                                        'PENDING', 'STARTED']),
                                                raise_if_not_complete=False,
                                                sleeping_time=0.1,
@@ -358,6 +370,9 @@ def test_post_maps_complex():
             'title': "Libereck\u00fd kraj: Administrativn\u00ed \u010dlen\u011bn\u00ed",
         }
     check_metadata(workspace, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
+
+    process_client.delete_workspace_map(USER, MAPNAME_2, )
+    publication_counter.decrease()
 
 
 def test_patch_map():
@@ -397,7 +412,8 @@ def test_patch_map():
 
     process_client.wait_for_publication_status(workspace, process_client.MAP_TYPE, mapname,
                                                check_response_fn=lambda response: not (
-                                                   'status' in response.json()['thumbnail'] and response.json()['thumbnail']['status'] in [
+                                                   'status' in response.json()['thumbnail'] and response.json()['thumbnail'][
+                                                       'status'] in [
                                                        'PENDING', 'STARTED']),
                                                raise_if_not_complete=False,
                                                sleeping_time=0.1,
@@ -424,7 +440,8 @@ def test_patch_map():
 
     process_client.wait_for_publication_status(workspace, process_client.MAP_TYPE, mapname,
                                                check_response_fn=lambda response: not (
-                                                   'status' in response.json()['metadata'] and response.json()['metadata']['status'] in [
+                                                   'status' in response.json()['metadata'] and response.json()['metadata'][
+                                                       'status'] in [
                                                        'PENDING', 'STARTED']),
                                                raise_if_not_complete=False,
                                                sleeping_time=0.1,
@@ -518,3 +535,165 @@ def test_delete_map():
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{MAP_TYPE}': publication_counter.get()
     })
+
+
+def test_map_composed_from_local_layers():
+    workspace = USER
+    mapname = MAPNAME_3
+    layername1 = LAYERNAME_1
+    layer1_uuid = '0b1dc7ee-de7e-4bbc-942d-ee28f9571706'
+    layername2 = LAYERNAME_2
+    layer2_uuid = '1add245a-b6fb-4720-a46d-f7de1b9af5ab'
+
+    process_client.publish_workspace_layer(workspace=workspace,
+                                           name=layername1,
+                                           uuid=layer1_uuid,
+                                           file_paths=[
+                                               'tmp/naturalearth/110m/cultural/ne_110m_populated_places.cpg',
+                                               'tmp/naturalearth/110m/cultural/ne_110m_populated_places.dbf',
+                                               'tmp/naturalearth/110m/cultural/ne_110m_populated_places.prj',
+                                               'tmp/naturalearth/110m/cultural/ne_110m_populated_places.shp',
+                                               'tmp/naturalearth/110m/cultural/ne_110m_populated_places.shx',
+                                           ],
+                                           )
+    # If no sleep, Micka throws 500
+    # [2020-03-26 09-54-11] Dibi\UniqueConstraintViolationException: duplicate key value violates unique constraint "edit_md_pkey" DETAIL:  Key (recno)=(17) already exists. SCHEMA NAME:  public TABLE NAME:  edit_md CONSTRAINT NAME:  edit_md_pkey LOCATION:  _bt_check_unique, nbtinsert.c:434 #23505 in /var/www/html/Micka/php/vendor/dibi/dibi/src/Dibi/Drivers/PostgreDriver.php:150  @  http://localhost:3080/csw  @@  exception--2020-03-26--09-54--3f034f5a61.html
+    # in /var/www/html/Micka/php/app/model/RecordModel.php, line 197 setEditMd2Md INSERT INTO ...
+    # probably problem with concurrent CSW insert
+    # so report bug to Micka
+    time.sleep(0.3)
+
+    process_client.publish_workspace_layer(workspace=workspace,
+                                           name=layername2,
+                                           uuid=layer2_uuid,
+                                           file_path_pattern='tmp/naturalearth/110m/cultural/ne_110m_admin_0_boundary_lines_land.*',
+                                           )
+
+    post_resp = process_client.publish_workspace_map(workspace=workspace,
+                                                     name=mapname,
+                                                     title='',
+                                                     file_paths=['sample/layman.map/internal_url.json'],
+                                                     do_not_post_title=True,
+                                                     check_response_fn=empty_method_returns_true,
+                                                     raise_if_not_complete=False,
+                                                     )
+    assert post_resp['name'] == mapname
+    publication_counter.increase()
+
+    process_client.wait_for_publication_status(workspace, process_client.MAP_TYPE, mapname,
+                                               check_response_fn=lambda response: not (
+                                                   'status' in response.json()['thumbnail'] and response.json()['thumbnail'][
+                                                       'status'] in [
+                                                       'PENDING', 'STARTED']),
+                                               raise_if_not_complete=False,
+                                               sleeping_time=0.1,
+                                               )
+
+    after_thumbnail_get_resp = process_client.get_workspace_map(workspace=workspace,
+                                                                name=mapname,
+                                                                )
+    thumbnail = after_thumbnail_get_resp['thumbnail']
+    assert 'status' not in thumbnail
+    assert 'path' in thumbnail
+    with app.app_context():
+        assert thumbnail['url'] == test_util.url_for_external('rest_workspace_map_thumbnail.get', workspace=workspace, mapname=mapname)
+
+    process_client.wait_for_publication_status(workspace, process_client.MAP_TYPE, mapname,
+                                               check_response_fn=lambda response: not (
+                                                   'status' in response.json()['metadata'] and response.json()['metadata'][
+                                                       'status'] in [
+                                                       'PENDING', 'STARTED']),
+                                               raise_if_not_complete=False,
+                                               sleeping_time=0.1,
+                                               )
+
+    # assert metadata file is the same as filled template except for UUID and dates
+    with app.app_context():
+        publication = Map(map_tuple=(workspace, mapname))
+        template_path, prop_values = csw.get_template_path_and_values(publication, http_method='post',
+                                                                      actor_name=settings.ANONYM_USER)
+    xml_file_object = micka_common_util.fill_xml_template_as_pretty_file_object(template_path, prop_values,
+                                                                                csw.METADATA_PROPERTIES)
+    expected_path = 'src/layman/map/rest_test_filled_template.xml'
+    with open(expected_path, encoding="utf-8") as file:
+        expected_lines = file.readlines()
+    diff_lines = list(
+        difflib.unified_diff([line.decode('utf-8') for line in xml_file_object.readlines()], expected_lines))
+    assert len(diff_lines) == 40, ''.join(diff_lines)
+    plus_lines = [line for line in diff_lines if line.startswith('+ ')]
+    assert len(plus_lines) == 5
+    minus_lines = [line for line in diff_lines if line.startswith('- ')]
+    assert len(minus_lines) == 5
+
+    plus_line = plus_lines[0]
+    assert plus_line == '+    <gco:CharacterString>m-91147a27-1ff4-4242-ba6d-faffb92224c6</gco:CharacterString>\n'
+    minus_line = minus_lines[0]
+    assert minus_line.startswith('-    <gco:CharacterString>m') and minus_line.endswith('</gco:CharacterString>\n')
+
+    plus_line = plus_lines[1]
+    assert plus_line == '+    <gco:Date>2007-05-25</gco:Date>\n'
+    minus_line = minus_lines[1]
+    assert minus_line.startswith('-    <gco:Date>') and minus_line.endswith('</gco:Date>\n')
+
+    plus_line = plus_lines[2]
+    assert plus_line == '+                <gco:Date>2007-05-25</gco:Date>\n'
+    minus_line = minus_lines[2]
+    assert minus_line.startswith('-                <gco:Date>') and minus_line.endswith('</gco:Date>\n')
+
+    plus_line = plus_lines[3]
+    assert plus_line.startswith(
+        '+      <srv:operatesOn xlink:href="http://localhost:3080/csw?SERVICE=CSW&amp;VERSION=2.0.2&amp;REQUEST=GetRecordById&amp;OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&amp;ID=') and plus_line.endswith(
+        '" xlink:title="hranice" xlink:type="simple"/>\n'), plus_line
+    minus_line = minus_lines[3]
+    assert minus_line.startswith(
+        '-      <srv:operatesOn xlink:href="http://localhost:3080/csw?SERVICE=CSW&amp;VERSION=2.0.2&amp;REQUEST=GetRecordById&amp;OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&amp;ID=') and minus_line.endswith(
+        '" xlink:title="hranice" xlink:type="simple"/>\n'), minus_line
+
+    plus_line = plus_lines[4]
+    assert plus_line.startswith(
+        '+      <srv:operatesOn xlink:href="http://localhost:3080/csw?SERVICE=CSW&amp;VERSION=2.0.2&amp;REQUEST=GetRecordById&amp;OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&amp;ID=') and plus_line.endswith(
+        '" xlink:title="mista" xlink:type="simple"/>\n'), plus_line
+    minus_line = minus_lines[4]
+    assert minus_line.startswith(
+        '-      <srv:operatesOn xlink:href="http://localhost:3080/csw?SERVICE=CSW&amp;VERSION=2.0.2&amp;REQUEST=GetRecordById&amp;OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&amp;ID=') and minus_line.endswith(
+        '" xlink:title="mista" xlink:type="simple"/>\n'), minus_line
+
+    with app.app_context():
+        expected_md_values = {
+            'abstract': "World places and boundaries abstract",
+            'extent': [
+                -35.0,
+                -48.5,
+                179.0,
+                81.5
+            ],
+            'graphic_url': test_util.url_for_external('rest_workspace_map_thumbnail.get', workspace=workspace, mapname=mapname),
+            'identifier': {
+                "identifier": test_util.url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname),
+                "label": "svet"
+            },
+            'map_endpoint': test_util.url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname),
+            'map_file_endpoint': test_util.url_for_external('rest_workspace_map_file.get', workspace=workspace, mapname=mapname),
+            'operates_on': [
+                {
+                    "xlink:href": f"http://localhost:3080/csw?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID=m-{layer2_uuid}#_m-{layer2_uuid}",
+                    "xlink:title": "hranice"
+                },
+                {
+                    "xlink:href": f"http://localhost:3080/csw?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID=m-{layer1_uuid}#_m-{layer1_uuid}",
+                    "xlink:title": "mista"
+                }
+            ],
+            'organisation_name': None,
+            'publication_date': TODAY_DATE,
+            'reference_system': [
+                'EPSG:3857'
+            ],
+            'revision_date': None,
+            'title': "World places and boundaries",
+        }
+    check_metadata(workspace, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
+    process_client.delete_workspace_map(USER, MAPNAME_3, )
+    publication_counter.decrease()
+    process_client.delete_workspace_layer(USER, LAYERNAME_1, )
+    process_client.delete_workspace_layer(USER, LAYERNAME_2, )
