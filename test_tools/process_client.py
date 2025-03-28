@@ -744,14 +744,14 @@ def check_publication_status(response):
 
 
 def wait_for_publication_status(workspace, publication_type, publication, *, check_response_fn=None, headers=None,
-                                raise_if_not_complete=True):
+                                raise_if_not_complete=True, sleeping_time=0.5):
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
     with app.app_context():
         url = url_for(publication_type_def.get_workspace_publication_url,
                       workspace=workspace,
                       **{publication_type_def.url_param_name: publication})
     check_response_fn = check_response_fn or check_publication_status
-    response = wait_for_rest(url, 60, 0.5, check_response=check_response_fn, headers=headers)
+    response = wait_for_rest(url, 60, sleeping_time, check_response=check_response_fn, headers=headers)
     if raise_if_not_complete:
         raise_if_not_complete_status(response)
 
