@@ -1,7 +1,6 @@
 import importlib
 import time
 import sys
-import pytest
 from celery import chain
 from celery.contrib.abortable import AbortableAsyncResult
 
@@ -11,7 +10,6 @@ from layman import app, celery_app
 from layman.layer.filesystem import input_chunk, util as fs_util
 from layman import celery as celery_util
 from layman.common import tasks as tasks_util
-from test_tools import flask_client
 from test_tools.mock.layman_classes import LayerMock
 
 MIN_GEOJSON = """
@@ -22,12 +20,7 @@ MIN_GEOJSON = """
 }
 """
 
-NUM_LAYERS_BEFORE_TEST = 0
 
-client = flask_client.client
-
-
-@pytest.mark.usefixtures('client')
 def test_single_abortable_task():
     task_names = [
         'layman.layer.filesystem.tasks.refresh_input_chunk',
@@ -80,7 +73,6 @@ def test_single_abortable_task():
         input_chunk.delete_layer(layer)
 
 
-@pytest.mark.usefixtures('client')
 def test_abortable_task_chain():
     task_names = [
         'layman.layer.filesystem.tasks.refresh_input_chunk',
