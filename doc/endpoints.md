@@ -1,8 +1,8 @@
 # Endpoints
-To use [headers for GeoServer's Proxy URL](https://docs.geoserver.org/2.21.x/en/user/configuration/globalsettings.html#use-headers-for-proxy-url) see [client proxy documentation](client-proxy.md).
+To use [headers for GeoServer's Proxy URL](https://docs.geoserver.org/2.26.x/en/user/configuration/globalsettings.html#use-headers-for-proxy-url) see [client proxy documentation](client-proxy.md).
 
 ## Web Map Service
-[Web Map Service (WMS)](https://www.ogc.org/publications/standard/wms/) endpoint is implemented using combination of Layman's authentication proxy, Layman's WMS proxy, and [GeoServer](https://docs.geoserver.org/2.21.x/en/user/services/wms/reference.html).
+[Web Map Service (WMS)](https://www.ogc.org/standards/wms/) endpoint is implemented using combination of Layman's authentication proxy, Layman's WMS proxy, and [GeoServer](https://docs.geoserver.org/2.26.x/en/user/services/wms/reference.html).
 
 The authentication proxy understands same [authentication credentials](security.md#authentication) as Layman REST API (e.g. OAuth2 credentials) and passes the request to GeoServer with credentials understandable by GeoServer.
 
@@ -15,7 +15,7 @@ WMS respects [publication access rights](security.md#publication-access-rights).
 GetLegendGraphic query is answered directly by GeoServer for layers with SLD style and can be parametrized according to [GeoServer documentation](https://docs.geoserver.org/latest/en/user/services/wms/get_legend_graphic/index.html). For layers with QML style is such query redirected by GeoServer to QGIS server and can be parametrized according to [QGIS documentation](https://docs.qgis.org/3.40/en/docs/server_manual/services/wms.html#getlegendgraphic). 
 
 ## Web Feature Service
-[Web Feature Service (WFS)](https://www.ogc.org/publications/standard/wfs/) endpoint is implemented using combination of Layman's authentication proxy, Layman's WFS proxy, and [GeoServer](https://docs.geoserver.org/2.21.x/en/user/services/wfs/reference.html).
+[Web Feature Service (WFS)](https://www.ogc.org/standards/wfs/) endpoint is implemented using combination of Layman's authentication proxy, Layman's WFS proxy, and [GeoServer](https://docs.geoserver.org/2.26.x/en/user/services/wfs/reference.html).
 
 The authentication proxy behaves in the same way as in case of [WMS](#web-map-service).
 
@@ -33,4 +33,4 @@ For layers in `EPSG:5514` and WFS requests in `CRS:84`, the features may have wr
 For layers with QML style, there is precision error about 3.2 meters in some WMS GetMap requests. The error appears if either data CRS or WMS GetMap CRS is `EPSG:5514` and the other one is not.
 
 ## Catalogue Service
-[Catalogue Service (CSW)](https://www.ogc.org/publications/standard/cat/) is implemented using [Micka](https://github.com/hsrs-cz/Micka).
+[Catalogue Service (CSW)](https://www.ogc.org/standards/cat/) is implemented using [Micka](https://github.com/hsrs-cz/Micka).

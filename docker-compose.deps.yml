@@ -40,14 +40,14 @@ services:
         - qgis
 
    geoserver:
-      image: docker.osgeo.org/geoserver:2.21.4
+      image: docker.osgeo.org/geoserver:2.26.2
       volumes:
         - ./deps/geoserver/data:/opt/geoserver_data/
       ports:
         - "8600:8080"
       restart: on-failure
       environment:
-        - GS_VERSION=2.21.4
+        - GS_VERSION=2.26.2
         - SKIP_DEMO_DATA=true
         - GEOSERVER_CSRF_WHITELIST=${LAYMAN_PROXY_SERVER_NAME}
       depends_on:

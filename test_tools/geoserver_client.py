@@ -53,7 +53,18 @@ def get_features(workspace, feature_type, crs=crs_def.EPSG_3857):
     }, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
     response.raise_for_status()
     result = response.json()
-    excpected_crs_urn = crs_urn if crs != crs_def.CRS_84 else get_crs_urn(crs_def.EPSG_4326)
-    assert result['crs']['properties']['name'] == excpected_crs_urn, \
-        f"result['crs']['properties']['name']={result['crs']['properties']['name']}, excpected_crs_urn={excpected_crs_urn}"
+
+    def get_equivalent_crs_urns(crs):
+        urns = {get_crs_urn(crs)}
+        if crs in [crs_def.EPSG_4326, crs_def.CRS_84]:
+            urns.update([
+                'urn:ogc:def:crs:EPSG::4326',
+                'urn:ogc:def:crs:CRS::84',
+                'urn:ogc:def:crs:OGC:1.3:CRS84',
+            ])
+        return urns
+    actual_urn = result['crs']['properties']['name']
+    accepted_urns = get_equivalent_crs_urns(crs)
+    assert actual_urn in accepted_urns, \
+        f"Unexpected CRS URN: {actual_urn}, expected one of: {accepted_urns}"
     return result
