@@ -49,6 +49,7 @@
   - directory `LAYMAN_NORMALIZED_RASTER_DATA_DIR/workspaces`
   - directory `LAYMAN_DATA_DIR/workspaces`
 ### Changes
+- [#1124](https://github.com/LayerManager/layman/issues/1124) Upgrade GeoServer to 2.26.2.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Many names, identifiers, and references of [layers](doc/models.md#layer) and [maps](doc/models.md#map) are now derived from `uuid` instead of Layman workspace and name. Entities that represented Layman workspaces are suppressed.
   - Names of [files and directories](doc/data-storage.md#filesystem) are derived from publication `uuid`. Workspace directories are not used anymore.
   - All layer tables are stored in [`layers` DB schema](doc/data-storage.md#postgresql). Workspace schemas are not used anymore.
