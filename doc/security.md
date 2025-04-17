@@ -84,7 +84,7 @@ Every user listed in [GRANT_DELETE_OTHER_USER](env-settings.md#grant_delete_othe
 ### Role Service
 Despite of [usernames](models.md#username), [role names](models.md#role) are not controlled by Layman, but by **role service**.
 
-Role service can be any PostgreSQL DB schema containing table (or view, or materialized view) structure described in [GeoServer documentation](https://docs.geoserver.org/2.21.x/en/user/security/usergrouprole/roleservices.html#jdbc-role-service). Furthermore, Layman has special requirements to records in the tables. There are two types of records: [admin records](#admin-role-service-records) and [business records](#business-role-service-records). No other records are allowed.
+Role service can be any PostgreSQL DB schema containing table (or view, or materialized view) structure described in [GeoServer documentation](https://docs.geoserver.org/2.26.x/en/user/security/usergrouprole/roleservices.html#jdbc-role-service). Furthermore, Layman has special requirements to records in the tables. There are two types of records: [admin records](#admin-role-service-records) and [business records](#business-role-service-records). No other records are allowed.
 
 Role service is used by both Layman and GeoServer when [access rights](#publication-access-rights) are evaluated.
 

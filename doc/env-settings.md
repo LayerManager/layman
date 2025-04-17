@@ -46,7 +46,7 @@ Only subset of these codes is allowed: `3857,4326,5514,32633,32634,3034,3035,305
 ### LAYMAN_OUTPUT_SRS_LIST
 List of [EPSG codes](https://en.wikipedia.org/wiki/EPSG_Geodetic_Parameter_Dataset) that will be supported as output spatial reference systems in both WMS and WFS. Value consists of integer codes separated by comma (`,`). If the list does not contain codes from [LAYMAN_INPUT_SRS_LIST](#LAYMAN_INPUT_SRS_LIST), they are appended by Layman automatically. For examples of SRS list, see [LAYMAN_INPUT_SRS_LIST](#LAYMAN_INPUT_SRS_LIST).
 
-During startup, Layman passes definitions of each EPSG to GeoServer, either from its internal sources, or from [epsg.io](https://epsg.io/). If download from epsg.io fails, warning `Not able to download EPSG definition from epsg.io` appears in log. In such case, you can [set EPSG definition manually](https://docs.geoserver.org/2.21.x/en/user/configuration/crshandling/customcrs.html) and restart GeoServer.
+During startup, Layman passes definitions of each EPSG to GeoServer, either from its internal sources, or from [epsg.io](https://epsg.io/). If download from epsg.io fails, warning `Not able to download EPSG definition from epsg.io` appears in log. In such case, you can [set EPSG definition manually](https://docs.geoserver.org/2.26.x/en/user/configuration/crshandling/customcrs.html) and restart GeoServer.
 
 If you want to be sure that GeoServer understands each of your SRS that you passed into LAYMAN_OUTPUT_SRS_LIST, visit GeoServer's admin GUI, page Services > WMS or WFS, and click on Submit. If you see no error message, everything is OK.
 
@@ -163,19 +163,19 @@ Internal URL host of GeoServer instance.
 Internal URL port of GeoServer instance.
 
 ### LAYMAN_GS_USER
-Name of [GeoServer user](https://docs.geoserver.org/2.21.x/en/user/security/webadmin/ugr.html#add-user) that Layman uses for authentication and communication with GeoServer. The LAYMAN_GS_USER must be another user than default `admin` user. The LAYMAN_GS_USER user must have at least the [LAYMAN_GS_ROLE](#LAYMAN_GS_ROLE) and default [`ADMIN`](https://docs.geoserver.org/2.21.x/en/user/security/usergrouprole/roleservices.html#mapping-roles-to-system-roles) role (defined by `adminRoleName`). The user and his required roles will be created automatically on Layman's startup if [GEOSERVER_ADMIN_PASSWORD](#GEOSERVER_ADMIN_PASSWORD) is provided.
+Name of [GeoServer user](https://docs.geoserver.org/2.26.x/en/user/security/webadmin/ugr.html#add-user) that Layman uses for authentication and communication with GeoServer. The LAYMAN_GS_USER must be another user than default `admin` user. The LAYMAN_GS_USER user must have at least the [LAYMAN_GS_ROLE](#LAYMAN_GS_ROLE) and default [`ADMIN`](https://docs.geoserver.org/2.26.x/en/user/security/usergrouprole/roleservices.html#mapping-roles-to-system-roles) role (defined by `adminRoleName`). The user and his required roles will be created automatically on Layman's startup if [GEOSERVER_ADMIN_PASSWORD](#GEOSERVER_ADMIN_PASSWORD) is provided.
 
 ### LAYMAN_GS_PASSWORD
 Password of [LAYMAN_GS_USER](#LAYMAN_GS_USER).
 
 ### LAYMAN_GS_ROLE
-Name of [GeoServer role](https://docs.geoserver.org/2.21.x/en/user/security/webadmin/ugr.html#edit-role-service) of [LAYMAN_GS_USER](#LAYMAN_GS_USER). The role is used to create explicit [access rule](https://docs.geoserver.org/2.21.x/en/user/security/layer.html) for all layers published by Layman. The LAYMAN_GS_ROLE must be another role than default [`ADMIN`](https://docs.geoserver.org/2.21.x/en/user/security/usergrouprole/roleservices.html#mapping-roles-to-system-roles) role (defined by `adminRoleName`)! The role will be created automatically if [GEOSERVER_ADMIN_PASSWORD](#GEOSERVER_ADMIN_PASSWORD) is provided.
+Name of [GeoServer role](https://docs.geoserver.org/2.26.x/en/user/security/webadmin/ugr.html#edit-role-service) of [LAYMAN_GS_USER](#LAYMAN_GS_USER). The role is used to create explicit [access rule](https://docs.geoserver.org/2.26.x/en/user/security/layer.html) for all layers published by Layman. The LAYMAN_GS_ROLE must be another role than default [`ADMIN`](https://docs.geoserver.org/2.26.x/en/user/security/usergrouprole/roleservices.html#mapping-roles-to-system-roles) role (defined by `adminRoleName`)! The role will be created automatically if [GEOSERVER_ADMIN_PASSWORD](#GEOSERVER_ADMIN_PASSWORD) is provided.
  
 ### LAYMAN_GS_USER_GROUP_SERVICE
-Name of [user/group service](https://docs.geoserver.org/2.21.x/en/user/security/usergrouprole/usergroupservices.html) used for managing users at GeoServer. If not set (default), the service named `default` is chosen. Usually it's [XML user/group service](https://docs.geoserver.org/2.21.x/en/user/security/usergrouprole/usergroupservices.html#xml-user-group-service).
+Name of [user/group service](https://docs.geoserver.org/2.26.x/en/user/security/usergrouprole/usergroupservices.html) used for managing users at GeoServer. If not set (default), the service named `default` is chosen. Usually it's [XML user/group service](https://docs.geoserver.org/2.26.x/en/user/security/usergrouprole/usergroupservices.html#xml-user-group-service).
 
 ### LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE
-Secret value of [GeoServer HTTP authentication request header attribute](https://docs.geoserver.org/2.21.x/en/user/security/tutorials/httpheaderproxy/index.html) used for WFS proxy. Only combination of lowercase characters and numbers must be used for the value. If you change an existing value, you have to change it also in GeoServer GUI manually.
+Secret value of [GeoServer HTTP authentication request header attribute](https://docs.geoserver.org/2.26.x/en/user/security/tutorials/httpheaderproxy/index.html) used for WFS proxy. Only combination of lowercase characters and numbers must be used for the value. If you change an existing value, you have to change it also in GeoServer GUI manually.
 
 ### LAYMAN_GS_NORMALIZED_RASTER_DIRECTORY
 Filesystem directory name where normalized raster files are stored. The directory will be created inside GeoServer data directory.
@@ -200,10 +200,10 @@ Filesystem directory where data published on QGIS are stored, including styles.
 HTTP Basic Authentication credentials for communication with [CSW](#CSW_URL) encoded as `user:password`.
 
 ### CSW_URL
-Internal URL of [OGC Catalogue Service v2.0.2](https://www.ogc.org/publications/standard/cat/) endpoint. Tested with [Micka](https://www.bnhelp.cz/produkty/metadata/).
+Internal URL of [OGC Catalogue Service v2.0.2](https://www.ogc.org/standards/cat/) endpoint. Tested with [Micka](https://www.bnhelp.cz/produkty/metadata/).
 
 ### CSW_PROXY_URL
-Public URL of [OGC Catalogue Service v2.0.2](https://www.ogc.org/publications/standard/cat/) endpoint. Tested with [Micka](https://www.bnhelp.cz/produkty/metadata/).
+Public URL of [OGC Catalogue Service v2.0.2](https://www.ogc.org/standards/cat/) endpoint. Tested with [Micka](https://www.bnhelp.cz/produkty/metadata/).
 
 ### MICKA_ACCEPTED_VERSION
 Version of Micka that Layman will accept on startup encoded as `version:revision`, e.g. `2020.014:2020-04-15.01`. Also, on one of '>=' or '==' prefixes can be used with obvious meaning, `e.g. >=2020.014:2020-04-15.01`. For prefix '>=', version and revision are compared independently as strings. If the variable is not set, a version defined in [`src/layman_settings.py`](../src/layman_settings.py) will be accepted. If none prefix is used, value is compared as with '=='.
