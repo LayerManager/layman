@@ -1,11 +1,7 @@
 # Changelog
 
 ## v2.1.0
- {release-date}
-### Upgrade requirements
-### Migrations and checks
-#### Schema migrations
-#### Data migrations
+ 2025-05-02
 ### Changes
 - [#1124](https://github.com/LayerManager/layman/issues/1124) Upgrade GeoServer to 2.26.2.
 
