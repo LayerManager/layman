@@ -34,7 +34,7 @@ ENDPOINTS_TO_TEST = {
         (process_client.get_workspace_publication, {}),
         (process_client.get_workspace_map_file, {}),
         (process_client.get_workspace_publication_metadata_comparison, {}),
-        (process_client.get_workspace_publication_thumbnail, {}),
+        (process_client.get_uuid_publication_thumbnail, {}),
         (process_client.patch_workspace_publication, {'title': 'New title'}),
         (process_client.patch_workspace_publication, {'file_paths': ['sample/layman.map/small_map.json']}),
     ],
@@ -98,6 +98,7 @@ def add_publication_test_cases_to_list(tc_list, publication, user, endpoints_to_
     all_args = {
         'workspace': publication.workspace,
         'name': publication.name,
+        'uuid': publication.uuid,
         'layer': publication.name,
         'actor_name': user,
         'publication_type': publication.type,

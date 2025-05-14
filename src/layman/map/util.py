@@ -24,7 +24,7 @@ from .map_class import Map
 from .micka import csw
 from .micka.csw import map_to_operates_on
 from ..publication_relation.util import check_no_internal_workspace_name_layer
-from ..uuid import delete_publication_uuid_from_redis
+from ..uuid import delete_publication_uuid_from_redis, is_valid_uuid
 
 MAPNAME_PATTERN = PUBLICATION_NAME_PATTERN
 MAPNAME_MAX_LENGTH = PUBLICATION_MAX_LENGTH
@@ -519,3 +519,15 @@ def get_layers_from_json(map_json, *, x_forwarded_items=None):
             if layer_def not in found_layers:
                 found_layers.append(layer_def)
     return found_layers
+
+
+def check_uuid_decorator(func):
+    @wraps(func)
+    def decorated_function(*args, **kwargs):        
+        uuid = request.view_args['uuid']
+        if not is_valid_uuid(uuid):
+            raise LaymanError(2, {'parameter': 'uuid', 'message': f'UUID `{uuid}` is not valid uuid'})
+        result = func(*args, **kwargs)
+        return result
+
+    return decorated_function

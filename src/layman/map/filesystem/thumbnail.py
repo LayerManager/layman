@@ -41,21 +41,36 @@ def get_map_info(workspace, mapname, *, x_forwarded_items=None):
         if publ_uuid else {}
 
 
+
 def get_map_info_by_uuid(publ_uuid, *, workspace, mapname, x_forwarded_items=None):
     thumbnail_path = get_map_thumbnail_path(publ_uuid)
     if os.path.exists(thumbnail_path):
         return {
             'thumbnail': {
-                'url': url_for('rest_workspace_map_thumbnail.get', workspace=workspace,
-                               mapname=mapname, x_forwarded_items=x_forwarded_items),
-                'path': os.path.relpath(thumbnail_path, settings.LAYMAN_DATA_DIR)
-            },
-            '_thumbnail': {
-                'path': thumbnail_path,
-            },
+                'url': url_for(
+                        'rest_uuid_map_thumbnail.get',
+                        uuid=publ_uuid,
+                        x_forwarded_items = x_forwarded_items,
+                ),
+                'path': os.path.relpath(thumbnail_path, settings.LAYMAN_DATA_DIR),
+        },
+            '_thumbnail': {'path': thumbnail_path},
         }
     return {}
-
+# def get_map_info_by_uuid(publ_uuid, *, workspace, mapname, x_forwarded_items=None):
+#     thumbnail_path = get_map_thumbnail_path(publ_uuid)
+#     if os.path.exists(thumbnail_path):
+#         return {
+#             'thumbnail': {
+#                 'url': url_for('rest_workspace_map_thumbnail.get', workspace=workspace,
+#                                mapname=mapname, x_forwarded_items=x_forwarded_items),
+#                 'path': os.path.relpath(thumbnail_path, settings.LAYMAN_DATA_DIR)
+#             },
+#             '_thumbnail': {
+#                 'path': thumbnail_path,
+#             },
+#         }
+#     return {}
 
 def delete_map(map: Map):
     util.delete_map_subdir(map.uuid, MAP_SUBDIR)
