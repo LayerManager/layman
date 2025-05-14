@@ -259,6 +259,10 @@ def test_metadata_comparison(client, publication):
 
     assert md_props.issubset(set(metadata_comparison_json['metadata_properties'].keys()))
     for key, value in metadata_comparison_json['metadata_properties'].items():
+        if key == 'graphic_url':
+            # Since version 3.0+, the thumbnail URL format has changed (UUID-based instead of workspace/name),
+            # so the difference is expected and should be ignored in this comparison.
+            continue
         assert value['equal_or_null'] is True, f'{key=}, {value=}\n{metadata_comparison_json=}'
         assert value['equal'] is True, f'{key=}, {value=}\n{metadata_comparison_json=}'
 

@@ -1,12 +1,13 @@
 # Changelog
 
-## v2.2.0
+## v3.0.0
  {release-date}
 ### Upgrade requirements
 ### Migrations and checks
 #### Schema migrations
 #### Data migrations
 ### Changes
+- [#1126](https://github.com/LayerManager/layman/issues/1126) Endpoint [GET Workspace Map Thumbnail](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-map-thumbnail) was removed and replaced with endpoint [GET Map Thumbnail](doc/rest.md#get-map-thumbnail) endpoint to use UUID-based URL `/rest/maps/{uuid}/thumbnail` instead of workspace&name-based URL.
 
 ## v2.1.0
  2025-05-02
@@ -171,7 +172,7 @@
   - [GET](doc/rest.md#get-workspace-layer)/[PATCH](doc/rest.md#patch-workspace-layer)/[DELETE](doc/rest.md#delete-workspace-layer) Workspace Layer
   - GET Workspace Layer [Thumbnail](doc/rest.md#get-workspace-layer-thumbnail)/[Style](doc/rest.md#get-workspace-layer-style)/[Metadata Comparison](doc/rest.md#get-workspace-layer-metadata-comparison)/[Chunk](doc/rest.md#get-workspace-layer-chunk)
   - [GET](doc/rest.md#get-workspace-map)/[PATCH](doc/rest.md#patch-workspace-map)/[DELETE](doc/rest.md#delete-workspace-map) Workspace Map
-  - GET Workspace Map [File](doc/rest.md#get-workspace-map-file)/[Thumbnail](doc/rest.md#get-workspace-map-thumbnail)/[Metadata Comparison](doc/rest.md#get-workspace-map-metadata-comparison)
+  - GET Workspace Map [File](doc/rest.md#get-workspace-map-file)/[Thumbnail](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-map-thumbnail)/[Metadata Comparison](doc/rest.md#get-workspace-map-metadata-comparison)
   - GET Workspace [Layers](doc/rest.md#get-workspace-layers)/[Maps](doc/rest.md#get-workspace-maps)
   - GET [Layers](doc/rest.md#get-layers)/[Maps](doc/rest.md#get-maps)/[Publications](doc/rest.md#get-publications)
   - DELETE Workspace [Layers](doc/rest.md#delete-workspace-layers)/[Maps](doc/rest.md#delete-workspace-maps)
@@ -399,7 +400,7 @@
   - `db` which replaces key `db_table` that is deprecated now
 - [#703](https://github.com/LayerManager/layman/issues/703) Attribute names in [WFS-T requests](doc/endpoints.md#web-feature-service) must match to regex `^[a-zA-Z_][a-zA-Z_0-9]*$`, otherwise Layman error is raised. It applies to attributes of both internal and external tables, and only to attributes that not exist in database yet.
 - [#703](https://github.com/LayerManager/layman/issues/703) Endpoint [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) raises exception if parameter `crs` is used without `file` parameter. It's the same behaviour as behaviour of [POST Workspace Layers](doc/rest.md#post-workspace-layers) endpoint.
-- [#772](https://github.com/LayerManager/layman/issues/772) Speed up endpoints [GET Workspace Layer Thumbnail](doc/rest.md#get-workspace-layer-thumbnail), [GET Workspace Layer Style](doc/rest.md#get-workspace-layer-style), [GET Workspace Map Thumbnail](doc/rest.md#get-workspace-map-thumbnail) and [GET Workspace Map File](doc/rest.md#get-workspace-map-file).
+- [#772](https://github.com/LayerManager/layman/issues/772) Speed up endpoints [GET Workspace Layer Thumbnail](doc/rest.md#get-workspace-layer-thumbnail), [GET Workspace Layer Style](doc/rest.md#get-workspace-layer-style), [GET Workspace Map Thumbnail](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-map-thumbnail) and [GET Workspace Map File](doc/rest.md#get-workspace-map-file).
 - [#755](https://github.com/LayerManager/layman/issues/755) Fix generation of some map thumbnails by downgrading Node.js of Timgen from v18 to v16.
 - [#755](https://github.com/LayerManager/layman/issues/755) Change Node.js dependencies of Timgen:
   - http-server -> express 4
@@ -770,7 +771,7 @@ make timgen-build
   - update of bounding box and thumbnail of each edited [layer](doc/models.md#layer)
      - bounding box is updated in DB, QGIS file, WMS/WFS capabilities, and CSW metadata record
      - thumbnail is updated in filesystem and it is accessible using [GET Workspace Layer Thumbnail](doc/rest.md#get-workspace-layer-thumbnail)
-  - update of thumbnail of each [map](doc/models.md#map) that points to at least one edited layer (thumbnail is updated in filesystem and accessible using [GET Workspace Map Thumbnail](doc/rest.md#get-workspace-map-thumbnail))  
+  - update of thumbnail of each [map](doc/models.md#map) that points to at least one edited layer (thumbnail is updated in filesystem and accessible using [GET Workspace Map Thumbnail](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-map-thumbnail))  
   These updates run in [asynchronous chain](doc/async-tasks.md). Documentation describes concurrency of WFS-T request and its asynchronous chains with another [WFS-T request](doc/endpoints.md#web-feature-service), [POST Workspace Layers](doc/rest.md#post-workspace-layers), [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer), [DELETE Workspace Layer](doc/rest.md#delete-workspace-layer), [DELETE Workspace Layers](doc/rest.md#delete-workspace-layers), [PATCH Workspace Map](doc/rest.md#patch-workspace-map), [DELETE Workspace Map](doc/rest.md#delete-workspace-map), and [DELETE Workspace Maps](doc/rest.md#delete-workspace-maps).
 - [#159](https://github.com/LayerManager/layman/issues/159) Object `layman_metadata` was added to [GET Workspace Layer](doc/rest.md#get-workspace-layer), [GET Workspace Map](doc/rest.md#get-workspace-map), [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer), and [PATCH Workspace Map](doc/rest.md#patch-workspace-map) responses. Attribute `layman_metadata.publication_status` can be used for watching global state of publication (updating, complete, incomplete).
 - [#331](https://github.com/LayerManager/layman/issues/331) Query parameter *full_text_filter* is also used for substring search in endpoints [GET Layers](doc/rest.md#get-layers), [GET Worksapce Layers](doc/rest.md#get-workspace-layers), [GET Maps](doc/rest.md#get-maps) and [GET Workspace Maps](doc/rest.md#get-workspace-maps).

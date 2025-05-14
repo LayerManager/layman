@@ -50,6 +50,7 @@
       - [REST API](rest.md): `/rest/workspaces/<workspace_name>/maps/<mapname>` 
   - or by UUID:
       - [filesystem](data-storage.md#filesystem): `/path/to/LAYMAN_DATA_DIR/maps/<UUID>` 
+      - [REST API](rest.md): `/rest/maps/<uuid>/thumbnail`
       - Micka: `/record/basic/m-<uuid>`
 - Simple rules
   - one map file per map

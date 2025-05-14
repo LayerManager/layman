@@ -228,7 +228,7 @@ def _get_property_values(
             'label': identifier_label,
         },
         'abstract': abstract,
-        'graphic_url': url_for('rest_workspace_map_thumbnail.get', workspace=workspace, mapname=mapname),
+        'graphic_url': url_for('rest_map_thumbnail.get', uuid=uuid),
         'extent': extent,
 
         'map_endpoint': escape(url_for('rest_workspace_map.get', workspace=workspace, mapname=mapname)),

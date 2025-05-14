@@ -74,7 +74,7 @@ def test_parse_md_properties():
         ], METADATA_PROPERTIES)
     with app.app_context():
         expected = {
-            'md_file_identifier': 'm-91147a27-1ff4-4242-ba6d-faffb92224c6',
+            'md_file_identifier': 'm-f4b2a3d1-2f77-4f7d-9a7e-4a2b0f75e2d3',
             'md_organisation_name': None,
             'organisation_name': None,
             'md_date_stamp': '2007-05-25',
@@ -86,7 +86,7 @@ def test_parse_md_properties():
                 'label': 'svet',
             },
             'abstract': 'World places and boundaries abstract',
-            'graphic_url': url_for('rest_workspace_map_thumbnail.get', workspace='testuser1', mapname='svet',
+            'graphic_url': url_for('rest_map_thumbnail.get', uuid='f4b2a3d1-2f77-4f7d-9a7e-4a2b0f75e2d3',
                                    internal=False),
             'extent': [-35, -48.5, 179, 81.5],
             'map_endpoint': url_for('rest_workspace_map.get', workspace='testuser1', mapname='svet',
@@ -127,7 +127,7 @@ def test_fill_xml_template():
             },
             'abstract': 'World places and boundaries abstract',
             'organisation_name': None,
-            'graphic_url': url_for('rest_workspace_map_thumbnail.get', workspace='testuser1', mapname='svet',
+            'graphic_url': url_for('rest_map_thumbnail.get', uuid='91147a27-1ff4-4242-ba6d-faffb92224c6',
                                    internal=False),
             'extent': [-35, -48.5, 179, 81.5],
             'map_endpoint': url_for('rest_workspace_map.get', workspace='testuser1', mapname='svet',

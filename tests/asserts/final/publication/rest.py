@@ -2,9 +2,9 @@ import copy
 
 from celery import states
 
-from layman import settings
+from layman import settings, app
 from layman.layer.geoserver import GEOSERVER_WMS_WORKSPACE, GEOSERVER_WFS_WORKSPACE
-from layman.util import XForwardedClass
+from layman.util import XForwardedClass, get_publication_info
 from test_tools import process_client, util as test_util, assert_util
 
 X_FORWARDED_ITEMS = XForwardedClass(proto='https', host='abc.cz:3001', prefix='/layman-proxy')
@@ -17,13 +17,23 @@ def get_expected_urls_in_rest_response(workspace, publ_type, name, *, rest_metho
     proxy_prefix = x_forwarded_items.prefix or ''
     assert rest_method in {'post', 'patch', 'get', 'delete', 'multi_delete'}
     publ_type_directory = f'{publ_type.split(".")[1]}s'
+
+    with app.app_context():
+        uuid = get_publication_info(workspace=workspace, publ_type=publ_type, publ_name=name, context={'keys': ['uuid']})['uuid']
     result = {
         'url': f'{proxy_proto}://{proxy_host}{proxy_prefix}/rest/workspaces/{workspace}/{publ_type_directory}/{name}'
     }
-    if rest_method in ['get']:
-        result['thumbnail'] = {
-            'url': f'{proxy_proto}://{proxy_host}{proxy_prefix}/rest/workspaces/{workspace}/{publ_type_directory}/{name}/thumbnail'
-        }
+
+    if rest_method == 'get':
+        if publ_type == process_client.MAP_TYPE and uuid:
+            result['thumbnail'] = {
+                'url': f'{proxy_proto}://{proxy_host}{proxy_prefix}/rest/maps/{uuid}/thumbnail'
+            }
+        else:
+            result['thumbnail'] = {
+                'url': f'{proxy_proto}://{proxy_host}{proxy_prefix}/rest/workspaces/{workspace}/{publ_type_directory}/{name}/thumbnail'
+            }
+
         result['metadata'] = {
             'comparison_url': f'{proxy_proto}://{proxy_host}{proxy_prefix}/rest/workspaces/{workspace}/{publ_type_directory}/{name}/metadata-comparison',
         }
