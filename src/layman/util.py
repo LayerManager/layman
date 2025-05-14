@@ -168,6 +168,18 @@ def check_workspace_name_decorator(func):
     return decorated_function
 
 
+def check_uuid_decorator(func):
+    @wraps(func)
+    def decorated_function(*args, **kwargs):
+        from .uuid import is_valid_uuid  # lazy import
+        uuid = request.view_args['uuid']
+        if not is_valid_uuid(uuid):
+            raise LaymanError(2, {'parameter': 'uuid', 'message': f'UUID `{uuid}` is not valid uuid'})
+        result = func(*args, **kwargs)
+        return result
+    return decorated_function
+
+
 def check_workspace_name(workspace, pattern_only=False):
     if not re.match(WORKSPACE_NAME_PATTERN, workspace):
         raise LaymanError(2, {'parameter': 'workspace', 'expected': WORKSPACE_NAME_PATTERN})

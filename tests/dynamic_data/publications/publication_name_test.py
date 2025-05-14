@@ -2,10 +2,12 @@ from copy import deepcopy
 import os
 import pytest
 
-from test_tools import cleanup
+from test_tools import cleanup, process_client
 from tests.asserts.final import publication as publ_asserts
 from tests.asserts.final.publication import util as assert_util
 from tests.dynamic_data import base_test, base_test_classes
+from layman import app
+from layman import util as layman_util
 from ... import Publication4Test, EnumTestTypes, EnumTestKeys
 
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
@@ -68,8 +70,24 @@ class TestPublication(base_test.TestSingleRestPublication):
         publ_def = parametrization.publication_definition
         rest_method.fn(publication, args=rest_args)
         assert_util.is_publication_valid_and_complete(publication)
-        publ_asserts.internal.correct_values_in_detail(publication.workspace, publication.type, publication.name,
-                                                       **publ_def.info_values)
+        with app.app_context():
+            uuid = layman_util.get_publication_info(
+                publication.workspace, publication.type, publication.name,
+                context={'keys': ['uuid']}
+            )["uuid"]
+
+        if publication.type == process_client.LAYER_TYPE:
+            publ_asserts.internal.correct_values_in_detail(
+                publication.workspace,
+                publication.type,
+                publication.name,
+                **publ_def.info_values
+            )
+        else:
+            publ_asserts.internal.correct_values_in_detail_uuid(
+                uuid,
+                **publ_def.info_values
+            )
         if publ_def.thumbnail:
             publ_asserts.internal.thumbnail_equals(publication.workspace, publication.type, publication.name,
                                                    exp_thumbnail=publ_def.thumbnail)

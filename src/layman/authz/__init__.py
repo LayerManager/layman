@@ -119,6 +119,26 @@ def authorize_workspace_publications_decorator(func):
     return decorated_function
 
 
+def authorize_uuid_publication_decorator(*, expected_publication_type):
+    def decorator(func):
+        @wraps(func)
+        def decorated_function(*args, **kwargs):
+            uuid = request.view_args['uuid']
+            info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['workspace', 'name', 'type']})
+            if info is None or info.get('type') != expected_publication_type:
+                raise LaymanError(26, {'uuid': uuid})
+            workspace = info['_workspace']
+            publication_type = info['type']
+            publication_name = info['name']
+            actor_name = authn.get_authn_username()
+            # raises exception in case of unauthorized request
+            authorize(workspace, publication_type, publication_name, request.method, actor_name)
+            return func(*args, **kwargs)
+        return decorated_function
+
+    return decorator
+
+
 def authorize_publications_decorator(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
