@@ -52,7 +52,7 @@ data200trans=tmp/data200/trans/trans-jtsk.zip
 data200transJtsk=tmp/data200/trans/jtsk
 data200transRoad=tmp/data200/trans/RoadL.shp
 if ! [ -f $data200transRoad ]; then
-  curl -A "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36" -L -o $data200trans "https://geoportal.cuzk.cz/ZAKAZKY/Data200/TRANS.zip"
+  curl -A "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36" -L -o $data200trans "https://watlas.lesprojekt.cz/maps/layman/TRANS.zip"
   unzip -q $data200trans -d $data200transJtsk
   for f in tmp/data200/trans/jtsk/RoadL.shp
   do
