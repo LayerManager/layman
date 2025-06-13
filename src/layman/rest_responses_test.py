@@ -151,7 +151,7 @@ class TestResponsesClass:
             'identifier': f"m-{map_uuid}",
             'record_url': None},
         'thumbnail': {'path': f'maps/{map_uuid}/thumbnail/{map_uuid}.png',
-                      'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/maps/{publication}/thumbnail'},
+                      'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/maps/{map_uuid}/thumbnail'},
         'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/maps/{publication}',
         'uuid': None,
     }

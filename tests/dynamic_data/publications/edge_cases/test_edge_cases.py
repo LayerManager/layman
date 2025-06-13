@@ -223,10 +223,21 @@ class TestPublication(base_test.TestSingleRestPublication):
     def test_publication(self, publication: Publication4Test, rest_method, rest_args, params):
         rest_method.fn(publication, args=rest_args)
         assert_util.is_publication_valid_and_complete(publication)
+        uuid = self.publ_uuids[publication]
         if params[Key.EXP_INFO] is not None:
-            asserts_publ.internal.correct_values_in_detail(*publication,
-                                                           **params[Key.EXP_INFO],
-                                                           )
+            if publication.type == process_client.MAP_TYPE:
+                asserts_publ.internal.correct_values_in_detail_uuid(
+                    uuid,
+                    **params[Key.EXP_INFO],
+                )
+            else:
+                asserts_publ.internal.correct_values_in_detail(
+                    publication.workspace,
+                    publication.type,
+                    publication.name,
+                    **params[Key.EXP_INFO],
+                )
+
         if params[Key.EXP_THUMBNAIL] is not None:
             asserts_publ.internal.thumbnail_equals(*publication,
                                                    exp_thumbnail=params[Key.EXP_THUMBNAIL],

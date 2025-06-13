@@ -12,10 +12,10 @@
 |Workspace Layer Chunk|`/rest/workspaces/<workspace_name>/layers/<layername>/chunk`|[GET](#get-workspace-layer-chunk)| [POST](#post-workspace-layer-chunk) | x | x |
 |Workspace Layer Metadata Comparison|`/rest/workspaces/<workspace_name>/layers/<layername>/metadata-comparison`|[GET](#get-workspace-layer-metadata-comparison) | x | x | x |
 |Maps|`/rest/maps`|[GET](#get-maps)| x | x | x |
+|Map Thumbnail|`/rest/maps/<uuid>/thumbnail`|[GET](#get-map-thumbnail)| x | x | x |
 |Workspace Maps|`/rest/workspaces/<workspace_name>/maps`|[GET](#get-workspace-maps)| [POST](#post-workspace-maps) | x | [DELETE](#delete-workspace-maps) |
 |[Workspace Map](models.md#map)|`/rest/workspaces/<workspace_name>/maps/<mapname>`|[GET](#get-workspace-map)| x | [PATCH](#patch-workspace-map) | [DELETE](#delete-workspace-map) |
 |Workspace Map File|`/rest/workspaces/<workspace_name>/maps/<mapname>/file`|[GET](#get-workspace-map-file)| x | x | x |
-|Workspace Map Thumbnail|`/rest/workspaces/<workspace_name>/maps/<mapname>/thumbnail`|[GET](#get-workspace-map-thumbnail)| x | x | x |
 |Workspace Map Metadata Comparison|`/rest/workspaces/<workspace_name>/layers/<layername>/metadata-comparison`|[GET](#get-workspace-map-metadata-comparison) | x | x | x |
 |Users|`/rest/users`|[GET](#get-users)| x | x | x |
 |User|`/rest/users/<username>`| x | x | x | [DELETE](#delete-user) |
@@ -658,7 +658,7 @@ JSON object with following structure:
   - *status*: Status information about availability of file. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **thumbnail**
-  - *url*: String. URL of map thumbnail. It points to [GET Workspace Map Thumbnail](#get-workspace-map-thumbnail).
+  - *url*: String. URL of map thumbnail. It points to [GET Map Thumbnail](#get-map-thumbnail).
   - *path*: String. Path to map thumbnail. Path is relative to [LAYMAN_DATA_DIR](env-settings.md#LAYMAN_DATA_DIR).
   - *status*: Status information about generating and availability of thumbnail. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
@@ -747,10 +747,10 @@ Content-Type: `application/json`
 JSON file describing the map valid against [map-composition schema](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema).
 
 
-## Workspace Map Thumbnail
+## Map Thumbnail
 ### URL
-`/rest/workspaces/<workspace_name>/maps/<mapname>/thumbnail`
-### GET Workspace Map Thumbnail
+`/rest/maps/<uuid>/thumbnail`
+### GET Map Thumbnail
 Get thumbnail of the map in PNG format, 300x300 px, transparent background, in EPSG:3857.
 
 #### Request

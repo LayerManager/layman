@@ -1,5 +1,6 @@
 import importlib
 import pytest
+from flask import request
 
 from test_tools import util as test_util
 from . import app, settings, LaymanError, util
@@ -250,3 +251,36 @@ def test_get_x_forwarded_items_raises(headers, exp_error):
     with pytest.raises(LaymanError) as exc_info:
         util.get_x_forwarded_items(headers)
     test_util.assert_error(exp_error, exc_info)
+
+
+@pytest.mark.parametrize('uuid, exp_error', [
+    pytest.param(
+        '123e4567-e89b-12d3-a456-42661417400',
+        {
+            'code': 2,
+            'data': {
+                'parameter': 'uuid',
+                'message': 'UUID `123e4567-e89b-12d3-a456-42661417400` is not valid uuid',
+            },
+        }, id='too-short-uuid'),
+])
+def test_check_uuid_decorator_raises(uuid, exp_error):
+    @util.check_uuid_decorator
+    def test_func():
+        return True
+
+    with app.test_request_context():
+        request.view_args = {'uuid': uuid}
+        with pytest.raises(LaymanError) as exc_info:
+            test_func()
+        test_util.assert_error(exp_error, exc_info)
+
+
+def test_check_uuid_decorator_success():
+    @util.check_uuid_decorator
+    def test_func():
+        return True
+
+    with app.test_request_context():
+        request.view_args = {'uuid': '123e4567-e89b-12d3-a456-426614174000'}
+        assert test_func() is True

@@ -81,6 +81,7 @@ def oauth2_provider_mock():
                 'test_patch_current_user_username_fail_xxxxxxxxxxxxxxxxxxxxxx': None,
                 'geoserver_proxy_wfs_authz_test_user': None,
                 'geoserver_proxy_wfs_authz_test_user_2': None,
+                'test_uuid_map_thumbnail': None,
             },
         },
         'host': '0.0.0.0',
