@@ -8,6 +8,8 @@
 ### Migrations and checks
 #### Schema migrations
 #### Data migrations
+- [#1126](https://github.com/LayerManager/layman/issues/1126) Migrate graphic URLs in map metadata from workspace&name-based format to UUID-based format.
+
 ### Changes
 - [#1126](https://github.com/LayerManager/layman/issues/1126) Endpoint [GET Workspace Map Thumbnail](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-map-thumbnail) was removed and replaced with endpoint [GET Map Thumbnail](doc/rest.md#get-map-thumbnail) endpoint to use UUID-based URL `/rest/maps/{uuid}/thumbnail` instead of workspace&name-based URL.
 
