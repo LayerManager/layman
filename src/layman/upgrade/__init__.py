@@ -2,7 +2,7 @@ import logging
 
 from db import util as db_util
 from layman.upgrade import upgrade_v1_8, upgrade_v1_9, upgrade_v1_10, upgrade_v1_12, upgrade_v1_16, upgrade_v1_17, upgrade_v1_18, \
-    upgrade_v1_20, upgrade_v1_21, upgrade_v1_22, upgrade_v1_23, upgrade_v2_0
+    upgrade_v1_20, upgrade_v1_21, upgrade_v1_22, upgrade_v1_23, upgrade_v2_0, upgrade_v3_0
 from layman import settings
 from . import consts
 
@@ -25,7 +25,9 @@ MIGRATIONS = {
         ((3, 0, 0), [lambda: logger.info("3.0.0 schema – no structural changes"),]),
     ],
     consts.MIGRATION_TYPE_DATA: [
-        ((3, 0, 0), [lambda: logger.info("3.0.0 data – no data changes"),]),
+        ((3, 0, 0), [
+            upgrade_v3_0.migrate_graphic_urls,
+        ]),
     ],
 }
 
