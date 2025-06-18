@@ -2,7 +2,7 @@ import logging
 
 from db import util as db_util
 from layman.upgrade import upgrade_v1_8, upgrade_v1_9, upgrade_v1_10, upgrade_v1_12, upgrade_v1_16, upgrade_v1_17, upgrade_v1_18, \
-    upgrade_v1_20, upgrade_v1_21, upgrade_v1_22, upgrade_v1_23, upgrade_v2_0
+    upgrade_v1_20, upgrade_v1_21, upgrade_v1_22, upgrade_v1_23, upgrade_v2_0, upgrade_v3_0
 from layman import settings
 from . import consts
 
@@ -14,19 +14,15 @@ logger = logging.getLogger(__name__)
 MIGRATION_TYPES = [consts.MIGRATION_TYPE_SCHEMA, consts.MIGRATION_TYPE_DATA]
 
 MIN_UPGRADEABLE_VERSION = {
-    consts.MIGRATION_TYPE_DATA: (1, 23, 0, 0),
-    consts.MIGRATION_TYPE_SCHEMA: (1, 23, 0, 3),
-    consts.MORE_INFO_VERSION: '2.0.0',
+    consts.MIGRATION_TYPE_DATA: (2, 0, 0, 0),
+    consts.MIGRATION_TYPE_SCHEMA: (2, 0, 0, 0),
+    consts.MORE_INFO_VERSION: '3.0.0',
 }
 
 
 MIGRATIONS = {
     consts.MIGRATION_TYPE_SCHEMA: [
-        ((2, 0, 0), [
-            upgrade_v2_0.adjust_db_for_description,
-            upgrade_v2_0.adjust_db_for_map_layer_relation,
-            upgrade_v2_0.adjust_db_for_created_at,
-        ]),
+        ((3, 0, 0), [lambda: logger.info("3.0.0 schema – no structural changes"),]),
     ],
     consts.MIGRATION_TYPE_DATA: [
         ((2, 0, 0), [
@@ -39,6 +35,9 @@ MIGRATIONS = {
             upgrade_v2_0.migrate_layers,
             upgrade_v2_0.migrate_maps,
             upgrade_v2_0.delete_old_workspaces,
+        ]),
+        ((3, 0, 0), [
+            upgrade_v3_0.migrate_graphic_urls,
         ]),
     ],
 }
@@ -76,6 +75,10 @@ def run_db_init():
     upgrade_v1_17.adjust_db_publication_file_type_constraint()
     upgrade_v1_21.ensure_sub_uniqueness()
     upgrade_v1_22.ensure_issuer_sub_uniqueness()
+
+    upgrade_v2_0.adjust_db_for_description()
+    upgrade_v2_0.adjust_db_for_map_layer_relation()
+    upgrade_v2_0.adjust_db_for_created_at()
     for mig_type in MIGRATION_TYPES:
         set_current_migration_version(mig_type, MIN_UPGRADEABLE_VERSION[mig_type])
 
