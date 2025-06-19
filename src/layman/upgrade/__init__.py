@@ -14,32 +14,18 @@ logger = logging.getLogger(__name__)
 MIGRATION_TYPES = [consts.MIGRATION_TYPE_SCHEMA, consts.MIGRATION_TYPE_DATA]
 
 MIN_UPGRADEABLE_VERSION = {
-    consts.MIGRATION_TYPE_DATA: (1, 23, 0, 0),
-    consts.MIGRATION_TYPE_SCHEMA: (1, 23, 0, 3),
-    consts.MORE_INFO_VERSION: '2.0.0',
+    consts.MIGRATION_TYPE_DATA: (2, 0, 0, 0),
+    consts.MIGRATION_TYPE_SCHEMA: (2, 0, 0, 0),
+    consts.MORE_INFO_VERSION: '3.0.0',
 }
 
 
 MIGRATIONS = {
     consts.MIGRATION_TYPE_SCHEMA: [
-        ((2, 0, 0), [
-            upgrade_v2_0.adjust_db_for_description,
-            upgrade_v2_0.adjust_db_for_map_layer_relation,
-            upgrade_v2_0.adjust_db_for_created_at,
-        ]),
+        ((3, 0, 0), [lambda: logger.info("3.0.0 schema – no structural changes"),]),
     ],
     consts.MIGRATION_TYPE_DATA: [
-        ((2, 0, 0), [
-            upgrade_v2_0.adjust_publications_description,
-            upgrade_v2_0.adjust_publications_created_at,
-            upgrade_v2_0.ensure_layers_db_schema,
-            upgrade_v2_0.ensure_gs_workspaces_and_stores,
-            upgrade_v2_0.delete_layers_without_wfs_wms_available,
-            upgrade_v2_0.adjust_map_layer_data,
-            upgrade_v2_0.migrate_layers,
-            upgrade_v2_0.migrate_maps,
-            upgrade_v2_0.delete_old_workspaces,
-        ]),
+        ((3, 0, 0), [lambda: logger.info("3.0.0 data – no data changes"),]),
     ],
 }
 
@@ -76,6 +62,15 @@ def run_db_init():
     upgrade_v1_17.adjust_db_publication_file_type_constraint()
     upgrade_v1_21.ensure_sub_uniqueness()
     upgrade_v1_22.ensure_issuer_sub_uniqueness()
+
+    upgrade_v2_0.adjust_db_for_description()
+    upgrade_v2_0.adjust_db_for_map_layer_relation()
+    upgrade_v2_0.adjust_db_for_created_at()
+    upgrade_v2_0.ensure_gs_workspaces_and_stores()
+    upgrade_v2_0.ensure_layers_db_schema()
+    upgrade_v2_0.adjust_publications_created_at()
+    upgrade_v2_0.adjust_map_layer_data()
+
     for mig_type in MIGRATION_TYPES:
         set_current_migration_version(mig_type, MIN_UPGRADEABLE_VERSION[mig_type])
 
