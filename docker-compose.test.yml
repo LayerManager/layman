@@ -13,7 +13,6 @@ services:
         - PYTHONPATH=/code/src:/code
       volumes:
         - ./layman_data_test:/layman_data_test
-        - ./migration_to_v2_0_tests:/code/migration_to_v2_0_tests
         - ./sample:/code/sample
         - ./src:/code/src
         - ./test_tools:/code/test_tools
