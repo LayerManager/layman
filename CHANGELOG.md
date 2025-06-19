@@ -3,6 +3,8 @@
 ## v3.0.0
  {release-date}
 ### Upgrade requirements
+- Only versions 2.0.0 and newer can be upgraded to this version. For older versions, please upgrade to last 2.1.x first.
+- If you have any `Pipfile*` files in the root directory of this repository, they can be deleted.
 ### Migrations and checks
 #### Schema migrations
 #### Data migrations
