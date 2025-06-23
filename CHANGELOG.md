@@ -1,5 +1,8 @@
 # Changelog
 
+## v2.1.1
+### Changes
+
 ## v2.1.0
  2025-05-02
 ### Changes
