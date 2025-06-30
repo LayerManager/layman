@@ -5,6 +5,10 @@
 ### Upgrade requirements
 - Only versions 2.0.0 and newer can be upgraded to this version. For older versions, please upgrade to last 2.1.x first.
 - If you have any `Pipfile*` files in the root directory of this repository, they can be deleted.
+- Change environment variable [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION):
+  ```
+  LAYMAN_CLIENT_VERSION=624dfb2b05be214381f27e2992c0dbe3e7388cd3
+  ```
 ### Migrations and checks
 #### Schema migrations
 #### Data migrations
