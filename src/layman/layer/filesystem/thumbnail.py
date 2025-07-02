@@ -32,17 +32,15 @@ def ensure_layer_thumbnail_dir(publ_uuid):
 
 def get_layer_info(workspace, layername, *, x_forwarded_items=None):
     publ_uuid = get_publication_uuid(workspace, LAYER_TYPE, layername)
-    return get_layer_info_by_uuid(publ_uuid, x_forwarded_items=x_forwarded_items, layername=layername,
-                                  workspace=workspace) if publ_uuid else {}
+    return get_layer_info_by_uuid(publ_uuid, x_forwarded_items=x_forwarded_items) if publ_uuid else {}
 
 
-def get_layer_info_by_uuid(publ_uuid, *, workspace, layername, x_forwarded_items=None):
+def get_layer_info_by_uuid(publ_uuid, *, x_forwarded_items=None):
     thumbnail_path = get_layer_thumbnail_path(publ_uuid)
     if os.path.exists(thumbnail_path):
         return {
             'thumbnail': {
-                'url': url_for('rest_workspace_layer_thumbnail.get', workspace=workspace,
-                               layername=layername,
+                'url': url_for('rest_layer_thumbnail.get', uuid=publ_uuid,
                                x_forwarded_items=x_forwarded_items),
                 'path': os.path.relpath(thumbnail_path, settings.LAYMAN_DATA_DIR)
             },
