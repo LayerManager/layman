@@ -17,15 +17,15 @@ OWNER = 'test_access_rights_application_owner'
 READER_BY_USERNAME = 'test_access_rights_application_reader_by_username'
 READER_BY_ROLE = 'test_access_rights_application_reader_by_role'
 
-LAYER_NO_ACCESS = Publication4Test(OWNER, process_client.LAYER_TYPE, 'test_no_access_layer')
-LAYER_ACCESS_RIGHTS = Publication4Test(OWNER, process_client.LAYER_TYPE, 'test_access_rights_layer')
+LAYER_NO_ACCESS = Publication4Test(OWNER, process_client.LAYER_TYPE, 'test_no_access_layer', uuid='6e427e10-d3ed-4a62-8785-c2506af3f1f7')
+LAYER_ACCESS_RIGHTS = Publication4Test(OWNER, process_client.LAYER_TYPE, 'test_access_rights_layer', uuid='2ac911df-5769-493e-9f0c-1149a8f08b79')
 
 ENDPOINTS_TO_TEST = {
     process_client.LAYER_TYPE: [
         (process_client.get_workspace_publication, {}),
         (process_client.get_workspace_publication_metadata_comparison, {}),
         (process_client.get_workspace_layer_style, {}),
-        (process_client.get_workspace_publication_thumbnail, {}),
+        (process_client.get_uuid_publication_thumbnail, {}),
         # process_client.get_workspace_layer_chunk,
         (process_client.patch_workspace_publication, {'title': 'New title'}),
         (process_client.patch_workspace_publication, {'file_paths': ['sample/layman.layer/small_layer.geojson']}),
@@ -122,7 +122,6 @@ def add_publication_test_cases_to_list(tc_list, publication, user, endpoints_to_
                                            }},
                                            type=test_type,
                                            )
-
         tc_list.append(test_case)
 
 
@@ -268,10 +267,10 @@ class TestAccessRights:
 
     LAYER_NO_ACCESS = LAYER_NO_ACCESS
     LAYER_ACCESS_RIGHTS = LAYER_ACCESS_RIGHTS
-    LAYER_EVERYONE_ACCESS = Publication4Test(OWNER, process_client.LAYER_TYPE, 'test_everyone_access_layer')
-    MAP_NO_ACCESS = Publication4Test(OWNER, process_client.MAP_TYPE, 'test_no_access_map')
-    MAP_ACCESS_RIGHTS = Publication4Test(OWNER, process_client.MAP_TYPE, 'test_access_rights_map')
-    MAP_EVERYONE_ACCESS = Publication4Test(OWNER, process_client.MAP_TYPE, 'test_everyone_access_map')
+    LAYER_EVERYONE_ACCESS = Publication4Test(OWNER, process_client.LAYER_TYPE, 'test_everyone_access_layer', uuid='ff1ca9dd-ff3b-4831-a9d2-c4866f2d5bfe')
+    MAP_NO_ACCESS = Publication4Test(OWNER, process_client.MAP_TYPE, 'test_no_access_map', uuid='e15b4432-95b6-45fd-a021-762fe9a743d7')
+    MAP_ACCESS_RIGHTS = Publication4Test(OWNER, process_client.MAP_TYPE, 'test_access_rights_map', uuid='5b7f339d-55a0-4b91-9438-5c8830f761e9')
+    MAP_EVERYONE_ACCESS = Publication4Test(OWNER, process_client.MAP_TYPE, 'test_everyone_access_map', uuid='850a51da-6e1b-4d63-87c1-5a95e7bc8d08')
 
     ACCESS_RIGHT_NO_ACCESS = {
         'read': OWNER,
@@ -326,6 +325,7 @@ class TestAccessRights:
         role_service_util.ensure_user_role(self.READER_BY_ROLE, self.NON_EXISTING_ROLE)
         for publication, access_rights, _ in self.PUBLICATIONS_DEFS:
             process_client.publish_workspace_publication(publication.type, publication.workspace, publication.name,
+                                                         uuid=publication.uuid,
                                                          actor_name=self.OWNER, access_rights=access_rights, )
         role_service_util.delete_user_role(self.READER_BY_ROLE, self.NON_EXISTING_ROLE)
         role_service_util.delete_role(self.NON_EXISTING_ROLE)

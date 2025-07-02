@@ -17,23 +17,19 @@ def get_expected_urls_in_rest_response(workspace, publ_type, name, *, rest_metho
     proxy_prefix = x_forwarded_items.prefix or ''
     assert rest_method in {'post', 'patch', 'get', 'delete', 'multi_delete'}
     publ_type_directory = f'{publ_type.split(".")[1]}s'
-
-    with app.app_context():
-        uuid = get_publication_info(workspace=workspace, publ_type=publ_type, publ_name=name, context={'keys': ['uuid']})['uuid']
+    uuid = None
+    if rest_method not in ['delete', 'multi_delete']:
+        with app.app_context():
+            uuid = get_publication_info(workspace=workspace, publ_type=publ_type, publ_name=name, context={'keys': ['uuid']})['uuid']
     result = {
         'url': f'{proxy_proto}://{proxy_host}{proxy_prefix}/rest/workspaces/{workspace}/{publ_type_directory}/{name}'
     }
 
     if rest_method == 'get':
-        if publ_type == process_client.MAP_TYPE and uuid:
+        if publ_type in [process_client.MAP_TYPE, process_client.LAYER_TYPE] and uuid:
             result['thumbnail'] = {
-                'url': f'{proxy_proto}://{proxy_host}{proxy_prefix}/rest/maps/{uuid}/thumbnail'
+                'url': f'{proxy_proto}://{proxy_host}{proxy_prefix}/rest/{publ_type_directory}/{uuid}/thumbnail'
             }
-        else:
-            result['thumbnail'] = {
-                'url': f'{proxy_proto}://{proxy_host}{proxy_prefix}/rest/workspaces/{workspace}/{publ_type_directory}/{name}/thumbnail'
-            }
-
         result['metadata'] = {
             'comparison_url': f'{proxy_proto}://{proxy_host}{proxy_prefix}/rest/workspaces/{workspace}/{publ_type_directory}/{name}/metadata-comparison',
         }
