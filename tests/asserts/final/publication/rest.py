@@ -25,9 +25,9 @@ def get_expected_urls_in_rest_response(workspace, publ_type, name, *, rest_metho
     }
 
     if rest_method == 'get':
-        if publ_type == process_client.MAP_TYPE and uuid:
+        if publ_type in [process_client.MAP_TYPE, process_client.LAYER_TYPE] and uuid:
             result['thumbnail'] = {
-                'url': f'{proxy_proto}://{proxy_host}{proxy_prefix}/rest/maps/{uuid}/thumbnail'
+                'url': f'{proxy_proto}://{proxy_host}{proxy_prefix}/rest/{publ_type_directory}/{uuid}/thumbnail'
             }
         else:
             result['thumbnail'] = {

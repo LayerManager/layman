@@ -5,9 +5,9 @@
 |---|---|---|---|---|---|
 |Publications|`/rest/publications`|[GET](#get-publications)| x | x | x |
 |Layers|`/rest/layers`|[GET](#get-layers)| x | x | x |
+|Layer Thumbnail|`/rest/layers/<uuid>/thumbnail`|[GET](#get-layer-thumbnail)| x | x | x |
 |Workspace Layers|`/rest/workspaces/<workspace_name>/layers`|[GET](#get-workspace-layers)| [POST](#post-workspace-layers) | x | [DELETE](#delete-workspace-layers) |
 |[Workspace Layer](models.md#layer)|`/rest/workspaces/<workspace_name>/layers/<layername>`|[GET](#get-workspace-layer)| x | [PATCH](#patch-workspace-layer) | [DELETE](#delete-workspace-layer) |
-|Workspace Layer Thumbnail|`/rest/workspaces/<workspace_name>/layers/<layername>/thumbnail`|[GET](#get-workspace-layer-thumbnail)| x | x | x |
 |Workspace Layer Style|`/rest/workspaces/<workspace_name>/layers/<layername>/style`|[GET](#get-workspace-layer-style)| x | x | x |
 |Workspace Layer Chunk|`/rest/workspaces/<workspace_name>/layers/<layername>/chunk`|[GET](#get-workspace-layer-chunk)| [POST](#post-workspace-layer-chunk) | x | x |
 |Workspace Layer Metadata Comparison|`/rest/workspaces/<workspace_name>/layers/<layername>/metadata-comparison`|[GET](#get-workspace-layer-metadata-comparison) | x | x | x |
@@ -307,7 +307,7 @@ JSON object with following structure:
   - *status*: Status information about GeoServer import and availability of WFS feature type. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **thumbnail**
-  - *url*: String. URL of layer thumbnail. It points to [GET Workspace Layer Thumbnail](#get-workspace-layer-thumbnail).
+  - *url*: String. URL of layer thumbnail. It points to [GET Layer Thumbnail](#get-layer-thumbnail).
   - *path*: String. Path to layer thumbnail. Path is relative to [LAYMAN_DATA_DIR](env-settings.md#LAYMAN_DATA_DIR).
   - *status*: Status information about generating and availability of thumbnail. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
@@ -435,10 +435,10 @@ JSON object representing deleted layer:
 - **url**: String. Former URL of the layer. It points to [GET Workspace Layer](#get-workspace-layer).
 
 
-## Workspace Layer Thumbnail
+## Layer Thumbnail
 ### URL
-`/rest/workspaces/<workspace_name>/layers/<layername>/thumbnail`
-### GET Workspace Layer Thumbnail
+`/rest/layers/<uuid>/thumbnail`
+### GET Layer Thumbnail
 Get thumbnail of the layer in PNG format, 300x300 px, transparent background, in native CRS.
 
 #### Request
