@@ -130,7 +130,7 @@ class TestResponsesClass:
         'style': {'type': 'sld',
                   'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}/style'},
         'thumbnail': {'path': f'layers/{layer_uuid}/thumbnail/{layer_uuid}.png',
-                      'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}/thumbnail'},
+                      'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/layers/{layer_uuid}/thumbnail'},
         'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}',
         'wfs': {'name': f'l_{layer_uuid}', 'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{GEOSERVER_WFS_WORKSPACE}/wfs'},
         'wms': {'name': f'l_{layer_uuid}', 'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{GEOSERVER_WMS_WORKSPACE}/ows'},
