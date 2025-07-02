@@ -214,7 +214,7 @@ def test_post_layers_simple():
         expected_md_values = {
             'abstract': None,
             'extent': [-180.0, -85.60903859383285, 180.0, 83.64513109859944],
-            'graphic_url': test_util.url_for_external('rest_workspace_layer_thumbnail.get', workspace=workspace, layername=layername),
+            'graphic_url': test_util.url_for_external('rest_layer_thumbnail.get', uuid=layeruuid),
             'identifier': {
                 'identifier': test_util.url_for_external('rest_workspace_layer.get', workspace=workspace, layername=layername),
                 'label': 'ne_110m_admin_0_countries'
@@ -397,7 +397,7 @@ def test_post_layers_complex():
         expected_md_values = {
             'abstract': "popis st\u00e1t\u016f",
             'extent': [-180.0, -85.60903859383285, 180.0, 83.64513109859944],
-            'graphic_url': test_util.url_for_external('rest_workspace_layer_thumbnail.get', workspace=workspace, layername=layername),
+            'graphic_url': test_util.url_for_external('rest_layer_thumbnail.get', uuid=layeruuid),
             'identifier': {
                 "identifier": test_util.url_for_external('rest_workspace_layer.get', workspace=workspace, layername=layername),
                 "label": "countries"
@@ -515,12 +515,13 @@ def test_patch_layer_title():
     get_response = process_client.get_workspace_layer(workspace=workspace, name=layername)
     assert get_response['title'] == new_title
     assert get_response['description'] == new_description
+    layer_uuid = get_response['uuid']
 
     with app.app_context():
         expected_md_values = {
             'abstract': "and new description",
             'extent': [-180.0, -85.60903859383285, 180.0, 83.64513109859944],
-            'graphic_url': test_util.url_for_external('rest_workspace_layer_thumbnail.get', workspace=workspace, layername=layername),
+            'graphic_url': test_util.url_for_external('rest_layer_thumbnail.get', uuid=layer_uuid),
             'identifier': {
                 'identifier': test_util.url_for_external('rest_workspace_layer.get', workspace=workspace, layername=layername),
                 'label': 'ne_110m_admin_0_countries'
@@ -574,7 +575,7 @@ def test_patch_layer_style():
         expected_md_values = {
             'abstract': "and new description",
             'extent': [-180.0, -85.60903859383285, 180.0, 83.64513109859944],
-            'graphic_url': test_util.url_for_external('rest_workspace_layer_thumbnail.get', workspace=workspace, layername=layername),
+            'graphic_url': test_util.url_for_external('rest_layer_thumbnail.get', uuid=layer_uuid),
             'identifier': {
                 'identifier': test_util.url_for_external('rest_workspace_layer.get', workspace=workspace, layername=layername),
                 'label': 'ne_110m_admin_0_countries'
@@ -635,7 +636,7 @@ def test_patch_layer_data():
         expected_md_values = {
             'abstract': "popis st\u00e1t\u016f",
             'extent': [-175.22056435043098, -41.29999116752133, 179.21664802661394, 64.15002486626597],
-            'graphic_url': test_util.url_for_external('rest_workspace_layer_thumbnail.get', workspace=workspace, layername=layername),
+            'graphic_url': test_util.url_for_external('rest_layer_thumbnail.get', uuid=layer_uuid),
             'identifier': {
                 'identifier': test_util.url_for_external('rest_workspace_layer.get', workspace=workspace, layername=layername),
                 "label": "countries"

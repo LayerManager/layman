@@ -142,7 +142,7 @@ def _correct_values_in_detail_common(
         filenames=None,
         archive_extension=None,
         external_table_uri=None,
-        thumbnail_by_uuid=False):
+):
 
     assert not file_extension or not filenames
     assert not archive_extension or filenames
@@ -157,12 +157,7 @@ def _correct_values_in_detail_common(
     publ_type = pub_info['type']
     publ_type_dir = util.get_directory_name_from_publ_type(publ_type)
 
-    thumbnail_url = (
-        f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/maps/{uuid}/thumbnail'
-        if thumbnail_by_uuid else
-        f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/'
-        f'{workspace}/{publ_type_dir}/{name}/thumbnail'
-    )
+    thumbnail_url = f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/{publ_type_dir}/{uuid}/thumbnail'
 
     expected_detail = {
         'name': name,
@@ -390,7 +385,6 @@ def correct_values_in_detail_uuid(uuid, *,
         filenames=filenames,
         archive_extension=archive_extension,
         external_table_uri=external_table_uri,
-        thumbnail_by_uuid=True,
     )
 
 
@@ -421,7 +415,6 @@ def correct_values_in_detail(workspace, publ_type, name, *,
         filenames=filenames,
         archive_extension=archive_extension,
         external_table_uri=external_table_uri,
-        thumbnail_by_uuid=False,
     )
 
 

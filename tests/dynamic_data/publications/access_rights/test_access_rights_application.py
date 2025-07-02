@@ -6,6 +6,7 @@ import pytest
 from geoserver.error import Error as GS_Error
 from layman import app, settings, LaymanError
 from layman.layer import db
+from layman.util import get_publication_uuid
 from layman.layer.layer_class import Layer
 from test_tools import process_client, role_service as role_service_util
 from test_tools.data import wfs
@@ -25,7 +26,7 @@ ENDPOINTS_TO_TEST = {
         (process_client.get_workspace_publication, {}),
         (process_client.get_workspace_publication_metadata_comparison, {}),
         (process_client.get_workspace_layer_style, {}),
-        (process_client.get_workspace_publication_thumbnail, {}),
+        (process_client.get_uuid_publication_thumbnail, {}),
         # process_client.get_workspace_layer_chunk,
         (process_client.patch_workspace_publication, {'title': 'New title'}),
         (process_client.patch_workspace_publication, {'file_paths': ['sample/layman.layer/small_layer.geojson']}),
@@ -104,7 +105,7 @@ def add_publication_test_cases_to_list(tc_list, publication, user, endpoints_to_
         'publication_type': publication.type,
         'publ_type': publication.type,
     }
-    for method, args in endpoints_to_test:
+    for method, raw_args in endpoints_to_test:
         # pylint: disable=comparison-with-callable
         test_type = EnumTestTypes.MANDATORY if user in {
             READER_BY_USERNAME,
@@ -112,17 +113,25 @@ def add_publication_test_cases_to_list(tc_list, publication, user, endpoints_to_
                                            geoserver_proxy.is_complete_in_workspace_wms_1_3_0} and publication in {LAYER_ACCESS_RIGHTS,
                                                                                                                    LAYER_NO_ACCESS} else EnumTestTypes.OPTIONAL
 
-        pytest_id = f'{method.__name__}__{user.split("_")[-1]}__{publication.name[5:]}{("__" + next(iter(args.keys()))) if args else ""}'
+        pytest_id = f'{method.__name__}__{user.split("_")[-1]}__{publication.name[5:]}{("__" + next(iter(raw_args.keys()))) if raw_args else ""}'
         method_args = inspect.getfullargspec(method).args + inspect.getfullargspec(method).kwonlyargs
 
-        test_case = base_test.TestCaseType(pytest_id=pytest_id,
-                                           rest_method=method,
-                                           rest_args={**args, **{
-                                               key: value for key, value in all_args.items() if key in method_args
-                                           }},
-                                           type=test_type,
-                                           )
-
+        args = copy.deepcopy(raw_args)
+        if method is process_client.get_uuid_publication_thumbnail and 'uuid' not in args:
+            args.update({
+                'workspace': publication.workspace,
+                'name': publication.name,
+            })
+        args.update({
+            key: value for key, value in all_args.items()
+            if key in method_args and key not in args
+        })
+        test_case = base_test.TestCaseType(
+            pytest_id=pytest_id,
+            rest_method=method,
+            rest_args=args,
+            type=test_type,
+        )
         tc_list.append(test_case)
 
 
@@ -340,11 +349,34 @@ class TestAccessRights:
             role_service_util.delete_role(self.OTHER_ROLE)
 
     def test_single_positive(self, rest_method, rest_args, ):
-        rest_method(**rest_args)
+        if rest_method is process_client.get_uuid_publication_thumbnail and rest_args.get('uuid') is None:
+            with app.app_context():
+                workspace = rest_args.pop('workspace')
+                name = rest_args.pop('name')
+                rest_args['uuid'] = get_publication_uuid(
+                    workspace,
+                    rest_args['publication_type'],
+                    name,
+                )
+        accepted = inspect.signature(rest_method).parameters
+        call_args = {k: v for k, v in rest_args.items() if k in accepted}
+        rest_method(**call_args)
 
     def test_single_negative(self, rest_method, rest_args, ):
+        if rest_method is process_client.get_uuid_publication_thumbnail and rest_args.get('uuid') is None:
+            with app.app_context():
+                workspace = rest_args.pop('workspace', None)
+                name = rest_args.pop('name', None)
+                if workspace and name:
+                    rest_args['uuid'] = get_publication_uuid(
+                        workspace,
+                        rest_args['publication_type'],
+                        name,
+                    )
+        accepted = inspect.signature(rest_method).parameters
+        call_args = {k: v for k, v in rest_args.items() if k in accepted}
         with pytest.raises(LaymanError) as exc_info:
-            rest_method(**rest_args)
+            rest_method(**call_args)
         assert exc_info.value.http_code == 404
         assert exc_info.value.code in [15, 26, ]
 

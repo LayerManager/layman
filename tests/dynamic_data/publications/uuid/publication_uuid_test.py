@@ -53,7 +53,7 @@ class TestPublication(base_test.TestSingleRestPublication):
         assert response.status_code == 200
         assert response.headers['Content-Type'] == 'image/png'
 
-    def test_layer_uuid(self):
+    def test_layer_uuid_in_map_endpoint(self):
         with app.app_context():
             layer_uuid = get_publication_uuid(LAYER.workspace, LAYER.type, LAYER.name)
             response = requests.get(
@@ -63,3 +63,23 @@ class TestPublication(base_test.TestSingleRestPublication):
         response_json = response.json()
         assert response_json['code'] == 26
         assert response_json['detail']['uuid'] == layer_uuid
+
+    def test_layer_uuid(self):
+        with app.app_context():
+            layer_uuid = get_publication_uuid(LAYER.workspace, LAYER.type, LAYER.name)
+            response = requests.get(
+                f"http://{settings.LAYMAN_SERVER_NAME}/rest/layers/{layer_uuid}/thumbnail"
+            )
+        assert response.status_code == 200
+        assert response.headers['Content-Type'] == 'image/png'
+
+    def test_map_uuid_in_layer_endpoint(self):
+        with app.app_context():
+            map_uuid = get_publication_uuid(MAP.workspace, MAP.type, MAP.name)
+            response = requests.get(
+                f"http://{settings.LAYMAN_SERVER_NAME}/rest/layers/{map_uuid}/thumbnail"
+            )
+        assert response.status_code == 404
+        response_json = response.json()
+        assert response_json['code'] == 15
+        assert response_json['detail']['uuid'] == map_uuid
