@@ -58,9 +58,8 @@ def test_fill_template():
                                                                           },
                                                                           'abstract': None,
                                                                           'graphic_url': layman_util.url_for(
-                                                                              'rest_workspace_layer_thumbnail.get',
-                                                                              workspace=workspace,
-                                                                              layername=layer),
+                                                                              'rest_layer_thumbnail.get',
+                                                                              uuid=layer_uuid),
                                                                           'extent': [11.87, 48.12, 19.13, 51.59],
                                                                           'temporal_extent': ['2022-03-16T00:00:00.000Z',
                                                                                               '2022-03-19T00:00:00.000Z', ],
@@ -91,6 +90,7 @@ def test_fill_template():
 
 def test_parse_md_properties():
     xml_path = 'src/layman/layer/micka/util_test_filled_template.xml'
+    layer_uuid = 'ca238200-8200-1a23-9399-42c9fca53542'
     with open(xml_path, 'r', encoding="utf-8") as xml_file:
         props = common_util.parse_md_properties(xml_file, [
             'abstract',
@@ -128,7 +128,7 @@ def test_parse_md_properties():
                 'label': 'MZP-CORINE',
             },
             'abstract': None,
-            'graphic_url': url_for('rest_workspace_layer_thumbnail.get', workspace='browser', layername='layer',
+            'graphic_url': url_for('rest_layer_thumbnail.get', uuid=layer_uuid,
                                    internal=False),
             'extent': [11.87, 48.12, 19.13, 51.59],
             'wms_url': 'http://www.env.cz/corine/data/download.zip',
