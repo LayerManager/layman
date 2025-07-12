@@ -126,7 +126,11 @@ def authorize_uuid_publication_decorator(*, expected_publication_type):
             uuid = request.view_args['uuid']
             info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['workspace', 'name', 'type']})
             if info is None or info.get('type') != expected_publication_type:
-                raise LaymanError(26, {'uuid': uuid})
+                publication_not_found_code = {
+                    'layman.layer': 15,
+                    'layman.map': 26,
+                }[expected_publication_type]
+                raise LaymanError(publication_not_found_code, {'uuid': uuid})
             workspace = info['_workspace']
             publication_type = info['type']
             publication_name = info['name']

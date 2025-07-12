@@ -47,7 +47,6 @@ PublicationTypeDef = namedtuple('PublicationTypeDef', ['url_param_name',
                                                        'patch_workspace_publication_url',
                                                        'get_workspace_publications_url',
                                                        'get_workspace_publication_url',
-                                                       'get_workspace_publication_thumbnail_url',
                                                        'get_publication_thumbnail_url',
                                                        'delete_workspace_publication_url',
                                                        'delete_workspace_publications_url',
@@ -62,7 +61,6 @@ PUBLICATION_TYPES_DEF = {MAP_TYPE: PublicationTypeDef('mapname',
                                                       'rest_workspace_map.patch',
                                                       'rest_workspace_maps.get',
                                                       'rest_workspace_map.get',
-                                                      None,
                                                       'rest_map_thumbnail.get',
                                                       'rest_workspace_map.delete_map',
                                                       'rest_workspace_maps.delete',
@@ -77,8 +75,7 @@ PUBLICATION_TYPES_DEF = {MAP_TYPE: PublicationTypeDef('mapname',
                                                         'rest_workspace_layer.patch',
                                                         'rest_workspace_layers.get',
                                                         'rest_workspace_layer.get',
-                                                        'rest_workspace_layer_thumbnail.get',
-                                                        None,
+                                                        'rest_layer_thumbnail.get',
                                                         'rest_workspace_layer.delete_layer',
                                                         'rest_workspace_layers.delete',
                                                         layer_keys_to_check,
@@ -88,7 +85,6 @@ PUBLICATION_TYPES_DEF = {MAP_TYPE: PublicationTypeDef('mapname',
                                                         ),
                          None: PublicationTypeDef('publicationname',
                                                   'rest_publications.get',
-                                                  None,
                                                   None,
                                                   None,
                                                   None,
@@ -793,31 +789,9 @@ def get_workspace_map_file(publication_type, workspace, name, headers=None, acto
     return response.json()
 
 
-def get_workspace_publication_thumbnail(publication_type, workspace, name, *, actor_name=None):
-    assert publication_type == LAYER_TYPE, f"Expected publication_type to be {LAYER_TYPE}, got {publication_type}"
-    headers = {}
-    publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
-    if actor_name:
-        assert TOKEN_HEADER not in headers
-
-    if actor_name and actor_name != settings.ANONYM_USER:
-        headers.update(get_authz_headers(actor_name))
-
-    with app.app_context():
-        r_url = url_for(publication_type_def.get_workspace_publication_thumbnail_url, **{publication_type_def.url_param_name: name}, workspace=workspace)
-    response = requests.get(r_url, headers=headers, timeout=HTTP_TIMEOUT)
-    raise_layman_error(response)
-    return response.content
-
-
 def get_uuid_publication_thumbnail(publication_type, uuid, *, actor_name=None):
-    assert publication_type == MAP_TYPE, f"Expected publication_type to be {MAP_TYPE}, got {publication_type}"
     headers = {}
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
-
-    if publication_type_def.get_uuid_publication_thumbnail_url is None:
-        raise ValueError(f"UUID-based thumbnail endpoint not defined for publication type {publication_type}")
-
     if actor_name:
         assert TOKEN_HEADER not in headers
 
@@ -825,7 +799,7 @@ def get_uuid_publication_thumbnail(publication_type, uuid, *, actor_name=None):
         headers.update(get_authz_headers(actor_name))
 
     with app.app_context():
-        r_url = url_for(publication_type_def.get_uuid_publication_thumbnail_url, uuid=uuid)
+        r_url = url_for(publication_type_def.get_publication_thumbnail_url, uuid=uuid)
 
     response = requests.get(r_url, headers=headers, timeout=HTTP_TIMEOUT)
     raise_layman_error(response)

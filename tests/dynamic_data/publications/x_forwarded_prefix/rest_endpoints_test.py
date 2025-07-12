@@ -36,6 +36,8 @@ class TestPublication(base_test.TestSingleRestPublication):
         x_forwarded_items = XForwardedClass(proto='https', host='localhost:4142', prefix='/layman-proxy')
         response = rest_method.fn(publication, args={'headers': x_forwarded_items.headers})
         publication_response = response[0] if isinstance(response, list) and len(response) == 1 else response
+        if isinstance(publication_response, dict) and 'uuid' not in publication_response and getattr(publication, 'uuid', None) is not None:
+            publication_response['uuid'] = publication.uuid
         geodata_type = publication_response.get('geodata_type')
         exp_resp = assert_rest.get_expected_urls_in_rest_response(publication.workspace, publication.type, publication.name,
                                                                   rest_method=rest_method.enum_item.publ_name_part,
