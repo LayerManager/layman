@@ -18,8 +18,8 @@ OWNER = 'test_access_rights_application_owner'
 READER_BY_USERNAME = 'test_access_rights_application_reader_by_username'
 READER_BY_ROLE = 'test_access_rights_application_reader_by_role'
 
-LAYER_NO_ACCESS = Publication4Test(OWNER, process_client.LAYER_TYPE, 'test_no_access_layer')
-LAYER_ACCESS_RIGHTS = Publication4Test(OWNER, process_client.LAYER_TYPE, 'test_access_rights_layer')
+LAYER_NO_ACCESS = Publication4Test(OWNER, process_client.LAYER_TYPE, 'test_no_access_layer', uuid='6e427e10-d3ed-4a62-8785-c2506af3f1f7')
+LAYER_ACCESS_RIGHTS = Publication4Test(OWNER, process_client.LAYER_TYPE, 'test_access_rights_layer', uuid='2ac911df-5769-493e-9f0c-1149a8f08b79')
 
 ENDPOINTS_TO_TEST = {
     process_client.LAYER_TYPE: [
@@ -105,7 +105,7 @@ def add_publication_test_cases_to_list(tc_list, publication, user, endpoints_to_
         'publication_type': publication.type,
         'publ_type': publication.type,
     }
-    for method, raw_args in endpoints_to_test:
+    for method, args in endpoints_to_test:
         # pylint: disable=comparison-with-callable
         test_type = EnumTestTypes.MANDATORY if user in {
             READER_BY_USERNAME,
@@ -113,25 +113,16 @@ def add_publication_test_cases_to_list(tc_list, publication, user, endpoints_to_
                                            geoserver_proxy.is_complete_in_workspace_wms_1_3_0} and publication in {LAYER_ACCESS_RIGHTS,
                                                                                                                    LAYER_NO_ACCESS} else EnumTestTypes.OPTIONAL
 
-        pytest_id = f'{method.__name__}__{user.split("_")[-1]}__{publication.name[5:]}{("__" + next(iter(raw_args.keys()))) if raw_args else ""}'
+        pytest_id = f'{method.__name__}__{user.split("_")[-1]}__{publication.name[5:]}{("__" + next(iter(args.keys()))) if args else ""}'
         method_args = inspect.getfullargspec(method).args + inspect.getfullargspec(method).kwonlyargs
 
-        args = copy.deepcopy(raw_args)
-        if method is process_client.get_uuid_publication_thumbnail and 'uuid' not in args:
-            args.update({
-                'workspace': publication.workspace,
-                'name': publication.name,
-            })
-        args.update({
-            key: value for key, value in all_args.items()
-            if key in method_args and key not in args
-        })
-        test_case = base_test.TestCaseType(
-            pytest_id=pytest_id,
-            rest_method=method,
-            rest_args=args,
-            type=test_type,
-        )
+        test_case = base_test.TestCaseType(pytest_id=pytest_id,
+                                           rest_method=method,
+                                           rest_args={**args, **{
+                                               key: value for key, value in all_args.items() if key in method_args
+                                           }},
+                                           type=test_type,
+                                           )
         tc_list.append(test_case)
 
 
@@ -277,10 +268,10 @@ class TestAccessRights:
 
     LAYER_NO_ACCESS = LAYER_NO_ACCESS
     LAYER_ACCESS_RIGHTS = LAYER_ACCESS_RIGHTS
-    LAYER_EVERYONE_ACCESS = Publication4Test(OWNER, process_client.LAYER_TYPE, 'test_everyone_access_layer')
-    MAP_NO_ACCESS = Publication4Test(OWNER, process_client.MAP_TYPE, 'test_no_access_map')
-    MAP_ACCESS_RIGHTS = Publication4Test(OWNER, process_client.MAP_TYPE, 'test_access_rights_map')
-    MAP_EVERYONE_ACCESS = Publication4Test(OWNER, process_client.MAP_TYPE, 'test_everyone_access_map')
+    LAYER_EVERYONE_ACCESS = Publication4Test(OWNER, process_client.LAYER_TYPE, 'test_everyone_access_layer', uuid='ff1ca9dd-ff3b-4831-a9d2-c4866f2d5bfe')
+    MAP_NO_ACCESS = Publication4Test(OWNER, process_client.MAP_TYPE, 'test_no_access_map', uuid='e15b4432-95b6-45fd-a021-762fe9a743d7')
+    MAP_ACCESS_RIGHTS = Publication4Test(OWNER, process_client.MAP_TYPE, 'test_access_rights_map', uuid='5b7f339d-55a0-4b91-9438-5c8830f761e9')
+    MAP_EVERYONE_ACCESS = Publication4Test(OWNER, process_client.MAP_TYPE, 'test_everyone_access_map', uuid='850a51da-6e1b-4d63-87c1-5a95e7bc8d08')
 
     ACCESS_RIGHT_NO_ACCESS = {
         'read': OWNER,
@@ -335,6 +326,7 @@ class TestAccessRights:
         role_service_util.ensure_user_role(self.READER_BY_ROLE, self.NON_EXISTING_ROLE)
         for publication, access_rights, _ in self.PUBLICATIONS_DEFS:
             process_client.publish_workspace_publication(publication.type, publication.workspace, publication.name,
+                                                         uuid=publication.uuid,
                                                          actor_name=self.OWNER, access_rights=access_rights, )
         role_service_util.delete_user_role(self.READER_BY_ROLE, self.NON_EXISTING_ROLE)
         role_service_util.delete_role(self.NON_EXISTING_ROLE)
@@ -349,34 +341,11 @@ class TestAccessRights:
             role_service_util.delete_role(self.OTHER_ROLE)
 
     def test_single_positive(self, rest_method, rest_args, ):
-        if rest_method is process_client.get_uuid_publication_thumbnail and rest_args.get('uuid') is None:
-            with app.app_context():
-                workspace = rest_args.pop('workspace')
-                name = rest_args.pop('name')
-                rest_args['uuid'] = get_publication_uuid(
-                    workspace,
-                    rest_args['publication_type'],
-                    name,
-                )
-        accepted = inspect.signature(rest_method).parameters
-        call_args = {k: v for k, v in rest_args.items() if k in accepted}
-        rest_method(**call_args)
+        rest_method(**rest_args)
 
     def test_single_negative(self, rest_method, rest_args, ):
-        if rest_method is process_client.get_uuid_publication_thumbnail and rest_args.get('uuid') is None:
-            with app.app_context():
-                workspace = rest_args.pop('workspace', None)
-                name = rest_args.pop('name', None)
-                if workspace and name:
-                    rest_args['uuid'] = get_publication_uuid(
-                        workspace,
-                        rest_args['publication_type'],
-                        name,
-                    )
-        accepted = inspect.signature(rest_method).parameters
-        call_args = {k: v for k, v in rest_args.items() if k in accepted}
         with pytest.raises(LaymanError) as exc_info:
-            rest_method(**call_args)
+            rest_method(**rest_args)
         assert exc_info.value.http_code == 404
         assert exc_info.value.code in [15, 26, ]
 
