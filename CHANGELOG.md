@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.1.1
+ 2025-07-25
+### Changes
+- Add `sed` command to Dockerfile files to change HTTP to HTTPS in apt sources.list.
+
 ## v2.1.0
  2025-05-02
 ### Changes
