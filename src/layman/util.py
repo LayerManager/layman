@@ -748,3 +748,14 @@ def get_publication_writer(workspace, publication_type, publication_name):
         user_or_role for user_or_role in info['access_rights']['write']
         if is_user(user_or_role)
     ), settings.ANONYM_USER)
+
+
+def get_publication_workspace(uuid):
+    if uuid is None:
+        return None
+
+    publication_info = _get_publication_by_uuid(uuid)
+    if publication_info is None:
+        return None
+    workspace, _, _ = publication_info
+    return workspace

@@ -65,7 +65,7 @@ Currently, value of X-Forwarded headers affects following URLs:
   * `file`.`url` key
   * `thumbnail`.`url` key
   * `metadata`.`comparison_url` key
-* [GET Workspace Map File](rest.md#get-workspace-map-file)
+* [GET Map File](rest.md#get-map-file)
   * some URLs of each [internal layer](models.md#internal-map-layer):
     * `url` key
     * `protocol`.`url` key

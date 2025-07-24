@@ -349,12 +349,12 @@ def get_metadata_comparison(publication: Map):
     for partial_info in partial_infos.values():
         if partial_info is not None:
             all_props.update(partial_info)
-    map_json = get_map_file_json(publ_uuid, workspace=publication.workspace)
+    map_json = get_map_file_json(publ_uuid)
     if map_json:
         soap_operates_on = next(iter(partial_infos[csw].values()))['operates_on'] if partial_infos[csw] else []
         operates_on_muuids_filter = micka_util.operates_on_values_to_muuids(soap_operates_on)
         layman_file_props = map_file_to_metadata_properties(publication, map_json, operates_on_muuids_filter)
-        map_file_url = url_for('rest_workspace_map_file.get', mapname=publication.name, workspace=publication.workspace)
+        map_file_url = url_for('rest_map_file.get', uuid=publication.uuid)
         all_props[map_file_url] = layman_file_props
 
     return metadata_common.transform_metadata_props_to_comparison(all_props)
@@ -392,7 +392,7 @@ def _adjust_url(*, url_obj=None, url_key=None, url_list=None, url_idx=None, prox
     return found_original_base_url
 
 
-def get_map_file_json(publ_uuid, *, workspace, adjust_urls=True, x_forwarded_items=None):
+def get_map_file_json(publ_uuid, *, adjust_urls=True, x_forwarded_items=None):
     x_forwarded_items = x_forwarded_items or XForwardedClass()
     map_json = input_file.get_map_json(publ_uuid)
 
@@ -421,6 +421,7 @@ def get_map_file_json(publ_uuid, *, workspace, adjust_urls=True, x_forwarded_ite
                                 path_prefix='/rest/')
 
     if map_json is not None:
+        workspace = layman_util.get_publication_workspace(publ_uuid)
         map_json['user'] = get_map_owner_info(workspace)
         map_json.pop("groups", None)
     return map_json
