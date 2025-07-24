@@ -772,10 +772,9 @@ def patch_after_feature_change(workspace, publ_type, name):
         layman_util.patch_after_feature_change(workspace, publ_type, name, queue=queue)
 
 
-def get_workspace_map_file(publication_type, workspace, name, headers=None, actor_name=None):
+def get_uuid_map_file(publication_type, uuid, *, headers=None, actor_name=None):
     headers = headers or {}
     assert publication_type == MAP_TYPE
-    publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
     if actor_name:
         assert TOKEN_HEADER not in headers
 
@@ -783,7 +782,7 @@ def get_workspace_map_file(publication_type, workspace, name, headers=None, acto
         headers.update(get_authz_headers(actor_name))
 
     with app.app_context():
-        r_url = url_for('rest_workspace_map_file.get', **{publication_type_def.url_param_name: name}, workspace=workspace)
+        r_url = url_for('rest_map_file.get', uuid=uuid)
     response = requests.get(r_url, headers=headers, timeout=HTTP_TIMEOUT)
     raise_layman_error(response)
     return response.json()

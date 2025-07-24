@@ -329,7 +329,7 @@ def _correct_values_in_detail_common(
         util.recursive_dict_update(expected_detail,
                                    {
                                        '_file': {
-                                           'url': f'http://{settings.LAYMAN_SERVER_NAME}/rest/workspaces/{workspace}/{publ_type_dir}/{name}/file',
+                                           'url': f'http://{settings.LAYMAN_SERVER_NAME}/rest/maps/{uuid}/file',
                                            'paths': {
                                                'absolute': [
                                                    f'/layman_data_test/{publ_type_dir}/{uuid}/input_file/{uuid}.json']
@@ -337,7 +337,7 @@ def _correct_values_in_detail_common(
                                        },
                                        'file': {
                                            'path': f'{publ_type_dir}/{uuid}/input_file/{uuid}.json',
-                                           'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/{publ_type_dir}/{name}/file'},
+                                           'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/maps/{uuid}/file'},
                                        '_style_type': None,
                                        '_map_layers': [],
                                    })

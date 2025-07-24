@@ -40,36 +40,31 @@ def get_map_file(publ_uuid):
 
 def get_map_info(workspace, mapname, *, x_forwarded_items=None):
     publ_uuid = get_publication_uuid(workspace, MAP_TYPE, mapname)
-    return get_map_info_by_uuid(publ_uuid, workspace=workspace, mapname=mapname, x_forwarded_items=x_forwarded_items) \
+    return get_map_info_by_uuid(publ_uuid, x_forwarded_items=x_forwarded_items) \
         if publ_uuid else {}
 
 
-def get_map_info_by_uuid(publ_uuid, *, workspace, mapname, x_forwarded_items=None):
+def get_map_info_by_uuid(publ_uuid, *, x_forwarded_items=None):
     map_file_path_absolute = get_map_file(publ_uuid)
-    result = {}
     if os.path.exists(map_file_path_absolute):
         with open(map_file_path_absolute, 'r', encoding="utf-8") as map_file:
             map_json = json.load(map_file)
         map_file_path = os.path.relpath(map_file_path_absolute, settings.LAYMAN_DATA_DIR)
-        result = {
+        return {
             'file': {
                 'path': map_file_path,
-                'url': url_for('rest_workspace_map_file.get', mapname=mapname, workspace=workspace, x_forwarded_items=x_forwarded_items),
+                'url': url_for('rest_map_file.get', uuid=publ_uuid, x_forwarded_items=x_forwarded_items),
             },
             '_file': {
                 'paths': {
                     'absolute': [map_file_path_absolute],
                 },
-                'url': url_for('rest_workspace_map_file.get', mapname=mapname, workspace=workspace, internal=True),
+                'url': url_for('rest_map_file.get', uuid=publ_uuid, internal=True),
             },
             'title': map_json['title'] or '',
             'description': map_json['abstract'] or '',
         }
-    elif os.path.exists(util.get_map_dir(publ_uuid)):
-        result = {
-            'name': mapname
-        }
-    return result
+    return {}
 
 
 def save_map_files(publ_uuid, files):

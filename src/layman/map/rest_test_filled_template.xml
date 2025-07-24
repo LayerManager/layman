@@ -210,7 +210,7 @@
           <gmd:onLine>
             <gmd:CI_OnlineResource>
               <gmd:linkage>
-                <gmd:URL>http://localhost:8000/rest/workspaces/testuser1/maps/svet/file</gmd:URL>
+                <gmd:URL>http://localhost:8000/rest/maps/f4b2a3d1-2f77-4f7d-9a7e-4a2b0f75e2d3/file</gmd:URL>
               </gmd:linkage>
               <gmd:protocol>
                 <gmx:Anchor xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/WWW:LINK-1.0-http--link">WWW:LINK-1.0-http--link</gmx:Anchor>

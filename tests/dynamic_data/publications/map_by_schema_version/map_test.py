@@ -68,7 +68,9 @@ class TestPublication(base_test.TestSingleRestPublication):
                    'X-Forwarded-Prefix': '/new-client-proxy',
                    }
 
-        resp = process_client.get_workspace_map_file(map.type, map.workspace, map.name, headers=headers)
+        uuid = TestPublication.publ_uuids.get(map)
+        resp = process_client.get_uuid_map_file(map.type, uuid, headers=headers)
+
         with open(exp_file, encoding='utf-8') as file:
             exp_json = json.load(file)
         exp_json['name'] = map.name
