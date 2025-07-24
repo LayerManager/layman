@@ -143,7 +143,7 @@ class TestResponsesClass:
         'native_crs': 'EPSG:3857',
         'native_bounding_box': list(test_data.SMALL_MAP_BBOX),
         'file': {'path': f'maps/{map_uuid}/input_file/{map_uuid}.json',
-                 'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/maps/{publication}/file'},
+                 'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/maps/{map_uuid}/file'},
         'metadata': {
             'comparison_url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/maps/{publication}/'
                               f'metadata-comparison',

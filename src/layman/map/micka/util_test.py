@@ -91,7 +91,7 @@ def test_parse_md_properties():
             'extent': [-35, -48.5, 179, 81.5],
             'map_endpoint': url_for('rest_workspace_map.get', workspace='testuser1', mapname='svet',
                                     internal=False),
-            'map_file_endpoint': url_for('rest_workspace_map_file.get', workspace='testuser1', mapname='svet',
+            'map_file_endpoint': url_for('rest_map_file.get', uuid='f4b2a3d1-2f77-4f7d-9a7e-4a2b0f75e2d3',
                                          internal=False),
             'operates_on': [
                 {
@@ -132,7 +132,7 @@ def test_fill_xml_template():
             'extent': [-35, -48.5, 179, 81.5],
             'map_endpoint': url_for('rest_workspace_map.get', workspace='testuser1', mapname='svet',
                                     internal=False),
-            'map_file_endpoint': url_for('rest_workspace_map_file.get', workspace='testuser1', mapname='svet',
+            'map_file_endpoint': url_for('rest_map_file.get', uuid='91147a27-1ff4-4242-ba6d-faffb92224c6',
                                          internal=False),
             'md_language': 'cze',
             'operates_on': [

@@ -180,7 +180,7 @@ def test_post_maps_simple():
     assert 'status' not in map_file
     assert 'path' in map_file
     with app.app_context():
-        assert map_file['url'] == test_util.url_for_external('rest_workspace_map_file.get', workspace=workspace, mapname=mapname)
+        assert map_file['url'] == test_util.url_for_external('rest_map_file.get', uuid=uuid_str)
     thumbnail = incomplete_get_resp['thumbnail']
     assert 'status' in thumbnail
     assert thumbnail['status'] in ['PENDING', 'STARTED']
@@ -205,7 +205,7 @@ def test_post_maps_simple():
     with app.app_context():
         assert thumbnail['url'] == test_util.url_for_external('rest_map_thumbnail.get', uuid=uuid_str)
 
-    file_resp = process_client.get_workspace_map_file(process_client.MAP_TYPE, workspace, mapname)
+    file_resp = process_client.get_uuid_map_file(process_client.MAP_TYPE, uuid_str)
     assert file_resp['name'] == mapname
 
     process_client.wait_for_publication_status(workspace, process_client.MAP_TYPE, mapname,
@@ -246,7 +246,7 @@ def test_post_maps_simple():
                 "label": mapname,
             },
             'map_endpoint': test_util.url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname),
-            'map_file_endpoint': test_util.url_for_external('rest_workspace_map_file.get', workspace=workspace, mapname=mapname),
+            'map_file_endpoint': test_util.url_for_external('rest_map_file.get', uuid=uuid_str),
             'operates_on': [],
             'organisation_name': None,
             'publication_date': TODAY_DATE,
@@ -295,7 +295,7 @@ def test_post_maps_complex():
     assert 'status' not in map_file
     assert 'path' in map_file
     with app.app_context():
-        assert map_file['url'] == test_util.url_for_external('rest_workspace_map_file.get', workspace=workspace, mapname=mapname)
+        assert map_file['url'] == test_util.url_for_external('rest_map_file.get', uuid=uuid_str)
     thumbnail = incomplete_get_resp['thumbnail']
     assert 'status' in thumbnail
     assert thumbnail['status'] in ['PENDING', 'STARTED']
@@ -330,7 +330,7 @@ def test_post_maps_complex():
     with app.app_context():
         assert thumbnail['url'] == test_util.url_for_external('rest_map_thumbnail.get', uuid=uuid_str)
 
-    file_resp = process_client.get_workspace_map_file(process_client.MAP_TYPE, workspace, mapname)
+    file_resp = process_client.get_uuid_map_file(process_client.MAP_TYPE, uuid_str)
     assert file_resp['name'] == mapname
     assert file_resp['title'] == title
     assert file_resp['abstract'] == description
@@ -365,7 +365,7 @@ def test_post_maps_complex():
                 "label": mapname
             },
             'map_endpoint': test_util.url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname),
-            'map_file_endpoint': test_util.url_for_external('rest_workspace_map_file.get', workspace=workspace, mapname=mapname),
+            'map_file_endpoint': test_util.url_for_external('rest_map_file.get', uuid=uuid_str),
             'operates_on': [],
             'organisation_name': None,
             'publication_date': TODAY_DATE,
@@ -411,7 +411,7 @@ def test_patch_map():
     assert 'status' not in map_file
     assert 'path' in map_file
     with app.app_context():
-        assert map_file['url'] == test_util.url_for_external('rest_workspace_map_file.get', workspace=workspace, mapname=mapname)
+        assert map_file['url'] == test_util.url_for_external('rest_map_file.get', uuid=uuid_str)
     thumbnail = incomplete_get_resp['thumbnail']
     assert 'status' in thumbnail
     assert thumbnail['status'] in ['PENDING', 'STARTED']
@@ -434,7 +434,7 @@ def test_patch_map():
     with app.app_context():
         assert thumbnail['url'] == test_util.url_for_external('rest_map_thumbnail.get', uuid=uuid_str)
 
-    file_resp = process_client.get_workspace_map_file(process_client.MAP_TYPE, workspace, mapname)
+    file_resp = process_client.get_uuid_map_file(process_client.MAP_TYPE, uuid_str)
     assert file_resp['name'] == mapname
     assert file_resp['title'] == "Jiné administrativn\u00ed \u010dlen\u011bn\u00ed Libereck\u00e9ho kraje"
     assert file_resp['abstract'] == "Jiný popis"
@@ -499,7 +499,7 @@ def test_patch_map():
                 "label": "administrativni_cleneni_libereckeho_kraje"
             },
             'map_endpoint': test_util.url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname),
-            'map_file_endpoint': test_util.url_for_external('rest_workspace_map_file.get', workspace=workspace, mapname=mapname),
+            'map_file_endpoint': test_util.url_for_external('rest_map_file.get', uuid=uuid_str),
             'operates_on': [],
             'organisation_name': None,
             'publication_date': TODAY_DATE,
@@ -676,7 +676,7 @@ def test_map_composed_from_local_layers():
                 "label": "svet"
             },
             'map_endpoint': test_util.url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname),
-            'map_file_endpoint': test_util.url_for_external('rest_workspace_map_file.get', workspace=workspace, mapname=mapname),
+            'map_file_endpoint': test_util.url_for_external('rest_map_file.get', uuid=uuid_str),
             'operates_on': [
                 {
                     "xlink:href": f"http://localhost:3080/csw?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID=m-{layer2_uuid}#_m-{layer2_uuid}",

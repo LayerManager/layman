@@ -13,9 +13,9 @@
 |Workspace Layer Metadata Comparison|`/rest/workspaces/<workspace_name>/layers/<layername>/metadata-comparison`|[GET](#get-workspace-layer-metadata-comparison) | x | x | x |
 |Maps|`/rest/maps`|[GET](#get-maps)| x | x | x |
 |Map Thumbnail|`/rest/maps/<uuid>/thumbnail`|[GET](#get-map-thumbnail)| x | x | x |
+|Map File|`/rest/maps/<uuid>/file`|[GET](#get-map-file)| x | x | x |
 |Workspace Maps|`/rest/workspaces/<workspace_name>/maps`|[GET](#get-workspace-maps)| [POST](#post-workspace-maps) | x | [DELETE](#delete-workspace-maps) |
 |[Workspace Map](models.md#map)|`/rest/workspaces/<workspace_name>/maps/<mapname>`|[GET](#get-workspace-map)| x | [PATCH](#patch-workspace-map) | [DELETE](#delete-workspace-map) |
-|Workspace Map File|`/rest/workspaces/<workspace_name>/maps/<mapname>/file`|[GET](#get-workspace-map-file)| x | x | x |
 |Workspace Map Metadata Comparison|`/rest/workspaces/<workspace_name>/layers/<layername>/metadata-comparison`|[GET](#get-workspace-map-metadata-comparison) | x | x | x |
 |Users|`/rest/users`|[GET](#get-users)| x | x | x |
 |User|`/rest/users/<username>`| x | x | x | [DELETE](#delete-user) |
@@ -653,7 +653,7 @@ JSON object with following structure:
 - **description**: String. Taken from `abstract` attribute of JSON root object.
 - **updated_at**: String. Date and time of last POST/PATCH of the publication. Format is [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601), more specifically `YYYY-MM-DDThh:mm:ss.sss±hh:mm`, always in UTC. Sample value: `"2021-03-18T09:29:53.769233+00:00"`
 - **file**
-  - *url*: String. URL of map-composition JSON file. It points to [GET Workspace Map File](#get-workspace-map-file).
+  - *url*: String. URL of map-composition JSON file. It points to [GET Map File](#get-map-file).
   - *path*: String. Path to map-composition JSON file, relative to [LAYMAN_DATA_DIR](env-settings.md#LAYMAN_DATA_DIR).
   - *status*: Status information about availability of file. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
@@ -722,14 +722,14 @@ JSON object representing deleted map:
 - **url**: String. Former URL of the map. It points to [GET Workspace Map](#get-workspace-map).
 
 
-## Workspace Map File
+## Map File
 ### URL
-`/rest/workspaces/<workspace_name>/maps/<mapname>/file`
-### GET Workspace Map File
+`/rest/maps/<uuid>/file`
+### GET Map File
 Get JSON file describing the map valid against [map-composition schema](https://github.com/hslayers/hslayers-ng/wiki/Composition-schema).
 
 Notice that some JSON properties are automatically updated by layman, so file obtained by this endpoint may be slightly different from file that was uploaded. Expected changes:
-- **name** set to `<mapname>` in URL of this endpoint
+- **name** set to the map's name
 - **title** obtained from [POST Workspace Maps](#post-workspace-maps) or [PATCH Workspace Map](#patch-workspace-map) as `title`
 - **abstract** obtained from [POST Workspace Maps](#post-workspace-maps) or [PATCH Workspace Map](#patch-workspace-map) as `description`
 - **user** updated on the fly during this request:
@@ -772,7 +772,7 @@ Content-Type: `application/json`
 
 JSON object with one attribute:
 - **metadata_sources**: Dictionary of objects. Key is ID of metadata source valid for this JSON only (not persistent in time!). Value is object with following attributes:
-  - **url**: String. URL of the metadata source ([GET Workspace Map](#get-workspace-map), [GET Workspace Map File](#get-workspace-map-file), or CSW record).
+  - **url**: String. URL of the metadata source ([GET Workspace Map](#get-workspace-map), [GET Map File](#get-map-file), or CSW record).
 - **metadata_properties**: Dictionary of objects. Key is name of [metadata property](./metadata.md) (e.g. `reference_system`). Value is object with following attributes:
   - **values**: Dictionary of objects. Key is ID of metadata source corresponding with `metadata_sources` attribute. Value is any valid JSON (null, number, string, boolean, list, or object) representing value of [metadata property](./metadata.md) (e.g. `[3857, 4326]`). Null means the value is not set.
   - **equal**: Boolean. True if all values are considered equal, false otherwise.

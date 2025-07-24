@@ -18,6 +18,7 @@
 ### Changes
 - [#1126](https://github.com/LayerManager/layman/issues/1126) Endpoint [GET Workspace Map Thumbnail](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-map-thumbnail) was removed and replaced with endpoint [GET Map Thumbnail](doc/rest.md#get-map-thumbnail) endpoint to use UUID-based URL `/rest/maps/{uuid}/thumbnail` instead of workspace&name-based URL.
 - [#1126](https://github.com/LayerManager/layman/issues/1126) Endpoint [GET Workspace Layer Thumbnail](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-layer-thumbnail) was removed and replaced with endpoint [GET Layer Thumbnail](doc/rest.md#get-layer-thumbnail) endpoint to use UUID-based URL `/rest/layers/{uuid}/thumbnail` instead of workspace&name-based URL.
+- [#1126](https://github.com/LayerManager/layman/issues/1126) Endpoint [GET Workspace Map File](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-map-file) was removed and replaced with endpoint [GET Map File](doc/rest.md#get-map-file) to use UUID-based URL `/rest/map/{uuid}/file` instead of workspace&name-based URL.
 
 ## v2.1.0
  2025-05-02
@@ -182,7 +183,7 @@
   - [GET](doc/rest.md#get-workspace-layer)/[PATCH](doc/rest.md#patch-workspace-layer)/[DELETE](doc/rest.md#delete-workspace-layer) Workspace Layer
   - GET Workspace Layer [Thumbnail](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-layer-thumbnail)/[Style](doc/rest.md#get-workspace-layer-style)/[Metadata Comparison](doc/rest.md#get-workspace-layer-metadata-comparison)/[Chunk](doc/rest.md#get-workspace-layer-chunk)
   - [GET](doc/rest.md#get-workspace-map)/[PATCH](doc/rest.md#patch-workspace-map)/[DELETE](doc/rest.md#delete-workspace-map) Workspace Map
-  - GET Workspace Map [File](doc/rest.md#get-workspace-map-file)/[Thumbnail](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-map-thumbnail)/[Metadata Comparison](doc/rest.md#get-workspace-map-metadata-comparison)
+  - GET Workspace Map [File](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-map-file)/[Thumbnail](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-map-thumbnail)/[Metadata Comparison](doc/rest.md#get-workspace-map-metadata-comparison)
   - GET Workspace [Layers](doc/rest.md#get-workspace-layers)/[Maps](doc/rest.md#get-workspace-maps)
   - GET [Layers](doc/rest.md#get-layers)/[Maps](doc/rest.md#get-maps)/[Publications](doc/rest.md#get-publications)
   - DELETE Workspace [Layers](doc/rest.md#delete-workspace-layers)/[Maps](doc/rest.md#delete-workspace-maps)
@@ -277,7 +278,7 @@
   - GET [Publications](doc/rest.md#get-publications), [Layers](doc/rest.md#get-layers), [Workspace Layers](doc/rest.md#get-workspace-layers), [Maps](doc/rest.md#get-maps), and [Workspace Maps](doc/rest.md#get-workspace-maps)
   - [GET](doc/rest.md#get-workspace-layer), [PATCH](doc/rest.md#patch-workspace-layer), and [DELETE](doc/rest.md#delete-workspace-layer) Workspace Layer
   - [GET](doc/rest.md#get-workspace-map), [PATCH](doc/rest.md#patch-workspace-map), and [DELETE](doc/rest.md#delete-workspace-map) Workspace Map
-  - [GET Workspace Map File](doc/rest.md#get-workspace-map-file)
+  - [GET Workspace Map File](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-map-file)
   - [POST](doc/rest.md#post-workspace-layers) and [DELETE](doc/rest.md#delete-workspace-layers) Workspace Layers
   - [POST](doc/rest.md#post-workspace-maps) and [DELETE](doc/rest.md#delete-workspace-maps) Workspace Maps
   - requests to [WMS](doc/endpoints.md#web-map-service) and [WFS](doc/endpoints.md#web-feature-service) endpoints
@@ -410,7 +411,7 @@
   - `db` which replaces key `db_table` that is deprecated now
 - [#703](https://github.com/LayerManager/layman/issues/703) Attribute names in [WFS-T requests](doc/endpoints.md#web-feature-service) must match to regex `^[a-zA-Z_][a-zA-Z_0-9]*$`, otherwise Layman error is raised. It applies to attributes of both internal and external tables, and only to attributes that not exist in database yet.
 - [#703](https://github.com/LayerManager/layman/issues/703) Endpoint [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) raises exception if parameter `crs` is used without `file` parameter. It's the same behaviour as behaviour of [POST Workspace Layers](doc/rest.md#post-workspace-layers) endpoint.
-- [#772](https://github.com/LayerManager/layman/issues/772) Speed up endpoints [GET Workspace Layer Thumbnail](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-layer-thumbnail), [GET Workspace Layer Style](doc/rest.md#get-workspace-layer-style), [GET Workspace Map Thumbnail](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-map-thumbnail) and [GET Workspace Map File](doc/rest.md#get-workspace-map-file).
+- [#772](https://github.com/LayerManager/layman/issues/772) Speed up endpoints [GET Workspace Layer Thumbnail](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-layer-thumbnail), [GET Workspace Layer Style](doc/rest.md#get-workspace-layer-style), [GET Workspace Map Thumbnail](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-map-thumbnail) and [GET Workspace Map File](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-map-file).
 - [#755](https://github.com/LayerManager/layman/issues/755) Fix generation of some map thumbnails by downgrading Node.js of Timgen from v18 to v16.
 - [#755](https://github.com/LayerManager/layman/issues/755) Change Node.js dependencies of Timgen:
   - http-server -> express 4
@@ -958,7 +959,7 @@ Data manipulations that automatically run at first start of Layman:
 - [#161](https://github.com/LayerManager/layman/issues/161) New method DELETE was implemented for endpoints [DELETE Workspace Maps](doc/rest.md#delete-workspace-maps) and [DELETE Workspace Layers](doc/rest.md#delete-workspace-layers).
 - [#178](https://github.com/LayerManager/layman/issues/178) New attribute `screen_name` is part of response for [GET Users](doc/rest.md#get-users) and [Get Current User](doc/rest.md#get-current-user).
 - [#178](https://github.com/LayerManager/layman/issues/178) LifeRay attribute `screen_name` is preferred for creating username in Layman. Previously it was first part of email.
-- Attribute `groups` is no longer returned in [GET Workspace Map File](doc/rest.md#get-workspace-map-file) response.
+- Attribute `groups` is no longer returned in [GET Workspace Map File](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-map-file) response.
 - [#28](https://github.com/LayerManager/layman/issues/28) New environment variable [LAYMAN_PRIME_SCHEMA](doc/env-settings.md#LAYMAN_PRIME_SCHEMA). 
 
 ## v1.7.4

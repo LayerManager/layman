@@ -23,7 +23,7 @@ In response of [POST Workspace Maps](rest.md#post-workspace-maps) you will obtai
  
  Later on, you can
  - get metadata about this map using [GET Workspace Map](rest.md#get-workspace-map)
- - get uploaded JSON file using [GET Workspace Map File](rest.md#get-workspace-map-file)
+ - get uploaded JSON file using [GET Map File](rest.md#get-map-file)
  - update the map using [PATCH Workspace Map](rest.md#patch-workspace-map)
  - delete the map using [DELETE Workspace Map](rest.md#delete-workspace-map)
  
