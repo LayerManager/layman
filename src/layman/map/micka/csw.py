@@ -232,7 +232,7 @@ def _get_property_values(
         'extent': extent,
 
         'map_endpoint': escape(url_for('rest_workspace_map.get', workspace=workspace, mapname=mapname)),
-        'map_file_endpoint': escape(url_for('rest_workspace_map_file.get', workspace=workspace, mapname=mapname)),
+        'map_file_endpoint': escape(url_for('rest_map_file.get', uuid=uuid)),
         'operates_on': operates_on,
         'md_organisation_name': md_organisation_name,
         'organisation_name': organisation_name,

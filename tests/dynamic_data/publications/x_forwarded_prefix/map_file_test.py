@@ -14,7 +14,7 @@ DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
 WORKSPACE = 'map_file_workspace'
 
-MAP = Publication4Test(WORKSPACE, process_client.MAP_TYPE, 'map_hranice')
+MAP = Publication4Test(WORKSPACE, process_client.MAP_TYPE, 'map_hranice', uuid='bf667aba-035a-4731-9516-0d0c22e9b236')
 MAP_FILE_PATH = os.path.join(DIRECTORY, 'internal_wms_and_wfs.json')
 
 
@@ -50,7 +50,7 @@ class TestPublication(base_test.TestSingleRestPublication):
     ])
     def test_x_forwarded_headers(self, headers, exp_url_prefix):
         map = MAP
-        resp = process_client.get_workspace_map_file(map.type, map.workspace, map.name, headers=headers)
+        resp = process_client.get_uuid_map_file(map.type, map.uuid, headers=headers)
 
         exp_adjusted_urls = [
             ('$.layers[1].url', '/geoserver/ows'),

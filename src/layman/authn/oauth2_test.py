@@ -298,8 +298,11 @@ def test_patch_current_user_without_username():
     mapname = 'map1'
     process_client.publish_workspace_map(workspace, mapname, headers=user1_authn_headers)
 
+    map_info = process_client.get_workspace_map(workspace, mapname, headers=user1_authn_headers)
+    uuid = map_info['uuid']
+
     with app.app_context():
-        rest_path = url_for('rest_workspace_map_file.get', workspace=workspace, mapname=mapname)
+        rest_path = url_for('rest_map_file.get', uuid=uuid)
     response = requests.get(rest_path, headers=user1_authn_headers, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
     assert response.status_code == 200, response.text
     resp_json = response.json()
