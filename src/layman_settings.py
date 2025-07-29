@@ -54,6 +54,8 @@ ALLOWED_INPUT_SRS_LIST = [
     'EPSG:3034',
     'EPSG:3035',
     'EPSG:3059',
+    'EPSG:32718',
+    'EPSG:9377'
 ]
 
 INPUT_SRS_LIST = [

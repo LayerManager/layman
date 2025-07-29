@@ -34,6 +34,8 @@ EPSG_32634 = 'EPSG:32634'
 EPSG_3034 = 'EPSG:3034'
 EPSG_3035 = 'EPSG:3035'
 EPSG_3059 = 'EPSG:3059'
+EPSG_32718 = 'EPSG:32718'
+EPSG_9377 = 'EPSG:9377'
 
 CRSDefinitions = {
     EPSG_3857: CRSTypeDef(
@@ -243,6 +245,52 @@ CRSDefinitions = {
         axes_order_east_north_in_epsg_db=False,
         proj4text='+proj=tmerc +lat_0=0 +lon_0=24 +k=0.9996 +x_0=500000 +y_0=-6000000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs',
         internal_srid=900917,
+    ),
+    EPSG_32718: CRSTypeDef(
+        default_bbox=(
+            166021.44,
+            1116915.04,
+            833978.56,
+            10000000.0,
+        ),
+        max_bbox=None,
+        no_area_bbox_padding=1,
+        world_bounds={},
+        qgis_template_spatialrefsys='''<wkt>PROJCRS["WGS 84 / UTM zone 18S",BASEGEOGCRS["WGS 84",ENSEMBLE["World Geodetic System 1984 ensemble",MEMBER["World Geodetic System 1984 (Transit)"],MEMBER["World Geodetic System 1984 (G730)"],MEMBER["World Geodetic System 1984 (G873)"],MEMBER["World Geodetic System 1984 (G1150)"],MEMBER["World Geodetic System 1984 (G1674)"],MEMBER["World Geodetic System 1984 (G1762)"],MEMBER["World Geodetic System 1984 (G2139)"],ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1]],ENSEMBLEACCURACY[2.0]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4326]],CONVERSION["UTM zone 18S",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",-75,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",10000000,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["Engineering survey, topographic mapping."],AREA["Between 78°W and 72°W, southern hemisphere between 80°S and equator, onshore and offshore. Argentina. Brazil. Chile. Colombia. Ecuador. Peru."],BBOX[-80,-78,0,-72]],ID["EPSG",32718]]</wkt>
+      <proj4>+proj=utm +zone=18 +south +datum=WGS84 +units=m +no_defs</proj4>
+      <srsid>3168</srsid>
+      <srid>32718</srid>
+      <authid>EPSG:32718</authid>
+      <description>WGS 84 / UTM zone 18S</description>
+      <projectionacronym>utm</projectionacronym>
+      <ellipsoidacronym>EPSG:7030</ellipsoidacronym>
+      <geographicflag>false</geographicflag>''',
+        axes_order_east_north_in_epsg_db=True,
+        proj4text='+proj=utm +zone=18 +south +datum=WGS84 +units=m +no_defs',
+        internal_srid=None,
+    ),
+    EPSG_9377: CRSTypeDef(
+        default_bbox=(
+            3681461.16,
+            1080616.36,
+            5683149.09,
+            3307327.96,
+        ),
+        max_bbox=None,
+        no_area_bbox_padding=1,
+        world_bounds={},
+        qgis_template_spatialrefsys='''<wkt>PROJCRS["MAGNA-SIRGAS / Origen-Nacional",BASEGEOGCRS["MAGNA-SIRGAS",DATUM["Marco Geocentrico Nacional de Referencia",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4686]],CONVERSION["Colombia Transverse Mercator",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",4,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",-73,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9992,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",5000000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",2000000,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["northing (N)",north,ORDER[1],LENGTHUNIT["metre",1]],AXIS["easting (E)",east,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["Cadastre."],AREA["Colombia - onshore and offshore. Includes San Andres y Providencia, Malpelo Islands, Roncador Bank, Serrana Bank and Serranilla Bank."],BBOX[-4.23,-84.77,15.51,-66.87]],ID["EPSG",9377]]</wkt>
+      <proj4>+proj=tmerc +lat_0=4 +lon_0=-73 +k=0.9992 +x_0=5000000 +y_0=2000000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
+      <srsid>63408</srsid>
+      <srid>520003408</srid>
+      <authid>EPSG:9377</authid>
+      <description>MAGNA-SIRGAS / Origen-Nacional</description>
+      <projectionacronym>tmerc</projectionacronym>
+      <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
+      <geographicflag>false</geographicflag>''',
+        axes_order_east_north_in_epsg_db=True,
+        proj4text='+proj=tmerc +lat_0=4 +lon_0=-73 +k=0.9992 +x_0=5000000 +y_0=2000000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs',
+        internal_srid=900918,
     ),
 }
 
