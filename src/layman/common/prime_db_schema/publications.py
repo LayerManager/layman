@@ -111,13 +111,18 @@ def get_publication_infos_with_metainfo(workspace_name=None, pub_type=None, *,
                 -- if there is any intersection
                 WHEN p.bbox_for_ordering && consts.ordering_bbox
                     THEN
-                        -- in cases, when area of intersection is 0, we want it rank higher than no intersection
-                        GREATEST(st_area(st_intersection(p.bbox_for_ordering, consts.ordering_bbox)),
-                                 0.00001)
-                        -- we have to solve division by 0
-                        / (GREATEST(st_area(p.bbox_for_ordering), 0.00001) +
-                           GREATEST(st_area(consts.ordering_bbox), 0.00001)
-                           )
+                        CASE WHEN st_isvalid(p.bbox_for_ordering) THEN
+                            -- in cases, when area of intersection is 0, we want it rank higher than no intersection
+                            GREATEST(st_area(st_intersection(p.bbox_for_ordering, consts.ordering_bbox)),
+                                     0.00001)
+                            -- we have to solve division by 0
+                            / (GREATEST(st_area(p.bbox_for_ordering), 0.00001) +
+                               GREATEST(st_area(consts.ordering_bbox), 0.00001)
+                               )
+                         ELSE
+                            -- if bbox is invalid (e.g. contains Infinity coordinates), use small result
+                            0.00001
+                         END
                 -- if there is no intersection, result is 0 in all cases
                 ELSE
                     0

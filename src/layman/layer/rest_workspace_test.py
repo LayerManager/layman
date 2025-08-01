@@ -30,7 +30,7 @@ publication_counter = SimpleCounter()
 
 TODAY_DATE = date.today().strftime('%Y-%m-%d')
 
-EXP_REFERENCE_SYSTEMS = [3034, 3035, 3059, 3857, 4326, 5514, 32633, 32634, ]
+EXP_REFERENCE_SYSTEMS = [3034, 3035, 3059, 3857, 4326, 5514, 32633, 32634, 9377, 32718, ]
 
 METADATA_PROPERTIES = {
     'abstract',
