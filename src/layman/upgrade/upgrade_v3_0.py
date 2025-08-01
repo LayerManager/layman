@@ -11,7 +11,7 @@ from layman.layer.layer_class import Layer
 logger = logging.getLogger(__name__)
 
 
-def migrate_graphic_urls(publ_type):
+def migrate_metadata_urls(publ_type):
     type_name = 'map' if publ_type == MAP_TYPE else 'layer'
     logger.info(f'Starting Micka {type_name} graphic URL migration to v3.0 format.')
 
@@ -25,7 +25,7 @@ def migrate_graphic_urls(publ_type):
                 publication = Map(uuid=uuid)
                 csw.patch_map(
                     publication=publication,
-                    metadata_properties_to_refresh=['graphic_url'],
+                    metadata_properties_to_refresh=['graphic_url', 'map_file_endpoint'],
                     actor_name=workspace,
                     create_if_not_exists=False
                 )
@@ -44,9 +44,9 @@ def migrate_graphic_urls(publ_type):
     logger.info(f'{type_name.capitalize()} graphic URL migration to v3.0 format completed.')
 
 
-def migrate_map_graphic_urls():
-    migrate_graphic_urls(MAP_TYPE)
+def migrate_map_metadata_urls():
+    migrate_metadata_urls(MAP_TYPE)
 
 
-def migrate_layer_graphic_urls():
-    migrate_graphic_urls(LAYER_TYPE)
+def migrate_layer_metadata_urls():
+    migrate_metadata_urls(LAYER_TYPE)
