@@ -12,7 +12,7 @@
 ### Migrations and checks
 #### Schema migrations
 #### Data migrations
-- [#1126](https://github.com/LayerManager/layman/issues/1126) Migrate graphic URLs in map metadata from workspace&name-based format to UUID-based format.
+- [#1126](https://github.com/LayerManager/layman/issues/1126) Migrate graphic URLs and map file endpoint URLs in map metadata from workspace&name-based format to UUID-based format.
 - [#1126](https://github.com/LayerManager/layman/issues/1126) Migrate graphic URLs in layer metadata from workspace&name-based format to UUID-based format.
 
 ### Changes
