@@ -51,8 +51,8 @@ def update_metadata_values(publication, *, metadata_properties_to_refresh=None, 
 
 
 @pytest.mark.parametrize('class_type,process_func,url_endpoint,test_uuid,publ_type,csw_module,migrate_func,delete_func', [
-    (Map, process_client.publish_workspace_map, 'rest_map_thumbnail.get', 'af238200-8200-1a23-9399-42c9fca53543', 'map', map_csw, upgrade_v3_0.migrate_map_graphic_urls, process_client.delete_workspace_map),
-    (Layer, process_client.publish_workspace_layer, 'rest_layer_thumbnail.get', 'bf238200-8200-1a23-9399-42c9fca53544', 'layer', layer_csw, upgrade_v3_0.migrate_layer_graphic_urls, process_client.delete_workspace_layer),
+    (Map, process_client.publish_workspace_map, 'rest_map_thumbnail.get', 'af238200-8200-1a23-9399-42c9fca53543', 'map', map_csw, upgrade_v3_0.migrate_map_metadata_urls, process_client.delete_workspace_map),
+    (Layer, process_client.publish_workspace_layer, 'rest_layer_thumbnail.get', 'bf238200-8200-1a23-9399-42c9fca53544', 'layer', layer_csw, upgrade_v3_0.migrate_layer_metadata_urls, process_client.delete_workspace_layer),
 ])
 @pytest.mark.usefixtures('ensure_layman')
 def test_update_graphic_url_metadata(class_type, process_func, url_endpoint, test_uuid, publ_type, csw_module, migrate_func, delete_func):
@@ -68,14 +68,22 @@ def test_update_graphic_url_metadata(class_type, process_func, url_endpoint, tes
         )
 
     old_thumbnail_url = f"{settings.LAYMAN_SERVER_NAME}/rest/workspaces/{workspace}/{publ_type}s/{publ_name}/thumbnail"
+    old_file_url = f"{settings.LAYMAN_SERVER_NAME}/rest/workspaces/{workspace}/{publ_type}s/{publ_name}/file" if publ_type == 'map' else None
 
     with app.app_context():
         publication = class_type(uuid=test_uuid)
+        metadata_properties_to_refresh = ['graphic_url']
+        kwargs = {'graphic_url': old_thumbnail_url}
+
+        if publ_type == 'map':
+            metadata_properties_to_refresh.append('map_file_endpoint')
+            kwargs['map_file_endpoint'] = old_file_url
+
         update_metadata_values(
             publication=publication,
-            metadata_properties_to_refresh=['graphic_url'],
+            metadata_properties_to_refresh=metadata_properties_to_refresh,
             actor_name=workspace,
-            graphic_url=old_thumbnail_url
+            **kwargs
         )
         csw_info = csw_module.get_metadata_comparison(publication)
 
@@ -84,6 +92,11 @@ def test_update_graphic_url_metadata(class_type, process_func, url_endpoint, tes
     assert metadata['graphic_url'] == old_thumbnail_url, (
         f"graphic_url did not match: expected '{old_thumbnail_url}', got '{metadata['graphic_url']}'"
     )
+
+    if publ_type == 'map':
+        assert metadata['map_file_endpoint'] == old_file_url, (
+            f"map_file_endpoint did not match: expected '{old_file_url}', got '{metadata['map_file_endpoint']}'"
+        )
 
     with app.app_context():
         migrate_func()
@@ -94,10 +107,16 @@ def test_update_graphic_url_metadata(class_type, process_func, url_endpoint, tes
 
     with app.app_context():
         new_thumbnail_url = test_util.url_for_external(url_endpoint, uuid=test_uuid)
+        new_file_url = test_util.url_for_external('rest_map_file.get', uuid=test_uuid) if publ_type == 'map' else None
 
     assert metadata['graphic_url'] == new_thumbnail_url, (
         f"graphic_url should be new format URL: expected '{new_thumbnail_url}', got '{metadata['graphic_url']}'"
     )
+
+    if publ_type == 'map':
+        assert metadata['map_file_endpoint'] == new_file_url, (
+            f"map_file_endpoint should be new format URL: expected '{new_file_url}', got '{metadata['map_file_endpoint']}'"
+        )
 
     with app.app_context():
         delete_func(workspace, publ_name)
