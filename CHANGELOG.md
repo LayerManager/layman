@@ -1,7 +1,7 @@
 # Changelog
 
 ## v2.2.0
- {release-date}
+ 2025-08-07
 ### Changes
 - Add `sed` command to Dockerfile files to change HTTP to HTTPS in apt sources.list.
 - Layman supports import of layers in EPSG:9377, EPSG:32718 using [LAYMAN_INPUT_SRS_LIST](doc/env-settings.md#LAYMAN_INPUT_SRS_LIST)
