@@ -15,6 +15,7 @@ DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 WORKSPACE = 'test_uuid_map_thumbnail_ws'
 MAP = Publication4Test(WORKSPACE, process_client.MAP_TYPE, 'map_test')
 LAYER = Publication4Test(WORKSPACE, process_client.LAYER_TYPE, 'layer_test')
+LAYER_QML = Publication4Test(WORKSPACE, process_client.LAYER_TYPE, 'layer_qml_test')
 
 
 @pytest.mark.timeout(60)
@@ -38,6 +39,14 @@ class TestPublication(base_test.TestSingleRestPublication):
             },
         }, scope='class')
         self.post_publication(LAYER, args={
+            'access_rights': {
+                'read': 'EVERYONE',
+                'write': 'EVERYONE',
+            },
+        }, scope='class')
+        self.post_publication(LAYER_QML, args={
+            'file_paths': ['sample/layman.layer/small_layer.geojson'],
+            'style_file': 'sample/style/small_layer.qml',
             'access_rights': {
                 'read': 'EVERYONE',
                 'write': 'EVERYONE',
@@ -78,6 +87,35 @@ class TestPublication(base_test.TestSingleRestPublication):
             map_uuid = get_publication_uuid(MAP.workspace, MAP.type, MAP.name)
             response = requests.get(
                 f"http://{settings.LAYMAN_SERVER_NAME}/rest/layers/{map_uuid}/thumbnail"
+            )
+        assert response.status_code == 404
+        response_json = response.json()
+        assert response_json['code'] == 15
+        assert response_json['detail']['uuid'] == map_uuid
+
+    def test_layer_style_uuid_sld(self):
+        with app.app_context():
+            layer_uuid = get_publication_uuid(LAYER.workspace, LAYER.type, LAYER.name)
+            response = requests.get(
+                f"http://{settings.LAYMAN_SERVER_NAME}/rest/layers/{layer_uuid}/style"
+            )
+        assert response.status_code == 200
+        assert response.headers['Content-Type'] == 'application/vnd.ogc.sld+xml'
+
+    def test_layer_style_uuid_qml(self):
+        with app.app_context():
+            layer_uuid = get_publication_uuid(LAYER_QML.workspace, LAYER_QML.type, LAYER_QML.name)
+            response = requests.get(
+                f"http://{settings.LAYMAN_SERVER_NAME}/rest/layers/{layer_uuid}/style"
+            )
+        assert response.status_code == 200
+        assert response.headers['Content-Type'] == 'application/x-qgis-layer-settings'
+
+    def test_map_uuid_in_layer_style_endpoint(self):
+        with app.app_context():
+            map_uuid = get_publication_uuid(MAP.workspace, MAP.type, MAP.name)
+            response = requests.get(
+                f"http://{settings.LAYMAN_SERVER_NAME}/rest/layers/{map_uuid}/style"
             )
         assert response.status_code == 404
         response_json = response.json()

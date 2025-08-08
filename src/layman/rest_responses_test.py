@@ -128,7 +128,7 @@ class TestResponsesClass:
                      'identifier': f"m-{layer_uuid}",
                      'record_url': None},
         'style': {'type': 'sld',
-                  'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}/style'},
+                  'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/layers/{layer_uuid}/style'},
         'thumbnail': {'path': f'layers/{layer_uuid}/thumbnail/{layer_uuid}.png',
                       'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/layers/{layer_uuid}/thumbnail'},
         'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}',

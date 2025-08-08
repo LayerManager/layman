@@ -1,6 +1,8 @@
 import os
 import pytest
 
+from layman import app
+from layman.util import get_publication_uuid
 from test_tools import process_client
 from tests import EnumTestTypes, Publication4Test, EnumTestKeys
 from tests.asserts.final.publication import util as assert_util
@@ -60,6 +62,8 @@ class TestLayer(base_test.TestSingleRestPublication):
         })
 
         assert_util.is_publication_valid_and_complete(layer)
-        style = process_client.get_workspace_layer_style(layer.workspace, layer.name)
+        with app.app_context():
+            uuid = get_publication_uuid(layer.workspace, layer.type, layer.name)
+        style = process_client.get_uuid_layer_style(uuid)
         root = style.getroot()
         assert root.attrib['version'] == params['exp_version']
