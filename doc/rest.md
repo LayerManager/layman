@@ -6,9 +6,9 @@
 |Publications|`/rest/publications`|[GET](#get-publications)| x | x | x |
 |Layers|`/rest/layers`|[GET](#get-layers)| x | x | x |
 |Layer Thumbnail|`/rest/layers/<uuid>/thumbnail`|[GET](#get-layer-thumbnail)| x | x | x |
+|Layer Style|`/rest/layers/<uuid>/style`|[GET](#get-layer-style)| x | x | x |
 |Workspace Layers|`/rest/workspaces/<workspace_name>/layers`|[GET](#get-workspace-layers)| [POST](#post-workspace-layers) | x | [DELETE](#delete-workspace-layers) |
 |[Workspace Layer](models.md#layer)|`/rest/workspaces/<workspace_name>/layers/<layername>`|[GET](#get-workspace-layer)| x | [PATCH](#patch-workspace-layer) | [DELETE](#delete-workspace-layer) |
-|Workspace Layer Style|`/rest/workspaces/<workspace_name>/layers/<layername>/style`|[GET](#get-workspace-layer-style)| x | x | x |
 |Workspace Layer Chunk|`/rest/workspaces/<workspace_name>/layers/<layername>/chunk`|[GET](#get-workspace-layer-chunk)| [POST](#post-workspace-layer-chunk) | x | x |
 |Workspace Layer Metadata Comparison|`/rest/workspaces/<workspace_name>/layers/<layername>/metadata-comparison`|[GET](#get-workspace-layer-metadata-comparison) | x | x | x |
 |Maps|`/rest/maps`|[GET](#get-maps)| x | x | x |
@@ -324,7 +324,7 @@ JSON object with following structure:
   - *status*: Status information about DB import and availability of the table. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **style**
-  - *url*: String. URL of layer default style. It points to [GET Workspace Layer Style](#get-workspace-layer-style).
+  - *url*: String. URL of layer default style. It points to [GET Layer Style](#get-layer-style).
   - *type*: String. Type of used style. Either 'sld' or 'qml'.
   - *status*: Status information about publishing style. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
@@ -449,10 +449,10 @@ Content-Type: `image/png`
 PNG image.
 
 
-## Workspace Layer Style
+## Layer Style
 ### URL
-`/rest/workspaces/<workspace_name>/layers/<layername>/style`
-### GET Workspace Layer Style
+`/rest/layers/<uuid>/style`
+### GET Layer Style
 Get default style of the layer in XML format. For layers with SLD style, request is redirected to GeoServer [/rest/workspaces/{workspace}/styles/{style}](https://docs.geoserver.org/2.26.x/en/api/#1.0.0/styles.yaml) and response is in version 1.0.0. For layers with QML style, response is created in Layman. Anybody can call GET, nobody can call any other method. 
 
 #### Request

@@ -24,7 +24,7 @@ ENDPOINTS_TO_TEST = {
     process_client.LAYER_TYPE: [
         (process_client.get_workspace_publication, {}),
         (process_client.get_workspace_publication_metadata_comparison, {}),
-        (process_client.get_workspace_layer_style, {}),
+        (process_client.get_uuid_layer_style, {}),
         (process_client.get_uuid_publication_thumbnail, {}),
         # process_client.get_workspace_layer_chunk,
         (process_client.patch_workspace_publication, {'title': 'New title'}),

@@ -563,16 +563,14 @@ get_workspace_map = partial(get_workspace_publication, MAP_TYPE)
 get_workspace_layer = partial(get_workspace_publication, LAYER_TYPE)
 
 
-def get_workspace_layer_style(workspace, layer, headers=None, *, actor_name=None, ):
+def get_uuid_layer_style(uuid, headers=None, *, actor_name=None):
     headers = headers or {}
     if actor_name:
         assert TOKEN_HEADER not in headers
     if actor_name and actor_name != settings.ANONYM_USER:
         headers.update(get_authz_headers(actor_name))
     with app.app_context():
-        r_url = url_for('rest_workspace_layer_style.get',
-                        workspace=workspace,
-                        layername=layer)
+        r_url = url_for('rest_layer_style.get', uuid=uuid)
     response = requests.get(r_url, headers=headers, timeout=HTTP_TIMEOUT)
     raise_layman_error(response)
     return ET.parse(io.BytesIO(response.content))

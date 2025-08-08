@@ -51,8 +51,7 @@ class TestLayer(base_test.TestSingleRestPublication):
                                          if value.get('xfail') else []
                                          ) for key, value in TEST_CASES.items()]
 
-    @staticmethod
-    def test_style_xml(layer: Publication4Test, params, rest_method):
+    def test_style_xml(self, layer: Publication4Test, params, rest_method):
         """Parametrized using pytest_generate_tests"""
         rest_method.fn(layer, args={
             'file_paths': ['sample/layman.layer/small_layer.geojson'],
@@ -60,6 +59,7 @@ class TestLayer(base_test.TestSingleRestPublication):
         })
 
         assert_util.is_publication_valid_and_complete(layer)
-        style = process_client.get_workspace_layer_style(layer.workspace, layer.name)
+        uuid = self.publ_uuids[layer]
+        style = process_client.get_uuid_layer_style(uuid)
         root = style.getroot()
         assert root.attrib['version'] == params['exp_version']
