@@ -38,7 +38,7 @@ def get_expected_urls_in_rest_response(workspace, publ_type, name, *, rest_metho
                 'url': f'{proxy_proto}://{proxy_host}{proxy_prefix}/geoserver/{GEOSERVER_WMS_WORKSPACE}/ows',
             }
             result['style'] = {
-                'url': f'{proxy_proto}://{proxy_host}{proxy_prefix}/rest/workspaces/{workspace}/{publ_type_directory}/{name}/style',
+                'url': f'{proxy_proto}://{proxy_host}{proxy_prefix}/rest/{publ_type_directory}/{uuid}/style',
             }
             if geodata_type == settings.GEODATA_TYPE_VECTOR:
                 result['wfs'] = {

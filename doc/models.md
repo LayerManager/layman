@@ -21,6 +21,7 @@
       - [GeoServer WFS](data-storage.md#geoserver): `/geoserver/layman/ows, layer=l_<UUID>`
       - [GeoServer WMS](data-storage.md#geoserver): `/geoserver/layman_wms/ows, layer=l_<UUID>, style=<UUID>`
       - Micka: `/record/basic/m-<UUID>`
+      - [REST API](rest.md): `/rest/layers/<uuid>/thumbnail`
 - Simple rules
   - one DB table per input file (vector layers only)
   - one WFS feature type per DB table (vector layers only)

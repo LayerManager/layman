@@ -43,8 +43,8 @@ def test_info(workspace, publ_type, publication):
     info = process_client.get_workspace_publication(publ_type, workspace, publication, headers=headers)
     with app.app_context():
         info_internal = layer_util.get_layer_info(workspace, publication)
-        expected_style_url = url_for('rest_workspace_layer_style.get', workspace=workspace, layername=publication,
-                                     internal=False)
+        uuid = layman_util.get_publication_uuid(workspace, publ_type, publication)
+        expected_style_url = url_for('rest_layer_style.get', uuid=uuid, internal=False)
 
     file_type = info_internal['_file']['file_type']
     original_data_source = info.get('original_data_source', settings.EnumOriginalDataSource.FILE.value)
@@ -80,7 +80,8 @@ def test_get_layer_style(workspace, publ_type, publication):
     headers = data.HEADERS.get(data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_write', [None])[0])
 
     with app.app_context():
-        rest_url = url_for('rest_workspace_layer_style.get', workspace=workspace, layername=publication)
+        uuid = layman_util.get_publication_uuid(workspace, publ_type, publication)
+        rest_url = url_for('rest_layer_style.get', uuid=uuid)
     response = requests.get(rest_url, headers=headers, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
     assert response.status_code == 200, response.text
 

@@ -378,7 +378,7 @@ def test_post_layers_complex():
     ]:
         assert 'status' not in get_response[source]
 
-    tree = process_client.get_workspace_layer_style(workspace=workspace, layer=layername)
+    tree = process_client.get_uuid_layer_style(layeruuid)
     root = tree.getroot()
     assert root.attrib['version'] == '1.0.0'
 

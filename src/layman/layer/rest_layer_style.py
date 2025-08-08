@@ -1,33 +1,35 @@
-from flask import Blueprint, current_app as app, g, Response
+from flask import Blueprint, Response, current_app as app, g
 
+from layman import LaymanError
+from layman.util import check_uuid_decorator
 from layman.authn import authenticate
-from layman.authz import authorize_workspace_publications_decorator
+from layman.authz import authorize_uuid_publication_decorator
 from layman.layer.geoserver import sld
 from layman.layer.qgis import wms as qgis_wms
-from layman.util import check_workspace_name_decorator
 from layman import settings, util as layman_util
-from . import util, LAYER_REST_PATH_NAME, LAYER_TYPE
+from . import LAYER_REST_PATH_NAME, LAYER_TYPE
 
-bp = Blueprint('rest_workspace_layer_style', __name__)
+bp = Blueprint('rest_layer_style', __name__)
 
 
 @bp.before_request
-@check_workspace_name_decorator
-@util.check_layername_decorator
+@check_uuid_decorator
 @authenticate
-@authorize_workspace_publications_decorator
+@authorize_uuid_publication_decorator(expected_publication_type=LAYER_TYPE)
 def before_request():
     pass
 
 
-@bp.route(f"/{LAYER_REST_PATH_NAME}/<layername>/style", methods=['GET'])
-def get(workspace, layername):
-    app.logger.info(f"GET Style, actor={g.user}, workspace={workspace}, layername={layername}")
+@bp.route(f"/{LAYER_REST_PATH_NAME}/<uuid>/style", methods=['GET'])
+def get(uuid):
+    app.logger.info(f"GET Layer Style, actor={g.user}")
 
-    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['style_type', 'uuid'], })
+    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['style_type']})
+
+    if not info:
+        raise LaymanError(15, {'uuid': uuid})
 
     style_type = info['_style_type']
-    uuid = info['uuid']
     result = None
     if style_type == 'sld':
         response = sld.get_style_response(uuid=uuid, auth=settings.LAYMAN_GS_AUTH)
