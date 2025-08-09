@@ -19,15 +19,14 @@ patch_layer = empty_method
 
 def get_layer_info(workspace, layername, *, x_forwarded_items=None):
     publ_uuid = get_publication_uuid(workspace, LAYER_TYPE, layername)
-    return get_layer_info_by_uuid(publ_uuid, x_forwarded_items=x_forwarded_items, layername=layername,
-                                  workspace=workspace) if publ_uuid else {}
+    return get_layer_info_by_uuid(publ_uuid, x_forwarded_items=x_forwarded_items, layername=layername) if publ_uuid else {}
 
 
-def get_layer_info_by_uuid(publ_uuid, *, workspace, layername, x_forwarded_items=None):
+def get_layer_info_by_uuid(publ_uuid, *, layername, x_forwarded_items=None):
     input_file_dir = qgis.get_layer_dir(publ_uuid)
     result = {}
     if os.path.exists(input_file_dir):
-        url = layman_util.url_for('rest_workspace_layer_style.get', workspace=workspace, layername=layername, x_forwarded_items=x_forwarded_items)
+        url = layman_util.url_for('rest_layer_style.get', uuid=publ_uuid, x_forwarded_items=x_forwarded_items)
         result = {
             'name': layername,
             'style': {

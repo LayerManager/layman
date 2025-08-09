@@ -180,7 +180,7 @@ def _correct_values_in_detail_common(
         util.recursive_dict_update(expected_detail,
                                    {
                                        'style': {
-                                           'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/{publ_type_dir}/{name}/style',
+                                           'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/{publ_type_dir}/{uuid}/style',
                                        },
                                        'wms': {
                                            'name': f'l_{uuid}',

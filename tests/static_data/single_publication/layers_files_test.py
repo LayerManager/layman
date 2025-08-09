@@ -52,7 +52,7 @@ def test_qml_files(workspace, publ_type, publication):
 
     assert os.path.exists(layer_directory)
     with app.app_context():
-        url = url_for('rest_workspace_layer_style.get', workspace=workspace, layername=publication, internal=False)
+        url = url_for('rest_layer_style.get', uuid=publ_uuid, internal=False)
         assert wms.get_layer_info(workspace, publication) == {'name': publication,
                                                               'style': {'type': 'qml',
                                                                         'url': url},

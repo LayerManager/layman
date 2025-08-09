@@ -43,13 +43,13 @@ def delete_layer(layer: Layer):
 
 def get_layer_info(workspace, layername, *, x_forwarded_items=None):
     uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layername)
-    return get_layer_info_by_uuid(workspace, uuid=uuid, layername=layername, x_forwarded_items=x_forwarded_items)
+    return get_layer_info_by_uuid(uuid=uuid, x_forwarded_items=x_forwarded_items)
 
 
-def get_layer_info_by_uuid(workspace, *, uuid, layername, x_forwarded_items=None):
+def get_layer_info_by_uuid(uuid, x_forwarded_items=None):
     response = get_style_response(uuid=uuid, headers=gs_util.headers_sld['1.0.0'], auth=settings.LAYMAN_GS_AUTH)
     if response and response.status_code == 200:
-        url = url_for('rest_workspace_layer_style.get', workspace=workspace, layername=layername, x_forwarded_items=x_forwarded_items)
+        url = url_for('rest_layer_style.get', uuid=uuid, x_forwarded_items=x_forwarded_items)
         info = {
             'style': {
                 'url': url,
