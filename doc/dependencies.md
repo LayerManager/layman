@@ -71,7 +71,7 @@
 | --- | --- | --- | --- | --- | --- |
 | [Wagtail CRX (CodeRed Extensions)](https://docs.coderedcorp.com/wagtail-crx/) | BSD 3-Clause | deps/wagtail/laymanportal/requirements.txt | opt | bin | to be consistent with production usage |
 | [django-allauth](https://github.com/pennersr/django-allauth) | MIT | deps/wagtail/laymanportal/requirements.txt | opt | bin | to be consistent with production usage |
-| [django-oauth-toolkit](https://github.com/jazzband/django-oauth-toolkit) | BSD 2-Clause | deps/wagtail/laymanportal/requirements.txt | opt | bin | as OAuth2 provider |
+| [django-oauth-toolkit](https://github.com/django-oauth/django-oauth-toolkit) | BSD 2-Clause | deps/wagtail/laymanportal/requirements.txt | opt | bin | as OAuth2 provider |
 
 ## Other dependencies
 
