@@ -296,6 +296,44 @@ def get_map_owner_info(username):
 
 lock_decorator = redis_util.create_lock_decorator(MAP_TYPE, 'mapname', is_map_chain_ready)
 
+
+def uuid_lock_decorator(func):
+    """Lock decorator for UUID-based endpoints"""
+    from functools import wraps
+    from flask import request
+    
+    @wraps(func)
+    def decorated_function(*args, **kwargs):
+        uuid = request.view_args['uuid']
+        # Get workspace and name from UUID
+        info = layman_util.get_publication_info_by_uuid(uuid, context={})
+        if not info:
+            raise LaymanError(26, {'uuid': uuid})
+        
+        workspace = info['_workspace']
+        name = info['name']
+        
+        # Create lock using workspace and name
+        redis_util.create_lock(workspace, MAP_TYPE, name, request.method)
+        try:
+            result = func(*args, **kwargs)
+            if is_map_chain_ready(workspace, name):
+                redis_util.unlock_publication(workspace, MAP_TYPE, name)
+                celery_util.run_next_chain(workspace, MAP_TYPE, name)
+            return result
+        except Exception as exception:
+            try:
+                if is_map_chain_ready(workspace, name):
+                    redis_util.unlock_publication(workspace, MAP_TYPE, name)
+                    celery_util.run_next_chain(workspace, MAP_TYPE, name)
+            finally:
+                redis_util.unlock_publication(workspace, MAP_TYPE, name)
+                celery_util.run_next_chain(workspace, MAP_TYPE, name)
+            raise exception
+    
+    return decorated_function
+
+
 get_syncable_prop_names = partial(metadata_common.get_syncable_prop_names, MAP_TYPE)
 
 

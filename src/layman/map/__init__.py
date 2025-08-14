@@ -33,6 +33,7 @@ from .rest_map_thumbnail import bp as map_thumbnail_bp
 from .rest_map_file import bp as map_file_bp
 from .rest_workspace_map_metadata_comparison import bp as workspace_map_metadata_comparison_bp
 from .rest_maps import bp as maps_bp
+from .rest_map import bp as map_bp
 
 PUBLICATION_TYPES = {
     f'{MAP_TYPE}': {
@@ -49,6 +50,7 @@ PUBLICATION_TYPES = {
             maps_bp,
             map_thumbnail_bp,
             map_file_bp,
+            map_bp,
         ],
         # see also .util.TASKS_TO_MAP_INFO_KEYS
         'internal_sources': OrderedDict([
@@ -93,3 +95,7 @@ PUBLICATION_TYPES = {
 
 def get_workspace_publication_url(workspace, publication_name, *, x_forwarded_items=None):
     return url_for('rest_workspace_map.get', mapname=publication_name, workspace=workspace, x_forwarded_items=x_forwarded_items)
+
+
+def get_publication_url(uuid, *, x_forwarded_items=None):
+    return url_for('rest_map.get', uuid=uuid, x_forwarded_items=x_forwarded_items)

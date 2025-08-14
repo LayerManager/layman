@@ -58,11 +58,11 @@ PublicationTypeDef = namedtuple('PublicationTypeDef', ['url_param_name',
 PUBLICATION_TYPES_DEF = {MAP_TYPE: PublicationTypeDef('mapname',
                                                       'rest_maps.get',
                                                       'rest_workspace_maps.post',
-                                                      'rest_workspace_map.patch',
+                                                      'rest_map.patch',
                                                       'rest_workspace_maps.get',
-                                                      'rest_workspace_map.get',
+                                                      'rest_map.get',
                                                       'rest_map_thumbnail.get',
-                                                      'rest_workspace_map.delete_map',
+                                                      'rest_map.delete_map',
                                                       'rest_workspace_maps.delete',
                                                       map_keys_to_check,
                                                       'sample/layman.map/small_map.json',
@@ -551,9 +551,13 @@ def get_workspace_publication(publication_type, workspace, name, headers=None, *
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
 
     with app.app_context():
-        r_url = url_for(publication_type_def.get_workspace_publication_url,
-                        workspace=workspace,
-                        **{publication_type_def.url_param_name: name})
+        if publication_type == MAP_TYPE:            
+            uuid = layman_util.get_publication_uuid(workspace, publication_type, name)
+            r_url = url_for(publication_type_def.get_workspace_publication_url, uuid=uuid)
+        else:            
+            r_url = url_for(publication_type_def.get_workspace_publication_url,
+                            workspace=workspace,
+                            **{publication_type_def.url_param_name: name})
     response = requests.get(r_url, headers=headers, timeout=HTTP_TIMEOUT)
     raise_layman_error(response)
     return response.json()
@@ -755,9 +759,13 @@ def wait_for_publication_status(workspace, publication_type, publication, *, che
                                 raise_if_not_complete=True, sleeping_time=0.5):
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
     with app.app_context():
-        url = url_for(publication_type_def.get_workspace_publication_url,
-                      workspace=workspace,
-                      **{publication_type_def.url_param_name: publication})
+        if publication_type == MAP_TYPE:            
+            uuid = layman_util.get_publication_uuid(workspace, publication_type, publication)
+            url = url_for(publication_type_def.get_workspace_publication_url, uuid=uuid)
+        else:           
+            url = url_for(publication_type_def.get_workspace_publication_url,
+                          workspace=workspace,
+                          **{publication_type_def.url_param_name: publication})
     check_response_fn = check_response_fn or check_publication_status
     response = wait_for_rest(url, 60, sleeping_time, check_response=check_response_fn, headers=headers)
     if raise_if_not_complete:
