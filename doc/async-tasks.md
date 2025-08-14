@@ -11,7 +11,7 @@ Asynchronous tasks are started by following requests:
    - tasks related to each map that points to patched layer
 - [POST Workspace Maps](rest.md#post-workspace-maps)
    - tasks related to newly published map
-- [PATCH Workspace Map](rest.md#patch-workspace-map)
+- [PATCH Map](rest.md#patch-map)
    - tasks related to patched map
 - [WFS-T](endpoints.md#web-feature-service)
    - tasks related to each edited vector layer

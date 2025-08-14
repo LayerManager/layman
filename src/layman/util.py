@@ -291,6 +291,18 @@ def get_workspace_publication_url(publication_type, workspace, publication_name,
     return publ_module.get_workspace_publication_url(workspace, publication_name, x_forwarded_items=x_forwarded_items)
 
 
+def get_publication_url(publication_type, uuid, use_cache=True, *, x_forwarded_items=None):
+    if publication_type == 'layman.map':
+        publ_module = get_publication_module(publication_type, use_cache=use_cache)
+        return publ_module.get_publication_url(uuid, x_forwarded_items=x_forwarded_items)
+    info = get_publication_info_by_uuid(uuid, context={'keys': ['_workspace', 'name']})
+    if not info:
+        raise Exception(f"Publication not found: {uuid}")
+    workspace = info['_workspace']
+    name = info['name']
+    return get_workspace_publication_url(publication_type, workspace, name, use_cache=use_cache, x_forwarded_items=x_forwarded_items)
+
+
 def get_providers_from_source_names(source_names, skip_modules=None):
     skip_modules = skip_modules or set()
     provider_names = list(OrderedDict.fromkeys(map(

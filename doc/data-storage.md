@@ -60,7 +60,7 @@ Subsequently, when asynchronous tasks run,
 - thumbnail file is saved to [filesystem](#filesystem)
 - and metadata record is saved to [PostgreSQL](#postgresql) using Micka's CSW.
 
-When user [patches existing map](rest.md#patch-workspace-map), data is saved in the same way.
+When user [patches existing map](rest.md#patch-map), data is saved in the same way.
 
 ### Tasks
 Information about asynchronous tasks consists of few parameters necessary for Celery task runner. In case of publishing or patching layer or map, it includes e.g. task name, owner name, layer/map name, and additional parameters derived from HTTP POST/PATCH parameters.

@@ -97,7 +97,7 @@ class TestResponsesClass:
         'bounding_box': list(test_data.SMALL_MAP_BBOX),
         'native_crs': 'EPSG:3857',
         'native_bounding_box': list(test_data.SMALL_MAP_BBOX),
-        'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/maps/{publication}',
+        'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/maps/{map_uuid}',
         'publication_type': 'map',
     }
 
@@ -152,7 +152,7 @@ class TestResponsesClass:
             'record_url': None},
         'thumbnail': {'path': f'maps/{map_uuid}/thumbnail/{map_uuid}.png',
                       'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/maps/{map_uuid}/thumbnail'},
-        'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/maps/{publication}',
+        'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/maps/{map_uuid}',
         'uuid': None,
     }
 
@@ -182,7 +182,7 @@ class TestResponsesClass:
         pytest.param(process_client.get_layers, {'workspace': workspace}, [expected_layers], id='get_workspace_layers'),
         pytest.param(process_client.get_maps, {'workspace': workspace}, [expected_maps], id='get_workspace_maps'),
         pytest.param(process_client.get_workspace_layer, {'workspace': workspace, 'name': publication}, expected_layer, id='get_workspace_layer'),
-        pytest.param(process_client.get_workspace_map, {'workspace': workspace, 'name': publication}, expected_map, id='get_workspace_map'),
+        pytest.param(process_client.get_map_by_uuid, {'uuid': map_uuid}, expected_map, id='get_workspace_map'),
     ])
     def test_rest_responses(query_method, method_params, expected_info, ):
         response = query_method(**method_params)

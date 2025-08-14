@@ -12,10 +12,10 @@
 |Workspace Layer Chunk|`/rest/workspaces/<workspace_name>/layers/<layername>/chunk`|[GET](#get-workspace-layer-chunk)| [POST](#post-workspace-layer-chunk) | x | x |
 |Workspace Layer Metadata Comparison|`/rest/workspaces/<workspace_name>/layers/<layername>/metadata-comparison`|[GET](#get-workspace-layer-metadata-comparison) | x | x | x |
 |Maps|`/rest/maps`|[GET](#get-maps)| x | x | x |
+|[Map](models.md#map)|`/rest/maps/<uuid>`|[GET](#get-map)| x | [PATCH](#patch-map) | [DELETE](#delete-map) |
 |Map Thumbnail|`/rest/maps/<uuid>/thumbnail`|[GET](#get-map-thumbnail)| x | x | x |
 |Map File|`/rest/maps/<uuid>/file`|[GET](#get-map-file)| x | x | x |
 |Workspace Maps|`/rest/workspaces/<workspace_name>/maps`|[GET](#get-workspace-maps)| [POST](#post-workspace-maps) | x | [DELETE](#delete-workspace-maps) |
-|[Workspace Map](models.md#map)|`/rest/workspaces/<workspace_name>/maps/<mapname>`|[GET](#get-workspace-map)| x | [PATCH](#patch-workspace-map) | [DELETE](#delete-workspace-map) |
 |Workspace Map Metadata Comparison|`/rest/workspaces/<workspace_name>/layers/<layername>/metadata-comparison`|[GET](#get-workspace-map-metadata-comparison) | x | x | x |
 |Users|`/rest/users`|[GET](#get-users)| x | x | x |
 |User|`/rest/users/<username>`| x | x | x | [DELETE](#delete-user) |
@@ -559,7 +559,7 @@ Some of these steps run [asynchronously](async-tasks.md).
 
 If workspace directory does not exist yet, it is created on demand.
 
-Response to this request may be returned sooner than the processing chain is finished to enable asynchronous processing. Status of processing chain can be seen using [GET Workspace Map](#get-workspace-map) and **layman_metadata.publication_status** property or **status** properties of map sources (file, thumbnail, metadata) for higher granularity.
+Response to this request may be returned sooner than the processing chain is finished to enable asynchronous processing. Status of processing chain can be seen using [GET Map](#get-map) and **layman_metadata.publication_status** property or **status** properties of map sources (file, thumbnail, metadata) for higher granularity.
 
 #### Request
 Content-Type: `multipart/form-data`
@@ -603,7 +603,7 @@ Content-Type: `application/json`
 JSON array of objects representing posted maps with following structure:
 - **name**: String. Name of the map.
 - **uuid**: String. UUID of the map.
-- **url**: String. URL of the map. It points to [GET Workspace Map](#get-workspace-map).
+- **url**: String. URL of the map. It points to [GET Map](#get-map).
 
 ### DELETE Workspace Maps
 Delete existing maps and all associated sources, including map-composition JSON file and map thumbnail for all maps in the workspace. The currently running [asynchronous tasks](async-tasks.md) of affected maps are aborted. Only maps on which user has [write access right](./security.md#access-to-multi-publication-endpoints) are deleted.
@@ -618,21 +618,20 @@ JSON array of objects representing deleted maps:
 - **name**: String. Former name of the map.
 - **title**: String. Former title of the map.
 - **uuid**: String. Former UUID of the map.
-- **url**: String. Former URL of the map. It points to [GET Workspace Map](#get-workspace-map).
+- **url**: String. Former URL of the map. It points to [GET Map](#get-map).
 - **access_rights**:
   - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with former [read access](./security.md#Authorization).
   - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with former [write access](./security.md#Authorization).
 
-## Workspace Map
+## Map
 ### URL
-`/rest/workspaces/<workspace_name>/maps/<mapname>`
+`/rest/maps/<uuid>`
 
 #### Endpoint path parameters
-- **mapname**
-   - map name used for identification
-   - it can be obtained from responses of [GET Workspace Maps](#get-workspace-maps), [POST Workspace Maps](#post-workspace-maps), and all responses of this endpoint
+- **uuid**
+   - UUID of the map used for identification
 
-### GET Workspace Map
+### GET Map
 Get information about existing map.
 
 #### Request
@@ -667,7 +666,7 @@ JSON object with following structure:
   - *record_url*: String. URL of metadata record accessible by web browser, probably with some editing capabilities.
   - *csw_url*: String. URL of CSW endpoint. It points to CSW endpoint of Micka.
   - *comparison_url*: String. URL of [GET Workspace Map Metadata Comparison](#get-workspace-map-metadata-comparison).
-  - *status*: Status information about metadata import and availability. See [GET Workspace Map](#get-workspace-map) 
+  - *status*: Status information about metadata import and availability. See [GET Map](#get-map) 
   - *error*: If status is FAILURE, this may contain error object.
 - **access_rights**:
   - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [read access](./security.md#Authorization).
@@ -676,7 +675,7 @@ JSON object with following structure:
 - **native_crs**: Code of native CRS in form "EPSG:&lt;code&gt;", e.g. "EPSG:4326". Native CRS is CRS of the input data file.
 - **native_bounding_box**: List of 4 floats. Bounding box coordinates [minx, miny, maxx, maxy] in native CRS.
 
-### PATCH Workspace Map
+### PATCH Map
 Update information about existing map. First, it deletes sources of the map, and then it publishes them again with new parameters. The processing chain is similar to [POST Workspace Maps](#post-workspace-maps), including [asynchronous tasks](async-tasks.md),
 
 Calling concurrent PATCH requests is not supported, as well as calling PATCH when [POST/PATCH async chain](async-tasks.md) is still running, is not allowed. In such cases, error is returned.
@@ -707,7 +706,7 @@ Content-Type: `application/json`
 
 JSON object, same as in case of [POST Workspace Maps](#post-workspace-maps).
 
-### DELETE Workspace Map
+### DELETE Map
 Delete existing map and all associated sources, including map-composition JSON file and map thumbnail. The currently running [asynchronous tasks](async-tasks.md) of affected map are aborted.
 
 #### Request
@@ -719,7 +718,7 @@ Content-Type: `application/json`
 JSON object representing deleted map:
 - **name**: String. Former name of the map.
 - **uuid**: String. Former UUID of the map.
-- **url**: String. Former URL of the map. It points to [GET Workspace Map](#get-workspace-map).
+- **url**: String. Former URL of the map. It points to [GET Map](#get-map).
 
 
 ## Map File
@@ -730,8 +729,8 @@ Get JSON file describing the map valid against [map-composition schema](https://
 
 Notice that some JSON properties are automatically updated by layman, so file obtained by this endpoint may be slightly different from file that was uploaded. Expected changes:
 - **name** set to the map's name
-- **title** obtained from [POST Workspace Maps](#post-workspace-maps) or [PATCH Workspace Map](#patch-workspace-map) as `title`
-- **abstract** obtained from [POST Workspace Maps](#post-workspace-maps) or [PATCH Workspace Map](#patch-workspace-map) as `description`
+- **title** obtained from [POST Workspace Maps](#post-workspace-maps) or [PATCH Map](#patch-map) as `title`
+- **abstract** obtained from [POST Workspace Maps](#post-workspace-maps) or [PATCH Map](#patch-map) as `description`
 - **user** updated on the fly during this request:
    - **name** set to `<workspace_name>` in URL of this endpoint
    - **email** set to email of the owner, or empty string if not known
@@ -772,7 +771,7 @@ Content-Type: `application/json`
 
 JSON object with one attribute:
 - **metadata_sources**: Dictionary of objects. Key is ID of metadata source valid for this JSON only (not persistent in time!). Value is object with following attributes:
-  - **url**: String. URL of the metadata source ([GET Workspace Map](#get-workspace-map), [GET Map File](#get-map-file), or CSW record).
+  - **url**: String. URL of the metadata source ([GET Map](#get-map), [GET Map File](#get-map-file), or CSW record).
 - **metadata_properties**: Dictionary of objects. Key is name of [metadata property](./metadata.md) (e.g. `reference_system`). Value is object with following attributes:
   - **values**: Dictionary of objects. Key is ID of metadata source corresponding with `metadata_sources` attribute. Value is any valid JSON (null, number, string, boolean, list, or object) representing value of [metadata property](./metadata.md) (e.g. `[3857, 4326]`). Null means the value is not set.
   - **equal**: Boolean. True if all values are considered equal, false otherwise.

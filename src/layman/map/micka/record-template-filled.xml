@@ -71,7 +71,7 @@
           <gmd:identifier>
             <gmd:MD_Identifier>
               <gmd:code>
-                <gmx:Anchor xlink:href="http://localhost:8000/rest/workspaces/testuser1/maps/svet">svet</gmx:Anchor>
+                <gmx:Anchor xlink:href="http://localhost:8000/rest/maps/91147a27-1ff4-4242-ba6d-faffb92224c6">m-91147a27-1ff4-4242-ba6d-faffb92224c6</gmx:Anchor>
               </gmd:code>
             </gmd:MD_Identifier>
           </gmd:identifier>
@@ -197,7 +197,7 @@
           <gmd:onLine>
             <gmd:CI_OnlineResource>
               <gmd:linkage>
-                <gmd:URL>http://localhost:8000/rest/workspaces/testuser1/maps/svet</gmd:URL>
+                <gmd:URL>http://localhost:8000/rest/maps/91147a27-1ff4-4242-ba6d-faffb92224c6</gmd:URL>
               </gmd:linkage>
               <gmd:protocol>
                 <gmx:Anchor xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/WWW:LINK-1.0-http--link">WWW:LINK-1.0-http--link</gmx:Anchor>
