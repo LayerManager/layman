@@ -219,10 +219,16 @@ class TestSingleRestPublication:
 
     @classmethod
     def patch_publication(cls, publication, args=None):
+        if publication.type == process_client.MAP_TYPE:
+            uuid = cls.publ_uuids.get(publication, publication.uuid)
+            return process_client.patch_map(uuid=uuid, **args)
         return process_client.patch_workspace_publication(publication.type, publication.workspace, publication.name, **args)
 
     @classmethod
     def delete_workspace_publication(cls, publication, args=None):
+        if publication.type == process_client.MAP_TYPE:
+            uuid = cls.publ_uuids.get(publication, publication.uuid)
+            return process_client.delete_map(uuid=uuid, **args)
         return process_client.delete_workspace_publication(publication.type, publication.workspace, publication.name, **args)
 
     @classmethod

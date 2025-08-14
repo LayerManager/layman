@@ -17,8 +17,10 @@ def test_get_map_title():
             ]
     sorted_maps = sorted(maps)
 
+    map_uuids = []
     for (name, title) in maps:
-        process_client.publish_workspace_map(workspace, name, title=title)
+        map_info = process_client.publish_workspace_map(workspace, name, title=title)
+        map_uuids.append(map_info['uuid'])
 
     with app.app_context():
         url_get = url_for('rest_workspace_maps.get', workspace=workspace)
@@ -30,5 +32,5 @@ def test_get_map_title():
         assert response.json()[i]["name"] == sorted_maps[i][0]
         assert response.json()[i]["title"] == sorted_maps[i][1]
 
-    for (name, title) in maps:
-        process_client.delete_workspace_map(workspace, name)
+    for uuid in map_uuids:
+        process_client.delete_map(uuid=uuid)

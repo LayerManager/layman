@@ -44,5 +44,5 @@ def test_map_refresh_after_layer_change():
     process_client.wait_for_publication_status(workspace, process_client.LAYER_TYPE, layer)
     assert_map_thumbnail(workspace, map, publ_uuid, f'/code/test_tools/data/thumbnail/map_with_internal_layer_basic.png')
 
-    process_client.delete_workspace_map(workspace, map)
+    process_client.delete_map(uuid=publ_uuid)
     process_client.delete_workspace_layer(workspace, layer)

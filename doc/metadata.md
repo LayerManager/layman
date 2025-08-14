@@ -52,7 +52,7 @@ Multiplicity: 1
 
 Shape: String
 
-Example: `"http://layman_test_run_1:8000/rest/workspace1/layers/ne_110m_admin_0_countries_shp/thumbnail"`
+Example: `"http://layman_test_run_1:8000/rest/layers/91147a27-1ff4-4242-ba6d-faffb92224c6/thumbnail"`
 
 Synchronizable: yes
 
@@ -73,6 +73,14 @@ Example:
 {
     "identifier": "http://layman_test_run_1:8000/rest/testuser1/layers/ne_110m_admin_0_countries_shp",
     "label": "ne_110m_admin_0_countries_shp"
+}
+```
+
+Example for map with UUID-based URL:
+```
+{
+    "identifier": "http://layman_test_run_1:8000/rest/maps/91147a27-1ff4-4242-ba6d-faffb92224c6",
+    "label": "91147a27-1ff4-4242-ba6d-faffb92224c6"
 }
 ```
 
@@ -126,7 +134,7 @@ Multiplicity: 1
 
 Shape: String
 
-Example: `"http://layman_test_run_1:8000/rest/workspace1/maps/svet/file"`
+Example: `"http://layman_test_run_1:8000/rest/maps/91147a27-1ff4-4242-ba6d-faffb92224c6/file"`
 
 Synchronizable: yes
 
