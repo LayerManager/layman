@@ -75,14 +75,11 @@ def post(workspace):
     else:
         description = file_json.get('abstract', '')
 
-    mapurl = url_for('rest_workspace_map.get', mapname=mapname, workspace=workspace, x_forwarded_items=x_forwarded_items)
-
     redis_util.create_lock(workspace, MAP_TYPE, mapname, request.method)
 
     try:
         map_result = {
             'name': mapname,
-            'url': mapurl,
         }
 
         actor_name = authn.get_authn_username()
@@ -105,6 +102,7 @@ def post(workspace):
 
         map_result.update({
             'uuid': uuid_str,
+            'url': url_for('rest_map.get', uuid=uuid_str, x_forwarded_items=x_forwarded_items),
         })
 
         file = FileStorage(

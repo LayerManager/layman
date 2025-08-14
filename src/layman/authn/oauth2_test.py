@@ -310,4 +310,4 @@ def test_patch_current_user_without_username():
     assert user_info['name'] == exp_name
     assert user_info['email'] == exp_email
 
-    process_client.delete_workspace_map(workspace, mapname, headers=user1_authn_headers)
+    process_client.delete_map(uuid=uuid, headers=user1_authn_headers)
