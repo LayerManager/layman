@@ -160,16 +160,14 @@ def get_template_path_and_values(publication: Map, *, http_method=None, actor_na
     ]))), None)
 
     prop_values = _get_property_values(
-        workspace=publication.workspace,
-        mapname=publication.name,
         uuid=publication.uuid,
         title=title,
         abstract=abstract or None,
         publication_date=publ_datetime.strftime('%Y-%m-%d'),
         revision_date=revision_date.strftime('%Y-%m-%d'),
         md_date_stamp=date.today().strftime('%Y-%m-%d'),
-        identifier=url_for('rest_workspace_map.get', workspace=publication.workspace, mapname=publication.name),
-        identifier_label=publication.name,
+        identifier=url_for('rest_map.get', uuid=publication.uuid),
+        identifier_label=f"m-{publication.uuid}",
         extent=extent,
         crs_list=[crs],
         md_organisation_name=None,
@@ -184,8 +182,6 @@ def get_template_path_and_values(publication: Map, *, http_method=None, actor_na
 
 
 def _get_property_values(
-        workspace='browser',
-        mapname='map',
         uuid='af238200-8200-1a23-9399-42c9fca53543',
         title='Administrativní členění Libereckého kraje',
         abstract=None,
@@ -231,7 +227,7 @@ def _get_property_values(
         'graphic_url': url_for('rest_map_thumbnail.get', uuid=uuid),
         'extent': extent,
 
-        'map_endpoint': escape(url_for('rest_workspace_map.get', workspace=workspace, mapname=mapname)),
+        'map_endpoint': escape(url_for('rest_map.get', uuid=uuid)),
         'map_file_endpoint': escape(url_for('rest_map_file.get', uuid=uuid)),
         'operates_on': operates_on,
         'md_organisation_name': md_organisation_name,

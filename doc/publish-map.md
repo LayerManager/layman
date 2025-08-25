@@ -19,13 +19,13 @@ Then save the file to Layman using [POST Workspace Maps](rest.md#post-workspace-
 
 In response of [POST Workspace Maps](rest.md#post-workspace-maps) you will obtain
  - `name` of the map unique within all maps in used [workspace](models.md#workspace)
- - `url` of the map pointing to [GET Workspace Map](rest.md#get-workspace-map)
+ - `url` of the map pointing to [GET Map](rest.md#get-map)
  
  Later on, you can
- - get metadata about this map using [GET Workspace Map](rest.md#get-workspace-map)
+ - get metadata about this map using [GET Map](rest.md#get-map)
  - get uploaded JSON file using [GET Map File](rest.md#get-map-file)
- - update the map using [PATCH Workspace Map](rest.md#patch-workspace-map)
- - delete the map using [DELETE Workspace Map](rest.md#delete-workspace-map)
+ - update the map using [PATCH Map](rest.md#patch-map)
+ - delete the map using [DELETE Map](rest.md#delete-map)
  
  Also, you can obtain list of all maps using [GET Workspace Maps](rest.md#get-workspace-maps).
  

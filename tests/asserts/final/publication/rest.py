@@ -10,20 +10,22 @@ from test_tools import process_client, util as test_util, assert_util
 X_FORWARDED_ITEMS = XForwardedClass(proto='https', host='abc.cz:3001', prefix='/layman-proxy')
 
 
-def get_expected_urls_in_rest_response(workspace, publ_type, name, *, rest_method, x_forwarded_items=None, geodata_type=None):
+def get_expected_urls_in_rest_response(workspace, publ_type, name, *, rest_method, x_forwarded_items=None, geodata_type=None, uuid=None):
     x_forwarded_items = x_forwarded_items or XForwardedClass()
     proxy_proto = x_forwarded_items.proto or settings.LAYMAN_PUBLIC_URL_SCHEME
     proxy_host = x_forwarded_items.host or settings.LAYMAN_PROXY_SERVER_NAME
     proxy_prefix = x_forwarded_items.prefix or ''
     assert rest_method in {'post', 'patch', 'get', 'delete', 'multi_delete'}
     publ_type_directory = f'{publ_type.split(".")[1]}s'
-    uuid = None
-    if rest_method not in ['delete', 'multi_delete']:
+    if uuid is None and rest_method not in ['delete', 'multi_delete']:
         with app.app_context():
             uuid = get_publication_info(workspace=workspace, publ_type=publ_type, publ_name=name, context={'keys': ['uuid']})['uuid']
-    result = {
-        'url': f'{proxy_proto}://{proxy_host}{proxy_prefix}/rest/workspaces/{workspace}/{publ_type_directory}/{name}'
-    }
+    result = {}
+    if publ_type == "layman.map":
+        result['url'] = f'{proxy_proto}://{proxy_host}{proxy_prefix}/rest/{publ_type_directory}/{uuid}'
+    else:
+        result[
+            'url'] = f'{proxy_proto}://{proxy_host}{proxy_prefix}/rest/workspaces/{workspace}/{publ_type_directory}/{name}'
 
     if rest_method == 'get':
         if publ_type in [process_client.MAP_TYPE, process_client.LAYER_TYPE] and uuid:
@@ -128,7 +130,11 @@ def multi_url_with_x_forwarded_prefix(workspace, publ_type, name, headers, ):
                                     if info['workspace'] == workspace and info['name'] == name and info['publication_type']
                                     == short_publ_type))
         url = rest_multi_info['url']
-        assert url == f'{proxy_items.proto}://{proxy_items.host}{proxy_items.prefix}/rest/workspaces/{workspace}/{short_publ_type}s/{name}'
+        if publ_type == 'layman.map':
+            expected_url = f'{proxy_items.proto}://{proxy_items.host}{proxy_items.prefix}/rest/maps/{rest_multi_info["uuid"]}'
+        else:
+            expected_url = f'{proxy_items.proto}://{proxy_items.host}{proxy_items.prefix}/rest/workspaces/{workspace}/{short_publ_type}s/{name}'
+        assert url == expected_url
 
 
 def get_layer_with_x_forwarded_prefix(workspace, name, headers, ):

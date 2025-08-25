@@ -20,6 +20,9 @@
 - [#1126](https://github.com/LayerManager/layman/issues/1126) Endpoint [GET Workspace Layer Thumbnail](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-layer-thumbnail) was removed and replaced with endpoint [GET Layer Thumbnail](doc/rest.md#get-layer-thumbnail) endpoint to use UUID-based URL `/rest/layers/{uuid}/thumbnail` instead of workspace&name-based URL.
 - [#1126](https://github.com/LayerManager/layman/issues/1126) Endpoint [GET Workspace Map File](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-map-file) was removed and replaced with endpoint [GET Map File](doc/rest.md#get-map-file) to use UUID-based URL `/rest/map/{uuid}/file` instead of workspace&name-based URL.
 - [#1126](https://github.com/LayerManager/layman/issues/1126) Endpoint [GET Workspace Layer Style](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-layer-style) was removed and replaced with endpoint [GET Layer Style](doc/rest.md#get-layer-style) to use UUID-based URL `/rest/layer/{uuid}/style` instead of workspace&name-based URL.
+- [#1126](https://github.com/LayerManager/layman/issues/1126) Endpoint [GET Workspace Map](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-map) was removed and replaced with endpoint [GET Map](doc/rest.md#get-map) to use UUID-based URL `/rest/maps/{uuid}` instead of workspace&name-based URL.
+- [#1126](https://github.com/LayerManager/layman/issues/1126) Endpoint [PATCH Workspace Map](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#patch-workspace-map) was removed and replaced with endpoint [PATCH Map](doc/rest.md#patch-map) to use UUID-based URL `/rest/maps/{uuid}` instead of workspace&name-based URL.
+- [#1126](https://github.com/LayerManager/layman/issues/1126) Endpoint [DELETE Workspace Map](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#delete-workspace-map) was removed and replaced with endpoint [DELETE Map](doc/rest.md#delete-map) to use UUID-based URL `/rest/maps/{uuid}` instead of workspace&name-based URL.
 
 ## v2.1.0
  2025-05-02
@@ -74,15 +77,15 @@
   - Metadata properties [wfs_url](doc/metadata.md#wfs_url) and [wms_url](doc/metadata.md#wms_url) contain new layer names `l_<UUID>`.
   - Layer in map JSON file is considered [internal](doc/models.md#internal-map-layer) if named `l_<UUID>` and located in GeoServer workspace `layman` or `layman_wms`.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) New keys `wfs.name` and `wms.name` were added to [GET Workspace Layer](doc/rest.md#get-workspace-layer) response. Use values from these keys when communicating with WFS and WMS.
-- [#1048](https://github.com/LayerManager/layman/issues/1048) Actions [POST Workspace Maps](doc/rest.md#post-workspace-maps) and [PATCH Workspace Map](doc/rest.md#patch-workspace-map) raises error if there is internal layer referenced by its Layman name and Layman workspace instead of new GeoServer name `l_<UUID>` and new GeoServer workspace `layman` or `layman_wms`.
+- [#1048](https://github.com/LayerManager/layman/issues/1048) Actions [POST Workspace Maps](doc/rest.md#post-workspace-maps) and [PATCH Workspace Map](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#patch-workspace-map) raises error if there is internal layer referenced by its Layman name and Layman workspace instead of new GeoServer name `l_<UUID>` and new GeoServer workspace `layman` or `layman_wms`.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Layers with QML style are named by their title instead of name in WMS graphical legend.
-- [#1048](https://github.com/LayerManager/layman/issues/1048) Keys `file.paths`, `file.path` and `thumbnail.path` of GET Workspace [Layer](doc/rest.md#get-workspace-layer)/[Map](doc/rest.md#get-workspace-map) are relative to [LAYMAN_DATA_DIR](doc/env-settings.md#layman_data_dir) instead of workspace directory.
+- [#1048](https://github.com/LayerManager/layman/issues/1048) Keys `file.paths`, `file.path` and `thumbnail.path` of GET Workspace [Layer](doc/rest.md#get-workspace-layer)/[Map](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-map) are relative to [LAYMAN_DATA_DIR](doc/env-settings.md#layman_data_dir) instead of workspace directory.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Stop saving publication UUID to `uuid.txt` file.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) Information about layer in WMS and WFS (e.g. keys `wms` and `wfs` in [GET Workspace Layer](doc/rest.md#get-workspace-layer)) is obtained from GeoServer REST API instead of WMS GetCapabilities to improve speed.
 - [#1048](https://github.com/LayerManager/layman/issues/1048) POST Workspace [Layers](doc/rest.md#post-workspace-layers)/[Maps](doc/rest.md#post-workspace-maps) accepts new optional body parameter `uuid`. It's meant mostly for testing purposes.
 - [#161](https://github.com/LayerManager/layman/issues/161) New method [DELETE User](doc/rest.md#delete-user) allows users to delete user accounts.
 - [#942](https://github.com/LayerManager/layman/issues/942) New key `used_in_maps` was added to responses of requests [GET Publications](doc/rest.md#get-publications), [GET Layers](doc/rest.md#get-layers), [GET Workspace Layers](doc/rest.md#get-workspace-layers), and [GET Workspace Layer](doc/rest.md#get-workspace-layer). It can be used to warn user before deleting layer that the layer is used in some maps.
-- [#1009](https://github.com/LayerManager/layman/issues/1009) PATCH Workspace [Layer](doc/rest.md#patch-workspace-layer)/[Map](doc/rest.md#patch-workspace-map) returns same response as POST Workspace [Layers](doc/rest.md#post-workspace-layers)/[Maps](doc/rest.md#post-workspace-maps) with only `name`, `uuid`, `url` and for Layer also optional `files_to_upload` keys.
+- [#1009](https://github.com/LayerManager/layman/issues/1009) PATCH Workspace [Layer](doc/rest.md#patch-workspace-layer)/[Map](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#patch-workspace-map) returns same response as POST Workspace [Layers](doc/rest.md#post-workspace-layers)/[Maps](doc/rest.md#post-workspace-maps) with only `name`, `uuid`, `url` and for Layer also optional `files_to_upload` keys.
 - [#1009](https://github.com/LayerManager/layman/issues/1009) Updating Micka record as part of PATCH Workspace [Layer](doc/rest.md#patch-workspace-layer) runs asynchronously to make PATCH request faster.
 - [#909](https://github.com/LayerManager/layman/issues/909) Upgrade QGIS Server from v3.32.2 to v3.40.4. Also use docker hub repo [layermanager/qgis-server](https://hub.docker.com/r/layermanager/qgis-server) instead of jirikcz/qgis-server,
   - QML styles up to v3.40.2 are supported.
@@ -97,7 +100,7 @@
   - workspace-related endpoints which did not include `/workspaces` in their path were removed 
 - [#701](https://github.com/LayerManager/layman/pull/701) Check bounding bbox of normalized raster before posting to GeoServer. Stop checking that Layer is available in WMS/WFS GetCapabilities after publishing to GeoServer.
 - Output from `make upgrade-demo` and `make upgrade-demo-full` is saved to `tmp/logs/demo_upgrade_${date -u +"%FT%H%MZ"}.log`. The output is also written to standard output.
-- Add forgotten `thumbnail.path` attributes to documentation of GET Workspace [Layer](doc/rest.md#get-workspace-layer)/[Map](doc/rest.md#get-workspace-map) responses.
+- Add forgotten `thumbnail.path` attributes to documentation of GET Workspace [Layer](doc/rest.md#get-workspace-layer)/[Map](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-map) responses.
 - Upgrade GeoServer to 2.21.4.
 - [#1028](https://github.com/LayerManager/layman/issues/1028) Upgrade Node.js of Laymen Test Client from v18 to v22 and dependencies:
   - eslint-config-next 13 -> 14
@@ -179,11 +182,11 @@
 - [#165](https://github.com/LayerManager/layman/issues/165) Roles (except of `EVERYONE`) are managed by [role service](doc/security.md#role-service).
 - [#165](https://github.com/LayerManager/layman/issues/165) New REST endpoint [GET Roles](doc/rest.md#get-roles) with list of all roles registered in [role service](doc/security.md#role-service), that can be used in access rights.
   - This new endpoint was added to Test Client into tab "Others".
-- [#165](https://github.com/LayerManager/layman/issues/165) POST Workspace [Layers](doc/rest.md#post-workspace-layers)/[Maps](doc/rest.md#post-workspace-maps) and PATCH Workspace [Layer](doc/rest.md#patch-workspace-layer)/[Map](doc/rest.md#patch-workspace-map) saves [role names](doc/models.md#role) mentioned in `access_rights.read` and `access_rights.write` parameters into [prime DB schema](doc/data-storage.md#postgresql).
+- [#165](https://github.com/LayerManager/layman/issues/165) POST Workspace [Layers](doc/rest.md#post-workspace-layers)/[Maps](doc/rest.md#post-workspace-maps) and PATCH Workspace [Layer](doc/rest.md#patch-workspace-layer)/[Map](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#patch-workspace-map) saves [role names](doc/models.md#role) mentioned in `access_rights.read` and `access_rights.write` parameters into [prime DB schema](doc/data-storage.md#postgresql).
 - [#165](https://github.com/LayerManager/layman/issues/165) Many requests respect roles in access rights:
   - [GET](doc/rest.md#get-workspace-layer)/[PATCH](doc/rest.md#patch-workspace-layer)/[DELETE](doc/rest.md#delete-workspace-layer) Workspace Layer
   - GET Workspace Layer [Thumbnail](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-layer-thumbnail)/[Style](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-layer-style)/[Metadata Comparison](doc/rest.md#get-workspace-layer-metadata-comparison)/[Chunk](doc/rest.md#get-workspace-layer-chunk)
-  - [GET](doc/rest.md#get-workspace-map)/[PATCH](doc/rest.md#patch-workspace-map)/[DELETE](doc/rest.md#delete-workspace-map) Workspace Map
+  - [GET](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-map)/[PATCH](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#patch-workspace-map)/[DELETE](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#delete-workspace-map) Workspace Map
   - GET Workspace Map [File](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-map-file)/[Thumbnail](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-map-thumbnail)/[Metadata Comparison](doc/rest.md#get-workspace-map-metadata-comparison)
   - GET Workspace [Layers](doc/rest.md#get-workspace-layers)/[Maps](doc/rest.md#get-workspace-maps)
   - GET [Layers](doc/rest.md#get-layers)/[Maps](doc/rest.md#get-maps)/[Publications](doc/rest.md#get-publications)
@@ -192,7 +195,7 @@
 - [#165](https://github.com/LayerManager/layman/issues/165) POST Workspace [Layers](doc/rest.md#post-workspace-layers)/[Maps](doc/rest.md#post-workspace-maps) respects roles in [GRANT_CREATE_PUBLIC_WORKSPACE](doc/env-settings.md#grant_create_public_workspace) and [GRANT_PUBLISH_IN_PUBLIC_WORKSPACE](doc/env-settings.md#grant_publish_in_public_workspace)
 - [#165](https://github.com/LayerManager/layman/issues/165) Many endpoints return previously associated [role names](doc/models.md#role) in `access_rights.read` and `access_rights.write` keys:
   - [GET](doc/rest.md#get-workspace-layer)/[PATCH](doc/rest.md#patch-workspace-layer) Workspace Layer
-  - [GET](doc/rest.md#get-workspace-map)/[PATCH](doc/rest.md#patch-workspace-map) Workspace Map
+  - [GET](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-map)/[PATCH](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#patch-workspace-map) Workspace Map
   - GET Workspace [Layers](doc/rest.md#get-workspace-layers)/[Maps](doc/rest.md#get-workspace-maps)
   - GET [Layers](doc/rest.md#get-layers)/[Maps](doc/rest.md#get-maps)/[Publications](doc/rest.md#get-publications)
 - [#165](https://github.com/LayerManager/layman/issues/165) Name of [users](doc/models.md#username) and [public workspaces](doc/models.md#public-workspace) are from now on restricted to a maximum length of 59 characters.
@@ -201,7 +204,7 @@
 - [941](https://github.com/LayerManager/layman/issues/941) Wagtail database is now persistent when restarting Layman or Wagtail.
 - All changes from [v1.22.1](#v1221), [v1.22.2](#v1222) and [v1.22.3](#v1223).
 - [#960](https://github.com/LayerManager/layman/issues/960) Handle WMS requests with HTTP error more efficiently in timgen.
-- [#962](https://github.com/LayerManager/layman/issues/962) Make values of `layman_metadata.publication_status` and `status` key(s) more consistent in responses of PATCH Workspace [Layer](doc/rest.md#patch-workspace-layer)/[Map](doc/rest.md#patch-workspace-map) and GET Workspace [Layer](doc/rest.md#get-workspace-layer)/[Map](doc/rest.md#get-workspace-map).
+- [#962](https://github.com/LayerManager/layman/issues/962) Make values of `layman_metadata.publication_status` and `status` key(s) more consistent in responses of PATCH Workspace [Layer](doc/rest.md#patch-workspace-layer)/[Map](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#patch-workspace-map) and GET Workspace [Layer](doc/rest.md#get-workspace-layer)/[Map](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-map).
 - Timgen handles better some edge cases:
   - If map's [internal layer](doc/models.md#internal-map-layer) points to non-existent workspace, Timgen is faster and does not fail.
   - If map's file was not obtained from Layman, Timgen fails quickly.
@@ -278,14 +281,14 @@
 - [#868](https://github.com/LayerManager/layman/issues/868) Responses to many requests respect [HTTP X-Forwarded headers](doc/client-proxy.md#x-forwarded-http-headers) of the request. Those requests are:
   - GET [Publications](doc/rest.md#get-publications), [Layers](doc/rest.md#get-layers), [Workspace Layers](doc/rest.md#get-workspace-layers), [Maps](doc/rest.md#get-maps), and [Workspace Maps](doc/rest.md#get-workspace-maps)
   - [GET](doc/rest.md#get-workspace-layer), [PATCH](doc/rest.md#patch-workspace-layer), and [DELETE](doc/rest.md#delete-workspace-layer) Workspace Layer
-  - [GET](doc/rest.md#get-workspace-map), [PATCH](doc/rest.md#patch-workspace-map), and [DELETE](doc/rest.md#delete-workspace-map) Workspace Map
+  - [GET](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-map), [PATCH](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#patch-workspace-map), and [DELETE](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#delete-workspace-map) Workspace Map
   - [GET Workspace Map File](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-map-file)
   - [POST](doc/rest.md#post-workspace-layers) and [DELETE](doc/rest.md#delete-workspace-layers) Workspace Layers
   - [POST](doc/rest.md#post-workspace-maps) and [DELETE](doc/rest.md#delete-workspace-maps) Workspace Maps
   - requests to [WMS](doc/endpoints.md#web-map-service) and [WFS](doc/endpoints.md#web-feature-service) endpoints
 - [#868](https://github.com/LayerManager/layman/issues/868) Responses to [GET Workspace Layer Metadata Comparison](doc/rest.md#get-workspace-layer-metadata-comparison) and [GET Workspace Map Metadata Comparison](doc/rest.md#get-workspace-map-metadata-comparison) do not respect [HTTP X-Forwarded headers](doc/client-proxy.md#x-forwarded-http-headers) of the request intentionally, in order to keep URLs in canonical form.
-- [#868](https://github.com/LayerManager/layman/issues/868) Relations between map and [internal layers](doc/models.md#internal-map-layer) are updated in `map_layer` table when calling [POST Workspace Maps](doc/rest.md#post-workspace-maps), [PATCH Workspace Map](doc/rest.md#patch-workspace-map), [DELETE Workspace Map](doc/rest.md#delete-workspace-map), and [DELETE Workspace Maps](doc/rest.md#delete-workspace-maps).
-- [#901](https://github.com/LayerManager/layman/issues/901) Endpoints [POST](doc/rest.md#post-workspace-maps) and [PATCH](doc/rest.md#patch-workspace-map) accept map compositions in version `3.x.x`.
+- [#868](https://github.com/LayerManager/layman/issues/868) Relations between map and [internal layers](doc/models.md#internal-map-layer) are updated in `map_layer` table when calling [POST Workspace Maps](doc/rest.md#post-workspace-maps), [PATCH Workspace Map](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#patch-workspace-map), [DELETE Workspace Map](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#delete-workspace-map), and [DELETE Workspace Maps](doc/rest.md#delete-workspace-maps).
+- [#901](https://github.com/LayerManager/layman/issues/901) Endpoints [POST](doc/rest.md#post-workspace-maps) and [PATCH](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#patch-workspace-map) accept map compositions in version `3.x.x`.
 - [#927](https://github.com/LayerManager/layman/issues/927) SLD styles are internally published to GeoServer with [`raw`](https://docs.geoserver.org/2.21.x/en/user/rest/api/styles.html#raw) parameter set to `True`.
 - [#880](https://github.com/LayerManager/layman/issues/880) Use Docker Compose v2 (`docker compose`) in Makefile without `compatibility` flag and remove `Makefile_docker-compose_v1` file. Docker containers are named according to Docker Compose v2 and may have different name after upgrade.
 - [#765](https://github.com/LayerManager/layman/issues/765) Stop saving OAuth2 claims in filesystem, use prime DB schema only.
@@ -606,7 +609,7 @@ make client-build
 - [#64](https://github.com/LayerManager/layman/issues/64) Native CRS of previously uploaded maps is set according their composition file (either `EPSG:3857` or `EPSG:4326`) and their composition file is upgraded to [version 2.0.0](https://raw.githubusercontent.com/hslayers/map-compositions/2.0.0/schema.json).
 ### Changes
 - [#64](https://github.com/LayerManager/layman/issues/64) Upgrade GeoServer to 2.15.2, because 2.13.0 had serious problem with transformations of EPSG:5514.
-- [#64](https://github.com/LayerManager/layman/issues/64) Responses of [GET Layers](doc/rest.md#get-layers), [GET Workspace Layers](doc/rest.md#get-workspace-layers), [GET Workspace Layer](doc/rest.md#get-workspace-layer), [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer), [GET Maps](doc/rest.md#get-maps), [GET Workspace Maps](doc/rest.md#get-workspace-maps), [GET Workspace Map](doc/rest.md#get-workspace-map), [PATCH Workspace Map](doc/rest.md#patch-workspace-map) contains new attributes
+- [#64](https://github.com/LayerManager/layman/issues/64) Responses of [GET Layers](doc/rest.md#get-layers), [GET Workspace Layers](doc/rest.md#get-workspace-layers), [GET Workspace Layer](doc/rest.md#get-workspace-layer), [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer), [GET Maps](doc/rest.md#get-maps), [GET Workspace Maps](doc/rest.md#get-workspace-maps), [GET Workspace Map](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-map), [PATCH Workspace Map](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#patch-workspace-map) contains new attributes
    - `native_crs` with native CRS in form "EPSG:&lt;code&gt;", e.g. "EPSG:4326"
    - `native_bounding_box` with coordinates in native CRS [minx, miny, maxx, maxy]
 - [#64](https://github.com/LayerManager/layman/issues/64) New environment variable [LAYMAN_INPUT_SRS_LIST](doc/env-settings.md#LAYMAN_INPUT_SRS_LIST)
@@ -753,7 +756,7 @@ make timgen-build
 ## v1.13.2
  2021-06-25
 ### Changes
-- Fix [#405](https://github.com/LayerManager/layman/issues/405). In some specific situations, [GET Workspace Layer](doc/rest.md#get-workspace-layer) and [GET Workspace Map](doc/rest.md#get-workspace-map) returned PENDING state although asynchronous tasks were already finished. Also PATCH request to these publications was not possible. It's fixed now.
+- Fix [#405](https://github.com/LayerManager/layman/issues/405). In some specific situations, [GET Workspace Layer](doc/rest.md#get-workspace-layer) and [GET Workspace Map](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-map) returned PENDING state although asynchronous tasks were already finished. Also PATCH request to these publications was not possible. It's fixed now.
 
 ## v1.13.1
  2021-06-07
@@ -784,8 +787,8 @@ make timgen-build
      - bounding box is updated in DB, QGIS file, WMS/WFS capabilities, and CSW metadata record
      - thumbnail is updated in filesystem and it is accessible using [GET Workspace Layer Thumbnail](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-layer-thumbnail)
   - update of thumbnail of each [map](doc/models.md#map) that points to at least one edited layer (thumbnail is updated in filesystem and accessible using [GET Workspace Map Thumbnail](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-map-thumbnail))  
-  These updates run in [asynchronous chain](doc/async-tasks.md). Documentation describes concurrency of WFS-T request and its asynchronous chains with another [WFS-T request](doc/endpoints.md#web-feature-service), [POST Workspace Layers](doc/rest.md#post-workspace-layers), [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer), [DELETE Workspace Layer](doc/rest.md#delete-workspace-layer), [DELETE Workspace Layers](doc/rest.md#delete-workspace-layers), [PATCH Workspace Map](doc/rest.md#patch-workspace-map), [DELETE Workspace Map](doc/rest.md#delete-workspace-map), and [DELETE Workspace Maps](doc/rest.md#delete-workspace-maps).
-- [#159](https://github.com/LayerManager/layman/issues/159) Object `layman_metadata` was added to [GET Workspace Layer](doc/rest.md#get-workspace-layer), [GET Workspace Map](doc/rest.md#get-workspace-map), [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer), and [PATCH Workspace Map](doc/rest.md#patch-workspace-map) responses. Attribute `layman_metadata.publication_status` can be used for watching global state of publication (updating, complete, incomplete).
+  These updates run in [asynchronous chain](doc/async-tasks.md). Documentation describes concurrency of WFS-T request and its asynchronous chains with another [WFS-T request](doc/endpoints.md#web-feature-service), [POST Workspace Layers](doc/rest.md#post-workspace-layers), [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer), [DELETE Workspace Layer](doc/rest.md#delete-workspace-layer), [DELETE Workspace Layers](doc/rest.md#delete-workspace-layers), [PATCH Workspace Map](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#patch-workspace-map), [DELETE Workspace Map](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#delete-workspace-map), and [DELETE Workspace Maps](doc/rest.md#delete-workspace-maps).
+- [#159](https://github.com/LayerManager/layman/issues/159) Object `layman_metadata` was added to [GET Workspace Layer](doc/rest.md#get-workspace-layer), [GET Workspace Map](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-map), [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer), and [PATCH Workspace Map](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#patch-workspace-map) responses. Attribute `layman_metadata.publication_status` can be used for watching global state of publication (updating, complete, incomplete).
 - [#331](https://github.com/LayerManager/layman/issues/331) Query parameter *full_text_filter* is also used for substring search in endpoints [GET Layers](doc/rest.md#get-layers), [GET Worksapce Layers](doc/rest.md#get-workspace-layers), [GET Maps](doc/rest.md#get-maps) and [GET Workspace Maps](doc/rest.md#get-workspace-maps).
 - Filesystem directory containing workspaces was renamed from `users` to `workspaces`
 - [#159](https://github.com/LayerManager/layman/issues/159) Bounding box is sent explicitly to GeoServer for every layer.
@@ -810,7 +813,7 @@ make timgen-build
 - [#257](https://github.com/LayerManager/layman/issues/257) Fill column `bbox` in `publications` table.
 ### Changes
 - [#257](https://github.com/LayerManager/layman/issues/257) Endpoints [GET Layers](doc/rest.md#get-layers), [GET Worksapce Layers](doc/rest.md#get-workspace-layers), [GET Maps](doc/rest.md#get-maps) and [GET Workspace Maps](doc/rest.md#get-workspace-maps) can filter, order, and paginate results according to new query parameters. All request parameters, response structure and response headers are described in [GET Layers](doc/rest.md#get-layers) documentation.
-- [#257](https://github.com/LayerManager/layman/issues/257) Responses of [GET Layers](doc/rest.md#get-layers), [GET Workspace Layers](doc/rest.md#get-workspace-layers), [GET Workspace Layer](doc/rest.md#get-workspace-layer), [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer), [GET Maps](doc/rest.md#get-maps), [GET Workspace Maps](doc/rest.md#get-workspace-maps), [GET Workspace Map](doc/rest.md#get-workspace-map), and [PATCH Workspace Map](doc/rest.md#patch-workspace-map) contains new attributes
+- [#257](https://github.com/LayerManager/layman/issues/257) Responses of [GET Layers](doc/rest.md#get-layers), [GET Workspace Layers](doc/rest.md#get-workspace-layers), [GET Workspace Layer](doc/rest.md#get-workspace-layer), [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer), [GET Maps](doc/rest.md#get-maps), [GET Workspace Maps](doc/rest.md#get-workspace-maps), [GET Workspace Map](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-map), and [PATCH Workspace Map](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#patch-workspace-map) contains new attributes
    - `updated_at` with date and time of last PATCH/POST request to given publication
    - `bounding_box` with bounding box coordinates in EPSG:3857
 - [#302](https://github.com/LayerManager/layman/issues/302) Metadata properties [wms_url](doc/metadata.md#wms_url) and [wfs_url](doc/metadata.md#wfs_url) contain new URL parameter `LAYERS` whose value is name of the layer. It's non-standard way how to store name of the layer at given WMS/WFS instance within metadata record.
@@ -947,8 +950,8 @@ Data manipulations that automatically run at first start of Layman:
     - Error messages and data, as well as Layman Test Client, also distinguishes workspace and user/username.
 - Each workspace is now either [personal](doc/models.md#personal-workspace), or [public](doc/models.md#public-workspace). Personal workspace is automatically created when user reserves his username. Creation of and posting new publication to public workspaces is controlled by [GRANT_CREATE_PUBLIC_WORKSPACE](doc/env-settings.md#GRANT_CREATE_PUBLIC_WORKSPACE) and [GRANT_PUBLISH_IN_PUBLIC_WORKSPACE](doc/env-settings.md#GRANT_PUBLISH_IN_PUBLIC_WORKSPACE).
 - [#28](https://github.com/LayerManager/layman/issues/28) It is possible to control also [read access](doc/security.md#publication-access-rights) to any publication per user.
-   - New attribute `access_rights` added to [GET Workspace Layers](doc/rest.md#get-workspace-layers), [GET Workspace Layer](doc/rest.md#get-workspace-layer), [GET Workspace Maps](doc/rest.md#get-workspace-maps) and [GET Workspace Map](doc/rest.md#get-workspace-map) responses.
-   - New parameters `access_rights.read` and `access_rights.write` added to [POST Workspace Layers](doc/rest.md#post-workspace-layers), [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer), [POST Workspace Maps](doc/rest.md#post-workspace-maps) and [PATCH Workspace Map](doc/rest.md#patch-workspace-map) requests. These new parameters are added to Test Client GUI.
+   - New attribute `access_rights` added to [GET Workspace Layers](doc/rest.md#get-workspace-layers), [GET Workspace Layer](doc/rest.md#get-workspace-layer), [GET Workspace Maps](doc/rest.md#get-workspace-maps) and [GET Workspace Map](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-map) responses.
+   - New parameters `access_rights.read` and `access_rights.write` added to [POST Workspace Layers](doc/rest.md#post-workspace-layers), [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer), [POST Workspace Maps](doc/rest.md#post-workspace-maps) and [PATCH Workspace Map](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#patch-workspace-map) requests. These new parameters are added to Test Client GUI.
    - Default values of access rights parameters (both read and write) of newly created publications are set to current authenticated user, or EVERYONE if published by anonymous.
 - [#28](https://github.com/LayerManager/layman/issues/28) At first start of Layman, access rights of existing publications are set in following way:
     - [everyone can read and only owner of the workspace can edit](doc/security.md#Authorization) publications in [personal workspaces](doc/models.md#personal-workspace)
@@ -1086,11 +1089,11 @@ There is a critical bug in this release, posting new layer breaks Layman: https:
 - If you are using Layman's `make` commands with `-d` suffix, use these commands without the `-d` suffix from now on (e.g. `make start-demo-full-d` becomes `make start-demo-full`).
 
 ### Changes
-- Both [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) and [PATCH Workspace Map](doc/rest.md#patch-workspace-map) automatically update also CSW metadata records.
+- Both [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) and [PATCH Workspace Map](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#patch-workspace-map) automatically update also CSW metadata records.
 - Use absolute URLs in responses of Layer and Map endpoints
 - Add [GET Workspace Layer Metadata Comparison](doc/rest.md#get-workspace-layer-metadata-comparison) and [GET Workspace Map Metadata Comparison](doc/rest.md#get-workspace-map-metadata-comparison) endpoints. 
 - Add [`revision_date`](doc/metadata.md#revision_date) metadata property
-- Add `metadata.comparison_url` to [GET Workspace Layer](doc/rest.md#get-workspace-layer) and [GET Workspace Map](doc/rest.md#get-workspace-map) responses.
+- Add `metadata.comparison_url` to [GET Workspace Layer](doc/rest.md#get-workspace-layer) and [GET Workspace Map](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-map) responses.
 - Upgrade Layman test client to version 1.1.1
 - Environment settings [CSW_ORGANISATION_NAME_REQUIRED](https://github.com/LayerManager/layman/blob/v1.2.1/doc/env-settings.md) is not used anymore as Micka v2020 accepts records without organisation names. 
 - Metadata properties [wms_url](doc/metadata.md#wms_url) and [wfs_url](doc/metadata.md#wfs_url) point directly to GetCapabilities documents. 
@@ -1117,7 +1120,7 @@ There is a critical bug in this release, posting new layer breaks Layman: https:
 
 ### Changes
 - Publish metadata record of [map](doc/models.md#map) to Micka on [POST Workspace Maps](doc/rest.md#post-workspace-maps).
-- Add `metadata` info to [GET Workspace Map](doc/rest.md#get-workspace-map) response.
+- Add `metadata` info to [GET Workspace Map](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-map) response.
 - Extend `metadata` info with `identitier` attribute in case of both layer and map.
 - Add documentation of [map metadata properties](doc/metadata.md)
 - Use `metadataStandardName` and `metadataStandardVersion` in metadata templates

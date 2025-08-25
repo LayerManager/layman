@@ -98,6 +98,15 @@ def pre_publication_action_check(workspace, mapname, task_options):
     call_modules_fn(sources, 'pre_publication_action_check', [workspace, mapname], kwargs=task_options)
 
 
+def pre_publication_action_check_by_uuid(uuid, task_options):
+    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['_workspace', 'name']})
+    if not info:
+        raise LaymanError(26, {'uuid': uuid})
+    workspace = info['_workspace']
+    mapname = info['name']
+    return pre_publication_action_check(workspace, mapname, task_options)
+
+
 def post_map(workspace, mapname, task_options, start_at):
     # sync processing
     sources = get_sources()
@@ -138,11 +147,7 @@ def delete_map(map: Map, kwargs=None, *, x_forwarded_items=None):
     celery_util.delete_publication(map.workspace, map.type, map.name)
     result = {
         **delete_info,
-        'url': url_for(**{'endpoint': 'rest_workspace_map.get',
-                          'workspace': map.workspace,
-                          'mapname': map.name,
-                          'x_forwarded_items': x_forwarded_items
-                          }),
+        'url': url_for('rest_map.get', uuid=map.uuid, x_forwarded_items=x_forwarded_items),
     }
     return result
 
@@ -163,7 +168,7 @@ def _get_complete_map_info(workspace, mapname, *, x_forwarded_items=None):
 
     complete_info = {
         'name': mapname,
-        'url': url_for('rest_workspace_map.get', mapname=mapname, workspace=workspace, x_forwarded_items=x_forwarded_items),
+        'url': url_for('rest_map.get', uuid=layman_util.get_publication_uuid(workspace, MAP_TYPE, mapname), x_forwarded_items=x_forwarded_items),
         'title': mapname,
         'description': '',
     }
@@ -185,6 +190,15 @@ def get_complete_map_info(workspace, layername, *, x_forwarded_items=None):
     return layman_util.get_complete_publication_info(workspace, MAP_TYPE, layername,
                                                      x_forwarded_items=x_forwarded_items,
                                                      complete_info_method=_get_complete_map_info)
+
+
+def get_complete_map_info_by_uuid(uuid, *, x_forwarded_items=None):
+    info = layman_util.get_publication_info_by_uuid(uuid, context={'x_forwarded_items': x_forwarded_items})
+    if not info:
+        return {}
+    workspace = info['_workspace']
+    mapname = info['name']
+    return get_complete_map_info(workspace, mapname, x_forwarded_items=x_forwarded_items)
 
 
 def get_composition_schema(url):
@@ -278,6 +292,15 @@ def abort_map_chain(workspace, mapname):
     celery_util.abort_publication_chain(workspace, MAP_TYPE, mapname)
 
 
+def abort_map_chain_by_uuid(uuid):
+    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['_workspace', 'name']})
+    if not info:
+        raise LaymanError(26, {'uuid': uuid})
+    workspace = info['_workspace']
+    mapname = info['name']
+    return abort_map_chain(workspace, mapname)
+
+
 def is_map_chain_ready(workspace, mapname):
     chain_info = get_map_chain(workspace, mapname)
     return chain_info is None or celery_util.is_chain_ready(chain_info)
@@ -296,6 +319,39 @@ def get_map_owner_info(username):
 
 lock_decorator = redis_util.create_lock_decorator(MAP_TYPE, 'mapname', is_map_chain_ready)
 
+
+def uuid_lock_decorator(func):
+    """Lock decorator for UUID-based endpoints"""
+
+    @wraps(func)
+    def decorated_function(*args, **kwargs):
+        uuid = request.view_args['uuid']
+        info = layman_util.get_publication_info_by_uuid(uuid, context={})
+        if not info:
+            raise LaymanError(26, {'uuid': uuid})
+
+        workspace = info['_workspace']
+        name = info['name']
+        redis_util.create_lock(workspace, MAP_TYPE, name, request.method)
+        try:
+            result = func(*args, **kwargs)
+            if is_map_chain_ready(workspace, name):
+                redis_util.unlock_publication(workspace, MAP_TYPE, name)
+                celery_util.run_next_chain(workspace, MAP_TYPE, name)
+            return result
+        except Exception as exception:
+            try:
+                if is_map_chain_ready(workspace, name):
+                    redis_util.unlock_publication(workspace, MAP_TYPE, name)
+                    celery_util.run_next_chain(workspace, MAP_TYPE, name)
+            finally:
+                redis_util.unlock_publication(workspace, MAP_TYPE, name)
+                celery_util.run_next_chain(workspace, MAP_TYPE, name)
+            raise exception
+
+    return decorated_function
+
+
 get_syncable_prop_names = partial(metadata_common.get_syncable_prop_names, MAP_TYPE)
 
 
@@ -304,7 +360,7 @@ def map_info_to_metadata_properties(info):
         'title': info['title'],
         'identifier': {
             'identifier': info['url'],
-            'label': info['name'],
+            'label': f"m-{info['uuid']}",
         },
         'abstract': info['description'],
         'graphic_url': info.get('thumbnail', {}).get('url', None),

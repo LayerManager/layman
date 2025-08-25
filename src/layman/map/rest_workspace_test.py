@@ -10,7 +10,7 @@ from layman.common import empty_method_returns_true
 from layman.common.metadata import prop_equals_strict, PROPERTIES
 from layman.common.micka import util as micka_common_util
 from layman.map.map_class import Map
-from layman.util import SimpleCounter, get_publication_uuid
+from layman.util import SimpleCounter
 from test_tools import process_client, util as test_util
 from . import MAP_TYPE
 from .micka import csw
@@ -20,6 +20,7 @@ USER = 'testuser1'
 MAPNAME_1 = 'administrativni_cleneni_libereckeho_kraje'
 MAPNAME_2 = 'libe'
 MAPNAME_3 = 'svet'
+MAP_UUID_1 = 'af238200-8200-1a23-9399-42c9fca53543'
 LAYERNAME_1 = 'mista'
 LAYERNAME_2 = 'hranice'
 
@@ -81,24 +82,6 @@ def test_get_maps_empty():
         })
 
 
-@pytest.mark.parametrize('mapname', [
-    (' ', ),
-    ('ě', ),
-    (';', ),
-    ('?', ),
-    ('ABC', ),
-])
-def test_wrong_value_of_mapname(mapname):
-    workspace = USER
-    with pytest.raises(LaymanError) as exc_info:
-        process_client.get_workspace_map(workspace=workspace,
-                                         name=mapname,
-                                         )
-    assert exc_info.value.http_code == 400
-    assert exc_info.value.code == 2
-    assert exc_info.value.data['parameter'] == 'mapname'
-
-
 def test_no_file():
     workspace = USER
     with pytest.raises(LaymanError) as exc_info:
@@ -151,6 +134,7 @@ def test_post_maps_simple():
     expected_mapname = MAPNAME_1
     post_resp = process_client.publish_workspace_map(workspace=workspace,
                                                      name=None,
+                                                     uuid=MAP_UUID_1,
                                                      file_paths=['sample/layman.map/full.json'],
                                                      check_response_fn=empty_method_returns_true,
                                                      raise_if_not_complete=False,
@@ -166,13 +150,12 @@ def test_post_maps_simple():
         f'{MAP_TYPE}': publication_counter.get()
     })
 
-    incomplete_get_resp = process_client.get_workspace_map(workspace=workspace,
-                                                           name=mapname,
-                                                           )
+    incomplete_get_resp = process_client.get_map_by_uuid(uuid=uuid_str)
+
     assert incomplete_get_resp['name'] == mapname
     assert incomplete_get_resp['uuid'] == uuid_str
     with app.app_context():
-        assert incomplete_get_resp['url'] == test_util.url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname)
+        assert incomplete_get_resp['url'] == test_util.url_for_external('rest_map.get', uuid=uuid_str)
     assert incomplete_get_resp['title'] == "Administrativn\u00ed \u010dlen\u011bn\u00ed Libereck\u00e9ho kraje"
     assert incomplete_get_resp[
         'description'] == "Na tematick\u00e9 map\u011b p\u0159i p\u0159ibl\u00ed\u017een\u00ed jsou postupn\u011b zobrazovan\u00e9 administrativn\u00ed celky Libereck\u00e9ho kraje : okresy, OP\u00da, ORP a obce."
@@ -196,9 +179,7 @@ def test_post_maps_simple():
                                                sleeping_time=0.1,
                                                )
 
-    after_thumbnail_get_resp = process_client.get_workspace_map(workspace=workspace,
-                                                                name=mapname,
-                                                                )
+    after_thumbnail_get_resp = process_client.get_map_by_uuid(uuid=uuid_str)
     thumbnail = after_thumbnail_get_resp['thumbnail']
     assert 'status' not in thumbnail
     assert 'path' in thumbnail
@@ -217,9 +198,7 @@ def test_post_maps_simple():
                                                sleeping_time=0.1,
                                                )
 
-    after_metadata_get_resp = process_client.get_workspace_map(workspace=workspace,
-                                                               name=mapname,
-                                                               )
+    after_metadata_get_resp = process_client.get_map_by_uuid(uuid=uuid_str)
 
     assert set(after_metadata_get_resp['metadata'].keys()) == {'identifier', 'csw_url', 'record_url', 'comparison_url'}
     assert after_metadata_get_resp['metadata']['identifier'] == f"m-{uuid_str}"
@@ -229,7 +208,7 @@ def test_post_maps_simple():
 
     response = requests.get(md_record_url, auth=settings.CSW_BASIC_AUTHN, timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
     response.raise_for_status()
-    assert mapname in response.text
+    assert f"m-{uuid_str}" in response.text
 
     with app.app_context():
         expected_md_values = {
@@ -242,10 +221,10 @@ def test_post_maps_simple():
             ],
             'graphic_url': test_util.url_for_external('rest_map_thumbnail.get', uuid=uuid_str),
             'identifier': {
-                "identifier": test_util.url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname),
-                "label": mapname,
+                "identifier": test_util.url_for_external('rest_map.get', uuid=uuid_str),
+                "label": f"m-{uuid_str}",
             },
-            'map_endpoint': test_util.url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname),
+            'map_endpoint': test_util.url_for_external('rest_map.get', uuid=uuid_str),
             'map_file_endpoint': test_util.url_for_external('rest_map_file.get', uuid=uuid_str),
             'operates_on': [],
             'organisation_name': None,
@@ -282,13 +261,11 @@ def test_post_maps_complex():
         f'{MAP_TYPE}': publication_counter.get()
     })
 
-    incomplete_get_resp = process_client.get_workspace_map(workspace=workspace,
-                                                           name=mapname,
-                                                           )
+    incomplete_get_resp = process_client.get_map_by_uuid(uuid=uuid_str)
     assert incomplete_get_resp['name'] == mapname
     assert incomplete_get_resp['uuid'] == uuid_str
     with app.app_context():
-        assert incomplete_get_resp['url'] == test_util.url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname)
+        assert incomplete_get_resp['url'] == test_util.url_for_external('rest_map.get', uuid=uuid_str)
     assert incomplete_get_resp['title'] == title
     assert incomplete_get_resp['description'] == description
     map_file = incomplete_get_resp['file']
@@ -302,12 +279,7 @@ def test_post_maps_complex():
 
     # assert another PATCH is not possible now
     with pytest.raises(LaymanError) as exc_info:
-        process_client.patch_workspace_map(workspace=workspace,
-                                           name=mapname,
-                                           title='abcd',
-                                           check_response_fn=empty_method_returns_true,
-                                           raise_if_not_complete=False,
-                                           )
+        process_client.patch_map_by_uuid(uuid=uuid_str)
     assert exc_info.value.http_code == 400
     assert exc_info.value.code == 49
 
@@ -321,9 +293,8 @@ def test_post_maps_complex():
                                                sleeping_time=0.1,
                                                )
 
-    after_thumbnail_get_resp = process_client.get_workspace_map(workspace=workspace,
-                                                                name=mapname,
-                                                                )
+    after_thumbnail_get_resp = process_client.get_map_by_uuid(uuid=uuid_str)
+
     thumbnail = after_thumbnail_get_resp['thumbnail']
     assert 'status' not in thumbnail
     assert 'path' in thumbnail
@@ -361,10 +332,10 @@ def test_post_maps_complex():
             ],
             'graphic_url': test_util.url_for_external('rest_map_thumbnail.get', uuid=uuid_str),
             'identifier': {
-                "identifier": test_util.url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname),
-                "label": mapname
+                "identifier": test_util.url_for_external('rest_map.get', uuid=uuid_str),
+                "label": f"m-{uuid_str}"
             },
-            'map_endpoint': test_util.url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname),
+            'map_endpoint': test_util.url_for_external('rest_map.get', uuid=uuid_str),
             'map_file_endpoint': test_util.url_for_external('rest_map_file.get', uuid=uuid_str),
             'operates_on': [],
             'organisation_name': None,
@@ -377,33 +348,29 @@ def test_post_maps_complex():
         }
     check_metadata(workspace, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
-    process_client.delete_workspace_map(USER, MAPNAME_2, )
+    process_client.delete_map_by_uuid(uuid_str, )
     publication_counter.decrease()
 
 
 def test_patch_map():
     workspace = USER
     mapname = MAPNAME_1
-    with app.app_context():
-        uuid_str = get_publication_uuid(workspace, MAP_TYPE, mapname)
-    patch_response = process_client.patch_workspace_map(
-        workspace=workspace,
-        name=mapname,
+    map_uuid = MAP_UUID_1
+    patch_response = process_client.patch_map_by_uuid(
+        uuid=map_uuid,
         file_paths=['sample/layman.map/full2.json'],
         check_response_fn=empty_method_returns_true,
         raise_if_not_complete=False,
     )
-    assert patch_response['uuid'] == uuid_str
+    assert patch_response['uuid'] == map_uuid
     with app.app_context():
-        assert patch_response['url'] == test_util.url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname)
+        assert patch_response['url'] == test_util.url_for_external('rest_map.get', uuid=map_uuid)
 
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{MAP_TYPE}': publication_counter.get()
     })
 
-    incomplete_get_resp = process_client.get_workspace_map(workspace=workspace,
-                                                           name=mapname,
-                                                           )
+    incomplete_get_resp = process_client.get_map_by_uuid(uuid=map_uuid)
 
     assert incomplete_get_resp['title'] == "Jiné administrativn\u00ed \u010dlen\u011bn\u00ed Libereck\u00e9ho kraje"
     assert incomplete_get_resp['description'] == "Jiný popis"
@@ -411,7 +378,7 @@ def test_patch_map():
     assert 'status' not in map_file
     assert 'path' in map_file
     with app.app_context():
-        assert map_file['url'] == test_util.url_for_external('rest_map_file.get', uuid=uuid_str)
+        assert map_file['url'] == test_util.url_for_external('rest_map_file.get', uuid=map_uuid)
     thumbnail = incomplete_get_resp['thumbnail']
     assert 'status' in thumbnail
     assert thumbnail['status'] in ['PENDING', 'STARTED']
@@ -425,16 +392,14 @@ def test_patch_map():
                                                sleeping_time=0.1,
                                                )
 
-    after_thumbnail_get_resp = process_client.get_workspace_map(workspace=workspace,
-                                                                name=mapname,
-                                                                )
+    after_thumbnail_get_resp = process_client.get_map_by_uuid(uuid=map_uuid)
     thumbnail = after_thumbnail_get_resp['thumbnail']
     assert 'status' not in thumbnail
     assert 'path' in thumbnail
     with app.app_context():
-        assert thumbnail['url'] == test_util.url_for_external('rest_map_thumbnail.get', uuid=uuid_str)
+        assert thumbnail['url'] == test_util.url_for_external('rest_map_thumbnail.get', uuid=map_uuid)
 
-    file_resp = process_client.get_uuid_map_file(process_client.MAP_TYPE, uuid_str)
+    file_resp = process_client.get_uuid_map_file(process_client.MAP_TYPE, map_uuid)
     assert file_resp['name'] == mapname
     assert file_resp['title'] == "Jiné administrativn\u00ed \u010dlen\u011bn\u00ed Libereck\u00e9ho kraje"
     assert file_resp['abstract'] == "Jiný popis"
@@ -454,30 +419,24 @@ def test_patch_map():
                                                )
 
     title = 'Nový název'
-    process_client.patch_workspace_map(
-        workspace=workspace,
-        name=mapname,
+    process_client.patch_map_by_uuid(
+        uuid=map_uuid,
         title=title,
         check_response_fn=empty_method_returns_true,
         raise_if_not_complete=False,
     )
-    get_resp_after_title = process_client.get_workspace_map(workspace=workspace,
-                                                            name=mapname,
-                                                            )
+    get_resp_after_title = process_client.get_map_by_uuid(uuid=map_uuid)
     assert get_resp_after_title['title'] == "Nový název"
     assert get_resp_after_title['description'] == "Jiný popis"
 
     description = 'Nový popis'
-    process_client.patch_workspace_map(
-        workspace=workspace,
-        name=mapname,
+    process_client.patch_map_by_uuid(
+        uuid=map_uuid,
         description=description,
         check_response_fn=empty_method_returns_true,
         raise_if_not_complete=False,
     )
-    get_resp_after_description = process_client.get_workspace_map(workspace=workspace,
-                                                                  name=mapname,
-                                                                  )
+    get_resp_after_description = process_client.get_map_by_uuid(uuid=map_uuid)
     assert get_resp_after_description['title'] == "Nový název"
     assert get_resp_after_description['description'] == "Nový popis"
     uuid.check_redis_consistency(expected_publ_num_by_type={
@@ -493,13 +452,13 @@ def test_patch_map():
                 15.42,
                 50.82
             ],
-            'graphic_url': test_util.url_for_external('rest_map_thumbnail.get', uuid=uuid_str),
+            'graphic_url': test_util.url_for_external('rest_map_thumbnail.get', uuid=map_uuid),
             'identifier': {
-                "identifier": test_util.url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname),
-                "label": "administrativni_cleneni_libereckeho_kraje"
+                "identifier": test_util.url_for_external('rest_map.get', uuid=map_uuid),
+                "label": f"m-{map_uuid}"
             },
-            'map_endpoint': test_util.url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname),
-            'map_file_endpoint': test_util.url_for_external('rest_map_file.get', uuid=uuid_str),
+            'map_endpoint': test_util.url_for_external('rest_map.get', uuid=map_uuid),
+            'map_file_endpoint': test_util.url_for_external('rest_map_file.get', uuid=map_uuid),
             'operates_on': [],
             'organisation_name': None,
             'publication_date': TODAY_DATE,
@@ -513,29 +472,21 @@ def test_patch_map():
 
 
 def test_delete_map():
-    workspace = USER
-    mapname = MAPNAME_1
-
-    delete_response = process_client.delete_workspace_map(workspace=workspace,
-                                                          name=mapname,
-                                                          )
+    map_uuid = MAP_UUID_1
+    process_client.delete_map_by_uuid(map_uuid)
     publication_counter.decrease()
-    uuid_str = delete_response['uuid']
-    md_record_url = f"http://micka:80/record/basic/m-{uuid_str}"
+    md_record_url = f"http://micka:80/record/basic/m-{map_uuid}"
     response = requests.get(md_record_url, auth=settings.CSW_BASIC_AUTHN,
                             timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
     response.raise_for_status()
     assert 'Záznam nenalezen' in response.text
-    assert mapname not in response.text
 
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{MAP_TYPE}': publication_counter.get()
     })
 
     with pytest.raises(LaymanError) as exc_info:
-        process_client.delete_workspace_map(workspace=workspace,
-                                            name=mapname,
-                                            )
+        process_client.delete_map_by_uuid(map_uuid)
     assert exc_info.value.http_code == 404
     assert exc_info.value.code == 26
     uuid.check_redis_consistency(expected_publ_num_by_type={
@@ -598,9 +549,7 @@ def test_map_composed_from_local_layers():
                                                sleeping_time=0.1,
                                                )
 
-    after_thumbnail_get_resp = process_client.get_workspace_map(workspace=workspace,
-                                                                name=mapname,
-                                                                )
+    after_thumbnail_get_resp = process_client.get_map_by_uuid(uuid=uuid_str)
     thumbnail = after_thumbnail_get_resp['thumbnail']
     assert 'status' not in thumbnail
     assert 'path' in thumbnail
@@ -672,10 +621,10 @@ def test_map_composed_from_local_layers():
             ],
             'graphic_url': test_util.url_for_external('rest_map_thumbnail.get', uuid=uuid_str),
             'identifier': {
-                "identifier": test_util.url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname),
-                "label": "svet"
+                "identifier": test_util.url_for_external('rest_map.get', uuid=uuid_str),
+                "label": f"m-{uuid_str}"
             },
-            'map_endpoint': test_util.url_for_external('rest_workspace_map.get', workspace=workspace, mapname=mapname),
+            'map_endpoint': test_util.url_for_external('rest_map.get', uuid=uuid_str),
             'map_file_endpoint': test_util.url_for_external('rest_map_file.get', uuid=uuid_str),
             'operates_on': [
                 {
@@ -696,7 +645,7 @@ def test_map_composed_from_local_layers():
             'title': "World places and boundaries",
         }
     check_metadata(workspace, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
-    process_client.delete_workspace_map(USER, MAPNAME_3, )
+    process_client.delete_map_by_uuid(uuid_str, )
     publication_counter.decrease()
     process_client.delete_workspace_layer(USER, LAYERNAME_1, )
     process_client.delete_workspace_layer(USER, LAYERNAME_2, )

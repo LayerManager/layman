@@ -78,7 +78,7 @@ def provide_map(client):
     yield publication
 
     with app.app_context():
-        rest_path = url_for('rest_workspace_map.delete_map', workspace=workspace, mapname=mapname)
+        rest_path = url_for('rest_map.delete_map', uuid=publication.uuid)
         response = client.delete(rest_path)
         assert response.status_code == 200
 
@@ -87,7 +87,8 @@ def patch_map(client):
     with app.app_context():
         workspace = TEST_WORKSPACE
         mapname = TEST_MAP
-        rest_path = url_for('rest_workspace_map.patch', workspace=workspace, mapname=mapname)
+        publication = Map(map_tuple=(workspace, mapname))
+        rest_path = url_for('rest_map.patch', uuid=publication.uuid)
         file_paths = [
             'sample/layman.map/full.json',
         ]

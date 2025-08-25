@@ -41,6 +41,7 @@ class TestPublication(base_test.TestSingleRestPublication):
                                                                   rest_method=rest_method.enum_item.publ_name_part,
                                                                   x_forwarded_items=x_forwarded_items,
                                                                   geodata_type=geodata_type,
+                                                                  uuid=publication_response.get('uuid'),
                                                                   )
 
         assert_util.assert_same_values_for_keys(
