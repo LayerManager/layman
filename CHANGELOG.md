@@ -7,7 +7,7 @@
 - If you have any `Pipfile*` files in the root directory of this repository, they can be deleted.
 - Change environment variable [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION):
   ```
-  LAYMAN_CLIENT_VERSION=dbf98d7b9f409373bf470863501a7a78be148bf9
+  LAYMAN_CLIENT_VERSION=10362bf02adb10aa42bfc2af68cc86d38f4a6392
   ```
 ### Migrations and checks
 #### Schema migrations
