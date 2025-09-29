@@ -5,6 +5,7 @@ from celery import states
 from layman import settings, app
 from layman.layer.geoserver import GEOSERVER_WMS_WORKSPACE, GEOSERVER_WFS_WORKSPACE
 from layman.util import XForwardedClass, get_publication_info
+import layman.util as layman_util
 from test_tools import process_client, util as test_util, assert_util
 
 X_FORWARDED_ITEMS = XForwardedClass(proto='https', host='abc.cz:3001', prefix='/layman-proxy')
@@ -21,12 +22,7 @@ def get_expected_urls_in_rest_response(workspace, publ_type, name, *, rest_metho
         with app.app_context():
             uuid = get_publication_info(workspace=workspace, publ_type=publ_type, publ_name=name, context={'keys': ['uuid']})['uuid']
     result = {}
-    if publ_type == process_client.MAP_TYPE:
-        result['url'] = f'{proxy_proto}://{proxy_host}{proxy_prefix}/rest/{publ_type_directory}/{uuid}'
-    else:
-        result[
-            'url'] = f'{proxy_proto}://{proxy_host}{proxy_prefix}/rest/workspaces/{workspace}/{publ_type_directory}/{name}'
-
+    result['url'] = f'{proxy_proto}://{proxy_host}{proxy_prefix}/rest/{publ_type_directory}/{uuid}'
     if rest_method == 'get':
         if publ_type in [process_client.MAP_TYPE, process_client.LAYER_TYPE] and uuid:
             result['thumbnail'] = {
@@ -94,7 +90,6 @@ def same_values_in_detail_and_multi(workspace, publ_type, name, rest_publication
 
     for key in different_value_keys:
         exp_info.pop(key)
-
     multi_requests = [
         (process_client.get_publications, [publ_type], {'workspace': workspace, 'headers': headers}),
         (process_client.get_publications, [publ_type], {'headers': headers}),
@@ -130,10 +125,7 @@ def multi_url_with_x_forwarded_prefix(workspace, publ_type, name, headers, ):
                                     if info['workspace'] == workspace and info['name'] == name and info['publication_type']
                                     == short_publ_type))
         url = rest_multi_info['url']
-        if publ_type == process_client.MAP_TYPE:
-            expected_url = f'{proxy_items.proto}://{proxy_items.host}{proxy_items.prefix}/rest/maps/{rest_multi_info["uuid"]}'
-        else:
-            expected_url = f'{proxy_items.proto}://{proxy_items.host}{proxy_items.prefix}/rest/workspaces/{workspace}/{short_publ_type}s/{name}'
+        expected_url = f'{proxy_items.proto}://{proxy_items.host}{proxy_items.prefix}/rest/{short_publ_type}s/{rest_multi_info["uuid"]}'
         assert url == expected_url
 
 
@@ -143,7 +135,9 @@ def get_layer_with_x_forwarded_prefix(workspace, name, headers, ):
         **(headers or {}),
         **proxy_items.headers,
     }
-    rest_layer_info = process_client.get_workspace_layer(workspace, name, headers=headers)
+    with app.app_context():
+        uuid = layman_util.get_publication_uuid(workspace, process_client.LAYER_TYPE, name)
+    rest_layer_info = process_client.get_layer(uuid, headers=headers)
     geodata_type = rest_layer_info['geodata_type']
 
     exp_resp = get_expected_urls_in_rest_response(workspace, process_client.LAYER_TYPE, name,

@@ -21,13 +21,14 @@ TEST_LAYER = 'ne_110m_admin_0_countries'
 def provide_layer(ensure_layman_module):
     workspace = TEST_WORKSPACE
     layername = TEST_LAYER
-    process_client.publish_workspace_layer(workspace, layername)
+    resp = process_client.publish_workspace_layer(workspace, layername)
+    uuid = resp['uuid']
     with app.app_context():
         layer = Layer(layer_tuple=(workspace, layername))
 
     yield layer
     process.ensure_layman_function(None)
-    process_client.delete_workspace_layer(workspace, layername)
+    process_client.delete_layer(uuid)
 
 
 class TestBrokenMicka:
@@ -111,10 +112,10 @@ class TestNoMicka:
 def test_patch_layer_without_metadata(provide_layer):
     with app.app_context():
         delete_layer(provide_layer)
-    process_client.patch_workspace_layer(provide_layer.workspace, provide_layer.name,
-                                         file_paths=['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',],
-                                         title='patched layer'
-                                         )
+    process_client.patch_layer(provide_layer.uuid,
+                               file_paths=['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson',],
+                               title='patched layer'
+                               )
 
 
 @pytest.mark.usefixtures('ensure_layman')

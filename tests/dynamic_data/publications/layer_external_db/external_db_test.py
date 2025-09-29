@@ -271,7 +271,7 @@ class TestLayer(base_test.TestSingleRestPublication):
             f"sp_res={md_spatial_res['values'].values()}, exp_sp_res={exp_sp_res}"
 
         # delete layer from external DB table
-        process_client.delete_workspace_layer(layer.workspace, layer.name)
+        process_client.delete_layer(uuid)
 
         # check GeoServer store of external DB does not exist anymore
         gs_asserts.assert_stores(exp_wfs_stores=internal_db_stores, exp_wms_stores=internal_db_stores)

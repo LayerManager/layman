@@ -6,7 +6,7 @@ Asynchronous tasks are started by following requests:
 - [POST Workspace Layers](rest.md#post-workspace-layers)
    - tasks related to newly published layer
    - tasks related to each map that points to newly published layer
-- [PATCH Workspace Layer](rest.md#patch-workspace-layer)
+- [PATCH Layer](rest.md#patch-layer)
    - tasks related to patched layer
    - tasks related to each map that points to patched layer
 - [POST Workspace Maps](rest.md#post-workspace-maps)

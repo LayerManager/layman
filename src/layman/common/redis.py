@@ -1,7 +1,7 @@
 from functools import wraps
 from flask import request, current_app
 
-from layman import settings, celery as celery_util, common
+from layman import settings, celery as celery_util, common, util as layman_util
 from layman import LaymanError
 
 PUBLICATION_LOCKS_KEY = f'{__name__}:PUBLICATION_LOCKS'
@@ -42,6 +42,39 @@ def create_lock_decorator(publication_type, publication_name_key, is_chain_ready
     return lock_decorator
 
 
+def create_lock_decorator_by_uuid(is_chain_ready_fn):
+    def lock_decorator(func):
+        @wraps(func)
+        def decorated_function(*args, **kwargs):
+            uuid = request.view_args['uuid']
+            info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['_workspace', 'name', 'type']})
+
+            workspace = info['_workspace']
+            publication_name = info['name']
+            publication_type = info['type']
+
+            create_lock(workspace, publication_type, publication_name, request.method)
+            try:
+                result = func(*args, **kwargs)
+                if is_chain_ready_fn(uuid):
+                    unlock_publication(workspace, publication_type, publication_name)
+                    celery_util.run_next_chain(workspace, publication_type, publication_name)
+            except Exception as exception:
+                try:
+                    if is_chain_ready_fn(uuid):
+                        unlock_publication(workspace, publication_type, publication_name)
+                        celery_util.run_next_chain(workspace, publication_type, publication_name)
+                finally:
+                    unlock_publication(workspace, publication_type, publication_name)
+                    celery_util.run_next_chain(workspace, publication_type, publication_name)
+                raise exception
+
+            return result
+
+        return decorated_function
+    return lock_decorator
+
+
 def get_publication_lock(workspace, publication_type, publication_name):
     rds = settings.LAYMAN_REDIS
     key = PUBLICATION_LOCKS_KEY
@@ -64,6 +97,11 @@ def unlock_publication(workspace, publication_type, publication_name):
     key = PUBLICATION_LOCKS_KEY
     hash = _get_publication_hash(workspace, publication_type, publication_name)
     rds.hdel(key, hash)
+
+
+def unlock_publication_by_uuid(uuid):
+    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['workspace', 'name', 'type']})
+    unlock_publication(info['workspace'], info['type'], info['name'])
 
 
 def solve_locks(workspace, publication_type, publication_name, requested_lock):

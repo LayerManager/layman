@@ -25,7 +25,7 @@ def test_updated_at(publication_type):
     ;'''
 
     timestamp1 = datetime.datetime.now(datetime.timezone.utc)
-    process_client.publish_workspace_publication(publication_type, workspace, publication)
+    uuid = process_client.publish_workspace_publication(publication_type, workspace, publication)['uuid']
     timestamp2 = datetime.datetime.now(datetime.timezone.utc)
 
     with app.app_context():
@@ -34,13 +34,13 @@ def test_updated_at(publication_type):
     updated_at_db = results[0][0]
     assert timestamp1 < updated_at_db < timestamp2
 
-    info = process_client.get_workspace_publication(publication_type, workspace, publication)
+    info = process_client.get_publication_by_uuid(publication_type, uuid)
     updated_at_rest_str = info['updated_at']
     updated_at_rest = parse(updated_at_rest_str)
     assert timestamp1 < updated_at_rest < timestamp2
 
     timestamp3 = datetime.datetime.now(datetime.timezone.utc)
-    process_client.patch_workspace_publication(publication_type, workspace, publication, title='Title')
+    process_client.patch_publication_by_uuid(publication_type, uuid, title='Title')
     timestamp4 = datetime.datetime.now(datetime.timezone.utc)
 
     with app.app_context():
@@ -49,12 +49,12 @@ def test_updated_at(publication_type):
     updated_at_db = results[0][0]
     assert timestamp3 < updated_at_db < timestamp4
 
-    info = process_client.get_workspace_publication(publication_type, workspace, publication)
+    info = process_client.get_publication_by_uuid(publication_type, uuid)
     updated_at_rest_str = info['updated_at']
     updated_at_rest = parse(updated_at_rest_str)
     assert timestamp3 < updated_at_rest < timestamp4
 
-    process_client.delete_workspace_publication(publication_type, workspace, publication)
+    process_client.delete_publication_by_uuid(publication_type, uuid=uuid)
 
 
 class TestResponsesClass:
@@ -86,7 +86,7 @@ class TestResponsesClass:
         'bounding_box': list(test_data.SMALL_LAYER_BBOX),
         'native_crs': 'EPSG:4326',
         'native_bounding_box': list(test_data.SMALL_LAYER_NATIVE_BBOX),
-        'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}',
+        'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/layers/{layer_uuid}',
         'geodata_type': settings.GEODATA_TYPE_VECTOR,
         'wfs_wms_status': settings.EnumWfsWmsStatus.AVAILABLE.value,
         'publication_type': 'layer',
@@ -131,7 +131,7 @@ class TestResponsesClass:
                   'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/layers/{layer_uuid}/style'},
         'thumbnail': {'path': f'layers/{layer_uuid}/thumbnail/{layer_uuid}.png',
                       'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/layers/{layer_uuid}/thumbnail'},
-        'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}',
+        'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/layers/{layer_uuid}',
         'wfs': {'name': f'l_{layer_uuid}', 'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{GEOSERVER_WFS_WORKSPACE}/wfs'},
         'wms': {'name': f'l_{layer_uuid}', 'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{GEOSERVER_WMS_WORKSPACE}/ows'},
         'original_data_source': 'file',
@@ -158,11 +158,13 @@ class TestResponsesClass:
 
     @pytest.fixture(scope="class")
     def provide_data(self):
+        uuids = {}
         for publication_type in process_client.PUBLICATION_TYPES:
-            process_client.publish_workspace_publication(publication_type, self.workspace, self.publication, **self.common_params[publication_type], )
+            resp = process_client.publish_workspace_publication(publication_type, self.workspace, self.publication, **self.common_params[publication_type], )
+            uuids[publication_type] = resp["uuid"]
         yield
-        for publication_type in process_client.PUBLICATION_TYPES:
-            process_client.delete_workspace_publication(publication_type, self.workspace, self.publication, )
+        for publication_type, uuid in uuids.items():
+            process_client.delete_publication_by_uuid(publication_type, uuid=uuid)
 
     @staticmethod
     def compare_infos(info, expected_info, path):
@@ -181,8 +183,8 @@ class TestResponsesClass:
         pytest.param(process_client.get_maps, {}, [expected_maps], id='get_maps'),
         pytest.param(process_client.get_layers, {'workspace': workspace}, [expected_layers], id='get_workspace_layers'),
         pytest.param(process_client.get_maps, {'workspace': workspace}, [expected_maps], id='get_workspace_maps'),
-        pytest.param(process_client.get_workspace_layer, {'workspace': workspace, 'name': publication}, expected_layer, id='get_workspace_layer'),
-        pytest.param(process_client.get_map, {'uuid': map_uuid}, expected_map, id='get_workspace_map'),
+        pytest.param(process_client.get_layer, {'uuid': layer_uuid}, expected_layer, id='get_layer'),
+        pytest.param(process_client.get_map, {'uuid': map_uuid}, expected_map, id='get_map'),
     ])
     def test_rest_responses(query_method, method_params, expected_info, ):
         response = query_method(**method_params)

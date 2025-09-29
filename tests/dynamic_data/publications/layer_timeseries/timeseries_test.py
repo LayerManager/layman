@@ -374,17 +374,15 @@ class TestLayer(base_test.TestSingleRestPublication):
 
             asserts_publ.metadata.correct_values_in_metadata(prod_layer, http_method=http_method)
 
-            process_client.patch_workspace_layer(layer.workspace,
-                                                 layer.name,
-                                                 title='Title: ' + layer.name)
+            uuid = self.publ_uuids[layer]
+            process_client.patch_layer(uuid=uuid,
+                                       title='Title: ' + layer.name)
             asserts_util.is_publication_valid_and_complete(layer)
 
-            process_client.patch_workspace_layer(layer.workspace,
-                                                 layer.name,
-                                                 file_paths=['sample/layman.layer/small_layer.geojson'],
-                                                 title=layer.name)
+            process_client.patch_layer(uuid=uuid,
+                                       file_paths=['sample/layman.layer/small_layer.geojson'],
+                                       title=layer.name)
             asserts_util.is_publication_valid_and_complete(layer)
-
             asserts_publ.internal.correct_values_in_detail(layer.workspace, layer.type, layer.name,
                                                            exp_publication_detail={
                                                                'bounding_box': [1571204.369948366, 6268896.225570714, 1572590.854206196,

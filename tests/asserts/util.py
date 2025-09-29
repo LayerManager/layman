@@ -33,6 +33,12 @@ def get_directory_name_from_publ_type(publ_type):
     return publ_type.split('.')[1] + 's'
 
 
+def get_publication_resp_by_publication(publication):
+    actor = get_publication_actor(publication)
+    uuid = get_publication_uuid(publication)
+    return process_client.get_publication_by_uuid(publication.type, uuid, actor_name=actor)
+
+
 def get_publication_uuid(publication):
     with app.app_context():
         publ_uuid = layman_util.get_publication_uuid(publication.workspace, publication.type, publication.name)
@@ -67,8 +73,8 @@ def run_action(publication, action, *, cache=None):
     param_def = {
         'headers': Action(get_publication_header, {}),
         'actor': Action(get_publication_actor, {}),
-        'rest_publication_detail': Action(process_client.get_workspace_publication, {}),
-        'publ_uuid': Action(get_publication_uuid, {}),
+        'rest_publication_detail': Action(get_publication_resp_by_publication, {}),
+        'publ_uuid': Action(get_publication_uuid, {})
     }
     method_params = inspect.getfullargspec(action.method)
     publ_type_param = 'publication_type' if 'publication_type' in method_params[0] else 'publ_type'

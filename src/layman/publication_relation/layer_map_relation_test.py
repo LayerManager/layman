@@ -40,9 +40,9 @@ def test_map_refresh_after_layer_change():
     assert_map_thumbnail(workspace, map, publ_uuid, f'/code/test_tools/data/thumbnail/map_with_internal_layer_basic_after_wfst.png')
 
     # Test refresh map thumbnail after patch layer
-    process_client.patch_workspace_layer(workspace, layer, file_paths=['sample/layman.layer/small_layer.geojson'])
+    process_client.patch_layer(layer_uuid, file_paths=['sample/layman.layer/small_layer.geojson'])
     process_client.wait_for_publication_status(workspace, process_client.LAYER_TYPE, layer)
     assert_map_thumbnail(workspace, map, publ_uuid, f'/code/test_tools/data/thumbnail/map_with_internal_layer_basic.png')
 
     process_client.delete_map(uuid=publ_uuid)
-    process_client.delete_workspace_layer(workspace, layer)
+    process_client.delete_layer(layer_uuid)

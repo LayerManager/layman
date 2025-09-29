@@ -1,6 +1,6 @@
 import pytest
 
-from layman import settings, app
+from layman import settings, app, util as layman_util
 from layman.layer.qgis import util as qgis_util, wms as qgis_wms
 from test_tools import process, process_client, geoserver_client
 from test_tools.mock.layman_classes import LayerMock
@@ -20,21 +20,24 @@ def test_default_srs_list():
 
 @pytest.fixture(scope="module")
 def delete_layer_after_test():
-    def register_layer_to_delete(workspace, layername):
-        LAYERS_TO_DELETE_AFTER_TEST.append((workspace, layername))
+    def register_layer_to_delete(publ_uuid):
+        LAYERS_TO_DELETE_AFTER_TEST.append(publ_uuid)
     yield register_layer_to_delete
-    for workspace, layername in LAYERS_TO_DELETE_AFTER_TEST:
-        process_client.delete_workspace_layer(workspace, layername)
+    for publ_uuid in LAYERS_TO_DELETE_AFTER_TEST:
+        process_client.delete_layer(publ_uuid)
 
 
 @pytest.fixture(scope="module")
 def ensure_layer(delete_layer_after_test):
     def ensure_layer_internal(workspace, layername, file_paths=None, style_file=None):
-        if (workspace, layername) not in LAYERS_TO_DELETE_AFTER_TEST:
+        with app.app_context():
+            uuid = layman_util.get_publication_uuid(workspace, process_client.LAYER_TYPE, layername)
+        if not uuid:
             response = process_client.publish_workspace_layer(workspace, layername, file_paths=file_paths, style_file=style_file)
-            delete_layer_after_test(workspace, layername)
+            uuid = response['uuid']
+            delete_layer_after_test(uuid)
         else:
-            response = process_client.patch_workspace_layer(workspace, layername, file_paths=file_paths, style_file=style_file)
+            response = process_client.patch_layer(uuid, file_paths=file_paths, style_file=style_file)
         return response
     yield ensure_layer_internal
 

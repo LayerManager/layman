@@ -1,6 +1,6 @@
 # Asynchronous file upload
 
-In case of [POST Workspace Layers](rest.md#post-workspace-layers) and [PATCH Workspace Layer](rest.md#patch-workspace-layer), it is possible to upload data files asynchronously, which is suitable for large files. Let's demonstrate how it can be implemented on client side.
+In case of [POST Workspace Layers](rest.md#post-workspace-layers) and [PATCH Layer](rest.md#patch-layer), it is possible to upload data files asynchronously, which is suitable for large files. Let's demonstrate how it can be implemented on client side.
 
 ## HTML
 You need some HTML form for user to choose files he wants to publish and fill some additional parametes:

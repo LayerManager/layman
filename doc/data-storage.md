@@ -44,7 +44,7 @@ Subsequently, asynchronous tasks ensure following steps:
 - thumbnail file is saved to [filesystem](#filesystem)
 - metadata record is saved to [PostgreSQL](#postgresql) using Micka's CSW
 
-When user [patches existing layer](rest.md#patch-workspace-layer), data is saved in the same way.
+When user [patches existing layer](rest.md#patch-layer), data is saved in the same way.
 
 ### Maps
 Information about [maps](models.md#map) includes JSON definition.

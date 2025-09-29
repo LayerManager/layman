@@ -48,7 +48,7 @@ Both read and write access rights contain list of [usernames](models.md#username
 
 Users listed in access rights, either directly or indirectly through roles, are granted to perform described actions.
 
-Access rights are set by [POST Workspace Layers](rest.md#post-workspace-layers) request and can be changed by [PATCH Workspace Layer](rest.md#patch-workspace-layer) request (analogically for maps). 
+Access rights are set by [POST Workspace Layers](rest.md#post-workspace-layers) request and can be changed by [PATCH Layer](rest.md#patch-layer) request (analogically for maps). 
 
 #### Access to single-publication endpoints
 Single-publication endpoints are:

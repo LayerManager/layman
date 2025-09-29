@@ -53,7 +53,7 @@ Currently, value of X-Forwarded headers affects following URLs:
   * `url` key
 * [POST Workspace Layers](rest.md#post-workspace-layers) and [POST Workspace Maps](rest.md#post-workspace-maps)
   * `url` key
-* [GET Workspace Layer](rest.md#get-workspace-layer) and [PATCH Workspace Layer](rest.md#patch-workspace-layer)
+* [GET Layer](rest.md#get-layer) and [PATCH Layer](rest.md#patch-layer)
   * `url` key
   * `wms`.`url` key
   * `wfs`.`url` key
@@ -72,7 +72,7 @@ Currently, value of X-Forwarded headers affects following URLs:
     * each `legends` key if its HTTP protocol and netloc corresponds with `url` or `protocol`.`url`
     * `style` key if its HTTP protocol and netloc corresponds with `url` or `protocol`.`url`
   * NOTE: If client proxy protocol, host, or URL path prefix was used in URLs in uploaded file, then such values are also replaced with values according to X-Forwarded header values. Default values are used for requests without X-Forwarded headers (protocol is the one from [LAYMAN_CLIENT_PUBLIC_URL](env-settings.md#layman_client_public_url), host is [LAYMAN_PROXY_SERVER_NAME](env-settings.md#layman_proxy_server_name), and path prefix is empty string).
-* [DELETE Workspace Layers](rest.md#delete-workspace-layers), [DELETE Workspace Maps](rest.md#delete-workspace-maps), [DELETE Workspace Layer](rest.md#delete-workspace-layer) and [DELETE Map](rest.md#delete-map)
+* [DELETE Workspace Layers](rest.md#delete-workspace-layers), [DELETE Workspace Maps](rest.md#delete-workspace-maps), [DELETE Layer](rest.md#delete-layer) and [DELETE Map](rest.md#delete-map)
   * `url` key
 * [OGC endpoints](endpoints.md)
   * Headers `X-Forwarded-For`, `X-Forwarded-Path`, `Forwarded` and `Host` are ignored

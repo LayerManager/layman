@@ -5,10 +5,10 @@
 |---|---|---|---|---|---|
 |Publications|`/rest/publications`|[GET](#get-publications)| x | x | x |
 |Layers|`/rest/layers`|[GET](#get-layers)| x | x | x |
+|[Layer](models.md#layer)|`/rest/layers/<uuid>`|[GET](#get-layer)| x | [PATCH](#patch-layer) | [DELETE](#delete-layer) |
 |Layer Thumbnail|`/rest/layers/<uuid>/thumbnail`|[GET](#get-layer-thumbnail)| x | x | x |
 |Layer Style|`/rest/layers/<uuid>/style`|[GET](#get-layer-style)| x | x | x |
 |Workspace Layers|`/rest/workspaces/<workspace_name>/layers`|[GET](#get-workspace-layers)| [POST](#post-workspace-layers) | x | [DELETE](#delete-workspace-layers) |
-|[Workspace Layer](models.md#layer)|`/rest/workspaces/<workspace_name>/layers/<layername>`|[GET](#get-workspace-layer)| x | [PATCH](#patch-workspace-layer) | [DELETE](#delete-workspace-layer) |
 |Workspace Layer Chunk|`/rest/workspaces/<workspace_name>/layers/<layername>/chunk`|[GET](#get-workspace-layer-chunk)| [POST](#post-workspace-layer-chunk) | x | x |
 |Workspace Layer Metadata Comparison|`/rest/workspaces/<workspace_name>/layers/<layername>/metadata-comparison`|[GET](#get-workspace-layer-metadata-comparison) | x | x | x |
 |Maps|`/rest/maps`|[GET](#get-maps)| x | x | x |
@@ -62,7 +62,7 @@ JSON array of objects representing available layers and maps with following stru
 - **name**: String. Name of the layer.
 - **title**: String. Title of the layer.
 - **uuid**: String. UUID of the layer.
-- **url**: String. URL of the layer. It points to [GET Workspace Layer](#get-workspace-layer).
+- **url**: String. URL of the layer. It points to [GET Layer](#get-layer).
 - **updated_at**: String. Date and time of last POST/PATCH of the layer. Format is [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601), more specifically `YYYY-MM-DDThh:mm:ss.sss±hh:mm`, always in UTC. Sample value: `"2021-03-18T09:29:53.769233+00:00"`
 - **access_rights**:
   - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [read access](./security.md#Authorization).
@@ -122,7 +122,7 @@ Processing chain consists of few steps:
 
 If workspace directory, database schema, or GeoServer's datastores does not exist yet, they are created on demand.
 
-Response to this request may be returned sooner than the processing chain is finished to enable [asynchronous processing](async-tasks.md). Status of processing chain can be seen using [GET Workspace Layer](#get-workspace-layer) and **layman_metadata.publication_status** property or **status** properties of layer sources (wms, wfs, thumbnail, db_table, file, style, metadata) for higher granularity.
+Response to this request may be returned sooner than the processing chain is finished to enable [asynchronous processing](async-tasks.md). Status of processing chain can be seen using [GET Layer](#get-layer) and **layman_metadata.publication_status** property or **status** properties of layer sources (wms, wfs, thumbnail, db_table, file, style, metadata) for higher granularity.
 
 It is possible to upload data files asynchronously, which is suitable for large files. This can be done in three steps:
 1. Send POST Workspace Layers request with **file** parameter filled by file names that you want to upload
@@ -232,7 +232,7 @@ Content-Type: `application/json`
 JSON array of objects representing posted layers with following structure:
 - **name**: String. Name of the layer.
 - **uuid**: String. UUID of the layer.
-- **url**: String. URL of the layer. It points to [GET Workspace Layer](#get-workspace-layer).
+- **url**: String. URL of the layer. It points to [GET Layer](#get-layer).
 - *files_to_upload*: List of objects. It's present only if **file** parameter contained file names. Each object represents one file that server expects to be subsequently uploaded using [POST Workspace Layer Chunk](#post-workspace-layer-chunk). Each object has following properties:
    - **file**: name of the file, equal to one of file name from **file** parameter
    - **layman_original_parameter**: name of the request parameter that contained the file name; currently, the only possible value is `file`
@@ -250,21 +250,20 @@ JSON array of objects representing deleted layers:
 - **name**: String. Former name of the layer.
 - **title**: String. Former title of the layer.
 - **uuid**: String. Former UUID of the layer.
-- **url**: String. Former URL of the layer. It points to [GET Workspace Layer](#get-workspace-layer).
+- **url**: String. Former URL of the layer. It points to [GET Layer](#get-layer).
 - **access_rights**:
   - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with former [read access](./security.md#Authorization).
   - **write**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with former [write access](./security.md#Authorization).
 
-## Workspace Layer
+## Layer
 ### URL
-`/rest/workspaces/<workspace_name>/layers/<layername>`
+`/rest/layers/<uuid>`
 
 #### Endpoint path parameters
-- **layername**
-   - layer name used for identification
-   - it can be obtained from responses of [GET Workspace Layers](#get-workspace-layers), [POST Workspace Layers](#post-workspace-layers), and all responses of this endpoint
+- **uuid**
+   - UUID of the layer used for identification
 
-### GET Workspace Layer
+### GET Layer
 Get information about existing layer.
 
 #### Request
@@ -304,29 +303,29 @@ JSON object with following structure:
 - *wfs*, available only for vector layers
   - *name*: String. Name of the layer on GeoServer in WFS workspace.
   - *url*: String. URL of WFS endpoint. It points to WFS endpoint of appropriate GeoServer workspace.
-  - *status*: Status information about GeoServer import and availability of WFS feature type. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
+  - *status*: Status information about GeoServer import and availability of WFS feature type. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **thumbnail**
   - *url*: String. URL of layer thumbnail. It points to [GET Layer Thumbnail](#get-layer-thumbnail).
   - *path*: String. Path to layer thumbnail. Path is relative to [LAYMAN_DATA_DIR](env-settings.md#LAYMAN_DATA_DIR).
-  - *status*: Status information about generating and availability of thumbnail. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
+  - *status*: Status information about generating and availability of thumbnail. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **file**
   - *paths*: List of strings. Paths to all main input data files. Path is relative to [LAYMAN_DATA_DIR](env-settings.md#LAYMAN_DATA_DIR).  
   If data file was sent in ZIP archive to the server, path includes also path to the main file inside ZIP file. E.g. `layers/b8a6c133-3363-4343-8a25-978d0df52c11/input_file/b8a6c133-3363-4343-8a25-978d0df52c11.zip/layer_main_file.shp`
-  - *status*: Status information about saving and availability of files. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
+  - *status*: Status information about saving and availability of files. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - *db*, available only for vector layers
   - *schema*: String. DB schema name within PostgreSQL database.
   - *table*: String. DB table name within PostgreSQL schema. This table is used as GeoServer source of layer.
   - *geo_column*: String. Geometry column of the table used by GeoServer.
   - *external_uri*: String. Available only for layers published from external table. Connection string to external table without password.
-  - *status*: Status information about DB import and availability of the table. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
+  - *status*: Status information about DB import and availability of the table. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **style**
   - *url*: String. URL of layer default style. It points to [GET Layer Style](#get-layer-style).
   - *type*: String. Type of used style. Either 'sld' or 'qml'.
-  - *status*: Status information about publishing style. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
+  - *status*: Status information about publishing style. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **original_data_source**: String. Either `file` if layer was published from file, or `database_table` if layer was published from external database table 
 - *metadata*
@@ -334,7 +333,7 @@ JSON object with following structure:
   - *record_url*: String. URL of metadata record accessible by web browser, probably with some editing capabilities.
   - *csw_url*: String. URL of CSW endpoint. It points to CSW endpoint of Micka.
   - *comparison_url*: String. URL of [GET Workspace Layer Metadata Comparison](#get-workspace-layer-metadata-comparison).
-  - *status*: Status information about metadata import and availability. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
+  - *status*: Status information about metadata import and availability. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **access_rights**:
   - **read**: Array of strings. Names of [users](./models.md#user) and [roles](./models.md#role) with [read access](./security.md#Authorization).
@@ -347,7 +346,7 @@ JSON object with following structure:
 - **used_in_maps**: JSON array of objects. List of maps in which the layer is used.
   - **name**: String. Name of the map where the layer is used.
   - **workspace**: String. Workspace to which the map belongs. 
-### PATCH Workspace Layer
+### PATCH Layer
 Update information about existing layer. First, it deletes sources of the layer (except external DB table published using `external_table_uri`), and then it publishes them again with new parameters. The processing chain is similar to [POST Workspace Layers](#post-workspace-layers).
 
 Response to this request may be returned sooner than the processing chain is finished to enable [asynchronous processing](async-tasks.md).
@@ -420,7 +419,7 @@ Content-Type: `application/json`
 
 JSON object, same as in case of [POST Workspace Layers](#post-workspace-layers).
 
-### DELETE Workspace Layer
+### DELETE Layer
 Delete existing layer and all associated sources except external DB table published using `external_table_uri`. So it deletes e.g. data file, vector internal DB table or normalized raster file. The currently running [asynchronous tasks](async-tasks.md) of affected layer are aborted.
 
 #### Request
@@ -432,7 +431,7 @@ Content-Type: `application/json`
 JSON object representing deleted layer:
 - **name**: String. Former name of the layer.
 - **uuid**: String. Former UUID of the layer.
-- **url**: String. Former URL of the layer. It points to [GET Workspace Layer](#get-workspace-layer).
+- **url**: String. Former URL of the layer. It points to [GET Layer](#get-layer).
 
 
 ## Layer Thumbnail
@@ -468,7 +467,7 @@ Layer Chunk endpoint enables to upload layer data files asynchronously by splitt
 
 Check [Asynchronous file upload](async-file-upload.md) example. 
 
-The endpoint is activated after [POST Workspace Layers](#post-workspace-layers) or [PATCH Workspace Layer](#patch-workspace-layer) request if and only if the **file** parameter contained file name(s). The endpoint is active till first of the following happens:
+The endpoint is activated after [POST Workspace Layers](#post-workspace-layers) or [PATCH Layer](#patch-layer) request if and only if the **file** parameter contained file name(s). The endpoint is active till first of the following happens:
 - all file chunks are uploaded
 - no chunk is uploaded within [UPLOAD_MAX_INACTIVITY_TIME](../src/layman_settings.py)
 - layer is deleted
@@ -480,7 +479,7 @@ Test if file chunk is already uploaded on the server.
 
 #### Request
 Query parameters:
-- **layman_original_parameter**, name of parameter of preceding request ([POST Workspace Layers](#post-workspace-layers) or [PATCH Workspace Layer](#patch-workspace-layer)) that contained the file name
+- **layman_original_parameter**, name of parameter of preceding request ([POST Workspace Layers](#post-workspace-layers) or [PATCH Layer](#patch-layer)) that contained the file name
 - **resumableFilename**, name of file whose chunk is requested
 - **resumableChunkNumber**, serial number of requested chunk
 
@@ -499,7 +498,7 @@ Body parameters:
 - **file**, uploaded chunk
 - **resumableChunkNumber**, serial number of uploaded chunk
 - **resumableFilename**, name of file whose chunk is uploaded
-- **layman_original_parameter**, name of parameter of preceding request ([POST Workspace Layers](#post-workspace-layers) or [PATCH Workspace Layer](#patch-workspace-layer)) that contained the file name
+- **layman_original_parameter**, name of parameter of preceding request ([POST Workspace Layers](#post-workspace-layers) or [PATCH Layer](#patch-layer)) that contained the file name
 - **resumableTotalChunks**, number of chunks the file is split to
 
 #### Response
@@ -519,7 +518,7 @@ Content-Type: `application/json`
 
 JSON object with one attribute:
 - **metadata_sources**: Dictionary of objects. Key is ID of metadata source valid for this JSON only (not persistent in time!). Value is object with following attributes:
-  - **url**: String. URL of the metadata source ([GET Workspace Layer](#get-workspace-layer), CSW record, WMS Capabilities, or WFS Capabitilities).
+  - **url**: String. URL of the metadata source ([GET Layer](#get-layer), CSW record, WMS Capabilities, or WFS Capabitilities).
 - **metadata_properties**: Dictionary of objects. Key is name of [metadata property](./metadata.md) (e.g. `reference_system`). Value is object with following attributes:
   - **values**: Dictionary of objects. Key is ID of metadata source corresponding with `metadata_sources` attribute. Value is any valid JSON (null, number, string, boolean, list, or object) representing value of [metadata property](./metadata.md) (e.g. `[3857, 4326]`). Null means the value is not set.
   - **equal**: Boolean. True if all values are considered equal, false otherwise.
@@ -654,12 +653,12 @@ JSON object with following structure:
 - **file**
   - *url*: String. URL of map-composition JSON file. It points to [GET Map File](#get-map-file).
   - *path*: String. Path to map-composition JSON file, relative to [LAYMAN_DATA_DIR](env-settings.md#LAYMAN_DATA_DIR).
-  - *status*: Status information about availability of file. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
+  - *status*: Status information about availability of file. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **thumbnail**
   - *url*: String. URL of map thumbnail. It points to [GET Map Thumbnail](#get-map-thumbnail).
   - *path*: String. Path to map thumbnail. Path is relative to [LAYMAN_DATA_DIR](env-settings.md#LAYMAN_DATA_DIR).
-  - *status*: Status information about generating and availability of thumbnail. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
+  - *status*: Status information about generating and availability of thumbnail. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - *metadata*
   - *identifier*: String. Identifier of metadata record in CSW instance.

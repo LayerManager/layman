@@ -2,7 +2,7 @@ import os
 import json
 import pytest
 
-from layman import app, settings, util
+from layman import app, settings, util as layman_util
 from layman.common import empty_method_returns_true
 from layman.common.prime_db_schema import workspaces
 from layman.layer.geoserver import wms
@@ -50,7 +50,9 @@ def ensure_test_data(oauth2_provider_mock, request):
             if test_util.get_publication_exists(Publication4Test(workspace, publ_type, publication)):
                 headers = data.HEADERS.get(
                     data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_write', [None])[0])
-                process_client.delete_workspace_publication(publ_type, workspace, publication, headers=headers)
+                with app.app_context():
+                    uuid = layman_util.get_publication_uuid(workspace, publ_type, publication)
+                process_client.delete_publication_by_uuid(publ_type, uuid=uuid, headers=headers)
                 assert_publication_after_delete(workspace, publ_type, publication)
 
 
@@ -67,9 +69,24 @@ def ensure_publication(workspace, publ_type, publication):
 
     if not test_util.get_publication_exists(Publication4Test(workspace, publ_type, publication)):
         assert_publication_before_post(workspace, publ_type, publication)
+        uuid = None
         for idx, params in enumerate(data.PUBLICATIONS[(workspace, publ_type, publication)][data.DEFINITION]):
-            write_method = process_client.patch_workspace_publication if idx > 0 else process_client.publish_workspace_publication
-            write_method(publ_type, workspace, publication, **params)
+            if idx == 0:
+                write_method = process_client.publish_workspace_publication
+                resp = write_method(
+                    publ_type,
+                    workspace,
+                    publication,
+                    **params,
+                )
+                uuid = resp["uuid"]
+            else:
+                write_method = process_client.patch_publication_by_uuid
+                write_method(
+                    publ_type,
+                    uuid=uuid,
+                    **params,
+                )
 
 
 def check_publication_status(response):
@@ -84,12 +101,18 @@ def check_publication_status(response):
 
 def publish_publications_step(publications_set, step_num):
     done_publications = set()
-    write_method = process_client.patch_workspace_publication if step_num > 0 else process_client.publish_workspace_publication
+    uuid = None
+    write_method = process_client.patch_publication_by_uuid if step_num > 0 else process_client.publish_workspace_publication
     for workspace, publ_type, publication in publications_set:
         data_def = data.PUBLICATIONS[(workspace, publ_type, publication)][data.DEFINITION]
         params = data_def[step_num]
-        write_method(publ_type, workspace, publication, **params, check_response_fn=empty_method_returns_true,
-                     raise_if_not_complete=False)
+        if step_num > 0:
+            write_method(publ_type, uuid, **params, check_response_fn=empty_method_returns_true,
+                         raise_if_not_complete=False)
+        else:
+            resp = write_method(publ_type, workspace, publication, **params, check_response_fn=empty_method_returns_true,
+                                raise_if_not_complete=False)
+            uuid = resp['uuid']
         if len(data_def) == step_num + 1:
             done_publications.add((workspace, publ_type, publication))
     for workspace, publ_type, publication in publications_set:
@@ -107,7 +130,7 @@ def publish_publications_step(publications_set, step_num):
 def ensure_all_publications():
     ensure_all_users()
     with app.app_context():
-        already_created_publications = util.get_publication_infos()
+        already_created_publications = layman_util.get_publication_infos()
     publications_to_publish = set(data.PUBLICATIONS) - set(already_created_publications)
     for p_type in [data.LAYER_TYPE, data.MAP_TYPE]:
         publications_by_type = {(workspace, publ_type, publication)

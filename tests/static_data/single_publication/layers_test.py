@@ -40,11 +40,11 @@ def test_info(workspace, publ_type, publication):
     headers = data.HEADERS.get(data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_write', [None])[0])
     style = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA]['style_type']
 
-    info = process_client.get_workspace_publication(publ_type, workspace, publication, headers=headers)
     with app.app_context():
         info_internal = layer_util.get_layer_info(workspace, publication)
         uuid = layman_util.get_publication_uuid(workspace, publ_type, publication)
         expected_style_url = url_for('rest_layer_style.get', uuid=uuid, internal=False)
+    info = process_client.get_publication_by_uuid(publ_type, uuid, headers=headers)
 
     file_type = info_internal['_file']['file_type']
     original_data_source = info.get('original_data_source', settings.EnumOriginalDataSource.FILE.value)
@@ -160,7 +160,7 @@ def test_wms_layer(workspace, publ_type, publication):
     for service_endpoint in ('ows', 'wms'):
         wms_url = geoserver_client.get_wms_url(wms_layername.workspace, service_endpoint)
 
-        layer_info = process_client.get_workspace_layer(workspace, publication, headers=authn_headers)
+        layer_info = process_client.get_layer(uuid, headers=authn_headers)
         crs = layer_info['native_crs']
         bbox = bbox_util.get_bbox_to_publish(layer_info['bounding_box'], crs)
         tn_bbox = gs_util.get_square_bbox(bbox)

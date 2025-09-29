@@ -6,48 +6,45 @@ from flask import Blueprint, jsonify, request, current_app as app, g
 from layman.common import rest as rest_util
 from layman.common.prime_db_schema import publications
 from layman.http import LaymanError
-from layman.util import check_workspace_name_decorator
+from layman.util import check_uuid_decorator
 from layman import settings, authn, util as layman_util
 from layman.authn import authenticate
-from layman.authz import authorize_workspace_publications_decorator
+from layman.authz import authorize_uuid_publication_decorator
 from . import util, LAYER_REST_PATH_NAME, LAYER_TYPE, get_layer_patch_keys
 from .filesystem import input_file, input_style, input_chunk, util as fs_util
 from .layer_class import Layer
 
-bp = Blueprint('rest_workspace_layer', __name__)
+bp = Blueprint('rest_layer', __name__)
 logger = logging.getLogger(__name__)
 
 
 @bp.before_request
-@check_workspace_name_decorator
-@util.check_layername_decorator
+@check_uuid_decorator
 @authenticate
-@authorize_workspace_publications_decorator
+@authorize_uuid_publication_decorator(expected_publication_type=LAYER_TYPE)
 def before_request():
     pass
 
 
-@bp.route(f"/{LAYER_REST_PATH_NAME}/<layername>", methods=['GET'])
-def get(workspace, layername):
-    # pylint: disable=unused-argument
+@bp.route(f"/{LAYER_REST_PATH_NAME}/<uuid>", methods=['GET'])
+def get(uuid):
     app.logger.info(f"GET Layer, actor={g.user}")
 
     x_forwarded_items = layman_util.get_x_forwarded_items(request.headers)
-    info = util.get_complete_layer_info(workspace, layername, x_forwarded_items=x_forwarded_items)
+    info = util.get_complete_layer_info(uuid=uuid, x_forwarded_items=x_forwarded_items)
 
     return jsonify(info), 200
 
 
-@bp.route(f"/{LAYER_REST_PATH_NAME}/<layername>", methods=['PATCH'])
-@util.lock_decorator
-def patch(workspace, layername):
+@bp.route(f"/{LAYER_REST_PATH_NAME}/<uuid>", methods=['PATCH'])
+@util.uuid_lock_decorator
+def patch(uuid):
     app.logger.info(f"PATCH Layer, actor={g.user}")
 
     x_forwarded_items = layman_util.get_x_forwarded_items(request.headers)
 
-    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername,
-                                            context={'keys': ['title', 'name', 'description', 'table_uri', 'geodata_type', 'style_type',
-                                                              'original_data_source', 'uuid']})
+    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['title', 'name', 'description', 'table_uri', 'geodata_type', 'style_type',
+                                                                            'original_data_source', 'uuid', '_workspace']})
     kwargs = {
         'title': info.get('title', info['name']) or '',
         'description': info.get('description'),
@@ -199,7 +196,7 @@ def patch(workspace, layername):
     kwargs['enable_more_main_files'] = enable_more_main_files
     request_method = request.method.lower()
     kwargs['http_method'] = request_method
-    old_layer = Layer(layer_tuple=(workspace, layername))
+    old_layer = Layer(uuid=uuid)
     props_to_refresh = util.get_same_or_missing_prop_names(old_layer)
     kwargs['metadata_properties_to_refresh'] = props_to_refresh
 
@@ -211,10 +208,7 @@ def patch(workspace, layername):
 
     kwargs.update({'actor_name': authn.get_authn_username()})
     rest_util.setup_patch_access_rights(request.form, kwargs)
-    util.pre_publication_action_check(workspace,
-                                      layername,
-                                      kwargs,
-                                      )
+    util.pre_publication_action_check_by_uuid(uuid, kwargs)
 
     if delete_from is not None:
         deleted = util.delete_layer(old_layer, source=delete_from, http_method=request_method)
@@ -246,7 +240,7 @@ def patch(workspace, layername):
                 })
             elif input_files:
                 shutil.move(temp_dir, input_file.get_layer_input_file_dir(info['uuid']))
-        publications.set_wfs_wms_status(workspace, LAYER_TYPE, layername, settings.EnumWfsWmsStatus.PREPARING)
+        publications.set_wfs_wms_status(info['_workspace'], LAYER_TYPE, info['name'], settings.EnumWfsWmsStatus.PREPARING)
     else:
         delete_from = 'layman.layer.micka.soap'
 
@@ -271,31 +265,30 @@ def patch(workspace, layername):
 
     app.logger.info('PATCH Layer changes done')
     patch_keys = get_layer_patch_keys()
-    info = util.get_layer_info(workspace, layername, context={'keys': patch_keys, 'x_forwarded_items': x_forwarded_items})
-    info['url'] = layman_util.get_workspace_publication_url(info['type'], workspace, layername, x_forwarded_items=x_forwarded_items)
+    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': patch_keys, 'x_forwarded_items': x_forwarded_items})
+    info['url'] = layman_util.get_publication_url(info['type'], info['uuid'], x_forwarded_items=x_forwarded_items)
     info.update(layer_result)
     info = {key: value for key, value in info.items() if key in patch_keys}
 
     return jsonify(info), 200
 
 
-@bp.route(f"/{LAYER_REST_PATH_NAME}/<layername>", methods=['DELETE'])
-@util.lock_decorator
-def delete_layer(workspace, layername):
+@bp.route(f"/{LAYER_REST_PATH_NAME}/<uuid>", methods=['DELETE'])
+@util.uuid_lock_decorator
+def delete_layer(uuid):
     app.logger.info(f"DELETE Layer, actor={g.user}")
     x_forwarded_items = layman_util.get_x_forwarded_items(request.headers)
 
-    info = util.get_complete_layer_info(workspace, layername, x_forwarded_items=x_forwarded_items)
-    layer = Layer(uuid=info['uuid'])
+    info = layman_util.get_publication_info_by_uuid(uuid, context={'x_forwarded_items': x_forwarded_items})
 
-    util.abort_layer_chain(workspace, layername)
+    util.abort_layer_chain_by_uuid(uuid)
 
+    layer = Layer(uuid=uuid)
     util.delete_layer(layer)
 
     app.logger.info('DELETE Layer done')
 
     return jsonify({
-        'name': layername,
-        'url': info['url'],
-        'uuid': info['uuid'],
+        'url': layman_util.get_publication_url(info['type'], uuid, x_forwarded_items=x_forwarded_items),
+        'uuid': uuid,
     }), 200

@@ -1,6 +1,7 @@
 import pytest
 
-from layman import settings, common
+from layman import settings, common, app
+import layman.util as layman_util
 from layman.common.micka import util as micka_util
 from test_tools import process_client
 
@@ -25,10 +26,9 @@ class TestSoapClass:
     @pytest.fixture()
     def clear_data(self):
         yield
-        process_client.delete_workspace_publication(self.publication_type,
-                                                    self.username,
-                                                    self.publication_name,
-                                                    headers=self.authz_headers)
+        with app.app_context():
+            uuid = layman_util.get_publication_uuid(self.username, self.publication_type, self.publication_name)
+        process_client.delete_publication_by_uuid(self.publication_type, uuid=uuid, headers=self.authz_headers)
 
     @pytest.mark.flaky(reruns=5, reruns_delay=2)
     @pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman', 'reserve_username', 'clear_data')
@@ -44,24 +44,32 @@ class TestSoapClass:
         username = self.username
         publ_name_prefix = self.publ_name_prefix
         authz_headers = self.authz_headers
-
         post_method = process_client.publish_workspace_publication
-        patch_method = process_client.patch_workspace_publication
+        patch_method = process_client.patch_publication_by_uuid
         publ_name = f"{publ_name_prefix}{publ_type.split('.')[-1]}"
         self.publication_type = publ_type
         self.publication_name = publ_name
-
+        uuid = None
         for idx, (access_rights, anonymous_visibility) in enumerate(params_and_expected_list):
-            write_method = patch_method if idx > 0 else post_method
-
-            write_method(publ_type,
-                         username,
-                         publ_name,
-                         headers=authz_headers,
-                         access_rights=access_rights)
-
-            publ_uuid = process_client.get_workspace_publication(publ_type, username, publ_name, headers=authz_headers)['uuid']
-            publ_muuid = f"m-{publ_uuid}"
+            if idx > 0:
+                write_method = patch_method
+                resp = write_method(
+                    publ_type,
+                    uuid=uuid,
+                    headers=authz_headers,
+                    access_rights=access_rights,
+                )
+            else:
+                write_method = post_method
+                resp = write_method(
+                    publ_type,
+                    username,
+                    publ_name,
+                    headers=authz_headers,
+                    access_rights=access_rights,
+                )
+            uuid = resp['uuid']
+            publ_muuid = f"m-{uuid}"
             assert micka_util.get_number_of_records(publ_muuid, use_authn=True) > 0
             anon_number_of_records = micka_util.get_number_of_records(publ_muuid, use_authn=False)
             assert bool(anon_number_of_records) == anonymous_visibility, \
@@ -77,27 +85,26 @@ def test_get_publication_layman_status(publ_type, error_params):
     workspace = 'test_get_publication_layman_status_workspace'
     publication = 'test_get_publication_layman_status_publication'
 
-    process_client.publish_workspace_publication(publ_type, workspace, publication, check_response_fn=common.empty_method_returns_true,
-                                                 raise_if_not_complete=False)
-
-    info = process_client.get_workspace_publication(publ_type, workspace, publication,)
+    resp = process_client.publish_workspace_publication(publ_type, workspace, publication, check_response_fn=common.empty_method_returns_true,
+                                                        raise_if_not_complete=False)
+    uuid = resp['uuid']
+    info = process_client.get_publication_by_uuid(publ_type, uuid)
     assert 'layman_metadata' in info, f'info={info}'
     assert 'publication_status' in info['layman_metadata'], f'info={info}'
     assert info['layman_metadata']['publication_status'] == 'UPDATING', f'info={info}'
 
-    process_client.wait_for_publication_status(workspace, publ_type, publication)
-
-    info = process_client.get_workspace_publication(publ_type, workspace, publication, )
+    process_client.wait_for_publication_status_by_uuid(uuid, publ_type)
+    info = process_client.get_publication_by_uuid(publ_type, uuid)
     assert 'layman_metadata' in info, f'info={info}'
     assert 'publication_status' in info['layman_metadata'], f'info={info}'
     assert info['layman_metadata']['publication_status'] == 'COMPLETE', f'info={info}'
 
     if error_params:
-        process_client.patch_workspace_publication(publ_type, workspace, publication, **error_params,
-                                                   raise_if_not_complete=False)
-        info = process_client.get_workspace_publication(publ_type, workspace, publication, )
+        process_client.patch_publication_by_uuid(publ_type, uuid, **error_params,
+                                                 raise_if_not_complete=False)
+        info = process_client.get_publication_by_uuid(publ_type, uuid)
         assert 'layman_metadata' in info, f'info={info}'
         assert 'publication_status' in info['layman_metadata'], f'info={info}'
         assert info['layman_metadata']['publication_status'] == 'INCOMPLETE', f'info={info}'
 
-    process_client.delete_workspace_publication(publ_type, workspace, publication)
+    process_client.delete_publication_by_uuid(publ_type, uuid)

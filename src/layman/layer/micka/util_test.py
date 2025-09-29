@@ -40,8 +40,6 @@ def test_fill_template():
         os.remove(xml_path)
     except OSError:
         pass
-    workspace = 'browser'
-    layer = 'layer'
     layer_uuid = 'ca238200-8200-1a23-9399-42c9fca53542'
     file_object = common_util.fill_xml_template_as_pretty_file_object('src/layman/layer/micka/record-template.xml',
                                                                       {
@@ -66,9 +64,8 @@ def test_fill_template():
                                                                           'wms_url': f"{wms.add_capabilities_params_to_url('http://www.env.cz/corine/data/download.zip')}&LAYERS=l_{layer_uuid}",
                                                                           'wfs_url': f"{wfs.add_capabilities_params_to_url('http://www.env.cz/corine/data/download.zip')}&LAYERS=l_{layer_uuid}",
                                                                           'layer_endpoint': layman_util.url_for(
-                                                                              'rest_workspace_layer.get',
-                                                                              workspace=workspace,
-                                                                              layername=layer),
+                                                                              'rest_layer.get',
+                                                                              uuid=layer_uuid),
                                                                           'spatial_resolution': {
                                                                               'scale_denominator': None,
                                                                           },
@@ -133,7 +130,7 @@ def test_parse_md_properties():
             'extent': [11.87, 48.12, 19.13, 51.59],
             'wms_url': 'http://www.env.cz/corine/data/download.zip',
             'wfs_url': 'http://www.env.cz/corine/data/download.zip',
-            'layer_endpoint': url_for('rest_workspace_layer.get', workspace='browser', layername='layer',
+            'layer_endpoint': url_for('rest_layer.get', uuid=layer_uuid,
                                       internal=False),
         }
     assert set(props.keys()) == set(expected.keys())

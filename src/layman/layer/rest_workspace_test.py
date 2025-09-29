@@ -12,7 +12,7 @@ from layman.common import empty_method_returns_true
 from layman.common.metadata import prop_equals_strict, PROPERTIES
 from layman.layer.filesystem.thumbnail import get_layer_thumbnail_path
 from layman.layer.geoserver import wms as geoserver_wms, GeoserverIds
-from layman.util import SimpleCounter, get_publication_uuid
+from layman.util import SimpleCounter
 from test_tools import process_client, util as test_util
 from test_tools.data import wfs as data_wfs
 from . import util, LAYER_TYPE
@@ -25,6 +25,11 @@ LAYERNAME_1 = 'countries_concurrent'
 LAYERNAME_2 = 'ne_110m_admin_0_countries'
 LAYERNAME_3 = 'ne_110m_admin_0_countries_shp'
 LAYERNAME_4 = 'countries'
+
+LAYER_UUID_1 = '11111111-1111-1111-1111-111111111111'
+LAYER_UUID_2 = '22222222-2222-2222-2222-222222222222'
+LAYER_UUID_3 = '33333333-3333-3333-3333-333333333333'
+LAYER_UUID_4 = '44444444-4444-4444-4444-444444444444'
 
 publication_counter = SimpleCounter()
 
@@ -117,26 +122,6 @@ def test_layman_gs_user_conflict():
     assert exc_info.value.code == 41
 
 
-@pytest.mark.parametrize('layername', [
-    (' ', ),
-    ('ě', ),
-    (';', ),
-    ('?', ),
-    ('ABC', ),
-])
-def test_wrong_value_of_layername(layername):
-    workspace = 'test_wrong_value_of_layername_workspace'
-    # publish and delete layer to ensure that username exists
-    process_client.ensure_workspace(workspace)
-    with pytest.raises(LaymanError) as exc_info:
-        process_client.get_workspace_layer(workspace=workspace,
-                                           name=layername,
-                                           )
-    assert exc_info.value.http_code == 400
-    assert exc_info.value.code == 2
-    assert exc_info.value.data['parameter'] == 'layername'
-
-
 def test_get_layers_testuser1_v1():
     workspace = 'test_get_layers_testuser1_v1_user'
     # publish and delete layer to ensure that username exists
@@ -153,6 +138,7 @@ def test_post_layers_simple():
     process_client.publish_workspace_layer(workspace=workspace,
                                            name=None,
                                            file_paths=['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson'],
+                                           uuid=LAYER_UUID_2,
                                            check_response_fn=empty_method_returns_true,
                                            raise_if_not_complete=False,
                                            do_not_post_name=True,
@@ -175,7 +161,7 @@ def test_post_layers_simple():
         assert isinstance(layer_info[key_to_check], str) \
             or 'status' not in layer_info[key_to_check]
 
-    layeruuid = layer_info['uuid']
+    layeruuid = LAYER_UUID_2
     wms_layername = GeoserverIds(uuid=layeruuid).wms
     wms_url = geoserver_wms.get_wms_url()
     wms = wms_proxy(wms_url)
@@ -187,8 +173,7 @@ def test_post_layers_simple():
         uuid.get_workspace_type_names_key(workspace, '.'.join(__name__.split('.')[:-1])),
         layername
     )
-
-    layer_info = process_client.get_workspace_layer(workspace=workspace, name=layername)
+    layer_info = process_client.get_layer(layeruuid)
     assert set(layer_info['metadata'].keys()) == {'identifier', 'csw_url', 'record_url', 'comparison_url'}
     assert layer_info['metadata']['identifier'] == f"m-{layeruuid}"
     assert layer_info['metadata']['csw_url'] == settings.CSW_PROXY_URL
@@ -216,11 +201,11 @@ def test_post_layers_simple():
             'extent': [-180.0, -85.60903859383285, 180.0, 83.64513109859944],
             'graphic_url': test_util.url_for_external('rest_layer_thumbnail.get', uuid=layeruuid),
             'identifier': {
-                'identifier': test_util.url_for_external('rest_workspace_layer.get', workspace=workspace, layername=layername),
+                'identifier': test_util.url_for_external('rest_layer.get', uuid=layeruuid),
                 'label': 'ne_110m_admin_0_countries'
             },
             'language': ['eng'],
-            'layer_endpoint': test_util.url_for_external('rest_workspace_layer.get', workspace=workspace, layername=layername),
+            'layer_endpoint': test_util.url_for_external('rest_layer.get', uuid=layeruuid),
             'organisation_name': None,
             'publication_date': TODAY_DATE,
             'reference_system': EXP_REFERENCE_SYSTEMS,
@@ -239,6 +224,7 @@ def test_post_layers_concurrent():
     process_client.publish_workspace_layer(workspace=workspace,
                                            name=layername,
                                            file_paths=['tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.geojson'],
+                                           uuid=LAYER_UUID_1,
                                            check_response_fn=empty_method_returns_true,
                                            raise_if_not_complete=False,
                                            )
@@ -284,21 +270,22 @@ def test_post_layers_shp_missing_extensions():
 def test_post_layers_shp():
     workspace = USER
     layername = LAYERNAME_3
-    post_response = process_client.publish_workspace_layer(workspace=workspace,
-                                                           name=layername,
-                                                           file_paths=[
-                                                               'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.cpg',
-                                                               'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.dbf',
-                                                               'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.prj',
-                                                               'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.README.html',
-                                                               'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.shp',
-                                                               'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.shx',
-                                                               'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.VERSION.txt',
-                                                           ],
-                                                           check_response_fn=empty_method_returns_true,
-                                                           raise_if_not_complete=False,
-                                                           )
-    layeruuid = post_response['uuid']
+    process_client.publish_workspace_layer(workspace=workspace,
+                                           name=layername,
+                                           file_paths=[
+                                               'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.cpg',
+                                               'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.dbf',
+                                               'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.prj',
+                                               'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.README.html',
+                                               'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.shp',
+                                               'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.shx',
+                                               'tmp/naturalearth/110m/cultural/ne_110m_admin_0_countries.VERSION.txt',
+                                           ],
+                                           uuid=LAYER_UUID_3,
+                                           check_response_fn=empty_method_returns_true,
+                                           raise_if_not_complete=False,
+                                           )
+    layeruuid = LAYER_UUID_3
     chain_info = util.get_layer_chain(workspace, layername)
     assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
     publication_counter.increase()
@@ -343,11 +330,11 @@ def test_post_layers_complex():
                                                            title=title,
                                                            description=description,
                                                            style_file='sample/style/generic-blue_sld.xml',
-
+                                                           uuid=LAYER_UUID_4,
                                                            check_response_fn=empty_method_returns_true,
                                                            raise_if_not_complete=False,
                                                            )
-    layeruuid = post_response['uuid']
+    layeruuid = LAYER_UUID_4
     assert post_response['name'] == layername
 
     chain_info = util.get_layer_chain(workspace, layername)
@@ -365,7 +352,7 @@ def test_post_layers_complex():
     assert wms[wms_layername.name].abstract == 'popis států'
     assert wms[wms_layername.name].styles[all_names.sld.name]['title'] == 'Generic Blue'
 
-    get_response = process_client.get_workspace_layer(workspace=workspace, name=layername)
+    get_response = process_client.get_layer(layeruuid)
     assert get_response['title'] == title
     assert get_response['description'] == description
     for source in [
@@ -399,11 +386,11 @@ def test_post_layers_complex():
             'extent': [-180.0, -85.60903859383285, 180.0, 83.64513109859944],
             'graphic_url': test_util.url_for_external('rest_layer_thumbnail.get', uuid=layeruuid),
             'identifier': {
-                "identifier": test_util.url_for_external('rest_workspace_layer.get', workspace=workspace, layername=layername),
+                "identifier": test_util.url_for_external('rest_layer.get', uuid=layeruuid),
                 "label": "countries"
             },
             'language': ["eng"],
-            'layer_endpoint': test_util.url_for_external('rest_workspace_layer.get', workspace=workspace, layername=layername),
+            'layer_endpoint': test_util.url_for_external('rest_layer.get', uuid=layeruuid),
             'organisation_name': None,
             'publication_date': TODAY_DATE,
             'reference_system': EXP_REFERENCE_SYSTEMS,
@@ -437,7 +424,7 @@ def test_uppercase_attr():
     process_client.wait_for_publication_status(workspace=workspace, publication_type=LAYER_TYPE, publication=layername)
     assert celery_util.is_chain_ready(chain_info)
 
-    get_response = process_client.get_workspace_layer(workspace=workspace, name=layername)
+    get_response = process_client.get_layer(publ_uuid)
     for source in [
         'wms',
         'wfs',
@@ -448,8 +435,7 @@ def test_uppercase_attr():
     ]:
         assert 'status' not in get_response[source]
 
-    layeruuid = get_response['uuid']
-    gs_layername = GeoserverIds(uuid=layeruuid, ).wfs
+    gs_layername = GeoserverIds(uuid=publ_uuid, ).wfs
     db_store = DEFAULT_INTERNAL_DB_STORE
     feature_type = get_feature_type(gs_layername.workspace, db_store, gs_layername.name)
     attributes = feature_type['attributes']['attribute']
@@ -465,7 +451,7 @@ def test_uppercase_attr():
         th_path = get_layer_thumbnail_path(publ_uuid)
     assert os.path.getsize(th_path) > 5000
 
-    process_client.delete_workspace_layer(workspace=workspace, name=layername)
+    process_client.delete_publication_by_uuid(LAYER_TYPE, uuid=publ_uuid)
     publication_counter.decrease()
 
     uuid.check_redis_consistency(expected_publ_num_by_type={
@@ -505,14 +491,15 @@ def test_patch_layer_title():
     new_title = "New Title of Countries"
     new_description = "and new description"
 
-    process_client.patch_workspace_layer(workspace, layername,
-                                         title=new_title,
-                                         description=new_description,
-                                         )
+    layer_uuid = LAYER_UUID_2
+    process_client.patch_layer(uuid=layer_uuid,
+                               title=new_title,
+                               description=new_description,
+                               )
     chain_info = util.get_layer_chain(workspace, layername)
     assert chain_info is not None and celery_util.is_chain_ready(chain_info)
 
-    get_response = process_client.get_workspace_layer(workspace=workspace, name=layername)
+    get_response = process_client.get_layer(layer_uuid)
     assert get_response['title'] == new_title
     assert get_response['description'] == new_description
     layer_uuid = get_response['uuid']
@@ -523,11 +510,11 @@ def test_patch_layer_title():
             'extent': [-180.0, -85.60903859383285, 180.0, 83.64513109859944],
             'graphic_url': test_util.url_for_external('rest_layer_thumbnail.get', uuid=layer_uuid),
             'identifier': {
-                'identifier': test_util.url_for_external('rest_workspace_layer.get', workspace=workspace, layername=layername),
+                'identifier': test_util.url_for_external('rest_layer.get', uuid=layer_uuid),
                 'label': 'ne_110m_admin_0_countries'
             },
             'language': ['eng'],
-            'layer_endpoint': test_util.url_for_external('rest_workspace_layer.get', workspace=workspace, layername=layername),
+            'layer_endpoint': test_util.url_for_external('rest_layer.get', uuid=layer_uuid),
             'organisation_name': None,
             'publication_date': TODAY_DATE,
             'reference_system': EXP_REFERENCE_SYSTEMS,
@@ -550,12 +537,12 @@ def test_patch_layer_style():
     new_title = 'countries in blue'
 
     sld_path = 'sample/style/generic-blue_sld.xml'
-    process_client.patch_workspace_layer(workspace, layername,
-                                         title=new_title,
-                                         style_file=sld_path,
-                                         )
-
-    get_response = process_client.get_workspace_layer(workspace=workspace, name=layername)
+    layer_uuid = LAYER_UUID_2
+    process_client.patch_layer(uuid=layer_uuid,
+                               title=new_title,
+                               style_file=sld_path,
+                               )
+    get_response = process_client.get_layer(layer_uuid)
     assert get_response['title'] == new_title
     layer_uuid = get_response['uuid']
 
@@ -577,11 +564,11 @@ def test_patch_layer_style():
             'extent': [-180.0, -85.60903859383285, 180.0, 83.64513109859944],
             'graphic_url': test_util.url_for_external('rest_layer_thumbnail.get', uuid=layer_uuid),
             'identifier': {
-                'identifier': test_util.url_for_external('rest_workspace_layer.get', workspace=workspace, layername=layername),
+                'identifier': test_util.url_for_external('rest_layer.get', uuid=layer_uuid),
                 'label': 'ne_110m_admin_0_countries'
             },
             'language': ['eng'],
-            'layer_endpoint': test_util.url_for_external('rest_workspace_layer.get', workspace=workspace, layername=layername),
+            'layer_endpoint': test_util.url_for_external('rest_layer.get', uuid=layer_uuid),
             'organisation_name': None,
             'publication_date': TODAY_DATE,
             'reference_system': EXP_REFERENCE_SYSTEMS,
@@ -598,24 +585,24 @@ def test_patch_layer_data():
     workspace = WORKSPACE_2
     layername = LAYERNAME_4
     new_title = 'populated places'
-    process_client.patch_workspace_layer(workspace, layername,
-                                         file_paths=['tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson'],
-                                         title=new_title,
-                                         check_response_fn=empty_method_returns_true,
-                                         raise_if_not_complete=False,
-                                         )
+    layer_uuid = LAYER_UUID_4
+    process_client.patch_layer(uuid=layer_uuid,
+                               file_paths=['tmp/naturalearth/110m/cultural/ne_110m_populated_places.geojson'],
+                               title=new_title,
+                               check_response_fn=empty_method_returns_true,
+                               raise_if_not_complete=False,
+                               )
 
     chain_info = util.get_layer_chain(workspace, layername)
     assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
-    get_incomplete_response = process_client.get_workspace_layer(workspace=workspace, name=layername)
+    get_incomplete_response = process_client.get_layer(layer_uuid)
     # keys_to_check = ['db', 'wms', 'wfs', 'thumbnail', 'metadata']
     keys_to_check = ['wms', 'thumbnail', 'metadata']
     for key_to_check in keys_to_check:
         assert 'status' in get_incomplete_response[key_to_check], f'{key_to_check=}\n{get_incomplete_response=}'
     process_client.wait_for_publication_status(workspace, LAYER_TYPE, layername)
-    layer_uuid = get_incomplete_response['uuid']
 
-    get_response = process_client.get_workspace_layer(workspace=workspace, name=layername)
+    get_response = process_client.get_layer(layer_uuid)
     assert get_response['title'] == new_title
     gs_layername = GeoserverIds(uuid=layer_uuid, ).wfs
     db_store = DEFAULT_INTERNAL_DB_STORE
@@ -638,11 +625,11 @@ def test_patch_layer_data():
             'extent': [-175.22056435043098, -41.29999116752133, 179.21664802661394, 64.15002486626597],
             'graphic_url': test_util.url_for_external('rest_layer_thumbnail.get', uuid=layer_uuid),
             'identifier': {
-                'identifier': test_util.url_for_external('rest_workspace_layer.get', workspace=workspace, layername=layername),
+                'identifier': test_util.url_for_external('rest_layer.get', uuid=layer_uuid),
                 "label": "countries"
             },
             'language': ["eng", 'chi', 'rus'],
-            'layer_endpoint': test_util.url_for_external('rest_workspace_layer.get', workspace=workspace, layername=layername),
+            'layer_endpoint': test_util.url_for_external('rest_layer.get', uuid=layer_uuid),
             'organisation_name': None,
             'publication_date': TODAY_DATE,
             'reference_system': EXP_REFERENCE_SYSTEMS,
@@ -658,15 +645,13 @@ def test_patch_layer_concurrent_and_delete_it():
     layername = LAYERNAME_4
     new_title = 'populated places'
 
-    with app.app_context():
-        uuid_str = get_publication_uuid(workspace, LAYER_TYPE, layername)
-
-    process_client.patch_workspace_layer(workspace, layername,
-                                         file_paths=['tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson'],
-                                         title=new_title,
-                                         check_response_fn=empty_method_returns_true,
-                                         raise_if_not_complete=False,
-                                         )
+    uuid_str = LAYER_UUID_4
+    process_client.patch_layer(uuid=uuid_str,
+                               file_paths=['tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson'],
+                               title=new_title,
+                               check_response_fn=empty_method_returns_true,
+                               raise_if_not_complete=False,
+                               )
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': publication_counter.get()
     })
@@ -674,16 +659,16 @@ def test_patch_layer_concurrent_and_delete_it():
     assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
 
     with pytest.raises(LaymanError) as exc_info:
-        process_client.patch_workspace_layer(workspace, layername,
-                                             file_paths=['tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson'],
-                                             )
+        process_client.patch_layer(uuid=uuid_str,
+                                   file_paths=['tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson'],
+                                   )
     assert exc_info.value.http_code == 400
     assert exc_info.value.code == 49
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': publication_counter.get()
     })
 
-    process_client.delete_workspace_layer(workspace, layername)
+    process_client.delete_publication_by_uuid(LAYER_TYPE, uuid=uuid_str)
     assert not settings.LAYMAN_REDIS.sismember(uuid.UUID_SET_KEY, uuid_str)
     assert not settings.LAYMAN_REDIS.exists(uuid.get_uuid_metadata_key(uuid_str))
     assert not settings.LAYMAN_REDIS.hexists(
@@ -725,10 +710,11 @@ def test_post_layers_long_and_delete_it():
         for key_to_check in keys_to_check:
             assert 'status' in layer_info[key_to_check], f'{key_to_check=}\n{layer_info=}'
 
-    process_client.delete_workspace_layer(workspace, layername)
+    layer_uuid = post_response['uuid']
+    process_client.delete_publication_by_uuid(LAYER_TYPE, uuid=layer_uuid)
 
     with pytest.raises(LaymanError) as exc_info:
-        process_client.get_workspace_layer(workspace, layername)
+        process_client.get_layer(layer_uuid)
     assert exc_info.value.http_code == 404
 
     uuid.check_redis_consistency(expected_publ_num_by_type={
@@ -737,17 +723,15 @@ def test_post_layers_long_and_delete_it():
 
 
 def test_delete_layer():
-    workspace = USER
-    layername = LAYERNAME_2
-
-    process_client.delete_workspace_layer(workspace, layername)
+    layer_uuid = LAYER_UUID_2
+    process_client.delete_publication_by_uuid(LAYER_TYPE, uuid=layer_uuid)
     publication_counter.decrease()
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': publication_counter.get()
     })
 
     with pytest.raises(LaymanError) as exc_info:
-        process_client.delete_workspace_layer(workspace, layername)
+        process_client.delete_publication_by_uuid(LAYER_TYPE, uuid=layer_uuid)
     assert exc_info.value.http_code == 404
     assert exc_info.value.code == 15
 
@@ -767,15 +751,15 @@ def test_post_layers_zero_length_attribute():
         info = response.json()
         return info.get('db', {}).get('status', '') == 'FAILURE'
 
-    process_client.publish_workspace_layer(workspace, layername, file_paths=file_paths,
-                                           check_response_fn=wait_for_db_finish, raise_if_not_complete=False)
+    layer_uuid = process_client.publish_workspace_layer(workspace, layername, file_paths=file_paths,
+                                                        check_response_fn=wait_for_db_finish, raise_if_not_complete=False)['uuid']
 
     with app.app_context():
         layer_info = util.get_layer_info(workspace, layername)
     assert layer_info['db']['status'] == 'FAILURE', f'layer_info={layer_info}'
     assert layer_info['db']['error']['code'] == 28, f'layer_info={layer_info}'
 
-    process_client.delete_workspace_layer(workspace, layername)
+    process_client.delete_publication_by_uuid(LAYER_TYPE, uuid=layer_uuid)
 
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': publication_counter.get()
@@ -792,9 +776,9 @@ def test_get_layers_testuser2():
 
 
 def test_just_delete_layers():
-    process_client.delete_workspace_layer(USER, LAYERNAME_1)
+    process_client.delete_publication_by_uuid(LAYER_TYPE, uuid=LAYER_UUID_1)
     publication_counter.decrease()
-    process_client.delete_workspace_layer(USER, LAYERNAME_3)
+    process_client.delete_publication_by_uuid(LAYER_TYPE, uuid=LAYER_UUID_3)
     publication_counter.decrease()
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': publication_counter.get()
@@ -854,4 +838,4 @@ def test_layer_with_different_geometry():
                              timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
                              )
     assert response.status_code == 200, f"HTTP Error {response.status_code}\n{response.text}"
-    process_client.delete_workspace_layer(workspace, layername)
+    process_client.delete_publication_by_uuid(LAYER_TYPE, uuid=layeruuid)

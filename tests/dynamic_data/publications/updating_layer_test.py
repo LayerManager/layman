@@ -34,7 +34,8 @@ class TestUpdatingLayer(base_test.TestSingleRestPublication):
     @staticmethod
     def test_layer(layer, params, rest_method):
         """Parametrized using pytest_generate_tests"""
-        rest_method.fn(layer, args=params)
+        resp = rest_method.fn(layer, args=params)
+        uuid = resp['uuid']
 
         exp_publication_detail = {
             'geodata_type': 'unknown',
@@ -77,7 +78,7 @@ class TestUpdatingLayer(base_test.TestSingleRestPublication):
                                                        )
 
         # check also wfs_wms_status
-        rest_detail = process_client.get_workspace_layer(layer.workspace, layer.name)
+        rest_detail = process_client.get_layer(uuid)
         for key in ['wms', 'style']:  # wfs is not here, because geodata_type is unknown
             assert rest_detail[key]['status'] == 'PENDING'
         asserts_publ.rest.same_values_in_detail_and_multi(workspace=layer.workspace,
