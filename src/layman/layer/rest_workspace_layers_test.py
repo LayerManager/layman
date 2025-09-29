@@ -35,7 +35,9 @@ def test_get_layer_title():
         assert response.json()[i]["title"] == sorted_layers[i][1]
 
     for (name, title) in layers:
-        process_client.delete_workspace_layer(workspace, name)
+        with app.app_context():
+            uuid = layman_util.get_publication_uuid(workspace, 'layman.layer', name)
+        process_client.delete_layer(uuid)
 
 
 def assert_style_file(publ_uuid, expected_style_file):
@@ -69,7 +71,7 @@ def test_style_correctly_saved(source_style_file_path,
         info = layman_util.get_publication_info(workspace, process_client.LAYER_TYPE, layer, context={'keys': ['style_type', 'style'], })
     assert info['_style_type'] == expected_style_type
 
-    process_client.delete_workspace_layer(workspace, layer)
+    process_client.delete_layer(publ_uuid)
     publ_uuid = process_client.publish_workspace_layer(workspace, layer)['uuid']
     expected_style_file = expected_style_file_template.format(publ_uuid=publ_uuid) if expected_style_file_template else None
 
@@ -81,15 +83,13 @@ def test_style_correctly_saved(source_style_file_path,
 
     assert_style_file(publ_uuid, None)
 
-    process_client.patch_workspace_layer(workspace,
-                                         layer,
-                                         style_file=source_style_file_path)
+    process_client.patch_layer(uuid=publ_uuid, style_file=source_style_file_path)
     assert_style_file(publ_uuid, expected_style_file)
     with app.app_context():
         info = layer_util.get_layer_info(workspace, layer)
     assert info['_style_type'] == expected_style_type
 
-    process_client.delete_workspace_layer(workspace, layer)
+    process_client.delete_layer(publ_uuid)
 
 
 @pytest.mark.parametrize('post_params, expected_exc', [

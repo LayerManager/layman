@@ -44,13 +44,10 @@ PUBLICATION_TYPES = [
 PublicationTypeDef = namedtuple('PublicationTypeDef', ['url_param_name',
                                                        'get_publications_url',
                                                        'post_workspace_publication_url',
-                                                       'patch_workspace_publication_url',
                                                        'patch_publication_url',
                                                        'get_workspace_publications_url',
-                                                       'get_workspace_publication_url',
                                                        'get_publication_url',
                                                        'get_publication_thumbnail_url',
-                                                       'delete_workspace_publication_url',
                                                        'delete_publication_url',
                                                        'delete_workspace_publications_url',
                                                        'keys_to_check',
@@ -61,13 +58,10 @@ PublicationTypeDef = namedtuple('PublicationTypeDef', ['url_param_name',
 PUBLICATION_TYPES_DEF = {MAP_TYPE: PublicationTypeDef('mapname',
                                                       'rest_maps.get',
                                                       'rest_workspace_maps.post',
-                                                      None,
                                                       'rest_map.patch',
                                                       'rest_workspace_maps.get',
-                                                      None,
                                                       'rest_map.get',
                                                       'rest_map_thumbnail.get',
-                                                      None,
                                                       'rest_map.delete_map',
                                                       'rest_workspace_maps.delete',
                                                       map_keys_to_check,
@@ -78,14 +72,11 @@ PUBLICATION_TYPES_DEF = {MAP_TYPE: PublicationTypeDef('mapname',
                          LAYER_TYPE: PublicationTypeDef('layername',
                                                         'rest_layers.get',
                                                         'rest_workspace_layers.post',
-                                                        'rest_workspace_layer.patch',
-                                                        None,
+                                                        'rest_layer.patch',
                                                         'rest_workspace_layers.get',
-                                                        'rest_workspace_layer.get',
-                                                        None,
+                                                        'rest_layer.get',
                                                         'rest_layer_thumbnail.get',
-                                                        'rest_workspace_layer.delete_layer',
-                                                        None,
+                                                        'rest_layer.delete_layer',
                                                         'rest_workspace_layers.delete',
                                                         layer_keys_to_check,
                                                         'sample/layman.layer/small_layer.geojson',
@@ -94,9 +85,6 @@ PUBLICATION_TYPES_DEF = {MAP_TYPE: PublicationTypeDef('mapname',
                                                         ),
                          None: PublicationTypeDef('publicationname',
                                                   'rest_publications.get',
-                                                  None,
-                                                  None,
-                                                  None,
                                                   None,
                                                   None,
                                                   None,
@@ -197,159 +185,17 @@ def upload_file_chunks(publication_type,
         raise_layman_error(chunk_response)
 
 
-def patch_workspace_publication(publication_type,
-                                workspace,
-                                name,
-                                *,
-                                file_paths=None,
-                                external_table_uri=None,
-                                headers=None,
-                                actor_name=None,
-                                access_rights=None,
-                                title=None,
-                                description=None,
-                                style_file=None,
-                                check_response_fn=None,
-                                raise_if_not_complete=True,
-                                compress=False,
-                                compress_settings=None,
-                                with_chunks=False,
-                                crs=None,
-                                map_layers=None,
-                                native_extent=None,
-                                overview_resampling=None,
-                                do_not_upload_chunks=False,
-                                time_regex=None,
-                                time_regex_format=None,
-                                skip_asserts=False,
-                                ):
+def ensure_publication_by_uuid(publication_type,
+                               uuid,
+                               *,
+                               headers=None,
+                               access_rights=None,
+                               ):
     headers = headers or {}
-    if actor_name:
-        assert TOKEN_HEADER not in headers
-    publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
-
-    if not skip_asserts:
-        # map layers must not be set together with file_paths
-        assert not map_layers or not file_paths
-        assert not map_layers or not external_table_uri
-
-        assert not (not with_chunks and do_not_upload_chunks)
-        assert not (check_response_fn and do_not_upload_chunks)  # because check_response_fn is not called when do_not_upload_chunks
-        assert not (raise_if_not_complete and do_not_upload_chunks)
-        assert not (check_response_fn and raise_if_not_complete)
-
-        assert not (time_regex and publication_type == MAP_TYPE)
-        assert not (publication_type == LAYER_TYPE and crs and not file_paths)
-
-        if style_file or with_chunks or compress or compress_settings or overview_resampling:
-            assert publication_type == LAYER_TYPE
-        if map_layers or native_extent:
-            assert publication_type == MAP_TYPE
-
-        # Compress settings can be used only with compress option
-        assert not compress_settings or compress
-
-    if actor_name and actor_name != settings.ANONYM_USER:
-        headers.update(get_authz_headers(actor_name))
-
-    file_paths = [] if file_paths is None and not map_layers else file_paths
-
     with app.app_context():
-        if publication_type == MAP_TYPE:
-            uuid = layman_util.get_publication_uuid(workspace, publication_type, name)
-            r_url = url_for(publication_type_def.patch_publication_url, uuid=uuid)
-        else:
-            r_url = url_for(publication_type_def.patch_workspace_publication_url,
-                            workspace=workspace,
-                            **{publication_type_def.url_param_name: name})
-
-    temp_dir = None
-    if compress:
-        temp_dir = tempfile.mkdtemp(prefix="layman_zip_")
-        zip_file = util.compress_files(file_paths, compress_settings=compress_settings, output_dir=temp_dir)
-        file_paths = [zip_file]
-
-    if map_layers:
-        temp_dir = tempfile.mkdtemp(prefix="layman_map_")
-        file_path = os.path.join(temp_dir, name)
-        map_data.create_map_with_internal_layers_file(map_layers, file_path=file_path, native_extent=native_extent,
-                                                      native_crs=crs)
-        file_paths = [file_path]
-
-    for file_path in file_paths:
-        assert os.path.isfile(file_path), file_path
-    files = []
-    with ExitStack() as stack:
-        data = {}
-        if not with_chunks:
-            for file_path in file_paths:
-                assert os.path.isfile(file_path), file_path
-            files = [('file', (os.path.basename(fp), stack.enter_context(open(fp, 'rb')))) for fp in file_paths]
-        else:
-            data['file'] = [os.path.basename(file) for file in file_paths]
-        if access_rights and access_rights.get('read'):
-            data["access_rights.read"] = access_rights['read']
-        if access_rights and access_rights.get('write'):
-            data["access_rights.write"] = access_rights['write']
-        if title:
-            data['title'] = title
-        if description:
-            data['description'] = description
-        if style_file:
-            files.append(('style', (os.path.basename(style_file), stack.enter_context(open(style_file, 'rb')))))
-        if overview_resampling:
-            data['overview_resampling'] = overview_resampling
-        if time_regex:
-            data['time_regex'] = time_regex
-        if time_regex_format:
-            data['time_regex_format'] = time_regex_format
-        if publication_type == LAYER_TYPE and crs:
-            data['crs'] = crs
-        if external_table_uri:
-            data['external_table_uri'] = external_table_uri
-
-        response = requests.patch(r_url,
-                                  files=files,
-                                  headers=headers,
-                                  data=data,
-                                  timeout=HTTP_TIMEOUT,
-                                  )
-    raise_layman_error(response)
-
-    assert response.json()['name'] == name or not name, f'name={name}, response.name={response.json()[0]["name"]}'
-    expected_resp_keys = ['name', 'uuid', 'url']
-    if with_chunks:
-        expected_resp_keys.append('files_to_upload')
-    assert all(key in response.json() for key in expected_resp_keys), f'name={name}, response.name={response.json()[0]["name"]}'
-
-    if with_chunks and not do_not_upload_chunks:
-        upload_file_chunks(publication_type,
-                           workspace,
-                           name,
-                           file_paths, )
-
-    if not do_not_upload_chunks:
-        wait_for_publication_status(workspace, publication_type, name, check_response_fn=check_response_fn,
-                                    headers=headers, raise_if_not_complete=raise_if_not_complete)
-    wfs.clear_cache()
-    wms.clear_cache()
-    if temp_dir:
-        shutil.rmtree(temp_dir)
-    return response.json()
-
-
-patch_workspace_layer = partial(patch_workspace_publication, LAYER_TYPE)
-
-
-def ensure_workspace_publication(publication_type,
-                                 workspace,
-                                 name,
-                                 *,
-                                 headers=None,
-                                 access_rights=None,
-                                 ):
-    headers = headers or {}
-
+        pub_info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['workspace', 'name']})
+    workspace = pub_info.get('_workspace')
+    name = pub_info.get('name')
     response = get_publications(publication_type, workspace=workspace, headers=headers, )
     publication_obj = next((publication for publication in response.json() if publication['name'] == name), None)
     if response.status_code == 200 and publication_obj:
@@ -360,7 +206,7 @@ def ensure_workspace_publication(publication_type,
             if 'write' in access_rights and set(access_rights['write'].split(',')) != set(publication_obj['access_rights']['write']):
                 patch_needed = True
         if patch_needed:
-            result = patch_workspace_publication(publication_type, workspace, name, access_rights=access_rights, headers=headers)
+            result = patch_publication_by_uuid(publication_type, uuid, access_rights=access_rights, headers=headers)
         else:
             result = None
     else:
@@ -368,8 +214,8 @@ def ensure_workspace_publication(publication_type,
     return result
 
 
-ensure_workspace_layer = partial(ensure_workspace_publication, LAYER_TYPE)
-ensure_workspace_map = partial(ensure_workspace_publication, MAP_TYPE)
+ensure_layer = partial(ensure_publication_by_uuid, LAYER_TYPE)
+ensure_map = partial(ensure_publication_by_uuid, MAP_TYPE)
 
 
 def publish_workspace_publication(publication_type,
@@ -556,28 +402,6 @@ get_maps = partial(get_publications, MAP_TYPE)
 get_layers = partial(get_publications, LAYER_TYPE)
 
 
-def get_workspace_publication(publication_type, workspace, name, headers=None, *, actor_name=None):
-    headers = headers or {}
-    if actor_name:
-        assert TOKEN_HEADER not in headers
-    if actor_name and actor_name != settings.ANONYM_USER:
-        headers.update(get_authz_headers(actor_name))
-
-    publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
-
-    with app.app_context():
-        if publication_type == MAP_TYPE:
-            uuid = layman_util.get_publication_uuid(workspace, publication_type, name)
-            r_url = url_for(publication_type_def.get_publication_url, **{'uuid': uuid})
-        else:
-            r_url = url_for(publication_type_def.get_workspace_publication_url,
-                            workspace=workspace,
-                            **{publication_type_def.url_param_name: name})
-    response = requests.get(r_url, headers=headers, timeout=HTTP_TIMEOUT)
-    raise_layman_error(response)
-    return response.json()
-
-
 def get_publication_by_uuid(publication_type, uuid, headers=None, *, actor_name=None):
     headers = headers or {}
     if actor_name:
@@ -596,8 +420,8 @@ def get_publication_by_uuid(publication_type, uuid, headers=None, *, actor_name=
     return response.json()
 
 
-get_workspace_layer = partial(get_workspace_publication, LAYER_TYPE)
 get_map = partial(get_publication_by_uuid, MAP_TYPE)
+get_layer = partial(get_publication_by_uuid, LAYER_TYPE)
 
 
 def get_uuid_layer_style(uuid, headers=None, *, actor_name=None):
@@ -622,31 +446,6 @@ def finish_delete(url, headers, skip_404=False, ):
     return response.json()
 
 
-def delete_workspace_publication(publication_type, workspace, name, *, headers=None, skip_404=False, actor_name=None, ):
-    headers = headers or {}
-    if actor_name:
-        assert TOKEN_HEADER not in headers
-    if actor_name and actor_name != settings.ANONYM_USER:
-        headers.update(get_authz_headers(actor_name))
-
-    publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
-
-    with app.app_context():
-        if publication_type == MAP_TYPE:
-            uuid = layman_util.get_publication_uuid(workspace, publication_type, name)
-            r_url = url_for(publication_type_def.delete_publication_url, uuid=uuid)
-        else:
-            r_url = url_for(publication_type_def.delete_workspace_publication_url,
-                            workspace=workspace,
-                            **{publication_type_def.url_param_name: name})
-
-    return finish_delete(r_url, headers, skip_404=skip_404)
-
-
-delete_workspace_map = partial(delete_workspace_publication, MAP_TYPE)
-delete_workspace_layer = partial(delete_workspace_publication, LAYER_TYPE)
-
-
 def delete_publication_by_uuid(publication_type, uuid, *, headers=None, skip_404=False, actor_name=None):
     headers = headers or {}
     if actor_name:
@@ -664,6 +463,7 @@ def delete_publication_by_uuid(publication_type, uuid, *, headers=None, skip_404
 
 
 delete_map = partial(delete_publication_by_uuid, MAP_TYPE)
+delete_layer = partial(delete_publication_by_uuid, LAYER_TYPE)
 
 
 def delete_workspace_publications(publication_type, workspace, headers=None, *, actor_name=None, ):
@@ -815,13 +615,8 @@ def wait_for_publication_status(workspace, publication_type, publication, *, che
                                 raise_if_not_complete=True, sleeping_time=0.5):
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
     with app.app_context():
-        if publication_type == MAP_TYPE:
-            uuid = layman_util.get_publication_uuid(workspace, publication_type, publication)
-            url = url_for('rest_map.get', uuid=uuid)
-        else:
-            url = url_for(publication_type_def.get_workspace_publication_url,
-                          workspace=workspace,
-                          **{publication_type_def.url_param_name: publication})
+        uuid = layman_util.get_publication_uuid(workspace, publication_type, publication)
+        url = url_for(publication_type_def.get_publication_url, uuid=uuid)
     check_response_fn = check_response_fn or check_publication_status
     response = wait_for_rest(url, 60, sleeping_time, check_response=check_response_fn, headers=headers)
     if raise_if_not_complete:
@@ -892,8 +687,9 @@ def delete_user(username, *, actor_name):
 
 def ensure_workspace(workspace):
     tmp_layername = 'tmp_layername'
-    publish_workspace_layer(workspace, tmp_layername)
-    delete_workspace_layer(workspace, tmp_layername)
+    resp = publish_workspace_layer(workspace, tmp_layername)
+    uuid = resp['uuid']
+    delete_publication_by_uuid(LAYER_TYPE, uuid=uuid)
 
 
 def patch_publication_by_uuid(publication_type,
@@ -1030,6 +826,7 @@ def patch_publication_by_uuid(publication_type,
 
 
 patch_map = partial(patch_publication_by_uuid, MAP_TYPE)
+patch_layer = partial(patch_publication_by_uuid, LAYER_TYPE)
 
 
 def upload_file_chunks_by_uuid(publication_type, uuid, file_paths):

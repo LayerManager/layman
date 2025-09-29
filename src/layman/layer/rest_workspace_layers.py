@@ -202,7 +202,7 @@ def post(workspace):
         delete_publication_uuid_from_redis(workspace, LAYER_TYPE, layername, uuid_str)
         raise exc
 
-    layerurl = url_for('rest_workspace_layer.get', layername=layername, workspace=workspace, x_forwarded_items=x_forwarded_items)
+    layerurl = url_for('rest_layer.get', uuid=uuid_str, x_forwarded_items=x_forwarded_items)
 
     layer_result = {
         'name': layername,

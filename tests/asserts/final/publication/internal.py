@@ -489,6 +489,11 @@ def expected_chain_info_state(workspace, publ_type, name, state):
     assert chain_info['state'] == state, f'chain_info={chain_info}'
 
 
+def expected_chain_info_state_by_uuid(uuid, state):
+    chain_info = celery.get_publication_chain_info_dict_by_uuid(uuid)
+    assert chain_info['state'] == state, f'chain_info={chain_info}'
+
+
 def no_bbox_and_crs(workspace, publ_type, name):
     with app.app_context():
         info = publications.get_publication_infos(workspace_name=workspace, pub_type=publ_type, )

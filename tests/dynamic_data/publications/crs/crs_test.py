@@ -161,7 +161,7 @@ class TestLayer(base_test.TestSingleRestPublication):
         response = rest_method.fn(layer, args=rest_args)
 
         # basic checks
-        valid_post(*layer, response)
+        valid_post(layer.type, layer.name, response)
         assert_util.is_publication_valid_and_complete(layer)
         correct_values_in_detail(*layer, **params['correct_values_in_detail_params'])
 

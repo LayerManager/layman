@@ -22,26 +22,26 @@ LAYER_ACCESS_RIGHTS = Publication4Test(OWNER, process_client.LAYER_TYPE, 'test_a
 
 ENDPOINTS_TO_TEST = {
     process_client.LAYER_TYPE: [
-        (process_client.get_workspace_publication, {}),
+        (process_client.get_publication_by_uuid, {}),
         (process_client.get_workspace_publication_metadata_comparison, {}),
         (process_client.get_uuid_layer_style, {}),
         (process_client.get_uuid_publication_thumbnail, {}),
         # process_client.get_workspace_layer_chunk,
-        (process_client.patch_workspace_publication, {'title': 'New title'}),
-        (process_client.patch_workspace_publication, {'file_paths': ['sample/layman.layer/small_layer.geojson']}),
+        (process_client.patch_publication_by_uuid, {'title': 'New title'}),
+        (process_client.patch_publication_by_uuid, {'file_paths': ['sample/layman.layer/small_layer.geojson']}),
     ],
     process_client.MAP_TYPE: [
-        (process_client.get_workspace_publication, {}),
+        (process_client.get_publication_by_uuid, {}),
         (process_client.get_uuid_map_file, {}),
         (process_client.get_workspace_publication_metadata_comparison, {}),
         (process_client.get_uuid_publication_thumbnail, {}),
-        (process_client.patch_workspace_publication, {'title': 'New title'}),
-        (process_client.patch_workspace_publication, {'file_paths': ['sample/layman.map/small_map.json']}),
+        (process_client.patch_publication_by_uuid, {'title': 'New title'}),
+        (process_client.patch_publication_by_uuid, {'file_paths': ['sample/layman.map/small_map.json']}),
     ],
 }
 
 ENDPOINTS_TO_TEST_NEGATIVE_ONLY = [
-    (process_client.delete_workspace_publication, {}),
+    (process_client.delete_publication_by_uuid, {}),
 ]
 
 GEOSERVER_METHODS_TO_TEST = [
@@ -108,7 +108,7 @@ def add_publication_test_cases_to_list(tc_list, publication, user, endpoints_to_
         # pylint: disable=comparison-with-callable
         test_type = EnumTestTypes.MANDATORY if user in {
             READER_BY_USERNAME,
-            READER_BY_ROLE} and method in {process_client.get_workspace_publication,
+            READER_BY_ROLE} and method in {process_client.get_publication_by_uuid,
                                            geoserver_proxy.is_complete_in_workspace_wms_1_3_0} and publication in {LAYER_ACCESS_RIGHTS,
                                                                                                                    LAYER_NO_ACCESS} else EnumTestTypes.OPTIONAL
 
@@ -332,8 +332,8 @@ class TestAccessRights:
         yield
         if request.node.session.testsfailed == 0 and not request.config.option.nocleanup:
             for publication, _, deleter in self.PUBLICATIONS_DEFS:
-                process_client.delete_workspace_publication(publication.type, publication.workspace, publication.name,
-                                                            actor_name=deleter, )
+                process_client.delete_publication_by_uuid(publication.type, publication.uuid,
+                                                          actor_name=deleter, )
             role_service_util.delete_user_role(self.READER_BY_ROLE, self.ROLE)
             role_service_util.delete_role(self.ROLE)
             role_service_util.delete_user_role(self.OTHER_USER, self.OTHER_ROLE)

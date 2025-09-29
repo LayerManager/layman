@@ -55,7 +55,7 @@ def test_empty_shapefile(layername, file_paths):
     wgs_bbox = wms_layer.boundingBoxWGS84
 
     title = 'new title'
-    process_client.patch_workspace_layer(workspace, layername, title=title)
+    process_client.patch_layer(uuid=uuid, title=title)
     wms_layer = assert_wms_layer(uuid, title)
     assert wms_layer.boundingBox == native_bbox
     assert wms_layer.boundingBoxWGS84 == wgs_bbox
@@ -65,4 +65,4 @@ def test_empty_shapefile(layername, file_paths):
     assert wms_layer.boundingBox == native_bbox
     assert wms_layer.boundingBoxWGS84 == wgs_bbox
 
-    process_client.delete_workspace_layer(workspace, layername)
+    process_client.delete_layer(uuid)

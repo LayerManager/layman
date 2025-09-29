@@ -12,10 +12,11 @@ def test_issue_738():
     layername = 'layer_issue_738'
 
     #  Publish with sld 1.0.0 style
-    process_client.publish_workspace_layer(workspace=workspace,
-                                           name=layername,
-                                           style_file='sample/style/basic.sld',
-                                           )
+    resp = process_client.publish_workspace_layer(workspace=workspace,
+                                                  name=layername,
+                                                  style_file='sample/style/basic.sld',
+                                                  )
+    uuid = resp['uuid']
     with app.app_context():
         layer = Layer(layer_tuple=(workspace, layername))
     style_name = layer.gs_ids.sld
@@ -28,4 +29,4 @@ def test_issue_738():
     style = response.content.decode()
     assert 'StyledLayerDescriptorImpl@' in style
 
-    process_client.delete_workspace_layer(workspace=workspace, name=layername)
+    process_client.delete_layer(uuid=uuid)

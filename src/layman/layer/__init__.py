@@ -39,12 +39,12 @@ LAYER_REST_PATH_NAME = f"{PUBLICATION_TYPE_NAME}s"
 
 from ..common import InternalSourceTypeDef
 from .rest_workspace_layers import bp as workspace_layers_bp
-from .rest_workspace_layer import bp as workspace_layer_bp
 from .rest_workspace_layer_chunk import bp as workspace_layer_chunk_bp
 from .rest_layer_thumbnail import bp as layer_thumbnail_bp
 from .rest_layer_style import bp as layer_style_bp
 from .rest_workspace_layer_metadata_comparison import bp as workspace_layer_metadata_comparison_bp
 from .rest_layers import bp as layers_bp
+from .rest_layer import bp as layer_bp
 
 PUBLICATION_TYPES = {
     f'{LAYER_TYPE}': {
@@ -54,12 +54,12 @@ PUBLICATION_TYPES = {
         'rest_path_name': LAYER_REST_PATH_NAME,
         'workspace_blueprints': [  # blueprints to register
             workspace_layers_bp,
-            workspace_layer_bp,
             workspace_layer_chunk_bp,
             workspace_layer_metadata_comparison_bp,
         ],
         'blueprints': [  # blueprints to register
             layers_bp,
+            layer_bp,
             layer_thumbnail_bp,
             layer_style_bp,
         ],
@@ -159,5 +159,5 @@ STYLE_TYPES_DEF = [StyleTypeDef('sld',
 NO_STYLE_DEF = STYLE_TYPES_DEF[0]
 
 
-def get_workspace_publication_url(workspace, publication_name, *, x_forwarded_items=None):
-    return url_for('rest_workspace_layer.get', layername=publication_name, workspace=workspace, x_forwarded_items=x_forwarded_items)
+def get_publication_url(uuid, *, x_forwarded_items=None):
+    return url_for('rest_layer.get', uuid=uuid, x_forwarded_items=x_forwarded_items)

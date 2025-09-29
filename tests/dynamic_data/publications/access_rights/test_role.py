@@ -17,6 +17,7 @@ USER_ROLE1_ROLE3_EVERYONE = {USERNAME, 'ROLE1', 'ROLE3', 'EVERYONE'}
 USER_ROLE1 = {USERNAME, 'ROLE1'}
 USER_ROLE1_ROLE2 = {USERNAME, 'ROLE1', 'ROLE2'}
 ROLES = ['ROLE1', 'ROLE2', 'ROLE3']
+PUBLICATION_UUID = '750f8365-8c27-48c2-8c3e-65e8fd752d85'
 
 
 @pytest.mark.usefixtures('oauth2_provider_mock')
@@ -47,7 +48,7 @@ class TestPublication(base_test.TestSingleRestPublication):
     test_cases = [base_test.TestCaseType(key='role_test',
                                          publication=lambda publ_def, cls: Publication4Test(cls.workspace,
                                                                                             publ_def.type,
-                                                                                            None),
+                                                                                            None, PUBLICATION_UUID),
                                          rest_args={
                                              'access_rights': {
                                                  'read': ','.join(USER_ROLE1_ROLE2),
@@ -66,16 +67,13 @@ class TestPublication(base_test.TestSingleRestPublication):
 
     def test_publication(self, publication, rest_method, rest_args):
         if rest_method.enum_item == base_test_classes.RestMethod.PATCH:
-            info = process_client.get_workspace_publication(publication.type, publication.workspace, publication.name)
+            info = process_client.get_publication_by_uuid(publication.type, publication.uuid)
             assert set(info['access_rights']['read']) == USER_ROLE1_ROLE3_EVERYONE
             assert set(info['access_rights']['write']) == {'EVERYONE'}
 
         rest_method.fn(publication, args=rest_args)
         assert_util.is_publication_valid_and_complete(publication)
-
-        info = process_client.get_workspace_publication(publication.type, publication.workspace, publication.name,
-                                                        actor_name=USERNAME)
-        uuid = info['uuid']
+        info = process_client.get_publication_by_uuid(publication.type, publication.uuid, actor_name=USERNAME)
         for right, exp_rights in [('read', USER_ROLE1_ROLE2),
                                   ('write', USER_ROLE1),
                                   ]:
@@ -88,7 +86,7 @@ class TestPublication(base_test.TestSingleRestPublication):
                 geodata_type = internal_info['geodata_type']
                 gs_workspace = internal_info['_wms']['workspace']
 
-                all_names = GeoserverIds(uuid=uuid, )
+                all_names = GeoserverIds(uuid=publication.uuid, )
                 workspaces_and_layers = [(all_names.wfs.workspace, all_names.wfs.name), (all_names.wms.workspace, all_names.wms.name)] if geodata_type != settings.GEODATA_TYPE_RASTER else [(gs_workspace, all_names.wms.name)]
                 for gs_wspace, gs_layername in workspaces_and_layers:
                     gs_expected_roles = gs_common.layman_users_and_roles_to_geoserver_roles(exp_rights)

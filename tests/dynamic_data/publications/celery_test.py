@@ -1,7 +1,8 @@
 import time
 import pytest
 
-from layman import app, celery
+from layman import app
+from layman.layer import util as layer_util
 from layman.common import empty_method_returns_true
 from test_tools import process_client
 from tests.asserts import processing
@@ -20,12 +21,10 @@ def test_task_abortion():
                                                                  check_response_fn=empty_method_returns_true,
                                                                  raise_if_not_complete=False,
                                                                  )
-    processing.response.valid_post(workspace, process_client.LAYER_TYPE, layername, post_response)
+    processing.response.valid_post(process_client.LAYER_TYPE, layername, post_response)
     time.sleep(2)
+    layer_uuid = post_response['uuid']
     with app.app_context():
-        celery.abort_publication_chain(workspace,
-                                       process_client.LAYER_TYPE,
-                                       layername,
-                                       )
-    internal.expected_chain_info_state(workspace, process_client.LAYER_TYPE, layername, 'ABORTED')
-    process_client.delete_workspace_layer(workspace, layername)
+        layer_util.abort_layer_chain_by_uuid(layer_uuid)
+    internal.expected_chain_info_state_by_uuid(layer_uuid, 'ABORTED')
+    process_client.delete_layer(layer_uuid)

@@ -23,7 +23,7 @@ class TestPublication:
         assert exc_info.value.data['message'] == f'UUID `959c95fb-ab54-47a6-9694-402926b8fd29` value already in use'
         assert exc_info.value.data['parameter'] == 'uuid'
 
-        process_client.delete_workspace_publication(publ_type, self.workspace, self.name)
+        process_client.delete_publication_by_uuid(publ_type, uuid=uuid)
 
     @pytest.mark.parametrize('publ_type', process_client.PUBLICATION_TYPES)
     def test_post_invalid_uuid(self, publ_type, ):

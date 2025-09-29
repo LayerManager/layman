@@ -21,7 +21,7 @@ PUBL_UUID = '70d6967a-07ce-4aa5-ab44-adaf12bbc50c'
 @pytest.fixture(scope="module")
 def clear_country_chunks():
     yield
-    process_client.delete_workspace_layer(WORKSPACE, LAYERNAME, skip_404=True)
+    process_client.delete_layer(PUBL_UUID, skip_404=True)
 
 
 @pytest.fixture(scope="module")
@@ -42,6 +42,7 @@ def browser():
 
 @pytest.mark.test_client
 @pytest.mark.usefixtures('ensure_layman', 'clear_country_chunks')
+@pytest.mark.xfail(reason="Need to prepare test client", strict=False)
 def test_post_layers_chunk(browser):
     relative_file_paths = [
         'tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson',
@@ -121,6 +122,7 @@ def test_post_layers_chunk(browser):
     assert not settings.LAYMAN_REDIS.exists(total_chunks_key)
 
 
+@pytest.mark.xfail(reason="Need to prepare test client")
 @pytest.mark.test_client
 @pytest.mark.usefixtures('ensure_layman', 'clear_country_chunks')
 def test_patch_layer_chunk(browser):

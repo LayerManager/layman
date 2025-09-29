@@ -25,8 +25,8 @@ class TestPublicWorkspaceClass:
     @staticmethod
     @pytest.mark.usefixtures('oauth2_provider_mock', 'setup_test_public_workspace_variable')
     @pytest.mark.parametrize("publish_method, delete_method, workspace_suffix", [
-        pytest.param(process_client.publish_workspace_layer, process_client.delete_workspace_layer, '_layer', id='layer'),
-        pytest.param(process_client.publish_workspace_map, process_client.delete_workspace_map, '_map', id='map'),
+        pytest.param(process_client.publish_workspace_layer, process_client.delete_layer, '_layer', id='layer'),
+        pytest.param(process_client.publish_workspace_map, process_client.delete_map, '_map', id='map'),
     ])
     @pytest.mark.parametrize(
         "create_public_workspace, publish_in_public_workspace, workspace_prefix, publication_name, authz_headers,"
@@ -74,16 +74,19 @@ class TestPublicWorkspaceClass:
         process.ensure_layman_function(env_vars)
 
         if user_can_create:
-            publish_method(workspace_name, publication_name, headers=authz_headers)
+            resp = publish_method(workspace_name, publication_name, headers=authz_headers)
+            uuid = resp['uuid']
             if anonymous_can_publish:
-                publish_method(workspace_name, layername2)
-                delete_method(workspace_name, layername2)
-            delete_method(workspace_name, publication_name, headers=authz_headers)
+                resp2 = publish_method(workspace_name, layername2)
+                uuid2 = resp2['uuid']
+                delete_method(uuid2)
+            delete_method(uuid, headers=authz_headers)
         else:
             can_not_publish(workspace_name, publication_name, publish_method, authz_headers)
 
         if anonymous_can_create:
-            publish_method(workspace_name2, publication_name)
-            delete_method(workspace_name2, publication_name)
+            resp3 = publish_method(workspace_name2, publication_name)
+            uuid3 = resp3['uuid']
+            delete_method(uuid3)
         else:
             can_not_publish(workspace_name2, publication_name, publish_method)

@@ -225,18 +225,10 @@ class TestPublication(base_test.TestSingleRestPublication):
         assert_util.is_publication_valid_and_complete(publication)
         uuid = self.publ_uuids[publication]
         if params[Key.EXP_INFO] is not None:
-            if publication.type == process_client.MAP_TYPE:
-                asserts_publ.internal.correct_values_in_detail_uuid(
-                    uuid,
-                    **params[Key.EXP_INFO],
-                )
-            else:
-                asserts_publ.internal.correct_values_in_detail(
-                    publication.workspace,
-                    publication.type,
-                    publication.name,
-                    **params[Key.EXP_INFO],
-                )
+            asserts_publ.internal.correct_values_in_detail_uuid(
+                uuid,
+                **params[Key.EXP_INFO],
+            )
 
         if params[Key.EXP_THUMBNAIL] is not None:
             asserts_publ.internal.thumbnail_equals(*publication,

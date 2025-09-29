@@ -647,5 +647,5 @@ def test_map_composed_from_local_layers():
     check_metadata(workspace, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
     process_client.delete_map(uuid_str, )
     publication_counter.decrease()
-    process_client.delete_workspace_layer(USER, LAYERNAME_1, )
-    process_client.delete_workspace_layer(USER, LAYERNAME_2, )
+    process_client.delete_layer(layer1_uuid, )
+    process_client.delete_layer(layer2_uuid, )

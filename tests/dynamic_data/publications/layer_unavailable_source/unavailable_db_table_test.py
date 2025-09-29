@@ -26,11 +26,12 @@ class TestLayer(base_test.TestSingleRestPublication):
     )]
 
     def test_internal_layer(self, layer: Publication4Test):
-        self.post_publication(layer)
+        resp = self.post_publication(layer)
         assert_publ_util.is_publication_valid_and_complete(layer)
+        uuid = resp['uuid']
 
         # validate rest info pre
-        rest_info_pre = process_client.get_workspace_layer(layer.workspace, layer.name)
+        rest_info_pre = process_client.get_layer(uuid)
 
         table_name = f"layer_{rest_info_pre['uuid'].replace('-', '_')}"
         table_schema = 'layers'
@@ -47,7 +48,7 @@ class TestLayer(base_test.TestSingleRestPublication):
         with app.app_context():
             db_util.run_statement(statement)
 
-        rest_info_post = process_client.get_workspace_layer(layer.workspace, layer.name)
+        rest_info_post = process_client.get_layer(uuid)
 
         assert rest_info_post['db'] == {
             'status': 'NOT_AVAILABLE',
@@ -61,16 +62,16 @@ class TestLayer(base_test.TestSingleRestPublication):
                                  schema=external_db_schema,
                                  table=external_db_table,
                                  )
-        self.post_publication(
+        resp = self.post_publication(
             layer,
             args={
                 'external_table_uri': f"{external_db.URI_STR}?schema={external_db_schema}&table={external_db_table}"
             }
         )
         assert_publ_util.is_publication_valid_and_complete(layer)
-
+        uuid = resp['uuid']
         # validate rest info pre
-        rest_info_pre = process_client.get_workspace_layer(layer.workspace, layer.name)
+        rest_info_pre = process_client.get_layer(uuid)
         assert 'db_table' not in rest_info_pre
         assert rest_info_pre['db'] == {
             'schema': external_db_schema,
@@ -83,7 +84,7 @@ class TestLayer(base_test.TestSingleRestPublication):
         external_db.drop_table(schema=external_db_schema,
                                name=external_db_table)
 
-        rest_info_post = process_client.get_workspace_layer(layer.workspace, layer.name)
+        rest_info_post = process_client.get_layer(uuid)
         assert 'db_table' not in rest_info_pre
         assert rest_info_post['db'] == {
             'status': 'NOT_AVAILABLE',
@@ -111,7 +112,7 @@ class TestLayer(base_test.TestSingleRestPublication):
         with app.app_context():
             db_util.run_statement(statement)
 
-        rest_info_post = process_client.get_workspace_layer(layer.workspace, layer.name)
+        rest_info_post = process_client.get_layer(uuid)
         assert 'db_table' not in rest_info_pre
         assert rest_info_post['db'] == {
             'status': 'NOT_AVAILABLE',

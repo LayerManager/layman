@@ -9,14 +9,13 @@ from test_tools import process_client
 @pytest.mark.usefixtures('ensure_layman')
 def test_http_header():
     username = 'test_http_header_user'
-    workspace = 'test_http_header_workspace'
-    layername = 'test_http_header_layer'
     http_authn_headers = {
         settings.LAYMAN_AUTHN_HTTP_HEADER_NAME: username,
     }
 
     with pytest.raises(LaymanError) as exc_info:
-        process_client.get_workspace_layer(workspace, layername, headers=http_authn_headers)
+        test_uuid = '12345678-1234-1234-1234-123456789abc'
+        process_client.get_layer(test_uuid, headers=http_authn_headers)
     assert exc_info.value.http_code == 403
     assert exc_info.value.code == 44
     assert exc_info.value.message == 'Unsuccessful HTTP Header authentication.'
@@ -39,12 +38,11 @@ def test_http_header():
                 }
             }
         )
-
     with pytest.raises(LaymanError) as exc_info:
-        process_client.get_workspace_layer(workspace, layername, headers=http_authn_headers)
+        process_client.get_layer(test_uuid, headers=http_authn_headers)
     assert exc_info.value.http_code == 404
-    assert exc_info.value.code == 40
-    assert exc_info.value.message == 'Workspace does not exist.'
+    assert exc_info.value.code == 15
+    assert exc_info.value.message == 'Layer was not found'
 
     with app.app_context():
         prime_db_schema.delete_whole_user(username)

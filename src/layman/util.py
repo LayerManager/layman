@@ -292,16 +292,8 @@ def get_workspace_publication_url(publication_type, workspace, publication_name,
 
 
 def get_publication_url(publication_type, uuid, use_cache=True, *, x_forwarded_items=None):
-    from layman.map import MAP_TYPE
-    if publication_type == MAP_TYPE:
-        publ_module = get_publication_module(publication_type, use_cache=use_cache)
-        return publ_module.get_publication_url(uuid, x_forwarded_items=x_forwarded_items)
-    info = get_publication_info_by_uuid(uuid, context={'keys': ['workspace', 'name']})
-    if not info:
-        raise Exception(f"Publication not found: {uuid}")
-    workspace = info['_workspace']
-    name = info['name']
-    return get_workspace_publication_url(publication_type, workspace, name, use_cache=use_cache, x_forwarded_items=x_forwarded_items)
+    publ_module = get_publication_module(publication_type, use_cache=use_cache)
+    return publ_module.get_publication_url(uuid, x_forwarded_items=x_forwarded_items)
 
 
 def get_providers_from_source_names(source_names, skip_modules=None):

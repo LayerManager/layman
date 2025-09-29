@@ -52,7 +52,7 @@ def update_metadata_values(publication, *, metadata_properties_to_refresh=None, 
 
 @pytest.mark.parametrize('class_type,process_func,url_endpoint,test_uuid,publ_type,csw_module,migrate_func,delete_func', [
     (Map, process_client.publish_workspace_map, 'rest_map_thumbnail.get', 'af238200-8200-1a23-9399-42c9fca53543', 'map', map_csw, upgrade_v3_0.migrate_map_metadata_urls, process_client.delete_map),
-    (Layer, process_client.publish_workspace_layer, 'rest_layer_thumbnail.get', 'bf238200-8200-1a23-9399-42c9fca53544', 'layer', layer_csw, upgrade_v3_0.migrate_layer_metadata_urls, process_client.delete_workspace_layer),
+    (Layer, process_client.publish_workspace_layer, 'rest_layer_thumbnail.get', 'bf238200-8200-1a23-9399-42c9fca53544', 'layer', layer_csw, upgrade_v3_0.migrate_layer_metadata_urls, process_client.delete_layer),
 ])
 @pytest.mark.usefixtures('ensure_layman')
 def test_update_graphic_url_metadata(class_type, process_func, url_endpoint, test_uuid, publ_type, csw_module, migrate_func, delete_func):
@@ -119,7 +119,4 @@ def test_update_graphic_url_metadata(class_type, process_func, url_endpoint, tes
         )
 
     with app.app_context():
-        if publ_type == 'map':
-            delete_func(uuid=test_uuid)
-        else:
-            delete_func(workspace, publ_name)
+        delete_func(uuid=test_uuid)

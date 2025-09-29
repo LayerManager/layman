@@ -62,7 +62,7 @@ class RestMethod(RestMethodBase):
 class RestMethodAll(RestMethodBase):
     POST = ('post_publication', 'post')
     PATCH = ('patch_publication', 'patch')
-    DELETE = ('delete_workspace_publication', 'delete')
+    DELETE = ('delete_publication', 'delete')
     MULTI_DELETE = ('delete_workspace_publications', 'multi_delete')
 
 

@@ -304,6 +304,13 @@ def is_map_chain_ready(workspace, mapname):
     return chain_info is None or celery_util.is_chain_ready(chain_info)
 
 
+def is_map_chain_ready_by_uuid(uuid):
+    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['workspace', 'name']})
+    workspace = info.get('_workspace')
+    mapname = info.get('name')
+    return is_map_chain_ready(workspace, mapname)
+
+
 def get_map_owner_info(username):
     claims = get_authn_info(username).get('claims', {})
     name = claims.get('name', username)
@@ -315,39 +322,7 @@ def get_map_owner_info(username):
     return result
 
 
-lock_decorator = redis_util.create_lock_decorator(MAP_TYPE, 'mapname', is_map_chain_ready)
-
-
-def uuid_lock_decorator(func):
-    """Lock decorator for UUID-based endpoints"""
-
-    @wraps(func)
-    def decorated_function(*args, **kwargs):
-        uuid = request.view_args['uuid']
-        info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['workspace', 'name']})
-        if not info:
-            raise LaymanError(26, {'uuid': uuid})
-
-        workspace = info['_workspace']
-        name = info['name']
-        redis_util.create_lock(workspace, MAP_TYPE, name, request.method)
-        try:
-            result = func(*args, **kwargs)
-            if is_map_chain_ready(workspace, name):
-                redis_util.unlock_publication(workspace, MAP_TYPE, name)
-                celery_util.run_next_chain(workspace, MAP_TYPE, name)
-            return result
-        except Exception as exception:
-            try:
-                if is_map_chain_ready(workspace, name):
-                    redis_util.unlock_publication(workspace, MAP_TYPE, name)
-                    celery_util.run_next_chain(workspace, MAP_TYPE, name)
-            finally:
-                redis_util.unlock_publication(workspace, MAP_TYPE, name)
-                celery_util.run_next_chain(workspace, MAP_TYPE, name)
-            raise exception
-
-    return decorated_function
+uuid_lock_decorator = redis_util.create_lock_decorator_by_uuid(is_map_chain_ready_by_uuid)
 
 
 get_syncable_prop_names = partial(metadata_common.get_syncable_prop_names, MAP_TYPE)

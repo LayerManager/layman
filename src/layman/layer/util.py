@@ -102,7 +102,7 @@ def _get_complete_layer_info(workspace, layername, *, x_forwarded_items=None):
 
     complete_info.update({
         'name': layername,
-        'url': url_for('rest_workspace_layer.get', layername=layername, workspace=workspace, x_forwarded_items=x_forwarded_items),
+        'url': url_for('rest_layer.get', uuid=layman_util.get_publication_uuid(workspace, LAYER_TYPE, layername), x_forwarded_items=x_forwarded_items),
         'title': layername,
         'description': '',
     })
@@ -120,7 +120,17 @@ def _get_complete_layer_info(workspace, layername, *, x_forwarded_items=None):
     return complete_info
 
 
-def get_complete_layer_info(workspace, layername, *, x_forwarded_items=None):
+def get_complete_layer_info(workspace=None, layername=None, *, uuid=None, x_forwarded_items=None):
+    if uuid is not None:
+        info = layman_util.get_publication_info_by_uuid(
+            uuid,
+            context={'keys': ['workspace', 'name']},
+        )
+        if not info:
+            return {}
+
+        workspace = info['_workspace']
+        layername = info['name']
     return layman_util.get_complete_publication_info(workspace, LAYER_TYPE, layername,
                                                      x_forwarded_items=x_forwarded_items,
                                                      complete_info_method=_get_complete_layer_info)
@@ -130,6 +140,15 @@ def pre_publication_action_check(workspace, layername, task_options):
     # sync processing
     sources = get_sources()
     call_modules_fn(sources, 'pre_publication_action_check', [workspace, layername], kwargs=task_options)
+
+
+def pre_publication_action_check_by_uuid(uuid, task_options):
+    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['workspace', 'name']})
+    if not info:
+        raise LaymanError(15, {'uuid': uuid})
+    workspace = info['_workspace']
+    layername = info['name']
+    return pre_publication_action_check(workspace, layername, task_options)
 
 
 def post_layer(workspace, layername, task_options, start_async_at):
@@ -202,11 +221,7 @@ def delete_layer(layer: Layer, source=None, http_method='delete', *, x_forwarded
     celery_util.delete_publication(layer.workspace, layer.type, layer.name)
     result = {
         **delete_info,
-        'url': url_for(**{'endpoint': 'rest_workspace_layer.get',
-                          'workspace': layer.workspace,
-                          'layername': layer.name,
-                          'x_forwarded_items': x_forwarded_items
-                          }),
+        'url': url_for('rest_layer.get', uuid=layer.uuid, x_forwarded_items=x_forwarded_items),
     }
     return result
 
@@ -220,12 +235,26 @@ def abort_layer_chain(workspace, layername):
     celery_util.abort_publication_chain(workspace, LAYER_TYPE, layername)
 
 
+def abort_layer_chain_by_uuid(uuid):
+    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['workspace', 'name']})
+    workspace = info['_workspace']
+    layername = info['name']
+    return abort_layer_chain(workspace, layername)
+
+
 def is_layer_chain_ready(workspace, layername):
     chain_info = get_layer_chain(workspace, layername)
     return chain_info is None or celery_util.is_chain_ready(chain_info)
 
 
-lock_decorator = redis_util.create_lock_decorator(LAYER_TYPE, 'layername', is_layer_chain_ready)
+def is_layer_chain_ready_by_uuid(uuid):
+    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['workspace', 'name']})
+    workspace = info.get('_workspace')
+    layername = info.get('name')
+    return is_layer_chain_ready(workspace, layername)
+
+
+uuid_lock_decorator = redis_util.create_lock_decorator_by_uuid(is_layer_chain_ready_by_uuid)
 
 
 def layer_info_to_metadata_properties(info):

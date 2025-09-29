@@ -41,8 +41,8 @@ First, publish each layer whose data source is local ShapeFile or GeoJSON as WMS
 
 In response of [POST Workspace Layers](rest.md#post-workspace-layers) you will obtain
  - `name` of the layer unique within all layers in used [workspace](models.md#workspace)
- - `url` of the layer pointing to [GET Workspace Layer](rest.md#get-workspace-layer)
+ - `url` of the layer pointing to [GET Layer](rest.md#get-layer)
  
-In response of [GET Workspace Layer](rest.md#get-workspace-layer) you will obtain among others URL of WMS endpoint of the layer (`wms/url`). Together with `name` of the layer you have now enough information to represent the original local vector file as WMS layer.
+In response of [GET Layer](rest.md#get-layer) you will obtain among others URL of WMS endpoint of the layer (`wms/url`). Together with `name` of the layer you have now enough information to represent the original local vector file as WMS layer.
 
 Continue with the same steps as in [previous example](#maps-composed-from-wms-layers).

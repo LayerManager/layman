@@ -8,7 +8,7 @@ from celery import states
 from celery.contrib.abortable import AbortableAsyncResult, ABORTED
 
 from layman.publication_relation.util import update_related_publications_after_change
-from layman import settings, common
+from layman import settings, common, app, util as layman_util
 from layman.common import redis as redis_util
 
 REDIS_CURRENT_TASK_NAMES = f"{__name__}:CURRENT_TASK_NAMES"
@@ -157,6 +157,15 @@ def get_publication_chain_info_dict(workspace, publication_type, publication_nam
     val = rds.hget(key, hash)
     chain_info = json.loads(val) if val is not None else val
     return chain_info
+
+
+def get_publication_chain_info_dict_by_uuid(uuid):
+    with app.app_context():
+        info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['workspace', 'name', 'type']})
+    workspace = info['_workspace']
+    name = info['name']
+    publication_type = info['type']
+    return get_publication_chain_info_dict(workspace, publication_type, name)
 
 
 def get_publication_chain_info(workspace, publication_type, publication_name):

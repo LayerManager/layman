@@ -73,4 +73,4 @@ def test_geoserver_bbox():
                                     )
         assert_util.assert_wms_bbox(uuid, expected_bbox)
 
-    process_client.delete_workspace_layer(workspace, layer)
+    process_client.delete_layer(uuid)

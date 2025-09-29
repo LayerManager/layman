@@ -1557,15 +1557,13 @@ class TestPublication(base_test.TestSingleRestPublication):
                 assert pre_stamp == post_stamp
                 assert_utils.is_publication_valid_and_complete(publication)
         else:
-            processing.response.valid_post(workspace=publication.workspace,
-                                           publ_type=publication.type,
+            processing.response.valid_post(publ_type=publication.type,
                                            name=publication.name,
                                            response=response,
                                            )
-            rest_publication_detail = process_client.get_workspace_publication(publication_type=publication.type,
-                                                                               workspace=publication.workspace,
-                                                                               name=publication.name,
-                                                                               )
+            rest_publication_detail = process_client.get_publication_by_uuid(publication_type=publication.type,
+                                                                             uuid=publication.uuid,
+                                                                             )
             failed_info_key = params[Key.FAILED_INFO_KEY]
             publication_asserts.rest.async_error_in_info_key(rest_publication_detail=rest_publication_detail,
                                                              info_key=failed_info_key,

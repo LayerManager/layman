@@ -26,19 +26,18 @@ def test_wrong_sld_causes_no_thumbnail():
             result = False
         return result
 
-    process_client.publish_workspace_layer(workspace,
-                                           layer,
-                                           file_paths=geojson_file,
-                                           style_file=style_file,
-                                           check_response_fn=wait_for_thumbnail_error,
-                                           raise_if_not_complete=False,
-                                           )
-
-    layer_info = process_client.get_workspace_layer(workspace, layer)
+    resp = process_client.publish_workspace_layer(workspace,
+                                                  layer,
+                                                  file_paths=geojson_file,
+                                                  style_file=style_file,
+                                                  check_response_fn=wait_for_thumbnail_error,
+                                                  raise_if_not_complete=False,
+                                                  )
+    uuid = resp['uuid']
+    layer_info = process_client.get_layer(uuid)
 
     assert 'error' in layer_info['thumbnail']
     assert layer_info['thumbnail']['error']['message'] == 'Thumbnail rendering failed'
     assert layer_info['thumbnail']['error']['code'] == -1
 
-    process_client.delete_workspace_layer(workspace,
-                                          layer)
+    process_client.delete_layer(uuid)

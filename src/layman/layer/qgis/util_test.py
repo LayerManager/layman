@@ -71,7 +71,7 @@ def test_geometry_types(layername, exp_db_types, qml_geometry_dict, qml_version)
                                                    f"source_type={source_type}, db_types={db_types}"
         if qml_style_name:
             style_file_path = f'/code/sample/data/geometry-types/{qml_style_name}-v{qml_version}.qml'
-            process_client.patch_workspace_layer(layer.workspace, layer.name, style_file=style_file_path)
+            process_client.patch_layer(layer.uuid, style_file=style_file_path)
             with app.app_context():
                 qml = util.get_original_style_xml(layer.uuid)
             found_qml_geometry = util.get_geometry_from_qml_and_db_types(qml, db_types=[])
@@ -87,7 +87,7 @@ def test_geometry_types(layername, exp_db_types, qml_geometry_dict, qml_version)
             diff_pixels = test_util.compare_images(thumbnail_path, exp_file_path)
             assert diff_pixels < diff_pixels_limit, f"thumbnail_path={thumbnail_path}, exp_file_path={exp_file_path}"
 
-    process_client.delete_workspace_layer(layer.workspace, layer.name)
+    process_client.delete_layer(layer.uuid)
 
 
 @pytest.mark.parametrize('qml_path, exp_qml_type', [
