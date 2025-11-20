@@ -36,6 +36,10 @@ EPSG_3035 = 'EPSG:3035'
 EPSG_3059 = 'EPSG:3059'
 EPSG_32718 = 'EPSG:32718'
 EPSG_9377 = 'EPSG:9377'
+EPSG_32719 = 'EPSG:32719'
+EPSG_32635 = 'EPSG:32635'
+EPSG_32636 = 'EPSG:32636'
+EPSG_32637 = 'EPSG:32637'
 
 CRSDefinitions = {
     EPSG_3857: CRSTypeDef(
@@ -291,6 +295,98 @@ CRSDefinitions = {
         axes_order_east_north_in_epsg_db=True,
         proj4text='+proj=tmerc +lat_0=4 +lon_0=-73 +k=0.9992 +x_0=5000000 +y_0=2000000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs',
         internal_srid=900918,
+    ),
+    EPSG_32719: CRSTypeDef(
+        default_bbox=(
+            166021.44,
+            1116915.04,
+            833978.56,
+            10000000.0,
+        ),
+        max_bbox=None,
+        no_area_bbox_padding=1,
+        world_bounds={},
+        qgis_template_spatialrefsys='''<wkt>PROJCRS["WGS 84 / UTM zone 19S",BASEGEOGCRS["WGS 84",ENSEMBLE["World Geodetic System 1984 ensemble",MEMBER["World Geodetic System 1984 (Transit)"],MEMBER["World Geodetic System 1984 (G730)"],MEMBER["World Geodetic System 1984 (G873)"],MEMBER["World Geodetic System 1984 (G1150)"],MEMBER["World Geodetic System 1984 (G1674)"],MEMBER["World Geodetic System 1984 (G1762)"],MEMBER["World Geodetic System 1984 (G2139)"],ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1]],ENSEMBLEACCURACY[2.0]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4326]],CONVERSION["UTM zone 19S",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",-69,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",10000000,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["Engineering survey, topographic mapping."],AREA["Between 72°W and 66°W, southern hemisphere between 80°S and equator, onshore and offshore. Argentina. Bolivia. Brazil. Chile. Colombia. Peru."],BBOX[-80,-72,0,-66]],ID["EPSG",32719]]</wkt>
+      <proj4>+proj=utm +zone=19 +south +datum=WGS84 +units=m +no_defs</proj4>
+      <srsid>3169</srsid>
+      <srid>32719</srid>
+      <authid>EPSG:32719</authid>
+      <description>WGS 84 / UTM zone 19S</description>
+      <projectionacronym>utm</projectionacronym>
+      <ellipsoidacronym>EPSG:7030</ellipsoidacronym>
+      <geographicflag>false</geographicflag>''',
+        axes_order_east_north_in_epsg_db=True,
+        proj4text='+proj=utm +zone=19 +south +datum=WGS84 +units=m +no_defs',
+        internal_srid=None,
+    ),
+    EPSG_32635: CRSTypeDef(
+        default_bbox=(
+            166021.44,
+            0.0,
+            833978.56,
+            9329005.18,
+        ),
+        max_bbox=None,
+        no_area_bbox_padding=1,
+        world_bounds={},
+        qgis_template_spatialrefsys='''<wkt>PROJCRS["WGS 84 / UTM zone 35N",BASEGEOGCRS["WGS 84",ENSEMBLE["World Geodetic System 1984 ensemble",MEMBER["World Geodetic System 1984 (Transit)"],MEMBER["World Geodetic System 1984 (G730)"],MEMBER["World Geodetic System 1984 (G873)"],MEMBER["World Geodetic System 1984 (G1150)"],MEMBER["World Geodetic System 1984 (G1674)"],MEMBER["World Geodetic System 1984 (G1762)"],MEMBER["World Geodetic System 1984 (G2139)"],ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1]],ENSEMBLEACCURACY[2.0]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4326]],CONVERSION["UTM zone 35N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",27,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["Engineering survey, topographic mapping."],AREA["Between 24°E and 30°E, northern hemisphere between equator and 84°N, onshore and offshore. Belarus. Bulgaria. Central African Republic. Democratic Republic of the Congo (Zaire). Egypt. Estonia. Finland. Greece. Latvia. Lesotho. Libya. Lithuania. Moldova. Norway. Poland. Romania. Russian Federation. Sudan. Svalbard. Türkiye (Turkey). Uganda. Ukraine."],BBOX[0,24,84,30]],ID["EPSG",32635]]</wkt>
+      <proj4>+proj=utm +zone=35 +datum=WGS84 +units=m +no_defs</proj4>
+      <srsid>3119</srsid>
+      <srid>32635</srid>
+      <authid>EPSG:32635</authid>
+      <description>WGS 84 / UTM zone 35N</description>
+      <projectionacronym>utm</projectionacronym>
+      <ellipsoidacronym>EPSG:7030</ellipsoidacronym>
+      <geographicflag>false</geographicflag>''',
+        axes_order_east_north_in_epsg_db=True,
+        proj4text='+proj=utm +zone=35 +datum=WGS84 +units=m +no_defs +type=crs',
+        internal_srid=None,
+    ),
+    EPSG_32636: CRSTypeDef(
+        default_bbox=(
+            166021.44,
+            0.0,
+            833978.56,
+            9329005.18,
+        ),
+        max_bbox=None,
+        no_area_bbox_padding=1,
+        world_bounds={},
+        qgis_template_spatialrefsys='''<wkt>PROJCRS["WGS 84 / UTM zone 36N",BASEGEOGCRS["WGS 84",ENSEMBLE["World Geodetic System 1984 ensemble",MEMBER["World Geodetic System 1984 (Transit)"],MEMBER["World Geodetic System 1984 (G730)"],MEMBER["World Geodetic System 1984 (G873)"],MEMBER["World Geodetic System 1984 (G1150)"],MEMBER["World Geodetic System 1984 (G1674)"],MEMBER["World Geodetic System 1984 (G1762)"],MEMBER["World Geodetic System 1984 (G2139)"],ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1]],ENSEMBLEACCURACY[2.0]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4326]],CONVERSION["UTM zone 36N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",33,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["Engineering survey, topographic mapping."],AREA["Between 30°E and 36°E, northern hemisphere between equator and 84°N, onshore and offshore. Belarus. Cyprus. Egypt. Ethiopia. Finland. Israel. Jordan. Kenya. Lebanon. Moldova. Norway. Russian Federation. Saudi Arabia. Sudan. Syria. Türkiye (Turkey). Uganda. Ukraine."],BBOX[0,30,84,36]],ID["EPSG",32636]]</wkt>
+      <proj4>+proj=utm +zone=36 +datum=WGS84 +units=m +no_defs</proj4>
+      <srsid>3120</srsid>
+      <srid>32636</srid>
+      <authid>EPSG:32636</authid>
+      <description>WGS 84 / UTM zone 36N</description>
+      <projectionacronym>utm</projectionacronym>
+      <ellipsoidacronym>EPSG:7030</ellipsoidacronym>
+      <geographicflag>false</geographicflag>''',
+        axes_order_east_north_in_epsg_db=True,
+        proj4text='+proj=utm +zone=36 +datum=WGS84 +units=m +no_defs +type=crs',
+        internal_srid=None,
+    ),
+    EPSG_32637: CRSTypeDef(
+        default_bbox=(
+            166021.44,
+            0.0,
+            833978.56,
+            9329005.18,
+        ),
+        max_bbox=None,
+        no_area_bbox_padding=1,
+        world_bounds={},
+        qgis_template_spatialrefsys='''<wkt>PROJCRS["WGS 84 / UTM zone 37N",BASEGEOGCRS["WGS 84",ENSEMBLE["World Geodetic System 1984 ensemble",MEMBER["World Geodetic System 1984 (Transit)"],MEMBER["World Geodetic System 1984 (G730)"],MEMBER["World Geodetic System 1984 (G873)"],MEMBER["World Geodetic System 1984 (G1150)"],MEMBER["World Geodetic System 1984 (G1674)"],MEMBER["World Geodetic System 1984 (G1762)"],MEMBER["World Geodetic System 1984 (G2139)"],ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1]],ENSEMBLEACCURACY[2.0]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4326]],CONVERSION["UTM zone 37N",METHOD["Transverse Mercator",ID["EPSG",9807]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",39,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["Scale factor at natural origin",0.9996,SCALEUNIT["unity",1],ID["EPSG",8805]],PARAMETER["False easting",500000,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["Engineering survey, topographic mapping."],AREA["Between 36°E and 42°E, northern hemisphere between equator and 84°N, onshore and offshore. Djibouti. Egypt. Eritrea. Ethiopia. Georgia. Iraq. Jordan. Kenya. Lebanon. Russian Federation. Saudi Arabia. Somalia. Sudan. Syria. Türkiye (Turkey). Ukraine."],BBOX[0,36,84,42]],ID["EPSG",32637]]</wkt>
+      <proj4>+proj=utm +zone=37 +datum=WGS84 +units=m +no_defs</proj4>
+      <srsid>3121</srsid>
+      <srid>32637</srid>
+      <authid>EPSG:32637</authid>
+      <description>WGS 84 / UTM zone 37N</description>
+      <projectionacronym>utm</projectionacronym>
+      <ellipsoidacronym>EPSG:7030</ellipsoidacronym>
+      <geographicflag>false</geographicflag>''',
+        axes_order_east_north_in_epsg_db=True,
+        proj4text='+proj=utm +zone=37 +datum=WGS84 +units=m +no_defs +type=crs',
+        internal_srid=None,
     ),
 }
 
