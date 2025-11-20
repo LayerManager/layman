@@ -2,11 +2,8 @@
 
 ## v2.3.0
  {release-date}
-### Upgrade requirements
-### Migrations and checks
-#### Schema migrations
-#### Data migrations
 ### Changes
+- [#1173](https://github.com/LayerManager/layman/issues/1173) Layman supports import of layers in EPSG:32719, EPSG:32635, EPSG:32636, EPSG:32637 using [LAYMAN_INPUT_SRS_LIST](doc/env-settings.md#LAYMAN_INPUT_SRS_LIST)
 
 ## v2.2.0
  2025-08-07
