@@ -27,7 +27,7 @@
 | [node.js](https://nodejs.org/) | 22 | MIT | client/docker/Dockerfile | prod | bin | to run Layman Test Client and Timgen |
 | [npm](https://www.npmjs.com/get-npm) | 10 | Artistic License 2.0 | client/docker/Dockerfile | prod | bin | to install node.js dependencies |
 | [gunicorn](https://gunicorn.org/) | 22 | MIT | requirements.production.txt | opt | bin | as Flask production server |
-| [nginx](http://nginx.org/) | 1.16 | BSD 2-Clause | docker-compose.yml | opt | bin | as production server |
+| [nginx](http://nginx.org/index.html) | 1.16 | BSD 2-Clause | docker-compose.yml | opt | bin | as production server |
 
 ### Python dependencies
 | name | license | used by | env | bin or src | purpose |
