@@ -411,9 +411,16 @@ Body parameters:
 - *time_regex*, string, e.g. `[0-9]{8}T[0-9]{6}Z`
   - supported only in combination with *file* parameter
   - see [POST Workspace Layers](#post-workspace-layers)
+  - not allowed when using *append* parameter
 - *time_regex_format*, string, e.g. yyyyddMM
   - description of `time_regex` result format as [java SimpleDateFormat](https://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html), [GeoServer examples](https://geoserver.geosolutionsgroup.com/edu/en/multidim/imagemosaic/mosaic_indexer.html#format)
   - supported only in combination with `time_regex`
+  - not allowed when using *append* parameter
+- *append*, boolean
+  - supported only for [timeseries](models.md#timeseries) raster layers
+  - when set to `true`, new files are added to existing timeseries layer
+  - requires *file* parameter to be provided
+  - existing `time_regex` and `time_regex_format` from layer are used automatically  
 
 #### Response
 Content-Type: `application/json`

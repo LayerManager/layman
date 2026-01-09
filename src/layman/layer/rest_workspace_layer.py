@@ -1,4 +1,3 @@
-import shutil
 import tempfile
 import logging
 from flask import Blueprint, jsonify, request, current_app as app, g
@@ -135,28 +134,39 @@ def patch(workspace, layername):
         raise LaymanError(48, f'Parameter overview_resampling requires parameter file to be set.')
     kwargs['overview_resampling'] = overview_resampling
 
+    append = request.form.get('append', '').lower() == 'true'
+
     # Timeseries regex
     time_regex = request.form.get('time_regex') or None
+
+    if append:
+        time_regex, time_regex_format = util.validate_and_prepare_append_mode(
+            workspace, layername, input_files,
+            time_regex, request.form.get('time_regex_format'),
+            x_forwarded_items=x_forwarded_items
+        )
+    else:
+        if time_regex:
+            if len(input_files.raw_paths) == 0:
+                raise LaymanError(48, f'Parameter time_regex is allowed only in combination with files.')
+            try:
+                import re
+                re.compile(time_regex)
+            except re.error as exp:
+                raise LaymanError(2, {'parameter': 'time_regex',
+                                      'expected': 'Regular expression',
+                                      }) from exp
+        time_regex_format = request.form.get('time_regex_format') or None
+        if time_regex_format and not time_regex:
+            raise LaymanError(48, {
+                'parameters': ['time_regex_format'],
+                'message': 'Parameter `time_regex_format` needs also parameter `time_regex`.',
+                'expected': 'Image mosaic regex in `time_regex` parameter or empty `time_regex_format` parameter.',
+                'found': {
+                    'time_regex_format': time_regex_format,
+                }})
+
     slugified_time_regex = input_file.slugify_timeseries_filename_pattern(time_regex) if time_regex else None
-    if time_regex:
-        if len(input_files.raw_paths) == 0:
-            raise LaymanError(48, f'Parameter time_regex is allowed only in combination with files.')
-        try:
-            import re
-            re.compile(time_regex)
-        except re.error as exp:
-            raise LaymanError(2, {'parameter': 'time_regex',
-                                  'expected': 'Regular expression',
-                                  }) from exp
-    time_regex_format = request.form.get('time_regex_format') or None
-    if time_regex_format and not time_regex:
-        raise LaymanError(48, {
-            'parameters': ['time_regex_format'],
-            'message': 'Parameter `time_regex_format` needs also parameter `time_regex`.',
-            'expected': 'Image mosaic regex in `time_regex` parameter or empty `time_regex_format` parameter.',
-            'found': {
-                'time_regex_format': time_regex_format,
-            }})
     slugified_time_regex_format = input_file.slugify_timeseries_filename_pattern(time_regex_format) if time_regex_format else None
 
     name_normalized_tif_by_layer = time_regex is None
@@ -165,6 +175,11 @@ def patch(workspace, layername):
 
     # FILE NAMES
     use_chunk_upload = bool(input_files.sent_paths)
+    temp_dir = None
+
+    if append:
+        delete_from = 'layman.layer.filesystem.input_file'
+
     if delete_from == 'layman.layer.filesystem.input_file' and input_files:
         if not (use_chunk_upload and input_files.is_one_archive):
             input_file.check_filenames(info['uuid'], input_files,
@@ -193,13 +208,17 @@ def patch(workspace, layername):
     kwargs['time_regex'] = time_regex
     kwargs['slugified_time_regex'] = slugified_time_regex
     kwargs['slugified_time_regex_format'] = slugified_time_regex_format
-    kwargs['image_mosaic'] = time_regex is not None if delete_from == 'layman.layer.filesystem.input_file' else None
     kwargs['name_normalized_tif_by_layer'] = name_normalized_tif_by_layer
     kwargs['name_input_file_by_layer'] = name_input_file_by_layer
     kwargs['enable_more_main_files'] = enable_more_main_files
     request_method = request.method.lower()
     kwargs['http_method'] = request_method
     old_layer = Layer(layer_tuple=(workspace, layername))
+
+    if delete_from == 'layman.layer.filesystem.input_file':
+        kwargs['image_mosaic'] = time_regex is not None
+    else:
+        kwargs['image_mosaic'] = old_layer.image_mosaic if hasattr(old_layer, 'image_mosaic') else None
     props_to_refresh = util.get_same_or_missing_prop_names(old_layer)
     kwargs['metadata_properties_to_refresh'] = props_to_refresh
 
@@ -216,8 +235,13 @@ def patch(workspace, layername):
                                       kwargs,
                                       )
 
+    existing_input_file_names = None
+    if append and delete_from == 'layman.layer.filesystem.input_file':
+        existing_input_file_names = util.get_existing_input_file_names_for_append(info['uuid'])
+
     if delete_from is not None:
-        deleted = util.delete_layer(old_layer, source=delete_from, http_method=request_method)
+        preserve_input_files = append and delete_from == 'layman.layer.filesystem.input_file'
+        deleted = util.delete_layer(old_layer, source=delete_from, http_method=request_method, preserve_input_files=preserve_input_files)
         if style_file is None:
             try:
                 style_file = deleted['style']['file']
@@ -233,8 +257,10 @@ def patch(workspace, layername):
             'crs_id': crs_id,
         })
 
-        if delete_from == 'layman.layer.filesystem.input_file':
+        if existing_input_file_names is not None:
+            kwargs['existing_input_file_names'] = existing_input_file_names
 
+        if delete_from == 'layman.layer.filesystem.input_file':
             if use_chunk_upload:
                 files_to_upload = input_chunk.save_layer_files_str(
                     info['uuid'], input_files, check_crs, name_input_file_by_layer=name_input_file_by_layer)
@@ -245,7 +271,8 @@ def patch(workspace, layername):
                     'check_crs': check_crs,
                 })
             elif input_files:
-                shutil.move(temp_dir, input_file.get_layer_input_file_dir(info['uuid']))
+                target_dir = input_file.get_layer_input_file_dir(info['uuid'])
+                util.move_files_from_temp_dir(temp_dir, target_dir, info['uuid'])
         publications.set_wfs_wms_status(workspace, LAYER_TYPE, layername, settings.EnumWfsWmsStatus.PREPARING)
     else:
         delete_from = 'layman.layer.micka.soap'

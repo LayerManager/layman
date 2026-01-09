@@ -91,6 +91,7 @@ def refresh_gdal(self, workspace, layername,
                  overview_resampling=None,
                  name_normalized_tif_by_layer=True,
                  original_data_source=settings.EnumOriginalDataSource.FILE.value,
+                 existing_input_file_names=None,
                  ):
     def finish_gdal_process(process):
         if self.is_aborted():
@@ -127,6 +128,33 @@ def refresh_gdal(self, workspace, layername,
     else:
         assert len(input_paths) == 1
         timeseries_filename_mapping = None
+
+    if existing_input_file_names is not None and len(existing_input_file_names) > 0:
+        existing_input_file_names_set = set(existing_input_file_names)
+        normalized_dir = gdal.get_normalized_raster_layer_dir(uuid)
+        existing_normalized_files = set()
+        if os.path.exists(normalized_dir):
+            existing_normalized_files = {f for f in os.listdir(normalized_dir) if f.endswith('.tif')}
+
+        new_input_paths = []
+        skipped_count = 0
+        for input_path in input_paths:
+            input_filename = os.path.basename(input_path)
+            if input_filename in existing_input_file_names_set:
+                if not name_normalized_tif_by_layer:
+                    normalized_filename = timeseries_filename_mapping[input_path]
+                    if not normalized_filename.endswith('.tif'):
+                        normalized_filename += '.tif'
+                else:
+                    normalized_filename = f'{uuid}.tif'
+
+                if normalized_filename not in existing_normalized_files:
+                    new_input_paths.append(input_path)
+                else:
+                    skipped_count += 1
+            else:
+                new_input_paths.append(input_path)
+        input_paths = new_input_paths
 
     for input_path in input_paths:
         vrt_file_path = gdal.create_vrt_file_if_needed(input_path)

@@ -7,6 +7,7 @@
 #### Schema migrations
 #### Data migrations
 ### Changes
+- [#1168](https://github.com/LayerManager/layman/issues/1168) Extend [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) with ability of appending data to existing time-series layer.
 
 ## v2.3.0
  2025-12-02

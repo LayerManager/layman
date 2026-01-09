@@ -36,6 +36,7 @@
 - Each file represents one time instant, more files may represent the same time instant.
 - The smallest possible supported temporal unit is one day (see [#875](https://github.com/LayerManager/layman/issues/875)).
 - Information about time representation is passed through [time_regex](rest.md#post-workspace-layers) parameter.
+- Additional files can be added to existing timeseries layer using [PATCH Workspace Layer](rest.md#patch-workspace-layer) with `append=true` parameter.
   
 ## Map
 - Also referred to as **map composition**

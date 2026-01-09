@@ -2,6 +2,8 @@ from functools import wraps, partial
 from urllib import parse
 import re
 import logging
+import os
+import shutil
 import psycopg2
 
 from flask import current_app, request
@@ -17,6 +19,7 @@ from . import get_layer_sources, LAYER_TYPE, get_layer_type_def, get_layer_info_
     LAYERNAME_MAX_LENGTH, SAFE_PG_IDENTIFIER_PATTERN
 from .db import get_all_table_column_names, get_table_crs
 from .layer_class import Layer
+from .filesystem import input_file
 from ..uuid import delete_publication_uuid_from_redis
 
 FLASK_PROVIDERS_KEY = f'{__name__}:PROVIDERS'
@@ -178,7 +181,7 @@ def patch_after_feature_change(workspace, layername, **kwargs):
     layman_util.patch_after_feature_change(workspace, LAYER_TYPE, layername, **kwargs)
 
 
-def delete_layer(layer: Layer, source=None, http_method='delete', *, x_forwarded_items=None):
+def delete_layer(layer: Layer, source=None, http_method='delete', *, x_forwarded_items=None, preserve_input_files=False):
     sources = get_sources()
     source_idx = next((
         idx for idx, m in enumerate(sources) if m.__name__ == source
@@ -193,7 +196,10 @@ def delete_layer(layer: Layer, source=None, http_method='delete', *, x_forwarded
     # print(f"delete_layer {username}.{layername} using {len(sources)} sources: {[s.__name__ for s in sources]}")
 
     delete_info = {}
-    results = call_modules_fn(sources, 'delete_layer', [layer])
+    delete_kwargs = {}
+    if preserve_input_files:
+        delete_kwargs['preserve_input_files'] = preserve_input_files
+    results = call_modules_fn(sources, 'delete_layer', [layer], kwargs=delete_kwargs)
     for partial_result in results.values():
         if partial_result is not None:
             delete_info.update(partial_result)
@@ -459,3 +465,71 @@ def set_wfs_wms_status_after_fail(workspace, name):
     wfs_wms_status = settings.EnumWfsWmsStatus.AVAILABLE if all(
         publ_info.get(key) for key in keys) else settings.EnumWfsWmsStatus.NOT_AVAILABLE
     publications.set_wfs_wms_status(workspace, LAYER_TYPE, name, wfs_wms_status)
+
+
+def validate_and_prepare_append_mode(workspace, layername, input_files, time_regex_from_request, time_regex_format_from_request, *, x_forwarded_items=None):
+    if len(input_files.raw_paths) == 0:
+        raise LaymanError(48, f'Parameter `append` requires parameter `file` to be set.')
+    if time_regex_from_request:
+        raise LaymanError(48, {
+            'parameter': 'time_regex',
+            'message': 'Parameter `time_regex` is not allowed when using `append` mode. Existing time_regex from layer will be used.',
+            'expected': 'Do not provide `time_regex` parameter when using `append` mode.',
+        })
+    if time_regex_format_from_request:
+        raise LaymanError(48, {
+            'parameter': 'time_regex_format',
+            'message': 'Parameter `time_regex_format` is not allowed when using `append` mode.',
+            'expected': 'Do not provide `time_regex_format` parameter when using `append` mode.',
+        })
+    layer_info_complete = get_complete_layer_info(workspace, layername, x_forwarded_items=x_forwarded_items)
+    if not layer_info_complete.get('image_mosaic'):
+        raise LaymanError(48, {
+            'parameter': 'append',
+            'message': 'Parameter `append` is allowed only for timeseries layers.',
+            'expected': 'Layer must be timeseries (image_mosaic=true).',
+        })
+    publ_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['wfs_wms_status']})
+    wfs_wms_status = publ_info.get('_wfs_wms_status')
+    if wfs_wms_status is None or wfs_wms_status != settings.EnumWfsWmsStatus.AVAILABLE:
+        raise LaymanError(48, {
+            'parameter': 'append',
+            'message': 'Parameter `append` is allowed only for layers with wfs_wms_status = AVAILABLE.',
+            'expected': 'Layer must have wfs_wms_status = AVAILABLE.',
+        })
+    existing_time_info = layer_info_complete.get('wms', {}).get('time', {})
+    if not existing_time_info or 'regex' not in existing_time_info:
+        raise LaymanError(48, {
+            'parameter': 'append',
+            'message': 'Cannot find existing time_regex for timeseries layer.',
+        })
+    time_regex = existing_time_info['regex']
+    time_regex_format = None
+
+    return time_regex, time_regex_format
+
+
+def get_existing_input_file_names_for_append(uuid):
+    existing_input_dir = input_file.get_layer_input_file_dir(uuid)
+    if not os.path.exists(existing_input_dir):
+        return []
+    existing_files = []
+    for filename in os.listdir(existing_input_dir):
+        file_path = os.path.join(existing_input_dir, filename)
+        if os.path.isfile(file_path):
+            existing_files.append(filename)
+    return existing_files
+
+
+def move_files_from_temp_dir(temp_dir, target_dir, uuid):
+    input_file.ensure_layer_input_file_dir(uuid)
+    for item in os.listdir(temp_dir):
+        src_path = os.path.join(temp_dir, item)
+        dst_path = os.path.join(target_dir, item)
+        if os.path.isfile(src_path):
+            shutil.move(src_path, dst_path)
+        elif os.path.isdir(src_path):
+            if os.path.exists(dst_path):
+                shutil.rmtree(dst_path)
+            shutil.move(src_path, dst_path)
+    shutil.rmtree(temp_dir)

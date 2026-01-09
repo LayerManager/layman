@@ -39,7 +39,9 @@ def ensure_layer_input_file_dir(publ_uuid):
     return input_file_dir
 
 
-def delete_layer(layer: Layer):
+def delete_layer(layer: Layer, preserve_input_files=False):
+    if preserve_input_files:
+        return
     util.delete_layer_subdir(layer.uuid, LAYER_SUBDIR)
 
 
