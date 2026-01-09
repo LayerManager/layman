@@ -215,7 +215,7 @@ def layer_file_chunk_info(publ_uuid):
                         'file_upload_complete ' + target_fn)
                     target_fp = file['target_file']
                     input_file.ensure_layer_input_file_dir(publ_uuid)
-                    with open(target_fp, "ab") as target_file:
+                    with open(target_fp, "wb") as target_file:
                         for chunk_path in chunk_paths:
                             with open(chunk_path, 'rb') as stored_chunk_file:
                                 target_file.write(stored_chunk_file.read())

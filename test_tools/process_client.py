@@ -209,6 +209,7 @@ def patch_workspace_publication(publication_type,
                                 do_not_upload_chunks=False,
                                 time_regex=None,
                                 time_regex_format=None,
+                                append=False,
                                 skip_asserts=False,
                                 ):
     headers = headers or {}
@@ -287,6 +288,8 @@ def patch_workspace_publication(publication_type,
             data['time_regex'] = time_regex
         if time_regex_format:
             data['time_regex_format'] = time_regex_format
+        if append:
+            data['append'] = 'true'
         if publication_type == LAYER_TYPE and crs:
             data['crs'] = crs
         if external_table_uri:

@@ -21,6 +21,24 @@ refresh_wfs_needed = empty_method_returns_true
 refresh_sld_needed = empty_method_returns_true
 
 
+def remove_old_imagemosaic_index_files(dir_path):
+    index_extensions = ['.dbf', '.shp', '.shx', '.prj', '.fix', '.qix']
+    properties_to_keep = ['indexer.properties', 'timeregex.properties']
+    if not os.path.exists(dir_path):
+        return
+    for filename in os.listdir(dir_path):
+        file_path_full = os.path.join(dir_path, filename)
+        if not os.path.isfile(file_path_full):
+            continue
+        if filename in properties_to_keep:
+            continue
+        if filename.endswith('.properties') or any(filename.endswith(ext) for ext in index_extensions):
+            try:
+                os.remove(file_path_full)
+            except FileNotFoundError:
+                pass
+
+
 @celery_app.task(
     name='layman.layer.geoserver.wms.refresh',
     bind=True,
@@ -38,6 +56,7 @@ def refresh_wms(
         image_mosaic=False,
         slugified_time_regex=None,
         slugified_time_regex_format=None,
+        existing_input_file_names=None,
 ):
     layer = Layer(uuid=uuid)
     gs_layername = layer.gs_ids.wms
@@ -82,6 +101,11 @@ def refresh_wms(
             source_file_or_dir = os.path.dirname(gs_file_path)
             file_path = file_paths['normalized_absolute']
             dir_path = os.path.dirname(file_path)
+
+            is_append = existing_input_file_names is not None and len(existing_input_file_names) > 0
+            if is_append:
+                remove_old_imagemosaic_index_files(dir_path)
+
             shutil.copy(os.path.join(DIRECTORY, 'indexer.properties'), dir_path)
             timeregex_path = os.path.join(dir_path, 'timeregex.properties')
             timeregex_format_str = f',format={slugified_time_regex_format}' if slugified_time_regex_format else ''
