@@ -223,7 +223,7 @@ Body parameters:
   - latin diacritic is removed from the regex and spaces are replaced with underscores to be consistent with slugifying of timeseries filenames
   - error is raised if any of main data file names do not match *time_regex* value
 - *time_regex_format*, string, e.g. yyyyddMM
-  - description of `time_regex` result format as [java SimpleDateFormat](https://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html), [GeoServer examples](https://docs.geoserver.geo-solutions.it/edu/en/multidim/imagemosaic/mosaic_indexer.html#format)
+  - description of `time_regex` result format as [java SimpleDateFormat](https://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html), [GeoServer examples](https://geoserver.geosolutionsgroup.com/edu/en/multidim/imagemosaic/mosaic_indexer.html#format)
   - supported only in combination with `time_regex`
 
 #### Response
@@ -412,7 +412,7 @@ Body parameters:
   - supported only in combination with *file* parameter
   - see [POST Workspace Layers](#post-workspace-layers)
 - *time_regex_format*, string, e.g. yyyyddMM
-  - description of `time_regex` result format as [java SimpleDateFormat](https://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html), [GeoServer examples](https://docs.geoserver.geo-solutions.it/edu/en/multidim/imagemosaic/mosaic_indexer.html#format)
+  - description of `time_regex` result format as [java SimpleDateFormat](https://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html), [GeoServer examples](https://geoserver.geosolutionsgroup.com/edu/en/multidim/imagemosaic/mosaic_indexer.html#format)
   - supported only in combination with `time_regex`
 
 #### Response
