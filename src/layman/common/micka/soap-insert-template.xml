@@ -4,6 +4,7 @@
     <hs:Public>{public}</hs:Public>
     <hs:Edit>{edit_user}</hs:Edit>
     <hs:Read>{read_user}</hs:Read>
+    <hs:CreateUser>{create_user}</hs:CreateUser>
 </soap:Header>
 <soap:Body>
 <csw:Transaction xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" version="2.0.2" service="CSW">

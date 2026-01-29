@@ -19,12 +19,12 @@ refresh_soap_needed = empty_method_returns_true
 )
 # pylint: disable=unused-argument
 def refresh_soap(self, username, layername, http_method=common.REQUEST_METHOD_POST,
-                 metadata_properties_to_refresh=None, access_rights=None, uuid=None):
+                 metadata_properties_to_refresh=None, actor_name=None, access_rights=None, uuid=None):
     if self.is_aborted():
         raise AbortedException
     layer = Layer(uuid=uuid)
     if http_method == common.REQUEST_METHOD_POST:
-        soap.soap_insert(layer, access_rights=access_rights)
+        soap.soap_insert(layer, access_rights=access_rights, actor_name=actor_name)
     else:
         assert metadata_properties_to_refresh is not None
         common_util.patch_publication_by_soap(layer,

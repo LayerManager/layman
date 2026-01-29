@@ -19,4 +19,4 @@ patch_layer = empty_method
 def soap_insert(publication: Layer, *, access_rights, actor_name=None):
     is_public = authz.is_user_in_access_rule(settings.RIGHTS_EVERYONE_ROLE, access_rights['read'])
     template_path, prop_values = csw.get_template_path_and_values(publication, http_method='post')
-    common_util.soap_insert_record_from_template(template_path, prop_values, csw.METADATA_PROPERTIES, is_public)
+    common_util.soap_insert_record_from_template(template_path, prop_values, csw.METADATA_PROPERTIES, is_public, create_user=actor_name)

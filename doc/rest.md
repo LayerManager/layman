@@ -117,7 +117,7 @@ Processing chain consists of few steps:
     - publish the layer on GeoServer through WMS cascade from QGIS server
 - for raster layers publish normalized GeoTIFF as new layer (coverage) on GeoServer WMS workspace
 - generate thumbnail image
-- publish metadata record to Micka (it's public if and only if read access is set to EVERYONE)
+- publish metadata record to Micka (it's public if and only if read access is set to EVERYONE; the creating user is sent as CreateUser in the CSW SOAP request)
 - update thumbnail of each [map](models.md#map) that points to this layer
 
 If workspace directory, database schema, or GeoServer's datastores does not exist yet, they are created on demand.
@@ -559,7 +559,7 @@ Processing chain consists of few steps:
 - save file to workspace directory
 - if needed, update some JSON attributes (`name`, `title`, or `abstract`)
 - generate thumbnail image
-- publish metadata record to Micka (it's public if and only if read access is set to EVERYONE)
+- publish metadata record to Micka (it's public if and only if read access is set to EVERYONE; the creating user is sent as CreateUser in the CSW SOAP request)
 - save basic information (name, title, access_rights) into PostgreSQL
 
 Some of these steps run [asynchronously](async-tasks.md).

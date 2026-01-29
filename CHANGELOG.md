@@ -9,6 +9,7 @@
 #### Data migrations
 ### Changes
 - [#1168](https://github.com/LayerManager/layman/issues/1168) Extend [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) with ability of appending data to existing time-series layer.
+- When publishing a layer or map to Micka via CSW, Layman sends the creating user (Layman username) in the SOAP request header (`CreateUser`), so the metadata record in Micka is associated with the user who created the publication.
 
 ## v2.3.0
  2025-12-02
