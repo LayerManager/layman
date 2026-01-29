@@ -6,7 +6,7 @@ Layman is able to publish partial metadata records to [OGC Catalogue Service](ht
 
 Although metadata records sent to Micka are partial, they can (and should) be completed using Micka web editor GUI. URL of layer's metadata record leading to Micka's GUI is available in [GET Workspace Layer](rest.md#get-workspace-layer) response as `metadata.record_url` property. To complete metadata records, just open this URL in browser, log in to micka as editor or admin, and complete the record.
 
-On POST requests, Layman automatically creates metadata record using CSW with values of all known properties. On PATCH requests, Layman also automatically updates metadata record, but only for subset of synchronizable metadata properties, whose values were `equal` in Metadata Comparison response at the time just when PATCH started.
+On POST requests, Layman automatically creates metadata record using CSW with values of all known properties. The SOAP request includes the Layman username of the publishing user in the `CreateUser` header, so the record is associated with the correct user in Micka. On PATCH requests, Layman also automatically updates metadata record, but only for subset of synchronizable metadata properties, whose values were `equal` in Metadata Comparison response at the time just when PATCH started.
 
 Properties listed below contains
 - unique name (as heading)
