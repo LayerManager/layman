@@ -1,3 +1,4 @@
+import os
 from flask import Blueprint, jsonify, request, g
 from flask import current_app as app
 
@@ -75,56 +76,58 @@ def post(workspace):
             }})
     check_crs = crs_id is None
 
+    file_path = request.form.get('file_path', '').strip()
+
     # EXTERNAL_TABLE_URI
     external_table_uri_str = request.form.get('external_table_uri', '')
-    if not input_files and not external_table_uri_str:
+    if not input_files and not external_table_uri_str and not file_path:
         raise LaymanError(1, {
-            'parameters': ['file', 'external_table_uri'],
-            'message': 'Both `file` and `external_table_uri` parameters are empty',
+            'parameters': ['file', 'external_table_uri', 'file_path'],
+            'message': 'All parameters `file`, `external_table_uri`, and `file_path` are empty',
             'expected': 'One of the parameters is filled.',
         })
-    if input_files and external_table_uri_str:
+    filled_params = []
+    if input_files:
+        filled_params.append('file')
+    if external_table_uri_str:
+        filled_params.append('external_table_uri')
+    if file_path:
+        filled_params.append('file_path')
+    if len(filled_params) > 1:
         raise LaymanError(48, {
-            'parameters': ['file', 'external_table_uri'],
-            'message': 'Both `file` and `external_table_uri` parameters are filled',
+            'parameters': filled_params,
+            'message': f'Multiple parameters are filled: {", ".join(filled_params)}',
             'expected': 'Only one of the parameters is fulfilled.',
             'found': {
-                'file': input_files.raw_paths,
-                'external_table_uri': external_table_uri_str,
+                'file': input_files.raw_paths if input_files else None,
+                'external_table_uri': external_table_uri_str if external_table_uri_str else None,
+                'file_path': file_path if file_path else None,
             }})
     external_table_uri = util.parse_and_validate_external_table_uri_str(external_table_uri_str) if external_table_uri_str else None
 
+    time_regex = request.form.get('time_regex') or None
+    time_regex_format = request.form.get('time_regex_format') or None
+
+    file_path_relative, file_path_absolute, _, _ = util.validate_and_process_file_path(file_path, check_crs=check_crs)
+    if file_path_relative:
+        file_path = file_path_absolute
+        util.validate_file_path_requires_time_regex(file_path_absolute, time_regex)
+
+    util.validate_time_regex(time_regex, time_regex_format)
+    slugified_time_regex = input_file.slugify_timeseries_filename_pattern(time_regex) if time_regex else None
+    slugified_time_regex_format = input_file.slugify_timeseries_filename_pattern(time_regex_format) if time_regex_format else None
     # NAME
     unsafe_layername = request.form.get('name', '')
     if len(unsafe_layername) == 0:
-        unsafe_layername = input_file.get_unsafe_layername(input_files) if input_files else external_table_uri.table
+        if file_path:
+            unsafe_layername = os.path.basename(file_path)
+        else:
+            unsafe_layername = input_file.get_unsafe_layername(input_files) if input_files else external_table_uri.table
     layername = util.to_safe_layer_name(unsafe_layername)
     util.check_layername(layername)
     info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername)
     if info:
         raise LaymanError(17, {'layername': layername})
-
-    # Timeseries regex
-    time_regex = request.form.get('time_regex') or None
-    slugified_time_regex = input_file.slugify_timeseries_filename_pattern(time_regex) if time_regex else None
-    if time_regex:
-        try:
-            import re
-            re.compile(time_regex)
-        except re.error as exp:
-            raise LaymanError(2, {'parameter': 'time_regex',
-                                  'expected': 'Regular expression',
-                                  }) from exp
-    time_regex_format = request.form.get('time_regex_format') or None
-    if time_regex_format and not time_regex:
-        raise LaymanError(48, {
-            'parameters': ['time_regex_format'],
-            'message': 'Parameter `time_regex_format` needs also parameter `time_regex`.',
-            'expected': 'Image mosaic regex in `time_regex` parameter or empty `time_regex_format` parameter.',
-            'found': {
-                'time_regex_format': time_regex_format,
-            }})
-    slugified_time_regex_format = input_file.slugify_timeseries_filename_pattern(time_regex_format) if time_regex_format else None
 
     name_normalized_tif_by_layer = time_regex is None
     name_input_file_by_layer = time_regex is None or input_files.is_one_archive
@@ -141,7 +144,19 @@ def post(workspace):
                                        enable_more_main_files=enable_more_main_files, time_regex=time_regex,
                                        slugified_time_regex=slugified_time_regex,
                                        name_input_file_by_layer=name_input_file_by_layer)
-        geodata_type = input_file.get_file_type(input_files.raw_or_archived_main_file_path) if not external_table_uri else settings.GEODATA_TYPE_VECTOR
+        if file_path:
+            geodata_type = settings.GEODATA_TYPE_RASTER
+            if not crs_id:
+                tif_files = util.get_geotiff_files(file_path)
+                crs_id = input_file.get_raster_crs_id(tif_files[0]) if tif_files else None
+                if not crs_id:
+                    raise LaymanError(4, {'found': None, 'supported_values': settings.INPUT_SRS_LIST})
+        elif input_files:
+            geodata_type = input_file.get_file_type(input_files.raw_or_archived_main_file_path)
+        elif external_table_uri:
+            geodata_type = settings.GEODATA_TYPE_VECTOR
+        else:
+            geodata_type = settings.GEODATA_TYPE_UNKNOWN
 
         # TITLE
         if len(request.form.get('title', '')) > 0:
@@ -190,6 +205,7 @@ def post(workspace):
             'name_input_file_by_layer': name_input_file_by_layer,
             'enable_more_main_files': enable_more_main_files,
             'external_table_uri': external_table_uri,
+            'file_path': file_path_relative if file_path else None,
             'original_data_source': settings.EnumOriginalDataSource.TABLE.value if external_table_uri else settings.EnumOriginalDataSource.FILE.value,
         }
 

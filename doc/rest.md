@@ -107,6 +107,7 @@ Processing chain consists of few steps:
 - for vector layers import vector file (if sent) to PostgreSQL database as new table into workspace schema
   - files with invalid byte sequence are first converted to GeoJSON, then cleaned with iconv, and finally imported to database.
 - for raster layers normalize and compress raster file to GeoTIFF with overviews (pyramids); NoData values are normalized as transparent
+- if `file_path` parameter is used raster files are used directly from GeoServer data directory without normalization
 - save bounding box into PostgreSQL
 - for vector layers publish the vector table as new layer (feature type) within appropriate WFS workspace of GeoServer
 - for vector layers
@@ -115,7 +116,7 @@ Processing chain consists of few steps:
   - for layers with QML style:
     - create QGS file on QGIS server filesystem with appropriate style
     - publish the layer on GeoServer through WMS cascade from QGIS server
-- for raster layers publish normalized GeoTIFF as new layer (coverage) on GeoServer WMS workspace
+- for raster layers publish GeoTIFF as new layer (coverage) on GeoServer WMS workspace (normalized if `file` parameter is used, original if `file_path` parameter is used)
 - generate thumbnail image
 - publish metadata record to Micka (it's public if and only if read access is set to EVERYONE; the creating user is sent as CreateUser in the CSW SOAP request)
 - update thumbnail of each [map](models.md#map) that points to this layer
@@ -140,7 +141,7 @@ Body parameters:
    - used if specified, otherwise generated
    - it's meant mostly for testing purposes
 - *file*, file(s) or file name(s)
-   - exactly one of `file` or `external_table_uri` must be set
+   - exactly one of `file`, `file_path`, or `external_table_uri` must be set
    - one of following options is expected:
       - GeoJSON file
       - ShapeFile files (at least three files: .shp, .shx, .dbf)
@@ -162,8 +163,24 @@ Body parameters:
    - if published file has empty bounding box (i.e. no features), its bounding box on WMS/WFS endpoint is set to the whole World
    - attribute names are [laundered](https://gdal.org/en/stable/drivers/vector/pg.html#layer-creation-options) to be safely stored in DB
    - if QML style is used in this request, it must list all attributes contained in given data file
+- *file_path*, string  
+  - exactly one of `file`, `file_path`, or `external_table_uri` must be set  
+  - relative path to a directory that already exists on the server  
+  - the path must be relative to the root of the GeoServer data directory  
+  - the referenced directory must be physically located inside the GeoServer data directory  
+  - the directory must contain at least one GeoTIFF file (with extension `.tif` or `.tiff`)
+
+  - for raster layers:
+    - supported only for GeoTIFF files (`.tif` or `.tiff` extension)
+    - raster files are not normalized when using `file_path` parameter      
+      - this may result in different styling behavior compared to layers published via `file` parameter      
+    - may point to a directory containing a single raster file (published as a single coverage)
+    - may point to a directory containing multiple raster files:
+      - if `time_regex` parameter is provided, files are treated as a time series and published as an ImageMosaic
+      - if `time_regex` parameter is not provided and directory contains multiple raster files, an error is raised
+ 
 - *external_table_uri*, string
-   - exactly one of `file` or `external_table_uri` must be set
+   - exactly one of `file`, `file_path`, or `external_table_uri` must be set
    - [connection URI](https://www.postgresql.org/docs/15/libpq-connect.html#id-1.7.3.8.3.6) is required, usual format is `postgresql://<username>:<password>@<host>:<port>/<dbname>?schema=<schema_name>&table=<table_name>&geo_column=<geo_column_name>`
      - `host` part and query parameters `schema` and `table` are mandatory
      - URI scheme is required to be `postgresql`
@@ -329,6 +346,7 @@ JSON object with following structure:
   - *status*: Status information about publishing style. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **original_data_source**: String. Either `file` if layer was published from file, or `database_table` if layer was published from external database table 
+- **file_path**: String. Available only for raster layers published using `file_path` parameter. Relative path to the directory containing raster files, relative to the root of the GeoServer data directory.
 - *metadata*
   - *identifier*: String. Identifier of metadata record in CSW instance.
   - *record_url*: String. URL of metadata record accessible by web browser, probably with some editing capabilities.

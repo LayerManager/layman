@@ -1,8 +1,9 @@
 from functools import wraps, partial
 from urllib import parse
+import os
+import glob
 import re
 import logging
-import os
 import shutil
 import psycopg2
 
@@ -86,6 +87,7 @@ def clear_publication_info(layer_info, file_type):
     clear_info = common_clear_publication_info(layer_info)
     if file_type != settings.GEODATA_TYPE_RASTER:
         clear_info.pop('image_mosaic')
+        clear_info.pop('file_path')
     return clear_info
 
 
@@ -249,6 +251,115 @@ def layer_info_to_metadata_properties(info):
         'temporal_extent': info.get('wms', {}).get('time', {}).get('values'),
     }
     return result
+
+
+def get_geotiff_files(directory):
+    files = []
+    for ext in settings.FILE_PATH_MAIN_FILE_EXTENSIONS:
+        files.extend(glob.glob(os.path.join(directory, f'*{ext}')))
+        files.extend(glob.glob(os.path.join(directory, f'*{ext.upper()}')))
+    return files
+
+
+def validate_and_process_file_path(file_path, *, check_crs=True):
+    from .filesystem import input_file
+
+    if not file_path:
+        return None, None, None, None
+
+    if os.path.isabs(file_path):
+        raise LaymanError(2, {
+            'parameter': 'file_path',
+            'message': 'Absolute path is not allowed',
+            'expected': 'Relative path to directory (relative to GEOSERVER_DATADIR)',
+            'found': file_path,
+        })
+
+    file_path_absolute = os.path.join(settings.GEOSERVER_DATADIR, file_path)
+    file_path_absolute = os.path.abspath(file_path_absolute)
+    geoserver_datadir_abs = os.path.abspath(settings.GEOSERVER_DATADIR)
+    if not file_path_absolute.startswith(geoserver_datadir_abs + os.sep):
+        raise LaymanError(2, {
+            'parameter': 'file_path',
+            'message': 'Path is outside GeoServer data directory',
+            'expected': 'Relative path to directory inside GeoServer data directory',
+            'found': file_path,
+        })
+
+    if not os.path.exists(file_path_absolute):
+        raise LaymanError(2, {
+            'parameter': 'file_path',
+            'message': 'Directory does not exist',
+            'expected': 'Relative path to existing directory on server',
+            'found': file_path,
+        })
+
+    if not os.path.isdir(file_path_absolute):
+        raise LaymanError(2, {
+            'parameter': 'file_path',
+            'message': 'Path is not a directory',
+            'expected': 'Relative path to existing directory containing raster files',
+            'found': file_path,
+        })
+
+    if not (
+            os.access(file_path_absolute, os.R_OK)
+            and os.access(file_path_absolute, os.X_OK)
+    ):
+        raise LaymanError(2, {
+            'parameter': 'file_path',
+            'message': 'Directory is not readable',
+            'expected': 'Readable directory containing raster files',
+            'found': file_path,
+        })
+
+    tif_files = get_geotiff_files(file_path_absolute)
+    if not tif_files:
+        raise LaymanError(2, {
+            'parameter': 'file_path',
+            'message': 'Directory does not contain any raster files',
+            'expected': 'Directory containing at least one GeoTIFF file (.tif or .tiff)',
+            'found': file_path,
+        })
+
+    if check_crs:
+        for tif_file in tif_files:
+            input_file.check_raster_layer_crs(tif_file)
+
+    return file_path, file_path_absolute, None, None
+
+
+def validate_file_path_requires_time_regex(file_path_absolute, time_regex):
+    tif_files = get_geotiff_files(file_path_absolute)
+    if len(tif_files) > 1 and not time_regex:
+        file_path_relative = os.path.relpath(file_path_absolute, settings.GEOSERVER_DATADIR)
+        raise LaymanError(48, {
+            'parameters': ['file_path', 'time_regex'],
+            'message': 'Directory contains multiple raster files, but time_regex is not provided',
+            'expected': 'Provide time_regex parameter for image mosaic when directory contains multiple raster files',
+            'found': {
+                'file_path': file_path_relative,
+                'raster_files_count': len(tif_files),
+            },
+        })
+
+
+def validate_time_regex(time_regex, time_regex_format):
+    if time_regex:
+        try:
+            re.compile(time_regex)
+        except re.error as exp:
+            raise LaymanError(2, {'parameter': 'time_regex',
+                                  'expected': 'Regular expression',
+                                  }) from exp
+    if time_regex_format and not time_regex:
+        raise LaymanError(48, {
+            'parameters': ['time_regex_format'],
+            'message': 'Parameter `time_regex_format` needs also parameter `time_regex`.',
+            'expected': 'Image mosaic regex in `time_regex` parameter or empty `time_regex_format` parameter.',
+            'found': {
+                'time_regex_format': time_regex_format,
+            }})
 
 
 def get_metadata_comparison(publication: Layer):

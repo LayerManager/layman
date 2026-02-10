@@ -21,8 +21,63 @@ def get_layer_info(workspace, layername, *, extra_keys=None):
     return get_layer_info_by_uuid(publ_uuid, extra_keys=extra_keys) if publ_uuid else {}
 
 
+def to_gs_path(path):
+    if path.startswith(settings.GEOSERVER_DATADIR):
+        return os.path.relpath(path, settings.GEOSERVER_DATADIR)
+    return path
+
+
+def add_file_extra_keys(file_dict, gdal_path, gdal_paths_for_stats, extra_keys, normalized_gdal_path=None):
+    if '_file.color_interpretations' in extra_keys:
+        file_dict['color_interpretations'] = get_color_interpretations(gdal_path)
+    if '_file.mask_flags' in extra_keys:
+        file_dict['mask_flags'] = get_mask_flags(gdal_path)
+    norm_file_dict = {}
+    if '_file.normalized_file.stats' in extra_keys:
+        norm_file_dict['stats'] = get_file_list_statistics(gdal_paths_for_stats)
+    normalized_path = normalized_gdal_path
+    if normalized_path is None:
+        normalized_path = gdal_paths_for_stats[0] if isinstance(gdal_paths_for_stats, list) and len(gdal_paths_for_stats) > 0 else gdal_path
+    if '_file.normalized_file.mask_flags' in extra_keys:
+        norm_file_dict['mask_flags'] = get_mask_flags(normalized_path)
+    if '_file.normalized_file.color_interpretations' in extra_keys:
+        norm_file_dict['color_interpretations'] = get_color_interpretations(normalized_path)
+    if '_file.normalized_file.nodata_value' in extra_keys:
+        norm_file_dict['nodata_value'] = get_nodata_value(normalized_path)
+    if norm_file_dict:
+        file_dict['normalized_file'] = norm_file_dict
+
+
+def get_file_path_layer_info(file_path_info_list, extra_keys):
+    file_path_info = file_path_info_list[0]
+    gdal_path = file_path_info['gdal']
+    paths_dict = {
+        os.path.basename(info['gdal']): {
+            'normalized_absolute': info['absolute'],
+            'normalized_geoserver': to_gs_path(info['gdal']),
+        }
+        for info in file_path_info_list
+    }
+
+    result = {
+        '_file': {
+            'paths': paths_dict,
+        },
+    }
+    file_dict = result['_file']
+    gdal_paths_for_stats = [info['gdal'] for info in file_path_info_list]
+    normalized_gdal_path = gdal_paths_for_stats[0] if gdal_paths_for_stats else gdal_path
+    add_file_extra_keys(file_dict, gdal_path, gdal_paths_for_stats, extra_keys, normalized_gdal_path=normalized_gdal_path)
+    return result
+
+
 def get_layer_info_by_uuid(publ_uuid, *, extra_keys=None):
     extra_keys = extra_keys or []
+    file_path_info_list = input_file.get_file_path_info(publ_uuid)
+
+    if file_path_info_list:
+        return get_file_path_layer_info(file_path_info_list, extra_keys)
+
     gdal_paths = get_normalized_raster_layer_main_filepaths(publ_uuid)
     gs_directory = get_normalized_raster_layer_dir(publ_uuid, geoserver=True)
     result = {}
@@ -43,25 +98,8 @@ def get_layer_info_by_uuid(publ_uuid, *, extra_keys=None):
         input_file_info = input_file.get_layer_info_by_uuid(publ_uuid)
         result['_file']['file_type'] = input_file_info['_file']['file_type']
         input_file_gdal_path = next(iter(input_file_info['_file']['paths'].values()))['gdal']
-        if '_file.color_interpretations' in extra_keys:
-            file_dict['color_interpretations'] = get_color_interpretations(input_file_gdal_path)
-        if '_file.mask_flags' in extra_keys:
-            file_dict['mask_flags'] = get_mask_flags(input_file_gdal_path)
-        norm_file_dict = {}
-        if '_file.normalized_file.stats' in extra_keys:
-            stats = get_file_list_statistics(gdal_paths)
-            norm_file_dict['stats'] = stats
-        if '_file.normalized_file.mask_flags' in extra_keys:
-            mask_flags = get_mask_flags(gdal_paths[0])
-            norm_file_dict['mask_flags'] = mask_flags
-        if '_file.normalized_file.color_interpretations' in extra_keys:
-            color_interpretations = get_color_interpretations(gdal_paths[0])
-            norm_file_dict['color_interpretations'] = color_interpretations
-        if '_file.normalized_file.nodata_value' in extra_keys:
-            nodata_value = get_nodata_value(gdal_paths[0])
-            norm_file_dict['nodata_value'] = nodata_value
-        if norm_file_dict:
-            file_dict['normalized_file'] = norm_file_dict
+        normalized_gdal_path = gdal_paths[0] if len(gdal_paths) > 0 else input_file_gdal_path
+        add_file_extra_keys(file_dict, input_file_gdal_path, gdal_paths, extra_keys, normalized_gdal_path=normalized_gdal_path)
     return result
 
 
@@ -461,14 +499,28 @@ def get_bbox_from_files(filepaths):
     return result
 
 
+def get_layer_filepaths(publ_uuid):
+    file_path_info_list = input_file.get_file_path_info(publ_uuid)
+    if file_path_info_list:
+        return [info['gdal'] for info in file_path_info_list]
+    return get_normalized_raster_layer_main_filepaths(publ_uuid)
+
+
+def get_layer_filepath(publ_uuid):
+    file_path_info_list = input_file.get_file_path_info(publ_uuid)
+    if file_path_info_list:
+        return file_path_info_list[0]['gdal']
+    return get_normalized_raster_layer_main_filepaths(publ_uuid)[0]
+
+
 def get_bbox(publ_uuid):
-    filepaths = get_normalized_raster_layer_main_filepaths(publ_uuid)
+    filepaths = get_layer_filepaths(publ_uuid)
     result = get_bbox_from_files(filepaths)
     return result
 
 
 def get_crs(publ_uuid):
-    filepath = get_normalized_raster_layer_main_filepaths(publ_uuid)[0]
+    filepath = get_layer_filepath(publ_uuid)
     data = open_raster_file(filepath, gdalconst.GA_ReadOnly)
     spatial_reference = osr.SpatialReference(wkt=data.GetProjection())
     auth_name = spatial_reference.GetAttrValue('AUTHORITY')
@@ -478,7 +530,7 @@ def get_crs(publ_uuid):
 
 
 def get_normalized_ground_sample_distance_in_m(publ_uuid, *, bbox_size):
-    filepath = get_normalized_raster_layer_main_filepaths(publ_uuid)[0]
+    filepath = get_layer_filepath(publ_uuid)
     raster_size = get_raster_size(filepath)
     pixel_size = [bbox_size / raster_size[idx] for (idx, bbox_size) in enumerate(bbox_size)]
     distance_value = sum(pixel_size) / len(pixel_size)

@@ -98,9 +98,14 @@ def refresh_wms(
             source_file_or_dir = gs_file_path
         else:
             coverage_store_name = wms.get_image_mosaic_store_name(uuid=layer.uuid)
-            source_file_or_dir = os.path.dirname(gs_file_path)
             file_path = file_paths['normalized_absolute']
-            dir_path = os.path.dirname(file_path)
+            gs_file_path_rel = file_paths['normalized_geoserver']
+            if os.path.isdir(file_path):
+                source_file_or_dir = gs_file_path_rel
+                dir_path = file_path
+            else:
+                source_file_or_dir = os.path.dirname(gs_file_path_rel)
+                dir_path = os.path.dirname(file_path)
 
             is_append = existing_input_file_names is not None and len(existing_input_file_names) > 0
             if is_append:

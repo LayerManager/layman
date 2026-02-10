@@ -11,8 +11,9 @@ from layman.http import LaymanError
 from layman import settings, patch_mode
 from layman.common import empty_method, empty_method_returns_dict
 from layman.common.filesystem import input_file as common
+from layman.common.prime_db_schema import publications as pubs_util
 from . import util, gdal as fs_gdal
-from .. import LAYER_TYPE
+from .. import LAYER_TYPE, util as layer_util
 from ..layer_class import Layer
 from ...util import get_publication_uuid
 
@@ -62,35 +63,78 @@ def get_layer_info(workspace, layername):
     return get_layer_info_by_uuid(publ_uuid) if publ_uuid else {}
 
 
-def get_layer_info_by_uuid(publ_uuid):
-    input_files = get_layer_input_files(publ_uuid)
+def is_file_path_layer(publ_uuid):
+    if not publ_uuid:
+        return False
+    infos = pubs_util.get_publication_infos(uuid=publ_uuid)
+    if not infos:
+        return False
+    info = list(infos.values())[0]
+    return info.get('file_path') is not None
 
-    if input_files.saved_paths:
-        # input_files.raw_or_archived_main_file_path is None if user sent ZIP file by chunks without main file inside
-        main_file_path = input_files.raw_or_archived_main_file_path or input_files.saved_paths[0]
-        rel_main_filepath = os.path.relpath(main_file_path, settings.LAYMAN_DATA_DIR)
-        main_files = input_files.raw_or_archived_main_file_paths or input_files.saved_paths
-        file_type = get_file_type(rel_main_filepath)
-        result = {
-            'file': {
-                'paths': [os.path.relpath(filepath, settings.LAYMAN_DATA_DIR) for filepath in main_files],
-            },
+
+def get_file_path_info(publ_uuid):
+    if not publ_uuid:
+        return None
+    infos = pubs_util.get_publication_infos(uuid=publ_uuid)
+    if not infos:
+        return None
+    info = list(infos.values())[0]
+    file_path_relative = info.get('file_path')
+    if not file_path_relative:
+        return None
+
+    abs_path = os.path.join(settings.GEOSERVER_DATADIR, file_path_relative)
+
+    if not os.path.isdir(abs_path):
+        raise LaymanError(2, {
+            'parameter': 'file_path',
+            'message': 'Path is not a directory',
+            'expected': 'Relative path to directory containing raster files',
+            'found': file_path_relative,
+        })
+
+    tifs = layer_util.get_geotiff_files(abs_path)
+    if not tifs:
+        return None
+    return [{'absolute': tif, 'gdal': tif, 'file_path': file_path_relative} for tif in tifs]
+
+
+def get_layer_info_by_uuid(publ_uuid):
+    file_path_info_list = get_file_path_info(publ_uuid)
+    if file_path_info_list:
+        return {
+            'file': {'paths': [os.path.relpath(info['gdal'], settings.GEOSERVER_DATADIR) for info in file_path_info_list]},
             '_file': {
-                'file_type': file_type,
+                'file_type': get_file_type(file_path_info_list[0]['gdal']),
                 'paths': {
-                    slugify_timeseries_filename(os.path.splitext(os.path.basename(main_file))[0]) if len(main_files) > 1 else publ_uuid:
-                    {
-                        'absolute': main_file,
-                        'gdal': main_file if input_files.archive_type is None
-                        else settings.COMPRESSED_FILE_EXTENSIONS[input_files.archive_type] + main_file,
-                    }
-                    for main_file in main_files
+                    os.path.basename(info['gdal']): {'absolute': info['absolute'], 'gdal': info['gdal']}
+                    for info in file_path_info_list
                 },
             },
         }
-    else:
-        result = {}
-    return result
+
+    input_files = get_layer_input_files(publ_uuid)
+    if not input_files.saved_paths:
+        return {}
+
+    main = input_files.raw_or_archived_main_file_path or input_files.saved_paths[0]
+    main_files = input_files.raw_or_archived_main_file_paths or input_files.saved_paths
+
+    return {
+        'file': {'paths': [os.path.relpath(p, settings.LAYMAN_DATA_DIR) for p in main_files]},
+        '_file': {
+            'file_type': get_file_type(os.path.relpath(main, settings.LAYMAN_DATA_DIR)),
+            'paths': {
+                slugify_timeseries_filename(os.path.splitext(os.path.basename(p))[0]) if len(main_files) > 1 else publ_uuid:
+                {
+                    'absolute': p,
+                    'gdal': p if input_files.archive_type is None else settings.COMPRESSED_FILE_EXTENSIONS[input_files.archive_type] + p
+                }
+                for p in main_files
+            },
+        },
+    }
 
 
 def get_all_main_file_names(filenames):

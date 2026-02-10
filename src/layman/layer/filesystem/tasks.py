@@ -69,7 +69,10 @@ def refresh_input_chunk(self, workspace, layername, *, uuid, check_crs=True, ove
 
     publ_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file']})
     main_filepaths = list(path['gdal'] for path in publ_info['_file']['paths'].values())
-    input_file.check_main_files(main_filepaths, check_crs=check_crs, overview_resampling=overview_resampling)
+
+    is_file_path = input_file.is_file_path_layer(uuid)
+    if not is_file_path:
+        input_file.check_main_files(main_filepaths, check_crs=check_crs, overview_resampling=overview_resampling)
 
     file_type = input_file.get_file_type(input_files.raw_or_archived_main_file_path)
     if enable_more_main_files and file_type == settings.GEODATA_TYPE_VECTOR:
@@ -114,6 +117,10 @@ def refresh_gdal(self, workspace, layername,
     layer_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file']})
     file_type = layer_info['_file']['file_type']
     if file_type != settings.GEODATA_TYPE_RASTER:
+        return
+
+    is_file_path = input_file.is_file_path_layer(uuid)
+    if is_file_path:
         return
 
     gdal.ensure_normalized_raster_layer_dir(uuid)

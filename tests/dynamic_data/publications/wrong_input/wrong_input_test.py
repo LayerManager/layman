@@ -1186,8 +1186,8 @@ TESTCASES = {
             'code': 1,
             'message': 'Missing parameter',
             'data': {
-                'parameters': ['file', 'external_table_uri'],
-                'message': 'Both `file` and `external_table_uri` parameters are empty',
+                'parameters': ['file', 'external_table_uri', 'file_path'],
+                'message': 'All parameters `file`, `external_table_uri`, and `file_path` are empty',
                 'expected': 'One of the parameters is filled.',
             },
         },
@@ -1219,7 +1219,18 @@ TESTCASES = {
         },
         Key.MANDATORY_CASES: None,
         Key.RUN_ONLY_CASES: frozenset([RestMethod, WithChunksDomain, CompressDomain.FALSE]),
-        Key.SPECIFIC_CASES: {},
+        Key.SPECIFIC_CASES: {
+            frozenset([RestMethod.POST, WithChunksDomain, CompressDomain.FALSE]): {
+                Key.EXPECTED_EXCEPTION: {
+                    'data': {
+                        'message': 'Multiple parameters are filled: file, external_table_uri',
+                        'found': {
+                            'file_path': None,
+                        },
+                    },
+                },
+            },
+        },
     },
     'partial_external_table_uri': {
         Key.PUBLICATION_TYPE: process_client.LAYER_TYPE,

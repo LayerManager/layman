@@ -18,5 +18,7 @@ def same_values_in_internal_and_rest(workspace, publ_type, name, rest_publicatio
 
     if 'image_mosaic' not in rest_publication_detail:
         publ_info.pop('image_mosaic')
+    if 'file_path' not in rest_publication_detail:
+        publ_info.pop('file_path')
 
     assert publ_info == rest_publication_detail
