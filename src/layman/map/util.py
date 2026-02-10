@@ -150,6 +150,7 @@ def delete_map(map: Map, kwargs=None, *, x_forwarded_items=None):
 def clear_publication_info(layer_info):
     clear_info = common_clear_publication_info(layer_info)
     clear_info.pop('image_mosaic')
+    clear_info.pop('file_path')
     return clear_info
 
 

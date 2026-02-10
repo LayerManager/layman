@@ -40,6 +40,8 @@ MAIN_FILE_EXTENSIONS = {
     '.jpeg': GEODATA_TYPE_RASTER,
 }
 
+FILE_PATH_MAIN_FILE_EXTENSIONS = ['.tif', '.tiff']
+
 # Files are opened with dedicated tools for each format, so adding new extension is not sufficient for new compress format to start working
 COMPRESSED_FILE_EXTENSIONS = {
     '.zip': '/vsizip/',

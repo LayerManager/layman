@@ -44,6 +44,8 @@ def source_internal_keys_are_subset_of_source_sibling_keys(workspace, publ_type,
                 internal_keys = [key[1:] for key in info if key.startswith('_')]
                 if publ_type == MAP_TYPE and source_name == 'layman.map.prime_db_schema.table':
                     internal_keys.remove('style_type')
+                    if 'file_path' in internal_keys:
+                        internal_keys.remove('file_path')
                 assert set(internal_keys) <= all_sibling_keys, \
                     f'internal_keys={set(internal_keys)}, all_sibling_keys={all_sibling_keys}, key={key}, info={info}'
 
@@ -119,6 +121,8 @@ def all_keys_assigned_to_source(workspace, publ_type, name):
     info_keys = {key[1:] if key.startswith('_') else key for key in info}
     if publ_type == MAP_TYPE:
         info_keys.remove('style_type')
+        if 'file_path' in info_keys:
+            info_keys.remove('file_path')
     assert info_keys.issubset(source_keys), f'missing={info_keys.difference(source_keys)} ,info_keys={info_keys}, source_keys={source_keys}'
 
 
@@ -141,8 +145,16 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
         publ_type_detail = (settings.GEODATA_TYPE_VECTOR, 'sld')
     with app.app_context():
         pub_info = layman_util.get_publication_info(workspace, publ_type, name)
+        uuid = pub_info["uuid"]
+        is_file_path_layer = False
+        file_path_input_file_info = None
+        file_path_gdal_info = None
+        if publ_type == process_client.LAYER_TYPE:
+            if input_file.is_file_path_layer(uuid):
+                is_file_path_layer = True
+                file_path_input_file_info = input_file.get_layer_info_by_uuid(uuid)
+                file_path_gdal_info = gdal.get_layer_info_by_uuid(uuid)
     publ_type_dir = util.get_directory_name_from_publ_type(publ_type)
-    uuid = pub_info["uuid"]
     expected_detail = {
         'name': name,
         '_workspace': workspace,
@@ -160,6 +172,7 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
         'access_rights': {'read': ['EVERYONE'], 'write': ['EVERYONE']},
         'image_mosaic': False,
         '_is_public_workspace': True,
+        'file_path': None,
     }
     if publ_type == process_client.LAYER_TYPE:
         geodata_type = publ_type_detail[0]
@@ -260,7 +273,22 @@ def correct_values_in_detail(workspace, publ_type, name, *, exp_publication_deta
                                            '_file': {'file_type': 'raster'},
                                            '_table_uri': None,
                                        })
-            if file_extension:
+            if is_file_path_layer:
+                file_paths = file_path_input_file_info.get('_file', {}).get('paths', {})
+                gdal_paths = file_path_gdal_info.get('_file', {}).get('paths', {})
+                combined_paths = {}
+                for key in file_paths:
+                    combined_paths[key] = {**file_paths[key], **gdal_paths.get(key, {})}
+                util.recursive_dict_update(expected_detail,
+                                           {
+                                               'file': file_path_input_file_info.get('file', {}),
+                                               '_file': {
+                                                   **expected_detail.get('_file', {}),
+                                                   'paths': combined_paths,
+                                               },
+                                               'file_path': pub_info.get('file_path'),
+                                           })
+            elif file_extension:
                 util.recursive_dict_update(expected_detail,
                                            {
                                                '_file': {
@@ -348,10 +376,12 @@ def nodata_preserved_in_normalized_raster(workspace, publ_type, name):
         publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['geodata_type', 'file']})
     geodata_type = publ_info['geodata_type']
     if geodata_type == settings.GEODATA_TYPE_RASTER:
+        is_file_path = publ_info.get('original_data_source') == settings.EnumOriginalDataSource.FILE.value and publ_info.get('file', {}).get('paths', [])
         for file_paths in publ_info['_file']['paths'].values():
             gdal_path = file_paths['gdal']
             input_nodata_value = gdal.get_nodata_value(gdal_path)
-            normalized_nodata_value = gdal.get_nodata_value(file_paths['normalized_absolute'])
+            normalized_path = gdal_path if is_file_path else file_paths['normalized_absolute']
+            normalized_nodata_value = gdal.get_nodata_value(normalized_path)
             assert normalized_nodata_value == pytest.approx(input_nodata_value, 0.000000001)
 
 
@@ -360,9 +390,10 @@ def stats_preserved_in_normalized_raster(workspace, publ_type, name):
         publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['geodata_type', 'file']})
     geodata_type = publ_info['geodata_type']
     if geodata_type == settings.GEODATA_TYPE_RASTER:
+        is_file_path = publ_info.get('original_data_source') == settings.EnumOriginalDataSource.FILE.value and publ_info.get('file', {}).get('paths', [])
         for file_paths in publ_info['_file']['paths'].values():
             gdal_path = file_paths['gdal']
-            normalized_path = file_paths['normalized_absolute']
+            normalized_path = gdal_path if is_file_path else file_paths['normalized_absolute']
             input_stats = gdal.get_statistics(gdal_path)
             driver_name = gdal.get_driver_short_name(gdal_path)
             tolerance = 0.000000001 if driver_name != 'JPEG' else 0.1
@@ -380,9 +411,10 @@ def size_and_position_preserved_in_normalized_raster(workspace, publ_type, name)
         publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['geodata_type', 'file']})
     geodata_type = publ_info['geodata_type']
     if geodata_type == settings.GEODATA_TYPE_RASTER:
+        is_file_path = publ_info.get('original_data_source') == settings.EnumOriginalDataSource.FILE.value and publ_info.get('file', {}).get('paths', [])
         for file_paths in publ_info['_file']['paths'].values():
             gdal_path = file_paths['gdal']
-            normalized_path = file_paths['normalized_absolute']
+            normalized_path = gdal_path if is_file_path else file_paths['normalized_absolute']
 
             input_raster_size = gdal.get_raster_size(gdal_path)
             normalized_raster_size = gdal.get_raster_size(normalized_path)

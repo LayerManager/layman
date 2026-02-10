@@ -368,6 +368,7 @@ def publish_workspace_publication(publication_type,
                                   file_paths=None,
                                   file_path_pattern=None,
                                   external_table_uri=None,
+                                  file_path=None,
                                   headers=None,
                                   actor_name=None,
                                   access_rights=None,
@@ -404,7 +405,7 @@ def publish_workspace_publication(publication_type,
     assert not (check_response_fn and raise_if_not_complete)
     assert not (file_paths and file_path_pattern)
 
-    file_paths = [publication_type_def.source_path] if file_paths is None and external_table_uri is None and not map_layers else file_paths
+    file_paths = [publication_type_def.source_path] if file_paths is None and external_table_uri is None and file_path is None and not map_layers else file_paths
 
     if style_file or with_chunks or compress or compress_settings or overview_resampling:
         assert publication_type == LAYER_TYPE
@@ -446,11 +447,13 @@ def publish_workspace_publication(publication_type,
         if not do_not_post_name:
             data['name'] = name
             data['title'] = title
+        if file_path:
+            data['file_path'] = file_path
         if file_paths:
             if not with_chunks:
-                for file_path in file_paths:
-                    assert os.path.isfile(file_path), file_path
-                files = [('file', (os.path.basename(fp), stack.enter_context(open(fp, 'rb')))) for fp in file_paths]
+                for path in file_paths:
+                    assert os.path.isfile(path), path
+                files = [('file', (os.path.basename(path), stack.enter_context(open(path, 'rb')))) for path in file_paths]
             else:
                 data['file'] = [os.path.basename(file) for file in file_paths]
         if style_file:
