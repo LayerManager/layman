@@ -40,6 +40,7 @@ services:
       environment:
         - C_FORCE_ROOT=true
         - LAYMAN_SKIP_REDIS_LOADING=true
+        - OGR_GEOJSON_MAX_OBJ_SIZE=1000
       extra_hosts:
          - "host.docker.internal:host-gateway"
          - ${EXTRA_HOST1}

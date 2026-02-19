@@ -54,11 +54,13 @@ def import_vector_file_to_internal_table(schema, table, main_filepath, crs_id):
 
 def create_ogr2ogr_args(*, schema, table_name, main_filepath, crs_id, output):
     pg_conn = ' '.join([f"{k}='{v}'" for k, v in settings.PG_CONN.items()])
+    max_obj_size_mb = os.environ.get('OGR_GEOJSON_MAX_OBJ_SIZE', '1000')
     ogr2ogr_args = [
         'ogr2ogr',
         '-nln', table_name,
         '-nlt', 'GEOMETRY',
         '--config', 'OGR_ENABLE_PARTIAL_REPROJECTION', 'TRUE',
+        '--config', 'OGR_GEOJSON_MAX_OBJ_SIZE', max_obj_size_mb,
         '-lco', f'SCHEMA={schema}',
         # '-clipsrc', '-180', '-85.06', '180', '85.06',
         '-f', 'PostgreSQL',
@@ -83,11 +85,12 @@ def create_ogr2ogr_args(*, schema, table_name, main_filepath, crs_id, output):
 def import_vector_file_to_internal_table_async_with_iconv(schema, table_name, main_filepath, crs_id):
     assert table_name, f'schema={schema}, table_name={table_name}, main_filepath={main_filepath}'
 
+    max_obj_size_mb = os.environ.get('OGR_GEOJSON_MAX_OBJ_SIZE', '1000')
     first_ogr2ogr_args = [
         'ogr2ogr',
         '--config', 'OGR_ENABLE_PARTIAL_REPROJECTION', 'TRUE',
+        '--config', 'OGR_GEOJSON_MAX_OBJ_SIZE', max_obj_size_mb,
         '-unsetFid',
-        '-a_srs', crs_id,
         '-f', 'GeoJSON',
         '/vsistdout/',
         f'{main_filepath}',
