@@ -3,6 +3,7 @@
 ## v2.4.0
  {release-date}
 ### Upgrade requirements
+- Only versions 2.0.0 and newer can be upgraded to this version. For older versions, please upgrade to 2.0.0 first.
 ### Migrations and checks
 #### Schema migrations
 #### Data migrations
