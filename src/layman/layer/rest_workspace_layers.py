@@ -108,10 +108,15 @@ def post(workspace):
     time_regex = request.form.get('time_regex') or None
     time_regex_format = request.form.get('time_regex_format') or None
 
-    file_path_relative, file_path_absolute, _, _ = util.validate_and_process_file_path(file_path, check_crs=check_crs)
+    file_path_relative, file_path_absolute, file_path_type, tif_files = util.validate_and_process_file_path(file_path, check_crs=check_crs)
     if file_path_relative:
         file_path = file_path_absolute
-        util.validate_file_path_requires_time_regex(file_path_absolute, time_regex)
+        util.validate_file_path_requires_time_regex(
+            file_path_absolute,
+            time_regex,
+            file_path_type=file_path_type,
+            tif_files=tif_files,
+        )
 
     util.validate_time_regex(time_regex, time_regex_format)
     slugified_time_regex = input_file.slugify_timeseries_filename_pattern(time_regex) if time_regex else None
@@ -147,7 +152,6 @@ def post(workspace):
         if file_path:
             geodata_type = settings.GEODATA_TYPE_RASTER
             if not crs_id:
-                tif_files = util.get_geotiff_files(file_path)
                 crs_id = input_file.get_raster_crs_id(tif_files[0]) if tif_files else None
                 if not crs_id:
                     raise LaymanError(4, {'found': None, 'supported_values': settings.INPUT_SRS_LIST})

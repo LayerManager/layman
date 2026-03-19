@@ -86,15 +86,7 @@ def get_file_path_info(publ_uuid):
 
     abs_path = os.path.join(settings.GEOSERVER_DATADIR, file_path_relative)
 
-    if not os.path.isdir(abs_path):
-        raise LaymanError(2, {
-            'parameter': 'file_path',
-            'message': 'Path is not a directory',
-            'expected': 'Relative path to directory containing raster files',
-            'found': file_path_relative,
-        })
-
-    tifs = layer_util.get_geotiff_files(abs_path)
+    tifs = layer_util.get_file_path_geotiff_files(abs_path)
     if not tifs:
         return None
     return [{'absolute': tif, 'gdal': tif, 'file_path': file_path_relative} for tif in tifs]

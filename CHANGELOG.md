@@ -11,7 +11,7 @@
 ### Changes
 - [#1168](https://github.com/LayerManager/layman/issues/1168) Extend [PATCH Workspace Layer](doc/rest.md#patch-workspace-layer) with ability of appending data to existing time-series layer.
 - When publishing a layer or map to Micka via CSW, Layman sends the creating user (Layman username) in the SOAP request header (`CreateUser`), so the metadata record in Micka is associated with the user who created the publication.
-- [#1185](https://github.com/LayerManager/layman/issues/1185) POST Workspace [Layers](doc/rest.md#post-workspace-layers) supports import of raster layers from an existing server-side directory via the file_path parameter, including ImageMosaic timeseries layers. 
+- [#1185](https://github.com/LayerManager/layman/issues/1185) POST Workspace [Layers](doc/rest.md#post-workspace-layers) supports import of raster layers from existing server-side data via `file_path` (directory for ImageMosaic timeseries layers, or direct GeoTIFF file path).
 - [#1185](https://github.com/LayerManager/layman/issues/1185)[GET Workspace Layer](doc/rest.md#get-workspace-layer) returns `file_path` key for raster layers published using this parameter.
 
 ## v2.3.0

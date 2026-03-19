@@ -8,7 +8,6 @@ from test_tools import process_client
 from tests.asserts.final import publication as asserts_publ
 from tests.asserts.final.publication import util as assert_util
 from tests.dynamic_data import base_test
-from tests.dynamic_data.publications import common_publications
 from tests import Publication4Test
 
 pytest_generate_tests = base_test.pytest_generate_tests
@@ -133,6 +132,38 @@ def generate_test_cases():
     )
     test_cases.append(test_case_single)
 
+    file_path_relative_single_file = os.path.join(
+        normalized_raster_data_dir_name,
+        'layers',
+        TEST_UUID_SINGLE,
+        'raster.tif',
+    )
+    publication_single_file = Publication4Test(
+        type=process_client.LAYER_TYPE,
+        workspace=WORKSPACE,
+        name='test_file_path_single_file',
+    )
+    test_case_single_file = base_test.TestCaseType(
+        key='file_path_single_file',
+        type=base_test.EnumTestTypes.MANDATORY,
+        publication=publication_single_file,
+        rest_method=base_test.RestMethod.POST,
+        rest_args={
+            'file_path': file_path_relative_single_file,
+        },
+        params={
+            'exp_info': {
+                'exp_publication_detail': {
+                    'geodata_type': 'raster',
+                    'image_mosaic': False,
+                },
+                'publ_type_detail': ('raster', 'sld'),
+            },
+            'exp_thumbnail': 'test_tools/data/thumbnail/raster_layer_tif.png',
+        },
+    )
+    test_cases.append(test_case_single_file)
+
     return test_cases
 
 
@@ -219,27 +250,6 @@ def generate_negative_test_cases():
     )
     test_cases.append(test_case_nonexistent)
 
-    publication_file = Publication4Test(
-        type=process_client.LAYER_TYPE,
-        workspace=WORKSPACE,
-        name='test_file_path_is_file',
-    )
-    test_case_file = base_test.TestCaseType(
-        key='file_path_is_file',
-        type=base_test.EnumTestTypes.MANDATORY,
-        publication=publication_file,
-        rest_method=base_test.RestMethod.POST,
-        rest_args={
-            'file_path': os.path.join(normalized_raster_data_dir_name, 'layers', TEST_UUID_SINGLE, 'raster.tif'),
-        },
-        params={
-            'should_succeed': False,
-            'expected_error_code': 2,
-            'expected_error_param': 'file_path',
-        },
-    )
-    test_cases.append(test_case_file)
-
     publication_no_tif = Publication4Test(
         type=process_client.LAYER_TYPE,
         workspace=WORKSPACE,
@@ -261,6 +271,48 @@ def generate_negative_test_cases():
     )
     test_cases.append(test_case_no_tif)
 
+    publication_file_unsupported = Publication4Test(
+        type=process_client.LAYER_TYPE,
+        workspace=WORKSPACE,
+        name='test_file_path_file_unsupported',
+    )
+    test_case_file_unsupported = base_test.TestCaseType(
+        key='file_path_file_unsupported',
+        type=base_test.EnumTestTypes.MANDATORY,
+        publication=publication_file_unsupported,
+        rest_method=base_test.RestMethod.POST,
+        rest_args={
+            'file_path': os.path.join(normalized_raster_data_dir_name, 'layers', 'unsupported_file', 'raster.png'),
+        },
+        params={
+            'should_succeed': False,
+            'expected_error_code': 2,
+            'expected_error_param': 'file_path',
+        },
+    )
+    test_cases.append(test_case_file_unsupported)
+
+    publication_vector_file = Publication4Test(
+        type=process_client.LAYER_TYPE,
+        workspace=WORKSPACE,
+        name='test_file_path_vector_file',
+    )
+    test_case_vector_file = base_test.TestCaseType(
+        key='file_path_vector_file',
+        type=base_test.EnumTestTypes.MANDATORY,
+        publication=publication_vector_file,
+        rest_method=base_test.RestMethod.POST,
+        rest_args={
+            'file_path': os.path.join(normalized_raster_data_dir_name, 'layers', 'vector_file', 'sample.shp'),
+        },
+        params={
+            'should_succeed': False,
+            'expected_error_code': 2,
+            'expected_error_param': 'file_path',
+        },
+    )
+    test_cases.append(test_case_vector_file)
+
     publication_no_regex = Publication4Test(
         type=process_client.LAYER_TYPE,
         workspace=WORKSPACE,
@@ -281,6 +333,28 @@ def generate_negative_test_cases():
         },
     )
     test_cases.append(test_case_no_regex)
+
+    publication_file_with_regex = Publication4Test(
+        type=process_client.LAYER_TYPE,
+        workspace=WORKSPACE,
+        name='test_file_path_file_with_regex',
+    )
+    test_case_file_with_regex = base_test.TestCaseType(
+        key='file_path_file_with_regex',
+        type=base_test.EnumTestTypes.MANDATORY,
+        publication=publication_file_with_regex,
+        rest_method=base_test.RestMethod.POST,
+        rest_args={
+            'file_path': os.path.join(normalized_raster_data_dir_name, 'layers', TEST_UUID_SINGLE, 'raster.tif'),
+            'time_regex': '[0-9]{8}',
+        },
+        params={
+            'should_succeed': False,
+            'expected_error_code': 48,
+            'expected_error_params': ['file_path', 'time_regex'],
+        },
+    )
+    test_cases.append(test_case_file_with_regex)
 
     return test_cases
 
@@ -311,6 +385,30 @@ def prepare_negative_test_data():
     shutil.copy2(sample_file, os.path.join(multi_no_regex_dir, 'raster1.tif'))
     shutil.copy2(sample_file, os.path.join(multi_no_regex_dir, 'raster2.tif'))
     target_dirs.append(multi_no_regex_dir)
+
+    unsupported_file_dir = os.path.join(layers_dir, 'unsupported_file')
+    if os.path.exists(unsupported_file_dir):
+        shutil.rmtree(unsupported_file_dir)
+    os.makedirs(unsupported_file_dir, exist_ok=True)
+    with open(os.path.join(unsupported_file_dir, 'raster.png'), 'wb') as unsupported_file:
+        unsupported_file.write(b'not-a-geotiff')
+    target_dirs.append(unsupported_file_dir)
+
+    vector_file_dir = os.path.join(layers_dir, 'vector_file')
+    if os.path.exists(vector_file_dir):
+        shutil.rmtree(vector_file_dir)
+    os.makedirs(vector_file_dir, exist_ok=True)
+    source_shp = os.path.join(DIRECTORY, 'layers', TEST_UUID_MOSAIC, f'{TEST_UUID_MOSAIC}.shp')
+    assert os.path.exists(source_shp), f"Sample vector file not found: {source_shp}"
+    shutil.copy2(source_shp, os.path.join(vector_file_dir, 'sample.shp'))
+    target_dirs.append(vector_file_dir)
+
+    single_file_for_regex_conflict_dir = os.path.join(layers_dir, TEST_UUID_SINGLE)
+    if os.path.exists(single_file_for_regex_conflict_dir):
+        shutil.rmtree(single_file_for_regex_conflict_dir)
+    os.makedirs(single_file_for_regex_conflict_dir, exist_ok=True)
+    shutil.copy2(sample_file, os.path.join(single_file_for_regex_conflict_dir, 'raster.tif'))
+    target_dirs.append(single_file_for_regex_conflict_dir)
 
     yield
 
