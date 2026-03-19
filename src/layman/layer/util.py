@@ -1,7 +1,6 @@
 from functools import wraps, partial
 from urllib import parse
 import os
-import glob
 import re
 import logging
 import shutil
@@ -28,6 +27,9 @@ FLASK_SOURCES_KEY = f'{__name__}:SOURCES'
 
 EXTERNAL_TABLE_URI_PATTERN = 'postgresql://<username>:<password>@<host>:<port>/<dbname>?schema=<schema_name>&table=<table_name>&geo_column=<geo_column_name>'
 logger = logging.getLogger(__name__)
+FILE_PATH_TYPE_DIRECTORY = 'directory'
+FILE_PATH_TYPE_FILE = 'file'
+FILE_PATH_MAIN_EXTENSIONS = {ext.lower() for ext in settings.FILE_PATH_MAIN_FILE_EXTENSIONS}
 
 
 def to_safe_layer_name(value):
@@ -254,11 +256,78 @@ def layer_info_to_metadata_properties(info):
 
 
 def get_geotiff_files(directory):
-    files = []
-    for ext in settings.FILE_PATH_MAIN_FILE_EXTENSIONS:
-        files.extend(glob.glob(os.path.join(directory, f'*{ext}')))
-        files.extend(glob.glob(os.path.join(directory, f'*{ext.upper()}')))
-    return files
+    return [
+        os.path.join(directory, f)
+        for f in os.listdir(directory)
+        if os.path.splitext(f)[1].lower() in FILE_PATH_MAIN_EXTENSIONS
+    ]
+
+
+def get_file_path_type(file_path_absolute):
+    if os.path.isdir(file_path_absolute):
+        return FILE_PATH_TYPE_DIRECTORY
+    if os.path.isfile(file_path_absolute):
+        return FILE_PATH_TYPE_FILE
+    return None
+
+
+def get_file_path_geotiff_files(file_path_absolute, *, file_path_type=None):
+    file_path_type = file_path_type or get_file_path_type(file_path_absolute)
+    if file_path_type == FILE_PATH_TYPE_DIRECTORY:
+        return get_geotiff_files(file_path_absolute)
+    if file_path_type == FILE_PATH_TYPE_FILE:
+        ext = os.path.splitext(file_path_absolute)[1].lower()
+        if ext in FILE_PATH_MAIN_EXTENSIONS:
+            return [file_path_absolute]
+    return []
+
+
+def validate_file_path_source(file_path, file_path_absolute):
+    file_path_type = get_file_path_type(file_path_absolute)
+    if file_path_type == FILE_PATH_TYPE_DIRECTORY:
+        if not (
+                os.access(file_path_absolute, os.R_OK)
+                and os.access(file_path_absolute, os.X_OK)
+        ):
+            raise LaymanError(2, {
+                'parameter': 'file_path',
+                'message': 'Directory is not readable',
+                'expected': 'Readable directory containing raster files',
+                'found': file_path,
+            })
+    elif file_path_type == FILE_PATH_TYPE_FILE:
+        ext = os.path.splitext(file_path_absolute)[1].lower()
+        if ext not in FILE_PATH_MAIN_EXTENSIONS:
+            raise LaymanError(2, {
+                'parameter': 'file_path',
+                'message': 'Path is not a supported raster file',
+                'expected': f'Relative path to GeoTIFF file with extension in {settings.FILE_PATH_MAIN_FILE_EXTENSIONS}',
+                'found': file_path,
+            })
+        if not os.access(file_path_absolute, os.R_OK):
+            raise LaymanError(2, {
+                'parameter': 'file_path',
+                'message': 'Raster file is not readable',
+                'expected': 'Readable GeoTIFF file',
+                'found': file_path,
+            })
+    else:
+        raise LaymanError(2, {
+            'parameter': 'file_path',
+            'message': 'Path is not a directory or file',
+            'expected': 'Relative path to existing directory or GeoTIFF file',
+            'found': file_path,
+        })
+
+    tif_files = get_file_path_geotiff_files(file_path_absolute, file_path_type=file_path_type)
+    if not tif_files:
+        raise LaymanError(2, {
+            'parameter': 'file_path',
+            'message': 'Directory does not contain any raster files',
+            'expected': 'Directory containing at least one GeoTIFF file (.tif or .tiff) or a GeoTIFF file path',
+            'found': file_path,
+        })
+    return file_path_type, tif_files
 
 
 def validate_and_process_file_path(file_path, *, check_crs=True):
@@ -271,7 +340,7 @@ def validate_and_process_file_path(file_path, *, check_crs=True):
         raise LaymanError(2, {
             'parameter': 'file_path',
             'message': 'Absolute path is not allowed',
-            'expected': 'Relative path to directory (relative to GEOSERVER_DATADIR)',
+            'expected': 'Relative path to directory or GeoTIFF file (relative to GEOSERVER_DATADIR)',
             'found': file_path,
         })
 
@@ -282,61 +351,46 @@ def validate_and_process_file_path(file_path, *, check_crs=True):
         raise LaymanError(2, {
             'parameter': 'file_path',
             'message': 'Path is outside GeoServer data directory',
-            'expected': 'Relative path to directory inside GeoServer data directory',
+            'expected': 'Relative path to directory or GeoTIFF file inside GeoServer data directory',
             'found': file_path,
         })
 
     if not os.path.exists(file_path_absolute):
         raise LaymanError(2, {
             'parameter': 'file_path',
-            'message': 'Directory does not exist',
-            'expected': 'Relative path to existing directory on server',
+            'message': 'Path does not exist',
+            'expected': 'Relative path to existing directory or GeoTIFF file on server',
             'found': file_path,
         })
 
-    if not os.path.isdir(file_path_absolute):
-        raise LaymanError(2, {
-            'parameter': 'file_path',
-            'message': 'Path is not a directory',
-            'expected': 'Relative path to existing directory containing raster files',
-            'found': file_path,
-        })
-
-    if not (
-            os.access(file_path_absolute, os.R_OK)
-            and os.access(file_path_absolute, os.X_OK)
-    ):
-        raise LaymanError(2, {
-            'parameter': 'file_path',
-            'message': 'Directory is not readable',
-            'expected': 'Readable directory containing raster files',
-            'found': file_path,
-        })
-
-    tif_files = get_geotiff_files(file_path_absolute)
-    if not tif_files:
-        raise LaymanError(2, {
-            'parameter': 'file_path',
-            'message': 'Directory does not contain any raster files',
-            'expected': 'Directory containing at least one GeoTIFF file (.tif or .tiff)',
-            'found': file_path,
-        })
+    file_path_type, tif_files = validate_file_path_source(file_path, file_path_absolute)
 
     if check_crs:
         for tif_file in tif_files:
             input_file.check_raster_layer_crs(tif_file)
 
-    return file_path, file_path_absolute, None, None
+    return file_path, file_path_absolute, file_path_type, tif_files
 
 
-def validate_file_path_requires_time_regex(file_path_absolute, time_regex):
-    tif_files = get_geotiff_files(file_path_absolute)
-    if len(tif_files) > 1 and not time_regex:
+def validate_file_path_requires_time_regex(file_path_absolute, time_regex, *, file_path_type, tif_files):
+    if file_path_type == FILE_PATH_TYPE_FILE and time_regex:
+        file_path_relative = os.path.relpath(file_path_absolute, settings.GEOSERVER_DATADIR)
+        raise LaymanError(48, {
+            'parameters': ['file_path', 'time_regex'],
+            'message': 'time_regex is not allowed for file_path pointing to a file',
+            'expected': 'Provide file_path to a directory when using time_regex',
+            'found': {
+                'file_path': file_path_relative,
+                'time_regex': time_regex,
+            },
+        })
+
+    if file_path_type == FILE_PATH_TYPE_DIRECTORY and len(tif_files) > 1 and not time_regex:
         file_path_relative = os.path.relpath(file_path_absolute, settings.GEOSERVER_DATADIR)
         raise LaymanError(48, {
             'parameters': ['file_path', 'time_regex'],
             'message': 'Directory contains multiple raster files, but time_regex is not provided',
-            'expected': 'Provide time_regex parameter for image mosaic when directory contains multiple raster files',
+            'expected': 'Provide time_regex for image mosaic or specify file_path to a single raster file',
             'found': {
                 'file_path': file_path_relative,
                 'raster_files_count': len(tif_files),

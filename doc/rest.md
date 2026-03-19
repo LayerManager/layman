@@ -167,13 +167,16 @@ Body parameters:
   - exactly one of `file`, `file_path`, or `external_table_uri` must be set  
   - relative path to a directory that already exists on the server  
   - the path must be relative to the root of the GeoServer data directory  
-  - the referenced directory must be physically located inside the GeoServer data directory  
-  - the directory must contain at least one GeoTIFF file (with extension `.tif` or `.tiff`)
+  - the referenced path must be physically located inside the GeoServer data directory  
+  - if directory is used, it must contain at least one GeoTIFF file (with extension `.tif` or `.tiff`)
+  - if directory contains more than one raster file, `time_regex` parameter is required
+  - if file is used, it must be a GeoTIFF file (with extension `.tif` or `.tiff`)
 
   - for raster layers:
     - supported only for GeoTIFF files (`.tif` or `.tiff` extension)
     - raster files are not normalized when using `file_path` parameter      
       - this may result in different styling behavior compared to layers published via `file` parameter      
+    - may point directly to a single raster file (published as a single coverage)
     - may point to a directory containing a single raster file (published as a single coverage)
     - may point to a directory containing multiple raster files:
       - if `time_regex` parameter is provided, files are treated as a time series and published as an ImageMosaic
@@ -346,7 +349,7 @@ JSON object with following structure:
   - *status*: Status information about publishing style. See [GET Workspace Layer](#get-workspace-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **original_data_source**: String. Either `file` if layer was published from file, or `database_table` if layer was published from external database table 
-- **file_path**: String. Available only for raster layers published using `file_path` parameter. Relative path to the directory containing raster files, relative to the root of the GeoServer data directory.
+- **file_path**: String. Available only for raster layers published using `file_path` parameter. Relative path (to directory or direct GeoTIFF file) inside the root of the GeoServer data directory.
 - *metadata*
   - *identifier*: String. Identifier of metadata record in CSW instance.
   - *record_url*: String. URL of metadata record accessible by web browser, probably with some editing capabilities.
