@@ -12,10 +12,7 @@
   - [Web Feature Service (WFS)](https://www.ogc.org/standards/wfs/)
   - [Catalogue Service](https://www.ogc.org/standards/cat/)
 - Thumbnail image available
-- Layer-related data is named and structured 
-  - either by [workspace](#workspace) name and layername
-      - [REST API](rest.md): `/rest/workspaces/<workspace_name>/layers/<layername>` 
-  - or by UUID:
+- Layer-related data is named and structured by UUID:
       - [filesystem](data-storage.md#filesystem): `/path/to/LAYMAN_DATA_DIR/layers/<UUID>` 
       - [PostgreSQL](data-storage.md#postgresql): `db=LAYMAN_PG_DBNAME, schema=layers, table=layer_<UUID>` 
       - [GeoServer WFS](data-storage.md#geoserver): `/geoserver/layman/ows, layer=l_<UUID>`
@@ -36,7 +33,7 @@
 - Timeseries is [layer](#layer) created from set of raster data files (GeoTIFF, JPEG2000, PNG or JPEG).
 - Each file represents one time instant, more files may represent the same time instant.
 - The smallest possible supported temporal unit is one day (see [#875](https://github.com/LayerManager/layman/issues/875)).
-- Information about time representation is passed through [time_regex](rest.md#post-workspace-layers) parameter.
+- Information about time representation is passed through [time_regex](rest.md#post-layers) parameter.
   
 ## Map
 - Also referred to as **map composition**

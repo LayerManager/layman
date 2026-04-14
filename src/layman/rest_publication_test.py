@@ -44,7 +44,7 @@ class TestSoapClass:
         username = self.username
         publ_name_prefix = self.publ_name_prefix
         authz_headers = self.authz_headers
-        post_method = process_client.publish_workspace_publication
+        post_method = process_client.publish_publication
         patch_method = process_client.patch_publication_by_uuid
         publ_name = f"{publ_name_prefix}{publ_type.split('.')[-1]}"
         self.publication_type = publ_type
@@ -85,8 +85,8 @@ def test_get_publication_layman_status(publ_type, error_params):
     workspace = 'test_get_publication_layman_status_workspace'
     publication = 'test_get_publication_layman_status_publication'
 
-    resp = process_client.publish_workspace_publication(publ_type, workspace, publication, check_response_fn=common.empty_method_returns_true,
-                                                        raise_if_not_complete=False)
+    resp = process_client.publish_publication(publ_type, workspace, publication, check_response_fn=common.empty_method_returns_true,
+                                              raise_if_not_complete=False)
     uuid = resp['uuid']
     info = process_client.get_publication_by_uuid(publ_type, uuid)
     assert 'layman_metadata' in info, f'info={info}'

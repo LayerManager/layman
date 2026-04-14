@@ -1,11 +1,14 @@
 # Asynchronous file upload
 
-In case of [POST Workspace Layers](rest.md#post-workspace-layers) and [PATCH Layer](rest.md#patch-layer), it is possible to upload data files asynchronously, which is suitable for large files. Let's demonstrate how it can be implemented on client side.
+In case of [POST Layers](rest.md#post-layers) and [PATCH Layer](rest.md#patch-layer), it is possible to upload data files asynchronously, which is suitable for large files. Let's demonstrate how it can be implemented on client side.
 
 ## HTML
 You need some HTML form for user to choose files he wants to publish and fill some additional parametes:
 ```html
-<form id="post-workspace-layers-form" >
+<form id="post-layers-form" >
+  Workspace:
+  <input name="workspace" type="text" />
+
   Data file:
   <input name="file" type="file" multiple />
 
@@ -28,14 +31,14 @@ You need some HTML form for user to choose files he wants to publish and fill so
 </form>
 ```
 
-Now, if you add `target="/rest/workspaces/some_workspace_name/layers" method="POST" enctype="multipart/form-data"` to the `form` element and let user click on Submit button, the browser will send everything to server **synchronously**. To do it **asynchronously**, you need to add some extra logic. 
+Now, if you add `target="/rest/layers" method="POST" enctype="multipart/form-data"` to the `form` element and let user click on Submit button, the browser will send everything to server **synchronously**. To do it **asynchronously**, you need to add some extra logic. 
 
 ## JavaScript
 
 Brief overview:
-- before [POST Workspace Layers](rest.md#post-workspace-layers) request is sent to the server, check file sizes and decide if to make sync or async file upload
+- before [POST Layers](rest.md#post-layers) request is sent to the server, check file sizes and decide if to make sync or async file upload
 - if async, switch from files to file names and save files for later async upload
-- send [POST Workspace Layers](rest.md#post-workspace-layers) request using AJAX
+- send [POST Layers](rest.md#post-layers) request using AJAX
 - if async, read server response to setup [Resumable.js](https://github.com/23/resumable.js/) correctly, and start async upload of files
 
 Example:
@@ -59,7 +62,7 @@ const onFormSubmit = (event) => {
 
   if (RESUMABLE_ENABLED) {
     // let's find out size of chosen files
-    const form_data = new FormData(document.getElementById("post-workspace-layers-form"));
+    const form_data = new FormData(document.getElementById("post-layers-form"));
     const sum_file_size = form_data.getAll("file") // all files in "file" input
         .filter(f => f.name) // ignore files without name
         .reduce((prev, f) => prev + f.size, 0);
@@ -78,8 +81,8 @@ const onFormSubmit = (event) => {
     }
   }
 
-  // send POST Workspace Layers request with form data
-  fetch('/rest/workspaces/some_workspace_name/layers', {
+  // send POST Layers request with form data
+  fetch('/rest/layers', {
     method: 'POST',
     body: form_data,
   }).then(r => {
@@ -106,7 +109,7 @@ const onFormSubmit = (event) => {
 
       // set up resumable.js instance
       const resumable = new Resumable({
-        target: `/rest/workspaces/some_workspace_name/layers/${layername}/chunk`,
+        target: `/rest/workspaces/${form_data.get('workspace')}/layers/${layername}/chunk`,
         query: {
           'layman_original_parameter': 'file'
         },
@@ -143,6 +146,6 @@ const onFormSubmit = (event) => {
 };
 
 // listen for user
-document.getElementById("post-workspace-layers-form").addEventListener("submit", onFormSubmit);
+document.getElementById("post-layers-form").addEventListener("submit", onFormSubmit);
 ```
 

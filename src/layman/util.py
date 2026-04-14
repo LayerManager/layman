@@ -189,6 +189,15 @@ def check_workspace_name(workspace, pattern_only=False):
     call_modules_fn(providers, 'check_workspace_name', [workspace])
 
 
+def get_workspace_from_request(source, *, required=False):
+    workspace = source.get('workspace')
+    if required and not workspace:
+        raise LaymanError(2, {'parameter': 'workspace', 'expected': WORKSPACE_NAME_PATTERN})
+    if workspace:
+        check_workspace_name(workspace, pattern_only=True)
+    return workspace
+
+
 def get_usernames(use_cache=True, skip_modules=None):
     skip_modules = skip_modules or set()
     if use_cache:

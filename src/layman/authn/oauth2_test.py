@@ -93,7 +93,7 @@ def test_two_clients():
 @pytest.mark.usefixtures('app_context')
 def test_auth_header_one_part(client, headers):
     username = 'testuser1'
-    response = client.get(url_for('rest_workspace_layers.get', workspace=username), headers=headers)
+    response = client.get(url_for('rest_layers.get'), query_string={'workspace': username}, headers=headers)
     assert response.status_code == 403
     resp_json = response.get_json()
     assert resp_json['code'] == 32
@@ -108,7 +108,7 @@ def test_auth_header_one_part(client, headers):
 @pytest.mark.usefixtures('app_context')
 def test_auth_header_bad_first_part(client, headers):
     username = 'testuser1'
-    response = client.get(url_for('rest_workspace_layers.get', workspace=username), headers=headers)
+    response = client.get(url_for('rest_layers.get'), query_string={'workspace': username}, headers=headers)
     assert response.status_code == 403
     resp_json = response.get_json()
     assert resp_json['code'] == 32
@@ -123,7 +123,7 @@ def test_auth_header_bad_first_part(client, headers):
 @pytest.mark.usefixtures('app_context')
 def test_auth_header_no_access_token(client, headers):
     username = 'testuser1'
-    response = client.get(url_for('rest_workspace_layers.get', workspace=username), headers=headers)
+    response = client.get(url_for('rest_layers.get'), query_string={'workspace': username}, headers=headers)
     assert response.status_code == 403
     resp_json = response.get_json()
     assert resp_json['code'] == 32
@@ -138,7 +138,7 @@ def test_auth_header_no_access_token(client, headers):
 @pytest.mark.usefixtures('app_context', 'unexisting_introspection_url')
 def test_unexisting_introspection_url(client, headers):
     username = 'testuser1'
-    response = client.get(url_for('rest_workspace_layers.get', workspace=username), headers=headers)
+    response = client.get(url_for('rest_layers.get'), query_string={'workspace': username}, headers=headers)
     assert response.status_code == 403
     resp_json = response.get_json()
     assert resp_json['code'] == 32
@@ -153,8 +153,7 @@ def test_unexisting_introspection_url(client, headers):
 @pytest.mark.usefixtures('app_context', 'inactive_token_introspection_url', 'user_profile_url')
 def test_token_inactive(client, headers):
     username = 'testuser1'
-    url = url_for('rest_workspace_layers.get', workspace=username)
-    response = client.get(url, headers=headers)
+    response = client.get(url_for('rest_layers.get'), query_string={'workspace': username}, headers=headers)
     assert response.status_code == 403
     resp_json = response.get_json()
     assert resp_json['code'] == 32
@@ -169,8 +168,7 @@ def test_token_inactive(client, headers):
 @pytest.mark.usefixtures('app_context', 'active_token_introspection_url', 'user_profile_url')
 def test_token_active(client, headers):
     username = 'testuser1'
-    url = url_for('rest_workspace_layers.get', workspace=username)
-    response = client.get(url, headers=headers)
+    response = client.get(url_for('rest_layers.get'), query_string={'workspace': username}, headers=headers)
     assert response.status_code == 404
     resp_json = response.get_json()
     assert resp_json['code'] == 40

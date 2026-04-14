@@ -71,13 +71,13 @@ PUBLICATION_TYPES_DEF = {MAP_TYPE: PublicationTypeDef('mapname',
                                                       ),
                          LAYER_TYPE: PublicationTypeDef('layername',
                                                         'rest_layers.get',
-                                                        'rest_workspace_layers.post',
+                                                        'rest_layers.post',
                                                         'rest_layer.patch',
-                                                        'rest_workspace_layers.get',
+                                                        'rest_layers.get',
                                                         'rest_layer.get',
                                                         'rest_layer_thumbnail.get',
                                                         'rest_layer.delete_layer',
-                                                        'rest_workspace_layers.delete',
+                                                        'rest_layers.delete',
                                                         layer_keys_to_check,
                                                         'sample/layman.layer/small_layer.geojson',
                                                         'rest_workspace_layer_metadata_comparison.get',
@@ -196,9 +196,9 @@ def ensure_publication_by_uuid(publication_type,
         pub_info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['workspace', 'name']})
     workspace = pub_info.get('_workspace')
     name = pub_info.get('name')
-    response = get_publications(publication_type, workspace=workspace, headers=headers, )
+    response = get_publications_response(publication_type, workspace=workspace, headers=headers)
     publication_obj = next((publication for publication in response.json() if publication['name'] == name), None)
-    if response.status_code == 200 and publication_obj:
+    if publication_obj:
         patch_needed = False
         if access_rights is not None:
             if 'read' in access_rights and set(access_rights['read'].split(',')) != set(publication_obj['access_rights']['read']):
@@ -210,7 +210,7 @@ def ensure_publication_by_uuid(publication_type,
         else:
             result = None
     else:
-        result = publish_workspace_publication(publication_type, workspace, name, access_rights=access_rights, headers=headers)
+        result = publish_publication(publication_type, workspace, name, access_rights=access_rights, headers=headers)
     return result
 
 
@@ -218,35 +218,35 @@ ensure_layer = partial(ensure_publication_by_uuid, LAYER_TYPE)
 ensure_map = partial(ensure_publication_by_uuid, MAP_TYPE)
 
 
-def publish_workspace_publication(publication_type,
-                                  workspace,
-                                  name,
-                                  *,
-                                  uuid=None,
-                                  file_paths=None,
-                                  file_path_pattern=None,
-                                  external_table_uri=None,
-                                  headers=None,
-                                  actor_name=None,
-                                  access_rights=None,
-                                  title=None,
-                                  style_file=None,
-                                  description=None,
-                                  check_response_fn=None,
-                                  raise_if_not_complete=True,
-                                  with_chunks=False,
-                                  compress=False,
-                                  compress_settings=None,
-                                  crs=None,
-                                  map_layers=None,
-                                  native_extent=None,
-                                  overview_resampling=None,
-                                  do_not_upload_chunks=False,
-                                  time_regex=None,
-                                  time_regex_format=None,
-                                  do_not_post_name=False,
-                                  do_not_post_title=False,
-                                  ):
+def publish_publication(publication_type,
+                        workspace,
+                        name,
+                        *,
+                        uuid=None,
+                        file_paths=None,
+                        file_path_pattern=None,
+                        external_table_uri=None,
+                        headers=None,
+                        actor_name=None,
+                        access_rights=None,
+                        title=None,
+                        style_file=None,
+                        description=None,
+                        check_response_fn=None,
+                        raise_if_not_complete=True,
+                        with_chunks=False,
+                        compress=False,
+                        compress_settings=None,
+                        crs=None,
+                        map_layers=None,
+                        native_extent=None,
+                        overview_resampling=None,
+                        do_not_upload_chunks=False,
+                        time_regex=None,
+                        time_regex_format=None,
+                        do_not_post_name=False,
+                        do_not_post_title=False,
+                        ):
     title = (title or name) if not do_not_post_title else None
     headers = headers or {}
     if actor_name:
@@ -278,7 +278,10 @@ def publish_workspace_publication(publication_type,
         headers.update(get_authz_headers(actor_name))
 
     with app.app_context():
-        r_url = url_for(publication_type_def.post_workspace_publication_url, workspace=workspace)
+        if publication_type == LAYER_TYPE:
+            r_url = url_for('rest_layers.post')
+        else:
+            r_url = url_for(publication_type_def.post_workspace_publication_url, workspace=workspace)
 
     temp_dir = None
     if compress:
@@ -299,6 +302,8 @@ def publish_workspace_publication(publication_type,
     files = []
     with ExitStack() as stack:
         data = {}
+        if publication_type == LAYER_TYPE:
+            data['workspace'] = workspace
         if uuid:
             data["uuid"] = uuid
         if not do_not_post_name:
@@ -353,8 +358,70 @@ def publish_workspace_publication(publication_type,
     return response.json()[0]
 
 
+def publish_workspace_publication(publication_type,
+                                  workspace,
+                                  name,
+                                  *,
+                                  uuid=None,
+                                  file_paths=None,
+                                  file_path_pattern=None,
+                                  external_table_uri=None,
+                                  headers=None,
+                                  actor_name=None,
+                                  access_rights=None,
+                                  title=None,
+                                  style_file=None,
+                                  description=None,
+                                  check_response_fn=None,
+                                  raise_if_not_complete=True,
+                                  with_chunks=False,
+                                  compress=False,
+                                  compress_settings=None,
+                                  crs=None,
+                                  map_layers=None,
+                                  native_extent=None,
+                                  overview_resampling=None,
+                                  do_not_upload_chunks=False,
+                                  time_regex=None,
+                                  time_regex_format=None,
+                                  do_not_post_name=False,
+                                  do_not_post_title=False,
+                                  ):
+    assert publication_type == MAP_TYPE, \
+        f'publish_workspace_publication is map-only wrapper, use publish_publication for {publication_type}'
+    return publish_publication(
+        publication_type,
+        workspace,
+        name,
+        uuid=uuid,
+        file_paths=file_paths,
+        file_path_pattern=file_path_pattern,
+        external_table_uri=external_table_uri,
+        headers=headers,
+        actor_name=actor_name,
+        access_rights=access_rights,
+        title=title,
+        style_file=style_file,
+        description=description,
+        check_response_fn=check_response_fn,
+        raise_if_not_complete=raise_if_not_complete,
+        with_chunks=with_chunks,
+        compress=compress,
+        compress_settings=compress_settings,
+        crs=crs,
+        map_layers=map_layers,
+        native_extent=native_extent,
+        overview_resampling=overview_resampling,
+        do_not_upload_chunks=do_not_upload_chunks,
+        time_regex=time_regex,
+        time_regex_format=time_regex_format,
+        do_not_post_name=do_not_post_name,
+        do_not_post_title=do_not_post_title,
+    )
+
+
 publish_workspace_map = partial(publish_workspace_publication, MAP_TYPE)
-publish_workspace_layer = partial(publish_workspace_publication, LAYER_TYPE)
+publish_workspace_layer = partial(publish_publication, LAYER_TYPE)
 
 GET_PUBLICATIONS_KNOWN_PARAMS = {'full_text_filter', 'bbox_filter', 'bbox_filter_crs', 'order_by', 'ordering_bbox',
                                  'ordering_bbox_crs', 'limit', 'offset'}
@@ -383,7 +450,17 @@ def get_publications_response(publication_type, *, workspace=None, headers=None,
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
 
     with app.app_context():
-        r_url = url_for(publication_type_def.get_workspace_publications_url, workspace=workspace) if workspace else url_for(publication_type_def.get_publications_url)
+        if workspace is not None and publication_type == MAP_TYPE:
+            r_url = url_for(publication_type_def.get_workspace_publications_url, workspace=workspace)
+        else:
+            r_url = url_for(publication_type_def.get_publications_url)
+
+    if workspace is not None and publication_type == LAYER_TYPE:
+        query_params = {
+            **query_params,
+            'workspace': workspace,
+        }
+
     response = requests.get(r_url, headers=headers, params=query_params, timeout=HTTP_TIMEOUT)
     raise_layman_error(response)
     return response
@@ -466,7 +543,7 @@ delete_map = partial(delete_publication_by_uuid, MAP_TYPE)
 delete_layer = partial(delete_publication_by_uuid, LAYER_TYPE)
 
 
-def delete_workspace_publications(publication_type, workspace, headers=None, *, actor_name=None, ):
+def delete_publications(publication_type, workspace, headers=None, *, actor_name=None, ):
     headers = headers or {}
     if actor_name:
         assert TOKEN_HEADER not in headers
@@ -475,11 +552,23 @@ def delete_workspace_publications(publication_type, workspace, headers=None, *, 
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
 
     with app.app_context():
+        if publication_type == LAYER_TYPE:
+            r_url = url_for('rest_layers.delete')
+            response = requests.delete(r_url, headers=headers, params={'workspace': workspace}, timeout=HTTP_TIMEOUT)
+            raise_layman_error(response)
+            wfs.clear_cache()
+            wms.clear_cache()
+            return response.json()
         r_url = url_for(publication_type_def.delete_workspace_publications_url,
                         workspace=workspace,
                         )
+        return finish_delete(r_url, headers)
 
-    return finish_delete(r_url, headers, )
+
+def delete_workspace_publications(publication_type, workspace, headers=None, *, actor_name=None, ):
+    assert publication_type == MAP_TYPE, \
+        f'delete_workspace_publications is map-only wrapper, use delete_publications for {publication_type}'
+    return delete_publications(publication_type, workspace, headers=headers, actor_name=actor_name)
 
 
 delete_workspace_maps = partial(delete_workspace_publications, MAP_TYPE)

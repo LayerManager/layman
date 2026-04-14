@@ -14,13 +14,13 @@ def test_task_abortion():
     workspace = 'test_task_abortion_ws'
     layername = 'test_task_abortion_layer'
 
-    post_response = process_client.publish_workspace_publication(process_client.LAYER_TYPE,
-                                                                 workspace, layername,
-                                                                 file_paths=[
-                                                                     'tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson', ],
-                                                                 check_response_fn=empty_method_returns_true,
-                                                                 raise_if_not_complete=False,
-                                                                 )
+    post_response = process_client.publish_publication(process_client.LAYER_TYPE,
+                                                       workspace, layername,
+                                                       file_paths=[
+                                                           'tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson', ],
+                                                       check_response_fn=empty_method_returns_true,
+                                                       raise_if_not_complete=False,
+                                                       )
     processing.response.valid_post(process_client.LAYER_TYPE, layername, post_response)
     time.sleep(2)
     layer_uuid = post_response['uuid']

@@ -31,7 +31,7 @@ class TestDeletePublicationsClass:
                      publ_type,
                      get_publications_response,
                      ):
-        delete_json = process_client.delete_workspace_publications(publ_type, self.owner, actor_name=actor_name)
+        delete_json = process_client.delete_publications(publ_type, self.owner, actor_name=actor_name)
         publication_set = {publication['name'] for publication in delete_json}
         assert after_delete_publications == publication_set
         exp_response_keys = {'name', 'title', 'uuid', 'access_rights', 'url'}
@@ -71,9 +71,9 @@ class TestDeletePublicationsClass:
                         ]
 
         for (name, access_rights) in publications:
-            process_client.publish_workspace_publication(publ_type, owner, name,
-                                                         access_rights=access_rights,
-                                                         actor_name=owner)
+            process_client.publish_publication(publ_type, owner, name,
+                                               access_rights=access_rights,
+                                               actor_name=owner)
 
         response = process_client.get_publications(publ_type, workspace=owner, actor_name=owner)
         assert len(response) == len(publications)

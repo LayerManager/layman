@@ -25,7 +25,7 @@ def test_updated_at(publication_type):
     ;'''
 
     timestamp1 = datetime.datetime.now(datetime.timezone.utc)
-    uuid = process_client.publish_workspace_publication(publication_type, workspace, publication)['uuid']
+    uuid = process_client.publish_publication(publication_type, workspace, publication)['uuid']
     timestamp2 = datetime.datetime.now(datetime.timezone.utc)
 
     with app.app_context():
@@ -160,7 +160,7 @@ class TestResponsesClass:
     def provide_data(self):
         uuids = {}
         for publication_type in process_client.PUBLICATION_TYPES:
-            resp = process_client.publish_workspace_publication(publication_type, self.workspace, self.publication, **self.common_params[publication_type], )
+            resp = process_client.publish_publication(publication_type, self.workspace, self.publication, **self.common_params[publication_type], )
             uuids[publication_type] = resp["uuid"]
         yield
         for publication_type, uuid in uuids.items():

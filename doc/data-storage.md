@@ -25,7 +25,7 @@ When user [reserves his username](rest.md#patch-current-user), names, contacts a
 ### Layers
 Information about [layers](models.md#layer) includes vector or raster data and visualization.
 
-When user [publishes new layer](rest.md#post-workspace-layers)
+When user [publishes new layer](rest.md#post-layers)
 - UUID and name is saved to [Redis](#redis),
 - UUID, name, title, description and access rights are to [PostgreSQL](#postgresql),
 - data files and visualization file is saved to [filesystem](#filesystem) (if uploaded [synchronously](async-file-upload.md)),
@@ -87,7 +87,7 @@ Data is saved to LAYMAN_DATA_DIR directory, LAYMAN_QGIS_DATA_DIR directory, and 
 
 **Normalized raster directory** named `normalized_raster_data` is created in GeoServer data directory.
 
-**Normalized raster layer directory** is created inside Normalized raster directory for every raster layer. Name of the publication directory is UUID of the layer. Normalized raster is stored in this directory for WMS purpose. In case of [timeseries](models.md#timeseries) layer, additional files holding e.g. [time_regex](rest.md#post-workspace-layers) are created too.
+**Normalized raster layer directory** is created inside Normalized raster directory for every raster layer. Name of the publication directory is UUID of the layer. Normalized raster is stored in this directory for WMS purpose. In case of [timeseries](models.md#timeseries) layer, additional files holding e.g. [time_regex](rest.md#post-layers) are created too.
 
 Filesystem is used as persistent data store, so data survives Layman restart.
  
@@ -102,7 +102,7 @@ Layman uses directly **one database** specified by [LAYMAN_PG_DBNAME](env-settin
 
 **Second database** is used by Micka to store metadata records. The database including its structure is completely managed by Micka. By default, it's named `hsrs_micka6`.
 
-**Other external databases** can be used to publish vector data from PostGIS tables (see `external_table_uri` in [POST Workspace Layers](rest.md#post-workspace-layers)). Layman is able to change data in the table using WFS-T (including adding new columns) if provided DB user has sufficient privileges. Other management is left completely on admin of such DB.
+**Other external databases** can be used to publish vector data from PostGIS tables (see `external_table_uri` in [POST Layers](rest.md#post-layers)). Layman is able to change data in the table using WFS-T (including adding new columns) if provided DB user has sufficient privileges. Other management is left completely on admin of such DB.
 
 Data changes made directly in vector data DB tables (both internal and external) are automatically propagated to WMS and WFS. However, layer thumbnail and bounding box at Layman are not automatically updated after such changes.
 

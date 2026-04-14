@@ -72,7 +72,7 @@ def ensure_publication(workspace, publ_type, publication):
         uuid = None
         for idx, params in enumerate(data.PUBLICATIONS[(workspace, publ_type, publication)][data.DEFINITION]):
             if idx == 0:
-                write_method = process_client.publish_workspace_publication
+                write_method = process_client.publish_publication if publ_type == process_client.LAYER_TYPE else process_client.publish_workspace_publication
                 resp = write_method(
                     publ_type,
                     workspace,
@@ -102,14 +102,19 @@ def check_publication_status(response):
 def publish_publications_step(publications_set, step_num):
     done_publications = set()
     uuid = None
-    write_method = process_client.patch_publication_by_uuid if step_num > 0 else process_client.publish_workspace_publication
     for workspace, publ_type, publication in publications_set:
         data_def = data.PUBLICATIONS[(workspace, publ_type, publication)][data.DEFINITION]
         params = data_def[step_num]
         if step_num > 0:
-            write_method(publ_type, uuid, **params, check_response_fn=empty_method_returns_true,
-                         raise_if_not_complete=False)
+            process_client.patch_publication_by_uuid(
+                publ_type,
+                uuid,
+                **params,
+                check_response_fn=empty_method_returns_true,
+                raise_if_not_complete=False,
+            )
         else:
+            write_method = process_client.publish_publication if publ_type == process_client.LAYER_TYPE else process_client.publish_workspace_publication
             resp = write_method(publ_type, workspace, publication, **params, check_response_fn=empty_method_returns_true,
                                 raise_if_not_complete=False)
             uuid = resp['uuid']

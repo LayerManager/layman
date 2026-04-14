@@ -188,7 +188,7 @@ def test_post_layers_simple():
     response = requests.get(md_record_url, auth=settings.CSW_BASIC_AUTHN,
                             timeout=settings.DEFAULT_CONNECTION_TIMEOUT)
     response.raise_for_status()
-    assert layername in response.text
+    assert f"m-{layeruuid}" in response.text
 
     publication_counter.increase()
     uuid.check_redis_consistency(expected_publ_num_by_type={

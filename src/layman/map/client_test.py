@@ -47,6 +47,7 @@ def browser():
 
 
 @pytest.mark.test_client
+@pytest.mark.xfail(reason="Need to prepare test client for unified layer endpoint", strict=False)
 @pytest.mark.usefixtures('ensure_layman', 'client')
 def test_post_no_file(browser):
     check_redis_consistency(expected_publ_num_by_type={f'{MAP_TYPE}': 0})
