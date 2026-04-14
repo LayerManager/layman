@@ -193,8 +193,8 @@ class TestSingleRestPublication:
             **args,
         }
 
-        resp = process_client.publish_workspace_publication(publication.type, publication.workspace, publication.name,
-                                                            **final_args)
+        resp = process_client.publish_publication(publication.type, publication.workspace, publication.name,
+                                                  **final_args)
         if isinstance(resp, dict):
             maybe_uuid = resp.get('uuid', None)
             if maybe_uuid:
@@ -229,7 +229,7 @@ class TestSingleRestPublication:
 
     @classmethod
     def delete_workspace_publications(cls, publication, args=None):
-        return process_client.delete_workspace_publications(publication.type, publication.workspace, **args)
+        return process_client.delete_publications(publication.type, publication.workspace, **args)
 
     @pytest.fixture(scope='class', autouse=True)
     def class_fixture(self, request):

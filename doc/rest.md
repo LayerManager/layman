@@ -4,11 +4,10 @@
 |Endpoint|URL|GET|POST|PATCH|DELETE|
 |---|---|---|---|---|---|
 |Publications|`/rest/publications`|[GET](#get-publications)| x | x | x |
-|Layers|`/rest/layers`|[GET](#get-layers)| x | x | x |
+|Layers|`/rest/layers`|[GET](#get-layers)| [POST](#post-layers) | x | [DELETE](#delete-layers) |
 |[Layer](models.md#layer)|`/rest/layers/<uuid>`|[GET](#get-layer)| x | [PATCH](#patch-layer) | [DELETE](#delete-layer) |
 |Layer Thumbnail|`/rest/layers/<uuid>/thumbnail`|[GET](#get-layer-thumbnail)| x | x | x |
 |Layer Style|`/rest/layers/<uuid>/style`|[GET](#get-layer-style)| x | x | x |
-|Workspace Layers|`/rest/workspaces/<workspace_name>/layers`|[GET](#get-workspace-layers)| [POST](#post-workspace-layers) | x | [DELETE](#delete-workspace-layers) |
 |Workspace Layer Chunk|`/rest/workspaces/<workspace_name>/layers/<layername>/chunk`|[GET](#get-workspace-layer-chunk)| [POST](#post-workspace-layer-chunk) | x | x |
 |Workspace Layer Metadata Comparison|`/rest/workspaces/<workspace_name>/layers/<layername>/metadata-comparison`|[GET](#get-workspace-layer-metadata-comparison) | x | x | x |
 |Maps|`/rest/maps`|[GET](#get-maps)| x | x | x |
@@ -89,16 +88,12 @@ Get list of published layers.
 
 Have the same request parameters and response structure and headers as [GET Publications](#get-publications), except only layers are returned.
 
-## Workspace Layers
-### URL
-`/rest/workspaces/<workspace_name>/layers`
+Query parameters:
+- *workspace*: String, optional
+  - workspace identifier
+  - if present, only layers from this workspace are returned
 
-### GET Workspace Layers
-Get list of published layers.
-
-Have the same request parameters and response structure and headers as [GET Layers](#get-layers).
-
-### POST Workspace Layers
+### POST Layers
 Publish vector or raster data as new WMS layer, in case of vector data also new WFS feature type.
 
 Processing chain consists of few steps:
@@ -125,8 +120,8 @@ If workspace directory, database schema, or GeoServer's datastores does not exis
 Response to this request may be returned sooner than the processing chain is finished to enable [asynchronous processing](async-tasks.md). Status of processing chain can be seen using [GET Layer](#get-layer) and **layman_metadata.publication_status** property or **status** properties of layer sources (wms, wfs, thumbnail, db_table, file, style, metadata) for higher granularity.
 
 It is possible to upload data files asynchronously, which is suitable for large files. This can be done in three steps:
-1. Send POST Workspace Layers request with **file** parameter filled by file names that you want to upload
-2. Read set of files accepted to upload from POST Workspace Layers response, **files_to_upload** property. The set of accepted files will be either equal to or subset of file names sent in **file** parameter.
+1. Send POST Layers request with **file** parameter filled by file names that you want to upload
+2. Read set of files accepted to upload from POST Layers response, **files_to_upload** property. The set of accepted files will be either equal to or subset of file names sent in **file** parameter.
 3. Send [POST Workspace Layer Chunk](#post-workspace-layer-chunk) requests using Resumable.js to upload files.
 
 Check [Asynchronous file upload](async-file-upload.md) example.
@@ -135,6 +130,8 @@ Check [Asynchronous file upload](async-file-upload.md) example.
 Content-Type: `multipart/form-data`, `application/x-www-form-urlencoded`
 
 Body parameters:
+- **workspace**, string `^[a-z][a-z0-9]*(_[a-z0-9]+)*$`
+   - workspace where the layer will be published
 - *uuid*, string, e.g. `959c95fb-ab54-47a6-9694-402926b8fd29`
    - layer primary key
    - used if specified, otherwise generated
@@ -237,11 +234,13 @@ JSON array of objects representing posted layers with following structure:
    - **file**: name of the file, equal to one of file name from **file** parameter
    - **layman_original_parameter**: name of the request parameter that contained the file name; currently, the only possible value is `file`
 
-### DELETE Workspace Layers
+### DELETE Layers
 Delete existing layers and all associated sources except external DB tables published using `external_table_uri`. So it deletes e.g. data file, vector internal DB table or normalized raster files for all layers in the workspace. The currently running [asynchronous tasks](async-tasks.md) of affected layers are aborted. Only layers on which user has [write access right](./security.md#access-to-multi-publication-endpoints) are deleted.
 
 #### Request
-No action parameters.
+Query parameters:
+- **workspace**, string `^[a-z][a-z0-9]*(_[a-z0-9]+)*$`
+  - workspace whose layers will be deleted
 
 #### Response
 Content-Type: `application/json`
@@ -347,11 +346,11 @@ JSON object with following structure:
   - **name**: String. Name of the map where the layer is used.
   - **workspace**: String. Workspace to which the map belongs. 
 ### PATCH Layer
-Update information about existing layer. First, it deletes sources of the layer (except external DB table published using `external_table_uri`), and then it publishes them again with new parameters. The processing chain is similar to [POST Workspace Layers](#post-workspace-layers).
+Update information about existing layer. First, it deletes sources of the layer (except external DB table published using `external_table_uri`), and then it publishes them again with new parameters. The processing chain is similar to [POST Layers](#post-layers).
 
 Response to this request may be returned sooner than the processing chain is finished to enable [asynchronous processing](async-tasks.md).
 
-It is possible to upload data files asynchronously, which is suitable for large files. See [POST Workspace Layers](#post-workspace-layers).
+It is possible to upload data files asynchronously, which is suitable for large files. See [POST Layers](#post-layers).
 
 Calling concurrent PATCH requests is not supported, as well as calling PATCH when [POST/PATCH async chain](async-tasks.md) is still running, is not allowed. In such cases, error is returned.
 
@@ -360,17 +359,17 @@ Calling PATCH request when [WFS-T async chain](async-tasks.md) is still running 
 #### Request
 Content-Type: `multipart/form-data`, `application/x-www-form-urlencoded`
 
-Parameters have same meaning as in case of [POST Workspace Layers](#post-workspace-layers).
+Parameters have same meaning as in case of [POST Layers](#post-layers).
 
 Body parameters:
 - *file*, file(s) or file name(s)
    - If provided, current data file will be deleted and replaced by this file. GeoServer feature types, DB table, normalized raster file, and thumbnail will be deleted and created again using the new file.
-   - same file types as in [POST Workspace Layers](#post-workspace-layers) are expected
+   - same file types as in [POST Layers](#post-layers) are expected
    - only one of `file` or `external_table_uri` can be set
    - if file names are provided, files must be uploaded subsequently using [POST Workspace Layer Chunk](#post-workspace-layer-chunk)
    - if published file has empty bounding box (i.e. no features), its bounding box on WMS/WFS endpoint is set to the whole World
    - if QML style is used (either directly within this request, or indirectly from previous state on server), it must list all attributes contained in given data file
-   - it is allowed to publish time-series layer - see [POST Workspace Layers](#post-workspace-layers)
+   - it is allowed to publish time-series layer - see [POST Layers](#post-layers)
 - *external_table_uri*, string
    - only one of `file` or `external_table_uri` can be set
    - [connection URI](https://www.postgresql.org/docs/15/libpq-connect.html#id-1.7.3.8.3.6) is required, usual format is `postgresql://<username>:<password>@<host>:<port>/<dbname>?schema=<schema_name>&table=<table_name>&geo_column=<geo_column_name>`
@@ -394,7 +393,7 @@ Body parameters:
 - *style*, style file
    - SLD or QML style file (recognized by the root element of XML: `StyledLayerDescriptor` or `qgis`)
      - QML style for raster data file is not supported
-     - It's possible to encode also external images in QML styles and use them in the style. See [POST Workspace Layers](#post-workspace-layers) body parameter *style* for details.
+     - It's possible to encode also external images in QML styles and use them in the style. See [POST Layers](#post-layers) body parameter *style* for details.
    - attribute names are [laundered](https://gdal.org/en/stable/drivers/vector/pg.html#layer-creation-options) to be in line with DB attribute names
    - If provided, current layer thumbnail will be temporarily deleted and created again using the new style.
 - *access_rights.read*, string
@@ -409,7 +408,7 @@ Body parameters:
    - can be used only together with `file` parameter, otherwise error is raised
 - *time_regex*, string, e.g. `[0-9]{8}T[0-9]{6}Z`
   - supported only in combination with *file* parameter
-  - see [POST Workspace Layers](#post-workspace-layers)
+  - see [POST Layers](#post-layers)
 - *time_regex_format*, string, e.g. yyyyddMM
   - description of `time_regex` result format as [java SimpleDateFormat](https://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html), [GeoServer examples](https://docs.geoserver.geo-solutions.it/edu/en/multidim/imagemosaic/mosaic_indexer.html#format)
   - supported only in combination with `time_regex`
@@ -417,7 +416,7 @@ Body parameters:
 #### Response
 Content-Type: `application/json`
 
-JSON object, same as in case of [POST Workspace Layers](#post-workspace-layers).
+JSON object, same as in case of [POST Layers](#post-layers).
 
 ### DELETE Layer
 Delete existing layer and all associated sources except external DB table published using `external_table_uri`. So it deletes e.g. data file, vector internal DB table or normalized raster file. The currently running [asynchronous tasks](async-tasks.md) of affected layer are aborted.
@@ -467,7 +466,7 @@ Layer Chunk endpoint enables to upload layer data files asynchronously by splitt
 
 Check [Asynchronous file upload](async-file-upload.md) example. 
 
-The endpoint is activated after [POST Workspace Layers](#post-workspace-layers) or [PATCH Layer](#patch-layer) request if and only if the **file** parameter contained file name(s). The endpoint is active till first of the following happens:
+The endpoint is activated after [POST Layers](#post-layers) or [PATCH Layer](#patch-layer) request if and only if the **file** parameter contained file name(s). The endpoint is active till first of the following happens:
 - all file chunks are uploaded
 - no chunk is uploaded within [UPLOAD_MAX_INACTIVITY_TIME](../src/layman_settings.py)
 - layer is deleted
@@ -479,7 +478,7 @@ Test if file chunk is already uploaded on the server.
 
 #### Request
 Query parameters:
-- **layman_original_parameter**, name of parameter of preceding request ([POST Workspace Layers](#post-workspace-layers) or [PATCH Layer](#patch-layer)) that contained the file name
+- **layman_original_parameter**, name of parameter of preceding request ([POST Layers](#post-layers) or [PATCH Layer](#patch-layer)) that contained the file name
 - **resumableFilename**, name of file whose chunk is requested
 - **resumableChunkNumber**, serial number of requested chunk
 
@@ -498,7 +497,7 @@ Body parameters:
 - **file**, uploaded chunk
 - **resumableChunkNumber**, serial number of uploaded chunk
 - **resumableFilename**, name of file whose chunk is uploaded
-- **layman_original_parameter**, name of parameter of preceding request ([POST Workspace Layers](#post-workspace-layers) or [PATCH Layer](#patch-layer)) that contained the file name
+- **layman_original_parameter**, name of parameter of preceding request ([POST Layers](#post-layers) or [PATCH Layer](#patch-layer)) that contained the file name
 - **resumableTotalChunks**, number of chunks the file is split to
 
 #### Response

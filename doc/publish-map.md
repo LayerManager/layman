@@ -37,9 +37,9 @@ Remember that Layman supports only CRS projections defined by [LAYMAN_INPUT_SRS_
 
 In QGIS, you need to implement following steps.
 
-First, publish each layer whose data source is local ShapeFile or GeoJSON as WMS layer using [POST Workspace Layers](rest.md#post-workspace-layers) endpoint. Do not forget to respect supported projection (see `crs` input parameter). Also set `style` parameter to layer style, otherwise the data file will be displayed with default GeoServer style.
+First, publish each layer whose data source is local ShapeFile or GeoJSON as WMS layer using [POST Layers](rest.md#post-layers) endpoint. Do not forget to respect supported projection (see `crs` input parameter). Also set `style` parameter to layer style, otherwise the data file will be displayed with default GeoServer style.
 
-In response of [POST Workspace Layers](rest.md#post-workspace-layers) you will obtain
+In response of [POST Layers](rest.md#post-layers) you will obtain
  - `name` of the layer unique within all layers in used [workspace](models.md#workspace)
  - `url` of the layer pointing to [GET Layer](rest.md#get-layer)
  

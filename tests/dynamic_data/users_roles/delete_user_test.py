@@ -86,7 +86,7 @@ def test_delete_user(setup_users_and_role, publication_type, workspace, _setup_r
     access_rights = access_rights(username)
     if callable(workspace):
         workspace = workspace(username)
-    process_client.publish_workspace_publication(publication_type, workspace, publication, actor_name=username, access_rights=access_rights)
+    process_client.publish_publication(publication_type, workspace, publication, actor_name=username, access_rights=access_rights)
 
     # check if publications exists
     publications = process_client.get_publications(publication_type, workspace=workspace, actor_name=username)
@@ -162,7 +162,7 @@ def test_delete_self_with_publications(publication_type, workspace, _setup_role,
     if callable(workspace):
         workspace = workspace(username)
     process_client.reserve_username(username, actor_name=username)
-    process_client.publish_workspace_publication(publication_type, workspace, publication, actor_name=username, access_rights=access_rights)
+    process_client.publish_publication(publication_type, workspace, publication, actor_name=username, access_rights=access_rights)
     process_client.delete_user(username, actor_name=username)
     with app.app_context():
         publ_info = layman_util.get_publication_info(workspace, publication_type, publication)
@@ -189,7 +189,7 @@ def test_delete_user_with_undeletable_publications(publication_type):
         process_client.reserve_username(username, actor_name=username)
     if not any(user['username'] == username2 for user in users):
         process_client.reserve_username(username2, actor_name=username2)
-    process_client.publish_workspace_publication(publication_type, public_workspace, publication, actor_name=username, access_rights=access_rights)
+    process_client.publish_publication(publication_type, public_workspace, publication, actor_name=username, access_rights=access_rights)
     process_client.delete_user(username, actor_name=username)
     with app.app_context():
         publ_info = layman_util.get_publication_info(public_workspace, publication_type, publication)
@@ -213,8 +213,8 @@ def test_delete_shared_publications_with_readers(setup_user_or_everyone, publica
         'read': f"{username},{reader}",
         'write': f"{username}"
     }
-    process_client.publish_workspace_publication(publication_type, public_workspace, publication, actor_name=username,
-                                                 access_rights=access_rights)
+    process_client.publish_publication(publication_type, public_workspace, publication, actor_name=username,
+                                       access_rights=access_rights)
     with pytest.raises(LaymanError) as exc_info:
         process_client.delete_user(username, actor_name=username)
     assert exc_info.value.code == 58, f"Unexpected error code: {exc_info.value.code}"
@@ -236,7 +236,7 @@ def test_delete_shared_publications_with_readers(setup_user_or_everyone, publica
         f"expected publications are different {unable_delete_publications}"
 
     )
-    process_client.delete_workspace_publications(publication_type, public_workspace, actor_name=username)
+    process_client.delete_publications(publication_type, public_workspace, actor_name=username)
 
 
 def workspace_exists(workspace):
@@ -266,12 +266,12 @@ def test_layer_with_external_table():
                              table=external_db_table,
                              )
 
-    process_client.publish_workspace_publication(process_client.LAYER_TYPE, workspace, layername,
-                                                 external_table_uri=f"{external_db.URI_STR}?schema={external_db_schema}&table={external_db_table}",
-                                                 actor_name=username,
-                                                 access_rights={'read': f"{username}, {username_2}",
-                                                                'write': f"{username}, {username_2}"
-                                                                })
+    process_client.publish_publication(process_client.LAYER_TYPE, workspace, layername,
+                                       external_table_uri=f"{external_db.URI_STR}?schema={external_db_schema}&table={external_db_table}",
+                                       actor_name=username,
+                                       access_rights={'read': f"{username}, {username_2}",
+                                                      'write': f"{username}, {username_2}"
+                                                      })
 
     process_client.delete_user(username, actor_name=username)
     process_client.delete_user(username_2, actor_name=username_2)

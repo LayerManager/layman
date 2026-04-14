@@ -11,7 +11,7 @@ def test_patch_after_feature_change_concurrency(publication_type):
     workspace = 'test_wfst_concurrency_workspace'
     publication = 'test_wfst_concurrency_layer'
 
-    resp = process_client.publish_workspace_publication(publication_type, workspace, publication, )
+    resp = process_client.publish_publication(publication_type, workspace, publication, )
     uuid = resp['uuid']
 
     queue = celery.get_run_after_chain_queue(workspace, publication_type, publication)

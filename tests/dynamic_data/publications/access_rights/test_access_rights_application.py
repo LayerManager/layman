@@ -324,9 +324,9 @@ class TestAccessRights:
         role_service_util.ensure_user_role(self.OTHER_USER, self.OTHER_ROLE)
         role_service_util.ensure_user_role(self.READER_BY_ROLE, self.NON_EXISTING_ROLE)
         for publication, access_rights, _ in self.PUBLICATIONS_DEFS:
-            process_client.publish_workspace_publication(publication.type, publication.workspace, publication.name,
-                                                         uuid=publication.uuid,
-                                                         actor_name=self.OWNER, access_rights=access_rights, )
+            process_client.publish_publication(publication.type, publication.workspace, publication.name,
+                                               uuid=publication.uuid,
+                                               actor_name=self.OWNER, access_rights=access_rights, )
         role_service_util.delete_user_role(self.READER_BY_ROLE, self.NON_EXISTING_ROLE)
         role_service_util.delete_role(self.NON_EXISTING_ROLE)
         yield

@@ -13,14 +13,16 @@ def test_issue_1081():
     layer2 = 'issue_1081_layer_2'
     layer2_uuid = 'd7247e9f-8f86-4438-82da-3f53e48df95f'
 
-    process_client.publish_workspace_layer(workspace=workspace,
-                                           name=layer1,
-                                           uuid=layer1_uuid,
-                                           )
-    process_client.publish_workspace_layer(workspace=workspace,
-                                           name=layer2,
-                                           uuid=layer2_uuid,
-                                           )
+    process_client.publish_publication(process_client.LAYER_TYPE,
+                                       workspace=workspace,
+                                       name=layer1,
+                                       uuid=layer1_uuid,
+                                       )
+    process_client.publish_publication(process_client.LAYER_TYPE,
+                                       workspace=workspace,
+                                       name=layer2,
+                                       uuid=layer2_uuid,
+                                       )
     wfs_layer1 = GeoserverIds(uuid=layer1_uuid).wfs
     wfs_layer2 = GeoserverIds(uuid=layer2_uuid).wfs
 
@@ -63,4 +65,4 @@ def test_issue_1081():
             workspace=GEOSERVER_WFS_WORKSPACE,
         )
 
-    process_client.delete_workspace_layers(workspace=workspace)
+    process_client.delete_publications(process_client.LAYER_TYPE, workspace=workspace)

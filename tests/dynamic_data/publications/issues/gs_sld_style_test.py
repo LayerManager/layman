@@ -12,10 +12,11 @@ def test_issue_738():
     layername = 'layer_issue_738'
 
     #  Publish with sld 1.0.0 style
-    resp = process_client.publish_workspace_layer(workspace=workspace,
-                                                  name=layername,
-                                                  style_file='sample/style/basic.sld',
-                                                  )
+    resp = process_client.publish_publication(process_client.LAYER_TYPE,
+                                              workspace=workspace,
+                                              name=layername,
+                                              style_file='sample/style/basic.sld',
+                                              )
     uuid = resp['uuid']
     with app.app_context():
         layer = Layer(layer_tuple=(workspace, layername))

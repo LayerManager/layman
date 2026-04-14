@@ -13,11 +13,11 @@ class TestPublication:
     @pytest.mark.parametrize('publ_type', process_client.PUBLICATION_TYPES)
     def test_post(self, publ_type):
         uuid = '959c95fb-ab54-47a6-9694-402926b8fd29'
-        response = process_client.publish_workspace_publication(publ_type, self.workspace, self.name, uuid=uuid)
+        response = process_client.publish_publication(publ_type, self.workspace, self.name, uuid=uuid)
         assert response['uuid'] == uuid
 
         with pytest.raises(LaymanError) as exc_info:
-            process_client.publish_workspace_publication(publ_type, self.workspace, self.name, uuid=uuid)
+            process_client.publish_publication(publ_type, self.workspace, self.name, uuid=uuid)
         assert exc_info.value.http_code == 400
         assert exc_info.value.code == 2
         assert exc_info.value.data['message'] == f'UUID `959c95fb-ab54-47a6-9694-402926b8fd29` value already in use'
@@ -29,7 +29,7 @@ class TestPublication:
     def test_post_invalid_uuid(self, publ_type, ):
         uuid = '959c95fb-402926b8fd29'
         with pytest.raises(LaymanError) as exc_info:
-            process_client.publish_workspace_publication(publ_type, self.workspace, self.name, uuid=uuid)
+            process_client.publish_publication(publ_type, self.workspace, self.name, uuid=uuid)
         assert exc_info.value.http_code == 400
         assert exc_info.value.code == 2
         assert exc_info.value.data['message'] == f'UUID `959c95fb-402926b8fd29` is not valid uuid'

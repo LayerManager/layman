@@ -3,7 +3,7 @@
 Layman uses asynchronous tasks for processing publications (layers and maps), because some processing steps may take a long time. For example, importing 100 MB ShapeFile to DB may take few tens of seconds.
 
 Asynchronous tasks are started by following requests:
-- [POST Workspace Layers](rest.md#post-workspace-layers)
+- [POST Layers](rest.md#post-layers)
    - tasks related to newly published layer
    - tasks related to each map that points to newly published layer
 - [PATCH Layer](rest.md#patch-layer)

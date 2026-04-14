@@ -24,9 +24,9 @@ class TestPublicWorkspaceClass:
 
     @staticmethod
     @pytest.mark.usefixtures('oauth2_provider_mock', 'setup_test_public_workspace_variable')
-    @pytest.mark.parametrize("publish_method, delete_method, workspace_suffix", [
-        pytest.param(process_client.publish_workspace_layer, process_client.delete_layer, '_layer', id='layer'),
-        pytest.param(process_client.publish_workspace_map, process_client.delete_map, '_map', id='map'),
+    @pytest.mark.parametrize("publication_type, workspace_suffix", [
+        pytest.param(process_client.LAYER_TYPE, '_layer', id='layer'),
+        pytest.param(process_client.MAP_TYPE, '_map', id='map'),
     ])
     @pytest.mark.parametrize(
         "create_public_workspace, publish_in_public_workspace, workspace_prefix, publication_name, authz_headers,"
@@ -47,10 +47,20 @@ class TestPublicWorkspaceClass:
                                        user_can_create,
                                        anonymous_can_publish,
                                        anonymous_can_create,
-                                       publish_method,
-                                       delete_method,
+                                       publication_type,
                                        workspace_suffix,
                                        ):
+        def publish_method(workspace_name, publication_name, headers=None):
+            return process_client.publish_publication(
+                publication_type,
+                workspace_name,
+                publication_name,
+                headers=headers,
+            )
+
+        def delete_method(uuid, headers=None):
+            return process_client.delete_publication_by_uuid(publication_type, uuid, headers=headers)
+
         def can_not_publish(workspace_name,
                             publication_name,
                             publish_method,
