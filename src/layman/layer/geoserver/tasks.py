@@ -113,11 +113,14 @@ def refresh_wms(
 
             shutil.copy(os.path.join(DIRECTORY, 'indexer.properties'), dir_path)
             timeregex_path = os.path.join(dir_path, 'timeregex.properties')
-            timeregex_format_str = f',format={slugified_time_regex_format}' if slugified_time_regex_format else ''
-            with open(timeregex_path, 'w', encoding="utf-8") as file:
-                file.write(f'regex={slugified_time_regex}{timeregex_format_str}\n')
+            if slugified_time_regex:
+                timeregex_format_str = f',format={slugified_time_regex_format}' if slugified_time_regex_format else ''
+                with open(timeregex_path, 'w', encoding="utf-8") as file:
+                    file.write(f'regex={slugified_time_regex}{timeregex_format_str}\n')
+            elif os.path.isfile(timeregex_path):
+                os.remove(timeregex_path)
             coverage_type = gs_util.COVERAGESTORE_IMAGEMOSAIC
-            enable_time_dimension = True
+            enable_time_dimension = bool(slugified_time_regex)
         gs_util.create_coverage_store(gs_layername.workspace, settings.LAYMAN_GS_AUTH, coverage_store_name, source_file_or_dir, coverage_type=coverage_type)
         gs_util.publish_coverage(gs_layername.workspace, settings.LAYMAN_GS_AUTH, coverage_store_name, gs_layername.name, layer.title,
                                  layer.description, bbox, layer.native_crs, lat_lon_bbox=lat_lon_bbox, metadata_url=metadata_url, enable_time_dimension=enable_time_dimension)

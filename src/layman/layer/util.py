@@ -282,6 +282,19 @@ def get_file_path_geotiff_files(file_path_absolute, *, file_path_type=None):
     return []
 
 
+def is_multi_raster_input_files(input_files):
+    if not input_files:
+        return False
+    main_paths = input_files.raw_or_archived_main_file_paths
+    if len(main_paths) <= 1:
+        return False
+    main_types = {
+        settings.MAIN_FILE_EXTENSIONS.get(os.path.splitext(path)[1].lower(), settings.GEODATA_TYPE_UNKNOWN)
+        for path in main_paths
+    }
+    return main_types == {settings.GEODATA_TYPE_RASTER}
+
+
 def validate_file_path_source(file_path, file_path_absolute):
     file_path_type = get_file_path_type(file_path_absolute)
     if file_path_type == FILE_PATH_TYPE_DIRECTORY:
@@ -372,7 +385,7 @@ def validate_and_process_file_path(file_path, *, check_crs=True):
     return file_path, file_path_absolute, file_path_type, tif_files
 
 
-def validate_file_path_requires_time_regex(file_path_absolute, time_regex, *, file_path_type, tif_files):
+def validate_file_path_requires_time_regex(file_path_absolute, time_regex, *, file_path_type):
     if file_path_type == FILE_PATH_TYPE_FILE and time_regex:
         file_path_relative = os.path.relpath(file_path_absolute, settings.GEOSERVER_DATADIR)
         raise LaymanError(48, {
@@ -382,18 +395,6 @@ def validate_file_path_requires_time_regex(file_path_absolute, time_regex, *, fi
             'found': {
                 'file_path': file_path_relative,
                 'time_regex': time_regex,
-            },
-        })
-
-    if file_path_type == FILE_PATH_TYPE_DIRECTORY and len(tif_files) > 1 and not time_regex:
-        file_path_relative = os.path.relpath(file_path_absolute, settings.GEOSERVER_DATADIR)
-        raise LaymanError(48, {
-            'parameters': ['file_path', 'time_regex'],
-            'message': 'Directory contains multiple raster files, but time_regex is not provided',
-            'expected': 'Provide time_regex for image mosaic or specify file_path to a single raster file',
-            'found': {
-                'file_path': file_path_relative,
-                'raster_files_count': len(tif_files),
             },
         })
 

@@ -157,6 +157,8 @@ def clear_cache():
 
 def get_timeregex_props(layer_dir):
     props_path = os.path.join(layer_dir, 'timeregex.properties')
+    if not os.path.isfile(props_path):
+        return {}
     props_config = configparser.ConfigParser()
     section_name = 'global'
     try:
@@ -194,11 +196,20 @@ def get_layer_info_by_uuid(*, uuid, x_forwarded_items=None):
                                                           get_image_mosaic_store_name(uuid=uuid),
                                                           gs_layername.name)
         if granules_json:
-            gdal_layer_dir = gdal.get_normalized_raster_layer_dir(uuid)
-            time_info = {
-                **image_mosaic_granules_to_wms_time_key(granules_json),
-                **get_timeregex_props(gdal_layer_dir),
-            }
+            gdal_layer_info = gdal.get_layer_info_by_uuid(uuid)
+            gdal_paths = gdal_layer_info.get('_file', {}).get('paths', {})
+            first_path = next(iter(gdal_paths.values()), {})
+            gdal_layer_dir = os.path.dirname(
+                first_path.get('normalized_absolute')
+                or first_path.get('gdal')
+                or gdal.get_normalized_raster_layer_dir(uuid)
+            )
+            timeregex_props = get_timeregex_props(gdal_layer_dir)
+            if timeregex_props:
+                time_info = {
+                    **image_mosaic_granules_to_wms_time_key(granules_json),
+                    **timeregex_props,
+                }
 
     wms_proxy_url = get_wms_url(external_url=True, x_forwarded_items=x_forwarded_items)
 

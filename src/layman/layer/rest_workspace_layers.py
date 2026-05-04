@@ -115,7 +115,6 @@ def post(workspace):
             file_path_absolute,
             time_regex,
             file_path_type=file_path_type,
-            tif_files=tif_files,
         )
 
     util.validate_time_regex(time_regex, time_regex_format)
@@ -134,9 +133,12 @@ def post(workspace):
     if info:
         raise LaymanError(17, {'layername': layername})
 
-    name_normalized_tif_by_layer = time_regex is None
-    name_input_file_by_layer = time_regex is None or input_files.is_one_archive
-    enable_more_main_files = time_regex is not None
+    is_file_path_multi_raster = file_path_type == util.FILE_PATH_TYPE_DIRECTORY and bool(tif_files) and len(tif_files) > 1
+    is_input_files_multi_raster = util.is_multi_raster_input_files(input_files)
+    image_mosaic = bool(time_regex) or is_file_path_multi_raster or is_input_files_multi_raster
+    name_normalized_tif_by_layer = not image_mosaic
+    name_input_file_by_layer = not image_mosaic or (bool(input_files) and input_files.is_one_archive and bool(time_regex))
+    enable_more_main_files = image_mosaic
 
     # register layer uuid
     uuid_str = register_publication_uuid_to_redis(workspace, LAYER_TYPE, layername, input_uuid)
@@ -204,7 +206,7 @@ def post(workspace):
             'time_regex': time_regex,
             'slugified_time_regex': slugified_time_regex,
             'slugified_time_regex_format': slugified_time_regex_format,
-            'image_mosaic': time_regex is not None,
+            'image_mosaic': image_mosaic,
             'name_normalized_tif_by_layer': name_normalized_tif_by_layer,
             'name_input_file_by_layer': name_input_file_by_layer,
             'enable_more_main_files': enable_more_main_files,
