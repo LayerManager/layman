@@ -13,6 +13,7 @@
 - When publishing a layer or map to Micka via CSW, Layman sends the creating user (Layman username) in the SOAP request header (`CreateUser`), so the metadata record in Micka is associated with the user who created the publication.
 - [#1185](https://github.com/LayerManager/layman/issues/1185) POST Workspace [Layers](doc/rest.md#post-workspace-layers) supports import of raster layers from existing server-side data via `file_path` (directory for ImageMosaic timeseries layers, or direct GeoTIFF file path).
 - [#1185](https://github.com/LayerManager/layman/issues/1185)[GET Workspace Layer](doc/rest.md#get-workspace-layer) returns `file_path` key for raster layers published using this parameter.
+- [#1195](https://github.com/LayerManager/layman/issues/1195) Allow publishing multiple raster granules as a single non-time series ImageMosaic layer (via `file` upload or `file_path` directory).
 
 ## v2.3.0
  2025-12-02

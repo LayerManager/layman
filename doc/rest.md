@@ -151,7 +151,10 @@ Body parameters:
       - JPEG (.jpg, .jpeg, with .jpg.aux.xml, .jgw, .jpgw, .jpegw or .wld)
       - any of above types in single ZIP file (.zip)
       - file names, i.e. array of strings
-   - it is allowed to publish time-series layer by setting time_regex parameter and sending one or more main raster files (compressed in one archive or uncompressed) with the same extension, color interpretation, pixel size, nodata value, mask flags, and data type name. Filename can be at most 210 characters long. Supported characters are 26 Latin letters `a-zA-Z` (with or without diacritics), numbers, underscores, dashes, dots, and spaces. Other Latin characters (e.g. ligatures `ß` or `Æ`) and other than Latin scripts (e.g. Cyrillic or Chinese) are not supported. Files are stored and published with slugified filenames (diacritic is removed from letters, and space ` ` is converted to underscore `_`).
+   - it is allowed to publish multi-file raster layer by sending one or more main raster files (compressed in one archive or uncompressed) with the same extension, color interpretation, pixel size, nodata value, mask flags, and data type name.
+   - if `time_regex` parameter is provided, files are treated as a time series and published as an ImageMosaic with time dimension.
+     - for time-series layers, filename can be at most 210 characters long. Supported characters are 26 Latin letters `a-zA-Z` (with or without diacritics), numbers, underscores, dashes, dots, and spaces. Other Latin characters (e.g. ligatures `ß` or `Æ`) and other than Latin scripts (e.g. Cyrillic or Chinese) are not supported. Files are stored and published with slugified filenames (diacritic is removed from letters, and space ` ` is converted to underscore `_`).
+   - if `time_regex` parameter is not provided and more than one main raster file is sent, files are published as an ImageMosaic without time dimension.
    - if file names are provided, files must be uploaded subsequently using [POST Workspace Layer Chunk](#post-workspace-layer-chunk)
    - in case of raster data input, following input combinations of bands and color interpretations are supported:
       - 1 band: Gray
@@ -169,7 +172,6 @@ Body parameters:
   - the path must be relative to the root of the GeoServer data directory  
   - the referenced path must be physically located inside the GeoServer data directory  
   - if directory is used, it must contain at least one GeoTIFF file (with extension `.tif` or `.tiff`)
-  - if directory contains more than one raster file, `time_regex` parameter is required
   - if file is used, it must be a GeoTIFF file (with extension `.tif` or `.tiff`)
 
   - for raster layers:
@@ -179,8 +181,8 @@ Body parameters:
     - may point directly to a single raster file (published as a single coverage)
     - may point to a directory containing a single raster file (published as a single coverage)
     - may point to a directory containing multiple raster files:
-      - if `time_regex` parameter is provided, files are treated as a time series and published as an ImageMosaic
-      - if `time_regex` parameter is not provided and directory contains multiple raster files, an error is raised
+      - if `time_regex` parameter is provided, files are treated as a time series and published as an ImageMosaic with time dimension
+      - if `time_regex` parameter is not provided, files are published as an ImageMosaic without time dimension
  
 - *external_table_uri*, string
    - exactly one of `file`, `file_path`, or `external_table_uri` must be set
@@ -363,7 +365,7 @@ JSON object with following structure:
 - **bounding_box**: List of 4 floats. Bounding box coordinates [minx, miny, maxx, maxy] in EPSG:3857.
 - **native_crs**: Code of native CRS in form "EPSG:&lt;code&gt;", e.g. "EPSG:4326". Native CRS is CRS of the input data file.
 - **native_bounding_box**: List of 4 floats. Bounding box coordinates [minx, miny, maxx, maxy] in native CRS.
-- *image_mosaic*: Boolean. True for raster layers using `image_mosaic` plugin in GeoServer, so far only [timeseries](models.md#timeseries) layers. Available only for raster layer
+- *image_mosaic*: Boolean. True for raster layers using `image_mosaic` plugin in GeoServer (with or without time dimension). Available only for raster layer
 - **geodata_type**: String. Either `vector`, `raster`, or `unknown`. Value `unknown` is used if input files are zipped and still being uploaded.
 - **used_in_maps**: JSON array of objects. List of maps in which the layer is used.
   - **name**: String. Name of the map where the layer is used.

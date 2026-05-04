@@ -241,6 +241,8 @@ def patch_workspace_publication(publication_type,
     if actor_name and actor_name != settings.ANONYM_USER:
         headers.update(get_authz_headers(actor_name))
 
+    if isinstance(file_paths, (str, os.PathLike)):
+        file_paths = [str(file_paths)]
     file_paths = [] if file_paths is None and not map_layers else file_paths
 
     with app.app_context():
@@ -405,6 +407,8 @@ def publish_workspace_publication(publication_type,
     assert not (check_response_fn and raise_if_not_complete)
     assert not (file_paths and file_path_pattern)
 
+    if isinstance(file_paths, (str, os.PathLike)):
+        file_paths = [str(file_paths)]
     file_paths = [publication_type_def.source_path] if file_paths is None and external_table_uri is None and file_path is None and not map_layers else file_paths
 
     if style_file or with_chunks or compress or compress_settings or overview_resampling:

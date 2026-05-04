@@ -169,9 +169,14 @@ def patch(workspace, layername):
     slugified_time_regex = input_file.slugify_timeseries_filename_pattern(time_regex) if time_regex else None
     slugified_time_regex_format = input_file.slugify_timeseries_filename_pattern(time_regex_format) if time_regex_format else None
 
-    name_normalized_tif_by_layer = time_regex is None
-    name_input_file_by_layer = time_regex is None or input_files.is_one_archive
-    enable_more_main_files = time_regex is not None
+    is_input_files_multi_raster = util.is_multi_raster_input_files(input_files)
+    input_files_image_mosaic = bool(time_regex) or is_input_files_multi_raster
+    name_normalized_tif_by_layer = not input_files_image_mosaic
+    name_input_file_by_layer = (
+        not input_files_image_mosaic
+        or (bool(input_files) and input_files.is_one_archive and bool(time_regex))
+    )
+    enable_more_main_files = input_files_image_mosaic
 
     # FILE NAMES
     use_chunk_upload = bool(input_files.sent_paths)
@@ -216,7 +221,7 @@ def patch(workspace, layername):
     old_layer = Layer(layer_tuple=(workspace, layername))
 
     if delete_from == 'layman.layer.filesystem.input_file':
-        kwargs['image_mosaic'] = time_regex is not None
+        kwargs['image_mosaic'] = input_files_image_mosaic
     else:
         kwargs['image_mosaic'] = old_layer.image_mosaic if hasattr(old_layer, 'image_mosaic') else None
     props_to_refresh = util.get_same_or_missing_prop_names(old_layer)

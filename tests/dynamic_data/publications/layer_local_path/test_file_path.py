@@ -17,6 +17,7 @@ WORKSPACE = "test_file_path_ws"
 
 TEST_UUID_MOSAIC = '4d2ee21d-f7d9-4f16-a191-f15637c94c96'
 TEST_UUID_SINGLE = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890'
+TEST_UUID_MULTI_NO_REGEX = 'b7c8d9e0-f1a2-3456-7890-bcdef1234567'
 
 
 @pytest.fixture(scope='class')
@@ -54,6 +55,14 @@ def prepare_file_path_data():
     target_file = os.path.join(target_dir_single, 'raster.tif')
     shutil.copy2(sample_file, target_file)
     target_dirs.append(target_dir_single)
+
+    target_dir_multi_no_regex = os.path.join(layers_dir, TEST_UUID_MULTI_NO_REGEX)
+    if os.path.exists(target_dir_multi_no_regex):
+        shutil.rmtree(target_dir_multi_no_regex)
+    os.makedirs(target_dir_multi_no_regex, exist_ok=True)
+    shutil.copy2(sample_file, os.path.join(target_dir_multi_no_regex, 'raster1.tif'))
+    shutil.copy2(sample_file, os.path.join(target_dir_multi_no_regex, 'raster2.tif'))
+    target_dirs.append(target_dir_multi_no_regex)
 
     yield
 
@@ -96,7 +105,8 @@ def generate_test_cases():
                 },
                 'publ_type_detail': ('raster', 'sld'),
             },
-            'exp_thumbnail': 'test_tools/data/thumbnail/raster_layer_tif.png',
+            'exp_thumbnail': 'tests/dynamic_data/publications/layer_local_path/file_path_thumbnail.png',
+            'exp_thumbnail_max_diffs': 5,
         },
     )
     test_cases.append(test_case_mosaic)
@@ -164,6 +174,38 @@ def generate_test_cases():
     )
     test_cases.append(test_case_single_file)
 
+    file_path_relative_multi_no_regex = os.path.join(
+        normalized_raster_data_dir_name,
+        'layers',
+        TEST_UUID_MULTI_NO_REGEX
+    )
+    publication_multi_no_regex = Publication4Test(
+        type=process_client.LAYER_TYPE,
+        workspace=WORKSPACE,
+        name='test_file_path_multi_no_regex',
+    )
+    test_case_multi_no_regex = base_test.TestCaseType(
+        key='file_path_multi_no_regex',
+        type=base_test.EnumTestTypes.MANDATORY,
+        publication=publication_multi_no_regex,
+        rest_method=base_test.RestMethod.POST,
+        rest_args={
+            'file_path': file_path_relative_multi_no_regex,
+        },
+        params={
+            'exp_info': {
+                'exp_publication_detail': {
+                    'geodata_type': 'raster',
+                    'image_mosaic': True,
+                },
+                'publ_type_detail': ('raster', 'sld'),
+            },
+            'exp_thumbnail': 'tests/dynamic_data/publications/layer_local_path/thumbnail_file_path_mosaic.png',
+            'exp_thumbnail_max_diffs': 5,
+        },
+    )
+    test_cases.append(test_case_multi_no_regex)
+
     return test_cases
 
 
@@ -181,7 +223,7 @@ class TestFilePath(base_test.TestSingleRestPublication):
 
         with app.app_context():
             pub_info = layman_util.get_publication_info(layer.workspace, layer.type, layer.name)
-            if params['exp_info']['exp_publication_detail'].get('image_mosaic'):
+            if rest_args.get('time_regex'):
                 assert 'wms' in pub_info and 'time' in pub_info['wms'], \
                     "Timeseries layer (image_mosaic=True) must expose WMS time dimension"
             assert 'bounding_box' in pub_info, "Layer must have bounding_box"
@@ -312,27 +354,6 @@ def generate_negative_test_cases():
         },
     )
     test_cases.append(test_case_vector_file)
-
-    publication_no_regex = Publication4Test(
-        type=process_client.LAYER_TYPE,
-        workspace=WORKSPACE,
-        name='test_file_path_no_regex',
-    )
-    test_case_no_regex = base_test.TestCaseType(
-        key='file_path_no_regex',
-        type=base_test.EnumTestTypes.MANDATORY,
-        publication=publication_no_regex,
-        rest_method=base_test.RestMethod.POST,
-        rest_args={
-            'file_path': os.path.join(normalized_raster_data_dir_name, 'layers', 'multi_no_regex'),
-        },
-        params={
-            'should_succeed': False,
-            'expected_error_code': 48,
-            'expected_error_params': ['file_path', 'time_regex'],
-        },
-    )
-    test_cases.append(test_case_no_regex)
 
     publication_file_with_regex = Publication4Test(
         type=process_client.LAYER_TYPE,
