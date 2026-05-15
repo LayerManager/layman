@@ -4,6 +4,10 @@
  {release-date}
 ### Upgrade requirements
 - Only versions 2.0.0 and newer can be upgraded to this version. For older versions, please upgrade to 2.0.0 first.
+- Change environment variable [LAYMAN_CLIENT_VERSION](doc/env-settings.md#LAYMAN_CLIENT_VERSION):
+  ```
+  LAYMAN_CLIENT_VERSION=v2.1.0
+  ```
 ### Migrations and checks
 #### Schema migrations
 - [#1185](https://github.com/LayerManager/layman/issues/1185) Add new text column `file_path` in `publications` table in prime DB schema. Add constraint that `file_path` can be non-null only when `geodata_type` is `raster`.
