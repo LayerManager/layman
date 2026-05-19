@@ -1,7 +1,7 @@
 # Changelog
 
 ## v2.4.0
- {release-date}
+ 2026-05-19
 ### Upgrade requirements
 - Only versions 2.0.0 and newer can be upgraded to this version. For older versions, please upgrade to 2.0.0 first.
 ### Migrations and checks
