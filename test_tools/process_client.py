@@ -81,7 +81,7 @@ PUBLICATION_TYPES_DEF = {MAP_TYPE: PublicationTypeDef('mapname',
                                                         layer_keys_to_check,
                                                         'sample/layman.layer/small_layer.geojson',
                                                         'rest_workspace_layer_metadata_comparison.get',
-                                                        'rest_workspace_layer_chunk.post',
+                                                        'rest_layer_chunk.post',
                                                         ),
                          None: PublicationTypeDef('publicationname',
                                                   'rest_publications.get',
@@ -152,18 +152,10 @@ def raise_if_not_complete_status(response):
         raise LaymanError(55, data=resp_json)
 
 
-def upload_file_chunks(publication_type,
-                       workspace,
-                       name,
-                       file_paths,
-                       ):
-    publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
+def upload_file_chunks(uuid, file_paths):
     time.sleep(0.5)
     with app.app_context():
-        chunk_url = url_for(publication_type_def.post_workspace_publication_chunk,
-                            workspace=workspace,
-                            **{publication_type_def.url_param_name: name},
-                            )
+        chunk_url = url_for('rest_layer_chunk.post', uuid=uuid)
 
     file_chunks = [('file', file_name) for file_name in file_paths]
     for file_type, file_name in file_chunks:
@@ -341,21 +333,19 @@ def publish_publication(publication_type,
                                  timeout=HTTP_TIMEOUT,
                                  )
     raise_layman_error(response)
-    assert response.json()[0]['name'] == name or not name, f'name={name}, response.name={response.json()[0]["name"]}'
-    name = name or response.json()[0]['name']
+    result = response.json()[0]
+    assert result['name'] == name or not name, f'name={name}, response.name={result["name"]}'
+    name = name or result['name']
 
     if with_chunks and not do_not_upload_chunks:
-        upload_file_chunks(publication_type,
-                           workspace,
-                           name,
-                           file_paths, )
+        upload_file_chunks(result['uuid'], file_paths)
 
     if not do_not_upload_chunks:
         wait_for_publication_status(workspace, publication_type, name, check_response_fn=check_response_fn,
                                     headers=headers, raise_if_not_complete=raise_if_not_complete)
     if temp_dir:
         shutil.rmtree(temp_dir)
-    return response.json()[0]
+    return result
 
 
 def publish_workspace_publication(publication_type,
@@ -900,7 +890,7 @@ def patch_publication_by_uuid(publication_type,
     assert all(key in response.json() for key in expected_resp_keys), f'uuid={uuid}, response={response.json()}'
 
     if with_chunks and not do_not_upload_chunks:
-        upload_file_chunks_by_uuid(publication_type, uuid, file_paths,)
+        upload_file_chunks(uuid, file_paths)
 
     if not do_not_upload_chunks:
         wait_for_publication_status_by_uuid(uuid, publication_type,
@@ -916,14 +906,6 @@ def patch_publication_by_uuid(publication_type,
 
 patch_map = partial(patch_publication_by_uuid, MAP_TYPE)
 patch_layer = partial(patch_publication_by_uuid, LAYER_TYPE)
-
-
-def upload_file_chunks_by_uuid(publication_type, uuid, file_paths):
-    with app.app_context():
-        pub_info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['workspace', 'name']})
-    workspace = pub_info.get('_workspace')
-    name = pub_info.get('name')
-    return upload_file_chunks(publication_type, workspace, name, file_paths)
 
 
 def wait_for_publication_status_by_uuid(uuid, publication_type, *, check_response_fn=None, headers=None,

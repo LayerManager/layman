@@ -104,12 +104,12 @@ const onFormSubmit = (event) => {
           )
       );
 
-      // find out layer name
-      const layername = resp_json[0]['name'];
+      // find out layer uuid
+      const layer_uuid = resp_json[0]['uuid'];
 
       // set up resumable.js instance
       const resumable = new Resumable({
-        target: `/rest/workspaces/${form_data.get('workspace')}/layers/${layername}/chunk`,
+        target: `/rest/layers/${layer_uuid}/chunk`,
         query: {
           'layman_original_parameter': 'file'
         },
