@@ -38,7 +38,7 @@ LAYER_REST_PATH_NAME = f"{PUBLICATION_TYPE_NAME}s"
 
 
 from ..common import InternalSourceTypeDef
-from .rest_workspace_layer_chunk import bp as workspace_layer_chunk_bp
+from .rest_layer_chunk import bp as layer_chunk_bp
 from .rest_layer_thumbnail import bp as layer_thumbnail_bp
 from .rest_layer_style import bp as layer_style_bp
 from .rest_workspace_layer_metadata_comparison import bp as workspace_layer_metadata_comparison_bp
@@ -52,7 +52,6 @@ PUBLICATION_TYPES = {
         'name': PUBLICATION_TYPE_NAME,
         'rest_path_name': LAYER_REST_PATH_NAME,
         'workspace_blueprints': [  # blueprints to register
-            workspace_layer_chunk_bp,
             workspace_layer_metadata_comparison_bp,
         ],
         'blueprints': [  # blueprints to register
@@ -60,6 +59,7 @@ PUBLICATION_TYPES = {
             layer_bp,
             layer_thumbnail_bp,
             layer_style_bp,
+            layer_chunk_bp,
         ],
         # see also .util.TASKS_TO_LAYER_INFO_KEYS
         'internal_sources': OrderedDict([  # internal sources to process when new source is published

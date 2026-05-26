@@ -8,7 +8,7 @@
 |[Layer](models.md#layer)|`/rest/layers/<uuid>`|[GET](#get-layer)| x | [PATCH](#patch-layer) | [DELETE](#delete-layer) |
 |Layer Thumbnail|`/rest/layers/<uuid>/thumbnail`|[GET](#get-layer-thumbnail)| x | x | x |
 |Layer Style|`/rest/layers/<uuid>/style`|[GET](#get-layer-style)| x | x | x |
-|Workspace Layer Chunk|`/rest/workspaces/<workspace_name>/layers/<layername>/chunk`|[GET](#get-workspace-layer-chunk)| [POST](#post-workspace-layer-chunk) | x | x |
+|Layer Chunk|`/rest/layers/<uuid>/chunk`|[GET](#get-layer-chunk)| [POST](#post-layer-chunk) | x | x |
 |Workspace Layer Metadata Comparison|`/rest/workspaces/<workspace_name>/layers/<layername>/metadata-comparison`|[GET](#get-workspace-layer-metadata-comparison) | x | x | x |
 |Maps|`/rest/maps`|[GET](#get-maps)| x | x | x |
 |[Map](models.md#map)|`/rest/maps/<uuid>`|[GET](#get-map)| x | [PATCH](#patch-map) | [DELETE](#delete-map) |
@@ -122,7 +122,7 @@ Response to this request may be returned sooner than the processing chain is fin
 It is possible to upload data files asynchronously, which is suitable for large files. This can be done in three steps:
 1. Send POST Layers request with **file** parameter filled by file names that you want to upload
 2. Read set of files accepted to upload from POST Layers response, **files_to_upload** property. The set of accepted files will be either equal to or subset of file names sent in **file** parameter.
-3. Send [POST Workspace Layer Chunk](#post-workspace-layer-chunk) requests using Resumable.js to upload files.
+3. Send [POST Layer Chunk](#post-layer-chunk) requests using Resumable.js to upload files.
 
 Check [Asynchronous file upload](async-file-upload.md) example.
 
@@ -148,7 +148,7 @@ Body parameters:
       - any of above types in single ZIP file (.zip)
       - file names, i.e. array of strings
    - it is allowed to publish time-series layer by setting time_regex parameter and sending one or more main raster files (compressed in one archive or uncompressed) with the same extension, color interpretation, pixel size, nodata value, mask flags, and data type name. Filename can be at most 210 characters long. Supported characters are 26 Latin letters `a-zA-Z` (with or without diacritics), numbers, underscores, dashes, dots, and spaces. Other Latin characters (e.g. ligatures `ß` or `Æ`) and other than Latin scripts (e.g. Cyrillic or Chinese) are not supported. Files are stored and published with slugified filenames (diacritic is removed from letters, and space ` ` is converted to underscore `_`).
-   - if file names are provided, files must be uploaded subsequently using [POST Workspace Layer Chunk](#post-workspace-layer-chunk)
+   - if file names are provided, files must be uploaded subsequently using [POST Layer Chunk](#post-layer-chunk)
    - in case of raster data input, following input combinations of bands and color interpretations are supported:
       - 1 band: Gray
       - 1 band: Palette
@@ -230,7 +230,7 @@ JSON array of objects representing posted layers with following structure:
 - **name**: String. Name of the layer.
 - **uuid**: String. UUID of the layer.
 - **url**: String. URL of the layer. It points to [GET Layer](#get-layer).
-- *files_to_upload*: List of objects. It's present only if **file** parameter contained file names. Each object represents one file that server expects to be subsequently uploaded using [POST Workspace Layer Chunk](#post-workspace-layer-chunk). Each object has following properties:
+- *files_to_upload*: List of objects. It's present only if **file** parameter contained file names. Each object represents one file that server expects to be subsequently uploaded using [POST Layer Chunk](#post-layer-chunk). Each object has following properties:
    - **file**: name of the file, equal to one of file name from **file** parameter
    - **layman_original_parameter**: name of the request parameter that contained the file name; currently, the only possible value is `file`
 
@@ -366,7 +366,7 @@ Body parameters:
    - If provided, current data file will be deleted and replaced by this file. GeoServer feature types, DB table, normalized raster file, and thumbnail will be deleted and created again using the new file.
    - same file types as in [POST Layers](#post-layers) are expected
    - only one of `file` or `external_table_uri` can be set
-   - if file names are provided, files must be uploaded subsequently using [POST Workspace Layer Chunk](#post-workspace-layer-chunk)
+   - if file names are provided, files must be uploaded subsequently using [POST Layer Chunk](#post-layer-chunk)
    - if published file has empty bounding box (i.e. no features), its bounding box on WMS/WFS endpoint is set to the whole World
    - if QML style is used (either directly within this request, or indirectly from previous state on server), it must list all attributes contained in given data file
    - it is allowed to publish time-series layer - see [POST Layers](#post-layers)
@@ -461,7 +461,7 @@ Content-Type:
   - `application/x-qgis-layer-settings` for QML
 
 
-## Workspace Layer Chunk
+## Layer Chunk
 Layer Chunk endpoint enables to upload layer data files asynchronously by splitting them into small parts called *chunks* that are uploaded independently. The endpoint is expected to be operated using [Resumable.js](https://github.com/23/resumable.js/) library. Resumable.js can split and upload files by chunks using [HTML File API](https://developer.mozilla.org/en-US/docs/Web/API/File), widely supported by major browsers.
 
 Check [Asynchronous file upload](async-file-upload.md) example. 
@@ -472,8 +472,8 @@ The endpoint is activated after [POST Layers](#post-layers) or [PATCH Layer](#pa
 - layer is deleted
 
 ### URL
-`/rest/<workspace_name>/layers/<layername>/chunk`
-### GET Workspace Layer Chunk
+`/rest/layers/<uuid>/chunk`
+### GET Layer Chunk
 Test if file chunk is already uploaded on the server.
 
 #### Request
@@ -487,7 +487,7 @@ Content-Type: `application/json`
 
 HTTP status code 200 if chunk is already uploaded on the server, otherwise 404.
 
-### POST Workspace Layer Chunk
+### POST Layer Chunk
 Upload file chunk to the server.
 
 #### Request
