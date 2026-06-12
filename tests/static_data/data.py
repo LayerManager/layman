@@ -72,7 +72,7 @@ def ensure_publication(workspace, publ_type, publication):
         uuid = None
         for idx, params in enumerate(data.PUBLICATIONS[(workspace, publ_type, publication)][data.DEFINITION]):
             if idx == 0:
-                write_method = process_client.publish_publication if publ_type == process_client.LAYER_TYPE else process_client.publish_workspace_publication
+                write_method = process_client.publish_publication
                 resp = write_method(
                     publ_type,
                     workspace,
@@ -114,7 +114,7 @@ def publish_publications_step(publications_set, step_num):
                 raise_if_not_complete=False,
             )
         else:
-            write_method = process_client.publish_publication if publ_type == process_client.LAYER_TYPE else process_client.publish_workspace_publication
+            write_method = process_client.publish_publication
             resp = write_method(publ_type, workspace, publication, **params, check_response_fn=empty_method_returns_true,
                                 raise_if_not_complete=False)
             uuid = resp['uuid']

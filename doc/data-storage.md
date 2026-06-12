@@ -49,7 +49,7 @@ When user [patches existing layer](rest.md#patch-layer), data is saved in the sa
 ### Maps
 Information about [maps](models.md#map) includes JSON definition.
 
-When user [publishes new map](rest.md#post-workspace-maps)
+When user [publishes new map](rest.md#post-maps)
 - UUID and name is saved to [Redis](#redis),
 - UUID, name, title, description and access rights are saved to [PostgreSQL](#postgresql),
 - JSON file is saved to [filesystem](#filesystem),

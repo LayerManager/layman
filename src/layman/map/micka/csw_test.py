@@ -57,7 +57,7 @@ def provide_map(client):
     with app.app_context():
         workspace = TEST_WORKSPACE
         mapname = TEST_MAP
-        rest_path = url_for('rest_workspace_maps.post', workspace=workspace)
+        rest_path = url_for('rest_maps.post')
         file_paths = [
             'sample/layman.map/full.json',
         ]
@@ -66,6 +66,7 @@ def provide_map(client):
         with ExitStack() as stack:
             files = [(stack.enter_context(open(fp, 'rb')), os.path.basename(fp)) for fp in file_paths]
             response = client.post(rest_path, data={
+                'workspace': workspace,
                 'file': files,
                 'name': mapname,
             })

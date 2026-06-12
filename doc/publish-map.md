@@ -12,12 +12,12 @@ In QGIS, you need to implement following steps.
 
 First, compose JSON valid against [map-composition schema](https://github.com/hslayers/map-compositions). For Layman, especially `describedBy`, `name`, `title`, `abstract`, `layers`, `projection`, and `extent attributes are important. Each layer must have `className` attribute equal to `HSLayers.Layer.WMS` or `WMS`.
 
-Then save the file to Layman using [POST Workspace Maps](rest.md#post-workspace-maps) endpoint. Well-known [requests](https://requests.readthedocs.io/en/latest/) module can be used for sending HTTP requests. See especially
+Then save the file to Layman using [POST Maps](rest.md#post-maps) endpoint. Well-known [requests](https://requests.readthedocs.io/en/latest/) module can be used for sending HTTP requests. See especially
 - [More complicated POST requests](https://requests.readthedocs.io/en/latest/user/quickstart/#more-complicated-post-requests)
 - [POST a Multipart-Encoded File](https://requests.readthedocs.io/en/latest/user/quickstart/#post-a-multipart-encoded-file)
 - [POST Multiple Multipart-Encoded Files](https://requests.readthedocs.io/en/latest/user/advanced/#post-multiple-multipart-encoded-files)
 
-In response of [POST Workspace Maps](rest.md#post-workspace-maps) you will obtain
+In response of [POST Maps](rest.md#post-maps) you will obtain
  - `name` of the map unique within all maps in used [workspace](models.md#workspace)
  - `url` of the map pointing to [GET Map](rest.md#get-map)
  
@@ -27,7 +27,7 @@ In response of [POST Workspace Maps](rest.md#post-workspace-maps) you will obtai
  - update the map using [PATCH Map](rest.md#patch-map)
  - delete the map using [DELETE Map](rest.md#delete-map)
  
- Also, you can obtain list of all maps using [GET Workspace Maps](rest.md#get-workspace-maps).
+ Also, you can obtain list of all maps using [GET Maps](rest.md#get-maps).
  
  
  ## Maps composed from vector files

@@ -57,13 +57,13 @@ PublicationTypeDef = namedtuple('PublicationTypeDef', ['url_param_name',
                                                        ])
 PUBLICATION_TYPES_DEF = {MAP_TYPE: PublicationTypeDef('mapname',
                                                       'rest_maps.get',
-                                                      'rest_workspace_maps.post',
+                                                      'rest_maps.post',
                                                       'rest_map.patch',
-                                                      'rest_workspace_maps.get',
+                                                      'rest_maps.get',
                                                       'rest_map.get',
                                                       'rest_map_thumbnail.get',
                                                       'rest_map.delete_map',
-                                                      'rest_workspace_maps.delete',
+                                                      'rest_maps.delete',
                                                       map_keys_to_check,
                                                       'sample/layman.map/small_map.json',
                                                       'rest_workspace_map_metadata_comparison.get',
@@ -270,10 +270,7 @@ def publish_publication(publication_type,
         headers.update(get_authz_headers(actor_name))
 
     with app.app_context():
-        if publication_type == LAYER_TYPE:
-            r_url = url_for('rest_layers.post')
-        else:
-            r_url = url_for(publication_type_def.post_workspace_publication_url, workspace=workspace)
+        r_url = url_for(publication_type_def.post_workspace_publication_url)
 
     temp_dir = None
     if compress:
@@ -293,9 +290,7 @@ def publish_publication(publication_type,
 
     files = []
     with ExitStack() as stack:
-        data = {}
-        if publication_type == LAYER_TYPE:
-            data['workspace'] = workspace
+        data = {'workspace': workspace}
         if uuid:
             data["uuid"] = uuid
         if not do_not_post_name:
@@ -348,87 +343,11 @@ def publish_publication(publication_type,
     return result
 
 
-def publish_workspace_publication(publication_type,
-                                  workspace,
-                                  name,
-                                  *,
-                                  uuid=None,
-                                  file_paths=None,
-                                  file_path_pattern=None,
-                                  external_table_uri=None,
-                                  headers=None,
-                                  actor_name=None,
-                                  access_rights=None,
-                                  title=None,
-                                  style_file=None,
-                                  description=None,
-                                  check_response_fn=None,
-                                  raise_if_not_complete=True,
-                                  with_chunks=False,
-                                  compress=False,
-                                  compress_settings=None,
-                                  crs=None,
-                                  map_layers=None,
-                                  native_extent=None,
-                                  overview_resampling=None,
-                                  do_not_upload_chunks=False,
-                                  time_regex=None,
-                                  time_regex_format=None,
-                                  do_not_post_name=False,
-                                  do_not_post_title=False,
-                                  ):
-    assert publication_type == MAP_TYPE, \
-        f'publish_workspace_publication is map-only wrapper, use publish_publication for {publication_type}'
-    return publish_publication(
-        publication_type,
-        workspace,
-        name,
-        uuid=uuid,
-        file_paths=file_paths,
-        file_path_pattern=file_path_pattern,
-        external_table_uri=external_table_uri,
-        headers=headers,
-        actor_name=actor_name,
-        access_rights=access_rights,
-        title=title,
-        style_file=style_file,
-        description=description,
-        check_response_fn=check_response_fn,
-        raise_if_not_complete=raise_if_not_complete,
-        with_chunks=with_chunks,
-        compress=compress,
-        compress_settings=compress_settings,
-        crs=crs,
-        map_layers=map_layers,
-        native_extent=native_extent,
-        overview_resampling=overview_resampling,
-        do_not_upload_chunks=do_not_upload_chunks,
-        time_regex=time_regex,
-        time_regex_format=time_regex_format,
-        do_not_post_name=do_not_post_name,
-        do_not_post_title=do_not_post_title,
-    )
-
-
-publish_workspace_map = partial(publish_workspace_publication, MAP_TYPE)
+publish_workspace_map = partial(publish_publication, MAP_TYPE)
 publish_workspace_layer = partial(publish_publication, LAYER_TYPE)
 
 GET_PUBLICATIONS_KNOWN_PARAMS = {'full_text_filter', 'bbox_filter', 'bbox_filter_crs', 'order_by', 'ordering_bbox',
                                  'ordering_bbox_crs', 'limit', 'offset'}
-
-
-def get_workspace_publications_response(publication_type, workspace, *, headers=None, query_params=None, ):
-    query_params = query_params or {}
-    assert set(query_params.keys()) <= GET_PUBLICATIONS_KNOWN_PARAMS, \
-        f"Unknown params: {set(query_params.keys()) - GET_PUBLICATIONS_KNOWN_PARAMS}"
-    headers = headers or {}
-    publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
-
-    with app.app_context():
-        r_url = url_for(publication_type_def.get_workspace_publications_url, workspace=workspace)
-    response = requests.get(r_url, headers=headers, params=query_params, timeout=HTTP_TIMEOUT)
-    raise_layman_error(response)
-    return response
 
 
 def get_publications_response(publication_type, *, workspace=None, headers=None, query_params=None):
@@ -440,12 +359,9 @@ def get_publications_response(publication_type, *, workspace=None, headers=None,
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
 
     with app.app_context():
-        if workspace is not None and publication_type == MAP_TYPE:
-            r_url = url_for(publication_type_def.get_workspace_publications_url, workspace=workspace)
-        else:
-            r_url = url_for(publication_type_def.get_publications_url)
+        r_url = url_for(publication_type_def.get_publications_url)
 
-    if workspace is not None and publication_type == LAYER_TYPE:
+    if workspace is not None:
         query_params = {
             **query_params,
             'workspace': workspace,
@@ -542,27 +458,17 @@ def delete_publications(publication_type, workspace, headers=None, *, actor_name
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
 
     with app.app_context():
-        if publication_type == LAYER_TYPE:
-            r_url = url_for('rest_layers.delete')
-            response = requests.delete(r_url, headers=headers, params={'workspace': workspace}, timeout=HTTP_TIMEOUT)
-            raise_layman_error(response)
-            wfs.clear_cache()
-            wms.clear_cache()
-            return response.json()
-        r_url = url_for(publication_type_def.delete_workspace_publications_url,
-                        workspace=workspace,
-                        )
-        return finish_delete(r_url, headers)
+        r_url = url_for(publication_type_def.delete_workspace_publications_url)
+        response = requests.delete(r_url, headers=headers, params={'workspace': workspace}, timeout=HTTP_TIMEOUT)
+    raise_layman_error(response)
+    if publication_type == LAYER_TYPE:
+        wfs.clear_cache()
+        wms.clear_cache()
+    return response.json()
 
 
-def delete_workspace_publications(publication_type, workspace, headers=None, *, actor_name=None, ):
-    assert publication_type == MAP_TYPE, \
-        f'delete_workspace_publications is map-only wrapper, use delete_publications for {publication_type}'
-    return delete_publications(publication_type, workspace, headers=headers, actor_name=actor_name)
-
-
-delete_workspace_maps = partial(delete_workspace_publications, MAP_TYPE)
-delete_workspace_layers = partial(delete_workspace_publications, LAYER_TYPE)
+delete_workspace_maps = partial(delete_publications, MAP_TYPE)
+delete_workspace_layers = partial(delete_publications, LAYER_TYPE)
 
 
 def assert_workspace_publications(publication_type, workspace, expected_publication_names, headers=None):
