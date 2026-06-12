@@ -112,8 +112,8 @@ def test_publication_interface_methods():
 
 
 @pytest.mark.parametrize('endpoint, internal, params, expected_url', [
-    ('rest_workspace_maps.get', False, {'workspace': 'workspace_name'},
-     f'http://localhost:8000/rest/{settings.REST_WORKSPACES_PREFIX}/workspace_name/maps'),
+    ('rest_maps.get', False, {'workspace': 'workspace_name'},
+     'http://localhost:8000/rest/maps?workspace=workspace_name'),
     ('rest_layers.get', False, {'workspace': 'workspace_name'},
      'http://localhost:8000/rest/layers?workspace=workspace_name'),
     ('rest_about.get_version', True, {}, 'http://layman_test_run_1:8000/rest/about/version'),
@@ -125,8 +125,8 @@ def test_url_for(endpoint, internal, params, expected_url):
 
 
 @pytest.mark.parametrize('endpoint, internal, x_forwarded_items, params, expected_url', [
-    pytest.param('rest_workspace_maps.get', False, None, {'workspace': 'workspace_name'},
-                 f'http://enjoychallenge.tech/rest/{settings.REST_WORKSPACES_PREFIX}/workspace_name/maps',
+    pytest.param('rest_maps.get', False, None, {'workspace': 'workspace_name'},
+                 'http://enjoychallenge.tech/rest/maps?workspace=workspace_name',
                  id='get-workspace-maps-external'),
     pytest.param('rest_about.get_version', True, None, {}, 'http://layman:8000/rest/about/version',
                  id='get-version-internal'),

@@ -10,12 +10,11 @@
 |Layer Style|`/rest/layers/<uuid>/style`|[GET](#get-layer-style)| x | x | x |
 |Layer Chunk|`/rest/layers/<uuid>/chunk`|[GET](#get-layer-chunk)| [POST](#post-layer-chunk) | x | x |
 |Workspace Layer Metadata Comparison|`/rest/workspaces/<workspace_name>/layers/<layername>/metadata-comparison`|[GET](#get-workspace-layer-metadata-comparison) | x | x | x |
-|Maps|`/rest/maps`|[GET](#get-maps)| x | x | x |
+|Maps|`/rest/maps`|[GET](#get-maps)| [POST](#post-maps) | x | [DELETE](#delete-maps) |
 |[Map](models.md#map)|`/rest/maps/<uuid>`|[GET](#get-map)| x | [PATCH](#patch-map) | [DELETE](#delete-map) |
 |Map Thumbnail|`/rest/maps/<uuid>/thumbnail`|[GET](#get-map-thumbnail)| x | x | x |
 |Map File|`/rest/maps/<uuid>/file`|[GET](#get-map-file)| x | x | x |
-|Workspace Maps|`/rest/workspaces/<workspace_name>/maps`|[GET](#get-workspace-maps)| [POST](#post-workspace-maps) | x | [DELETE](#delete-workspace-maps) |
-|Workspace Map Metadata Comparison|`/rest/workspaces/<workspace_name>/layers/<layername>/metadata-comparison`|[GET](#get-workspace-map-metadata-comparison) | x | x | x |
+|Workspace Map Metadata Comparison|`/rest/workspaces/<workspace_name>/maps/<mapname>/metadata-comparison`|[GET](#get-workspace-map-metadata-comparison) | x | x | x |
 |Users|`/rest/users`|[GET](#get-users)| x | x | x |
 |User|`/rest/users/<username>`| x | x | x | [DELETE](#delete-user) |
 |Current [User](models.md#user)|`/rest/current-user`|[GET](#get-current-user)| x | [PATCH](#patch-current-user) | [DELETE](#delete-current-user) |
@@ -533,16 +532,12 @@ Get list of published maps (map compositions).
 
 Have the same request parameters and response structure and headers as [GET Publications](#get-publications), except only maps are returned.
 
-## Workspace Maps
-### URL
-`/rest/workspaces/<workspace_name>/maps`
+Query parameters:
+- *workspace*: String, optional
+  - workspace identifier
+  - if present, only maps from this workspace are returned
 
-### GET Workspace Maps
-Get list of published maps (map compositions).
-
-Have the same request parameters and response structure and headers as [GET Maps](#get-maps).
-
-### POST Workspace Maps
+### POST Maps
 Publish new map composition. Accepts JSON valid against [map-composition schema](https://github.com/hslayers/map-compositions) version 2 or 3 used by [Hslayers-ng](https://github.com/hslayers/hslayers-ng). Exact version of schema is defined by `describedBy` key of JSON data file.
 
 Processing chain consists of few steps:
@@ -563,6 +558,8 @@ Response to this request may be returned sooner than the processing chain is fin
 Content-Type: `multipart/form-data`
 
 Body parameters:
+- **workspace**, string `^[a-z][a-z0-9]*(_[a-z0-9]+)*$`
+   - workspace where the map will be published
 - *uuid*, string, e.g. `959c95fb-ab54-47a6-9694-402926b8fd29`
    - map primary key
    - used if specified, otherwise generated
@@ -603,11 +600,13 @@ JSON array of objects representing posted maps with following structure:
 - **uuid**: String. UUID of the map.
 - **url**: String. URL of the map. It points to [GET Map](#get-map).
 
-### DELETE Workspace Maps
+### DELETE Maps
 Delete existing maps and all associated sources, including map-composition JSON file and map thumbnail for all maps in the workspace. The currently running [asynchronous tasks](async-tasks.md) of affected maps are aborted. Only maps on which user has [write access right](./security.md#access-to-multi-publication-endpoints) are deleted.
 
 #### Request
-No action parameters.
+Query parameters:
+- **workspace**, string `^[a-z][a-z0-9]*(_[a-z0-9]+)*$`
+  - workspace whose maps will be deleted
 
 #### Response
 Content-Type: `application/json`
@@ -674,7 +673,7 @@ JSON object with following structure:
 - **native_bounding_box**: List of 4 floats. Bounding box coordinates [minx, miny, maxx, maxy] in native CRS.
 
 ### PATCH Map
-Update information about existing map. First, it deletes sources of the map, and then it publishes them again with new parameters. The processing chain is similar to [POST Workspace Maps](#post-workspace-maps), including [asynchronous tasks](async-tasks.md),
+Update information about existing map. First, it deletes sources of the map, and then it publishes them again with new parameters. The processing chain is similar to [POST Maps](#post-maps), including [asynchronous tasks](async-tasks.md),
 
 Calling concurrent PATCH requests is not supported, as well as calling PATCH when [POST/PATCH async chain](async-tasks.md) is still running, is not allowed. In such cases, error is returned.
 
@@ -683,7 +682,7 @@ Calling PATCH request when [WFS-T async chain](async-tasks.md) is still running 
 #### Request
 Content-Type: `multipart/form-data`, `application/x-www-form-urlencoded`
 
-Parameters have same meaning as in case of [POST Workspace Maps](#post-workspace-maps).
+Parameters have same meaning as in case of [POST Maps](#post-maps).
 
 Body parameters:
 - *file*, JSON file
@@ -702,7 +701,7 @@ Body parameters:
 #### Response
 Content-Type: `application/json`
 
-JSON object, same as in case of [POST Workspace Maps](#post-workspace-maps).
+JSON object, same as in case of [POST Maps](#post-maps).
 
 ### DELETE Map
 Delete existing map and all associated sources, including map-composition JSON file and map thumbnail. The currently running [asynchronous tasks](async-tasks.md) of affected map are aborted.
@@ -727,8 +726,8 @@ Get JSON file describing the map valid against [map-composition schema](https://
 
 Notice that some JSON properties are automatically updated by layman, so file obtained by this endpoint may be slightly different from file that was uploaded. Expected changes:
 - **name** set to the map's name
-- **title** obtained from [POST Workspace Maps](#post-workspace-maps) or [PATCH Map](#patch-map) as `title`
-- **abstract** obtained from [POST Workspace Maps](#post-workspace-maps) or [PATCH Map](#patch-map) as `description`
+- **title** obtained from [POST Maps](#post-maps) or [PATCH Map](#patch-map) as `title`
+- **abstract** obtained from [POST Maps](#post-maps) or [PATCH Map](#patch-map) as `description`
 - **user** updated on the fly during this request:
    - **name** set to `<workspace_name>` in URL of this endpoint
    - **email** set to email of the owner, or empty string if not known
