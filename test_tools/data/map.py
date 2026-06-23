@@ -33,21 +33,21 @@ def get_map_with_internal_layers_json(layers, *, native_extent=None, native_crs=
                 "metadata": {},
                 "visibility": True,
                 "opacity": 1,
-                "title": "Defini\u010dn\u00ed body administrativn\u00edch celk\u016f",
+                "title": "Liberec raster",
                 "className": "HSLayers.Layer.WMS",
                 "singleTile": True,
                 "wmsMaxScale": 0,
                 "legends": [
-                    "https%3A%2F%2Fgeoportal.kraj-lbc.cz%2Fcgi-bin%2Fmapserv%3Fmap%3D%2Fdata%2Fgis%2FMapServer%2Fprojects%2Fwms%2Fatlas%2Fadministrativni_cleneni.map%26version%3D1.3.0%26service%3DWMS%26request%3DGetLegendGraphic%26sld_version%3D1.1.0%26layer%3Ddefinicni_body_administrativnich_celku%26format%3Dimage%2Fpng%26STYLE%3Ddefault"
+                    "https://hub4everybody.com/geoserver/layman_test_cases/wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetLegendGraphic&FORMAT=image/png&LAYER=layman_test_cases:liberec_raster"
                 ],
                 "maxResolution": None,
                 "minResolution": 0,
-                "url": "https%3A%2F%2Fgeoportal.kraj-lbc.cz%2Fcgi-bin%2Fmapserv%3Fmap%3D%2Fdata%2Fgis%2FMapServer%2Fprojects%2Fwms%2Fatlas%2Fadministrativni_cleneni.map%26",
+                "url": "https://hub4everybody.com/geoserver/layman_test_cases/wms",
                 "params": {
-                    "LAYERS": "definicni_body_administrativnich_celku",
+                    "LAYERS": "layman_test_cases:liberec_raster",
                     "INFO_FORMAT": "application/vnd.ogc.gml",
                     "FORMAT": "image/png",
-                    "FROMCRS": "EPSG:3857",
+                    "CRS": "EPSG:3857",
                     "VERSION": "1.3.0"
                 },
                 "dimensions": {}
