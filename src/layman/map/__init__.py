@@ -27,7 +27,6 @@ PUBLICATION_TYPE_NAME = __name__.split('.', maxsplit=1)[-1]
 MAP_REST_PATH_NAME = f"{PUBLICATION_TYPE_NAME}s"
 
 
-from .rest_workspace_maps import bp as workspace_maps_bp
 from .rest_map_thumbnail import bp as map_thumbnail_bp
 from .rest_map_file import bp as map_file_bp
 from .rest_workspace_map_metadata_comparison import bp as workspace_map_metadata_comparison_bp
@@ -41,7 +40,6 @@ PUBLICATION_TYPES = {
         'name': PUBLICATION_TYPE_NAME,
         'rest_path_name': MAP_REST_PATH_NAME,
         'workspace_blueprints': [
-            workspace_maps_bp,
             workspace_map_metadata_comparison_bp,
         ],
         'blueprints': [
