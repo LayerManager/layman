@@ -80,7 +80,7 @@ PUBLICATION_TYPES_DEF = {MAP_TYPE: PublicationTypeDef('mapname',
                                                         'rest_layers.delete',
                                                         layer_keys_to_check,
                                                         'sample/layman.layer/small_layer.geojson',
-                                                        'rest_workspace_layer_metadata_comparison.get',
+                                                        'rest_layer_metadata_comparison.get',
                                                         'rest_layer_chunk.post',
                                                         ),
                          None: PublicationTypeDef('publicationname',
@@ -492,7 +492,13 @@ def get_workspace_publication_metadata_comparison(publication_type, workspace, n
 
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
     with app.app_context():
-        r_url = url_for(publication_type_def.get_workspace_metadata_comparison_url, **{publication_type_def.url_param_name: name}, workspace=workspace)
+        if publication_type == LAYER_TYPE:
+            uuid = layman_util.get_publication_uuid(workspace, publication_type, name)
+            r_url = url_for(publication_type_def.get_workspace_metadata_comparison_url, uuid=uuid)
+        else:
+            r_url = url_for(publication_type_def.get_workspace_metadata_comparison_url,
+                            **{publication_type_def.url_param_name: name},
+                            workspace=workspace)
     response = requests.get(r_url, headers=headers, timeout=HTTP_TIMEOUT)
     raise_layman_error(response)
     return response.json()

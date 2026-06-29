@@ -180,8 +180,8 @@ def test_post_layers_simple():
     md_record_url = f"http://micka:80/record/basic/m-{layeruuid}"
     assert layer_info['metadata']['record_url'].replace("http://localhost:3080", "http://micka:80") == md_record_url
     with app.app_context():
-        assert layer_info['metadata']['comparison_url'] == test_util.url_for_external('rest_workspace_layer_metadata_comparison.get',
-                                                                                      workspace=workspace, layername=layername)
+        assert layer_info['metadata']['comparison_url'] == test_util.url_for_external('rest_layer_metadata_comparison.get',
+                                                                                      uuid=layeruuid)
     assert 'id' not in layer_info.keys()
     assert 'type' not in layer_info.keys()
 

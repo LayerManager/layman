@@ -9,7 +9,7 @@
 |Layer Thumbnail|`/rest/layers/<uuid>/thumbnail`|[GET](#get-layer-thumbnail)| x | x | x |
 |Layer Style|`/rest/layers/<uuid>/style`|[GET](#get-layer-style)| x | x | x |
 |Layer Chunk|`/rest/layers/<uuid>/chunk`|[GET](#get-layer-chunk)| [POST](#post-layer-chunk) | x | x |
-|Workspace Layer Metadata Comparison|`/rest/workspaces/<workspace_name>/layers/<layername>/metadata-comparison`|[GET](#get-workspace-layer-metadata-comparison) | x | x | x |
+|Layer Metadata Comparison|`/rest/layers/<uuid>/metadata-comparison`|[GET](#get-layer-metadata-comparison) | x | x | x |
 |Maps|`/rest/maps`|[GET](#get-maps)| [POST](#post-maps) | x | [DELETE](#delete-maps) |
 |[Map](models.md#map)|`/rest/maps/<uuid>`|[GET](#get-map)| x | [PATCH](#patch-map) | [DELETE](#delete-map) |
 |Map Thumbnail|`/rest/maps/<uuid>/thumbnail`|[GET](#get-map-thumbnail)| x | x | x |
@@ -330,7 +330,7 @@ JSON object with following structure:
   - *identifier*: String. Identifier of metadata record in CSW instance.
   - *record_url*: String. URL of metadata record accessible by web browser, probably with some editing capabilities.
   - *csw_url*: String. URL of CSW endpoint. It points to CSW endpoint of Micka.
-  - *comparison_url*: String. URL of [GET Workspace Layer Metadata Comparison](#get-workspace-layer-metadata-comparison).
+  - *comparison_url*: String. URL of [GET Layer Metadata Comparison](#get-layer-metadata-comparison).
   - *status*: Status information about metadata import and availability. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
 - **access_rights**:
@@ -505,7 +505,7 @@ Content-Type: `application/json`
 HTTP status code 200 if chunk was successfully saved.
 
 
-### GET Workspace Layer Metadata Comparison
+### GET Layer Metadata Comparison
 Get comparison of metadata properties among Layman, CSW, WMS and WFS.
 
 #### Request

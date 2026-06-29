@@ -82,4 +82,4 @@ Currently, value of X-Forwarded headers affects following URLs:
   * [WFS endpoints](endpoints.md#web-feature-service)
     * all operations URLs
 
-Values of X-Forwarded headers does not affect responses of [GET Workspace Layer Metadata Comparison](rest.md#get-workspace-layer-metadata-comparison) and [GET Workspace Map Metadata Comparison](rest.md#get-workspace-map-metadata-comparison) intentionally, in order to keep URLs in canonical form.
+Values of X-Forwarded headers does not affect responses of [GET Layer Metadata Comparison](rest.md#get-layer-metadata-comparison) and [GET Workspace Map Metadata Comparison](rest.md#get-workspace-map-metadata-comparison) intentionally, in order to keep URLs in canonical form.

@@ -122,8 +122,7 @@ class TestResponsesClass:
         'geodata_type': 'vector',
         'file': {'paths': [f'layers/{layer_uuid}/input_file/{layer_uuid}.geojson'],
                  },
-        'metadata': {'comparison_url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/layers/{publication}/'
-                                       f'metadata-comparison',
+        'metadata': {'comparison_url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/layers/{layer_uuid}/metadata-comparison',
                      'csw_url': f'{settings.CSW_PROXY_URL}',
                      'identifier': f"m-{layer_uuid}",
                      'record_url': None},
