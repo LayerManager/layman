@@ -158,6 +158,9 @@ def _correct_values_in_detail_common(
     publ_type_dir = util.get_directory_name_from_publ_type(publ_type)
 
     thumbnail_url = f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/{publ_type_dir}/{uuid}/thumbnail'
+    comparison_url = f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/{publ_type_dir}/{name}/metadata-comparison'
+    if publ_type == process_client.LAYER_TYPE:
+        comparison_url = f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/{publ_type_dir}/{uuid}/metadata-comparison'
 
     expected_detail = {
         'name': name,
@@ -166,9 +169,7 @@ def _correct_values_in_detail_common(
         'type': publ_type,
         'thumbnail': {'url': thumbnail_url,
                       'path': f'{publ_type_dir}/{uuid}/thumbnail/{uuid}.png'},
-        'metadata': {'comparison_url':
-                     f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/'
-                     f'{workspace}/{publ_type_dir}/{name}/metadata-comparison',
+        'metadata': {'comparison_url': comparison_url,
                      'csw_url': 'http://localhost:3080/csw'},
         '_thumbnail': {'path': f'/layman_data_test/{publ_type_dir}/{uuid}/thumbnail/{uuid}.png'},
         'access_rights': {'read': ['EVERYONE'], 'write': ['EVERYONE']},

@@ -46,8 +46,7 @@ def get_layer_info(workspace, layername, *, x_forwarded_items=None):
                 'identifier': muuid,
                 'csw_url': settings.CSW_PROXY_URL,
                 'record_url': common_util.get_metadata_url(layer.uuid, url_type=common_util.RecordUrlType.BASIC),
-                'comparison_url': url_for('rest_workspace_layer_metadata_comparison.get', workspace=workspace, layername=layername,
-                                          x_forwarded_items=x_forwarded_items),
+                'comparison_url': url_for('rest_layer_metadata_comparison.get', uuid=layer.uuid, x_forwarded_items=x_forwarded_items),
             }
         }
     return {}
