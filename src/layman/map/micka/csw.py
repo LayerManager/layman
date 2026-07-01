@@ -40,7 +40,7 @@ def get_map_info(workspace, mapname, *, x_forwarded_items=None):
                 'identifier': muuid,
                 'csw_url': settings.CSW_PROXY_URL,
                 'record_url': common_util.get_metadata_url(publication.uuid, url_type=common_util.RecordUrlType.BASIC),
-                'comparison_url': url_for('rest_workspace_map_metadata_comparison.get', workspace=workspace, mapname=mapname,
+                'comparison_url': url_for('rest_map_metadata_comparison.get', uuid=publication.uuid,
                                           x_forwarded_items=x_forwarded_items),
             }
         }

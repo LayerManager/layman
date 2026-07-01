@@ -14,7 +14,7 @@
 |[Map](models.md#map)|`/rest/maps/<uuid>`|[GET](#get-map)| x | [PATCH](#patch-map) | [DELETE](#delete-map) |
 |Map Thumbnail|`/rest/maps/<uuid>/thumbnail`|[GET](#get-map-thumbnail)| x | x | x |
 |Map File|`/rest/maps/<uuid>/file`|[GET](#get-map-file)| x | x | x |
-|Workspace Map Metadata Comparison|`/rest/workspaces/<workspace_name>/maps/<mapname>/metadata-comparison`|[GET](#get-workspace-map-metadata-comparison) | x | x | x |
+|Map Metadata Comparison|`/rest/maps/<uuid>/metadata-comparison`|[GET](#get-map-metadata-comparison) | x | x | x |
 |Users|`/rest/users`|[GET](#get-users)| x | x | x |
 |User|`/rest/users/<username>`| x | x | x | [DELETE](#delete-user) |
 |Current [User](models.md#user)|`/rest/current-user`|[GET](#get-current-user)| x | [PATCH](#patch-current-user) | [DELETE](#delete-current-user) |
@@ -662,7 +662,7 @@ JSON object with following structure:
   - *identifier*: String. Identifier of metadata record in CSW instance.
   - *record_url*: String. URL of metadata record accessible by web browser, probably with some editing capabilities.
   - *csw_url*: String. URL of CSW endpoint. It points to CSW endpoint of Micka.
-  - *comparison_url*: String. URL of [GET Workspace Map Metadata Comparison](#get-workspace-map-metadata-comparison).
+  - *comparison_url*: String. URL of [GET Map Metadata Comparison](#get-map-metadata-comparison).
   - *status*: Status information about metadata import and availability. See [GET Map](#get-map) 
   - *error*: If status is FAILURE, this may contain error object.
 - **access_rights**:
@@ -757,7 +757,7 @@ Content-Type: `image/png`
 PNG image.
 
 
-### GET Workspace Map Metadata Comparison
+### GET Map Metadata Comparison
 Get comparison of metadata properties among Layman and CSW.
 
 #### Request

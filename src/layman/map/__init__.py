@@ -29,7 +29,7 @@ MAP_REST_PATH_NAME = f"{PUBLICATION_TYPE_NAME}s"
 
 from .rest_map_thumbnail import bp as map_thumbnail_bp
 from .rest_map_file import bp as map_file_bp
-from .rest_workspace_map_metadata_comparison import bp as workspace_map_metadata_comparison_bp
+from .rest_map_metadata_comparison import bp as map_metadata_comparison_bp
 from .rest_maps import bp as maps_bp
 from .rest_map import bp as map_bp
 
@@ -40,12 +40,12 @@ PUBLICATION_TYPES = {
         'name': PUBLICATION_TYPE_NAME,
         'rest_path_name': MAP_REST_PATH_NAME,
         'workspace_blueprints': [
-            workspace_map_metadata_comparison_bp,
         ],
         'blueprints': [
             maps_bp,
             map_thumbnail_bp,
             map_file_bp,
+            map_metadata_comparison_bp,
             map_bp,
         ],
         # see also .util.TASKS_TO_MAP_INFO_KEYS

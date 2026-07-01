@@ -28,9 +28,7 @@ def get_expected_urls_in_rest_response(workspace, publ_type, name, *, rest_metho
             result['thumbnail'] = {
                 'url': f'{proxy_proto}://{proxy_host}{proxy_prefix}/rest/{publ_type_directory}/{uuid}/thumbnail'
             }
-        comparison_url = f'{proxy_proto}://{proxy_host}{proxy_prefix}/rest/workspaces/{workspace}/{publ_type_directory}/{name}/metadata-comparison'
-        if publ_type == process_client.LAYER_TYPE:
-            comparison_url = f'{proxy_proto}://{proxy_host}{proxy_prefix}/rest/{publ_type_directory}/{uuid}/metadata-comparison'
+        comparison_url = f'{proxy_proto}://{proxy_host}{proxy_prefix}/rest/{publ_type_directory}/{uuid}/metadata-comparison'
         result['metadata'] = {
             'comparison_url': comparison_url,
         }

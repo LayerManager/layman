@@ -158,9 +158,7 @@ def _correct_values_in_detail_common(
     publ_type_dir = util.get_directory_name_from_publ_type(publ_type)
 
     thumbnail_url = f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/{publ_type_dir}/{uuid}/thumbnail'
-    comparison_url = f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/{publ_type_dir}/{name}/metadata-comparison'
-    if publ_type == process_client.LAYER_TYPE:
-        comparison_url = f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/{publ_type_dir}/{uuid}/metadata-comparison'
+    comparison_url = f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/{publ_type_dir}/{uuid}/metadata-comparison'
 
     expected_detail = {
         'name': name,
