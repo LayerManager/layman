@@ -144,8 +144,7 @@ class TestResponsesClass:
         'file': {'path': f'maps/{map_uuid}/input_file/{map_uuid}.json',
                  'url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/maps/{map_uuid}/file'},
         'metadata': {
-            'comparison_url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/workspaces/{workspace}/maps/{publication}/'
-                              f'metadata-comparison',
+            'comparison_url': f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/rest/maps/{map_uuid}/metadata-comparison',
             'csw_url': f'{settings.CSW_PROXY_URL}',
             'identifier': f"m-{map_uuid}",
             'record_url': None},
