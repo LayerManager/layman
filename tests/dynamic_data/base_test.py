@@ -220,12 +220,12 @@ class TestSingleRestPublication:
     @classmethod
     def patch_publication(cls, publication, args=None):
         uuid = cls.publ_uuids.get(publication, publication.uuid)
-        return process_client.patch_publication_by_uuid(publication.type, uuid=uuid, **args)
+        return process_client.patch_publication(publication.type, uuid=uuid, **args)
 
     @classmethod
     def delete_publication(cls, publication, args=None):
         uuid = cls.publ_uuids.get(publication, publication.uuid)
-        return process_client.delete_publication_by_uuid(publication.type, uuid=uuid, **args)
+        return process_client.delete_publication(publication.type, uuid=uuid, **args)
 
     @classmethod
     def delete_workspace_publications(cls, publication, args=None):

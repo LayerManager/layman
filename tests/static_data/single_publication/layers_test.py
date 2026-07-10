@@ -44,7 +44,7 @@ def test_info(workspace, publ_type, publication):
         info_internal = layer_util.get_layer_info(workspace, publication)
         uuid = layman_util.get_publication_uuid(workspace, publ_type, publication)
         expected_style_url = url_for('rest_layer_style.get', uuid=uuid, internal=False)
-    info = process_client.get_publication_by_uuid(publ_type, uuid, headers=headers)
+    info = process_client.get_publication(publ_type, uuid, headers=headers)
 
     file_type = info_internal['_file']['file_type']
     original_data_source = info.get('original_data_source', settings.EnumOriginalDataSource.FILE.value)

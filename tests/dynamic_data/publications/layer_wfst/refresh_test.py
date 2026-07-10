@@ -85,7 +85,7 @@ class TestRefresh(base_test.TestSingleRestPublication):
         for wfs_method, exp_bbox, exp_native_bbox, thumbnail_bbox_postfix in wfst_actions:
             data_xml = wfs_method(wfs_names.workspace, wfs_names.name, )
             process_client.post_wfst(data_xml, workspace=wfs_names.workspace)
-            process_client.wait_for_publication_status(layer.workspace, process_client.LAYER_TYPE, layer.name)
+            process_client.wait_for_publication_status(layer_uuid, process_client.LAYER_TYPE)
             assert_publ_util.is_publication_valid_and_complete(layer)
 
             assert_util.assert_all_sources_bbox(layer.workspace, layer.name,

@@ -66,8 +66,8 @@ def correct_values_in_metadata(publication: Publication, http_method, *, exp_val
         process_client.MAP_TYPE: MAP_METADATA_PROPERTIES,
     }[publication.type]
     with app.app_context():
-        resp_json = process_client.get_workspace_publication_metadata_comparison(
-            publication.type, publication.workspace, publication.name, actor_name=actor_name, headers=headers
+        resp_json = process_client.get_publication_metadata_comparison(
+            publication.type, publication.uuid, actor_name=actor_name, headers=headers
         )
         assert md_props.issubset(set(resp_json['metadata_properties'].keys()))
         for key, value in resp_json['metadata_properties'].items():
@@ -89,24 +89,24 @@ def correct_values_in_metadata(publication: Publication, http_method, *, exp_val
     expected_values_in_micka_metadata(publication, exp_metadata)
 
 
-def correct_comparison_response_with_x_forwarded_headers(workspace, publ_type, name, *, actor_name=None, headers=None):
+def correct_comparison_response_with_x_forwarded_headers(publication, *, actor_name=None, headers=None):
     proxy_headers = XForwardedClass(proto='https', host='enjoychallenge.tech', prefix='/layman-proxy')
     headers = headers or {}
     actor_name = actor_name or settings.ANONYM_USER
     md_props = {
         process_client.LAYER_TYPE: LAYER_METADATA_PROPERTIES,
         process_client.MAP_TYPE: MAP_METADATA_PROPERTIES,
-    }[publ_type]
+    }[publication.type]
     headers_with_header = {**headers,
                            **proxy_headers.headers,
                            }
     with app.app_context():
-        resp_json_with_proxy = process_client.get_workspace_publication_metadata_comparison(publ_type, workspace, name,
-                                                                                            actor_name=actor_name,
-                                                                                            headers=headers_with_header)
-        resp_json_without_proxy = process_client.get_workspace_publication_metadata_comparison(publ_type, workspace, name,
-                                                                                               actor_name=actor_name,
-                                                                                               headers=headers)
+        resp_json_with_proxy = process_client.get_publication_metadata_comparison(publication.type, publication.uuid,
+                                                                                  actor_name=actor_name,
+                                                                                  headers=headers_with_header)
+        resp_json_without_proxy = process_client.get_publication_metadata_comparison(publication.type, publication.uuid,
+                                                                                     actor_name=actor_name,
+                                                                                     headers=headers)
     assert md_props.issubset(set(resp_json_with_proxy['metadata_properties'].keys()))
     for key, value in resp_json_with_proxy['metadata_properties'].items():
         assert value['equal_or_null'] is True, f"key={key}, value={value}, sources={resp_json_with_proxy['metadata_sources']}"

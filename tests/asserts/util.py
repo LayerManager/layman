@@ -36,7 +36,7 @@ def get_directory_name_from_publ_type(publ_type):
 def get_publication_resp_by_publication(publication):
     actor = get_publication_actor(publication)
     uuid = get_publication_uuid(publication)
-    return process_client.get_publication_by_uuid(publication.type, uuid, actor_name=actor)
+    return process_client.get_publication(publication.type, uuid, actor_name=actor)
 
 
 def get_publication_uuid(publication):

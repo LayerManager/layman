@@ -44,10 +44,10 @@ METADATA_PROPERTIES_EQUAL = METADATA_PROPERTIES
 publication_counter = SimpleCounter()
 
 
-def check_metadata(workspace, mapname, props_equal, expected_values):
-    response = process_client.get_workspace_publication_metadata_comparison(
+def check_metadata(uuid, props_equal, expected_values):
+    response = process_client.get_publication_metadata_comparison(
         process_client.MAP_TYPE,
-        workspace, mapname,
+        uuid,
     )
     assert METADATA_PROPERTIES == set(response['metadata_properties'].keys())
     for key, value in response['metadata_properties'].items():
@@ -170,7 +170,7 @@ def test_post_maps_simple():
     assert 'id' not in incomplete_get_resp.keys()
     assert 'type' not in incomplete_get_resp.keys()
 
-    process_client.wait_for_publication_status(workspace, process_client.MAP_TYPE, mapname,
+    process_client.wait_for_publication_status(uuid_str, process_client.MAP_TYPE,
                                                check_response_fn=lambda response: not (
                                                    'status' in response.json()['thumbnail'] and response.json()['thumbnail'][
                                                        'status'] in [
@@ -186,10 +186,10 @@ def test_post_maps_simple():
     with app.app_context():
         assert thumbnail['url'] == test_util.url_for_external('rest_map_thumbnail.get', uuid=uuid_str)
 
-    file_resp = process_client.get_uuid_map_file(process_client.MAP_TYPE, uuid_str)
+    file_resp = process_client.get_map_file(process_client.MAP_TYPE, uuid_str)
     assert file_resp['name'] == mapname
 
-    process_client.wait_for_publication_status(workspace, process_client.MAP_TYPE, mapname,
+    process_client.wait_for_publication_status(uuid_str, process_client.MAP_TYPE,
                                                check_response_fn=lambda response: not (
                                                    'status' in response.json()['metadata'] and response.json()['metadata'][
                                                        'status'] in [
@@ -235,7 +235,7 @@ def test_post_maps_simple():
             'revision_date': None,
             'title': "Administrativn\u00ed \u010dlen\u011bn\u00ed Libereck\u00e9ho kraje",
         }
-    check_metadata(workspace, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
+    check_metadata(uuid_str, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
 @pytest.mark.timeout(60)
@@ -284,7 +284,7 @@ def test_post_maps_complex():
     assert exc_info.value.code == 49
 
     # continue with thumbnail assertion
-    process_client.wait_for_publication_status(workspace, process_client.MAP_TYPE, mapname,
+    process_client.wait_for_publication_status(uuid_str, process_client.MAP_TYPE,
                                                check_response_fn=lambda response: not (
                                                    'status' in response.json()['thumbnail'] and response.json()['thumbnail'][
                                                        'status'] in [
@@ -301,7 +301,7 @@ def test_post_maps_complex():
     with app.app_context():
         assert thumbnail['url'] == test_util.url_for_external('rest_map_thumbnail.get', uuid=uuid_str)
 
-    file_resp = process_client.get_uuid_map_file(process_client.MAP_TYPE, uuid_str)
+    file_resp = process_client.get_map_file(process_client.MAP_TYPE, uuid_str)
     assert file_resp['name'] == mapname
     assert file_resp['title'] == title
     assert file_resp['abstract'] == description
@@ -312,7 +312,7 @@ def test_post_maps_complex():
     assert 'groups' not in file_resp
 
     # continue with metadata assertion
-    process_client.wait_for_publication_status(workspace, process_client.MAP_TYPE, mapname,
+    process_client.wait_for_publication_status(uuid_str, process_client.MAP_TYPE,
                                                check_response_fn=lambda response: not (
                                                    'status' in response.json()['metadata'] and response.json()['metadata'][
                                                        'status'] in [
@@ -346,7 +346,7 @@ def test_post_maps_complex():
             'revision_date': None,
             'title': "Libereck\u00fd kraj: Administrativn\u00ed \u010dlen\u011bn\u00ed",
         }
-    check_metadata(workspace, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
+    check_metadata(uuid_str, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
     process_client.delete_map(uuid_str, )
     publication_counter.decrease()
@@ -383,7 +383,7 @@ def test_patch_map():
     assert 'status' in thumbnail
     assert thumbnail['status'] in ['PENDING', 'STARTED']
 
-    process_client.wait_for_publication_status(workspace, process_client.MAP_TYPE, mapname,
+    process_client.wait_for_publication_status(map_uuid, process_client.MAP_TYPE,
                                                check_response_fn=lambda response: not (
                                                    'status' in response.json()['thumbnail'] and response.json()['thumbnail'][
                                                        'status'] in [
@@ -399,7 +399,7 @@ def test_patch_map():
     with app.app_context():
         assert thumbnail['url'] == test_util.url_for_external('rest_map_thumbnail.get', uuid=map_uuid)
 
-    file_resp = process_client.get_uuid_map_file(process_client.MAP_TYPE, map_uuid)
+    file_resp = process_client.get_map_file(process_client.MAP_TYPE, map_uuid)
     assert file_resp['name'] == mapname
     assert file_resp['title'] == "Jiné administrativn\u00ed \u010dlen\u011bn\u00ed Libereck\u00e9ho kraje"
     assert file_resp['abstract'] == "Jiný popis"
@@ -409,7 +409,7 @@ def test_patch_map():
     assert len(user_json) == 2
     assert 'groups' not in file_resp
 
-    process_client.wait_for_publication_status(workspace, process_client.MAP_TYPE, mapname,
+    process_client.wait_for_publication_status(map_uuid, process_client.MAP_TYPE,
                                                check_response_fn=lambda response: not (
                                                    'status' in response.json()['metadata'] and response.json()['metadata'][
                                                        'status'] in [
@@ -468,7 +468,7 @@ def test_patch_map():
             'revision_date': TODAY_DATE,
             'title': "Nov\u00fd n\u00e1zev",
         }
-    check_metadata(workspace, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
+    check_metadata(map_uuid, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
 def test_delete_map():
@@ -540,7 +540,7 @@ def test_map_composed_from_local_layers():
     uuid_str = post_resp['uuid']
     publication_counter.increase()
 
-    process_client.wait_for_publication_status(workspace, process_client.MAP_TYPE, mapname,
+    process_client.wait_for_publication_status(uuid_str, process_client.MAP_TYPE,
                                                check_response_fn=lambda response: not (
                                                    'status' in response.json()['thumbnail'] and response.json()['thumbnail'][
                                                        'status'] in [
@@ -556,7 +556,7 @@ def test_map_composed_from_local_layers():
     with app.app_context():
         assert thumbnail['url'] == test_util.url_for_external('rest_map_thumbnail.get', uuid=uuid_str)
 
-    process_client.wait_for_publication_status(workspace, process_client.MAP_TYPE, mapname,
+    process_client.wait_for_publication_status(uuid_str, process_client.MAP_TYPE,
                                                check_response_fn=lambda response: not (
                                                    'status' in response.json()['metadata'] and response.json()['metadata'][
                                                        'status'] in [
@@ -644,7 +644,7 @@ def test_map_composed_from_local_layers():
             'revision_date': None,
             'title': "World places and boundaries",
         }
-    check_metadata(workspace, mapname, METADATA_PROPERTIES_EQUAL, expected_md_values)
+    check_metadata(uuid_str, METADATA_PROPERTIES_EQUAL, expected_md_values)
     process_client.delete_map(uuid_str, )
     publication_counter.decrease()
     process_client.delete_layer(layer1_uuid, )

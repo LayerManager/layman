@@ -6,7 +6,7 @@ import crs as crs_def
 from layman import app, util as layman_util, settings
 from layman.common import bbox as bbox_util
 from layman.layer.geoserver import wfs, wms, GeoserverIds
-from .process_client import LAYER_TYPE, get_workspace_layer_metadata_comparison, get_source_key_from_metadata_comparison
+from .process_client import LAYER_TYPE, get_layer_metadata_comparison, get_source_key_from_metadata_comparison
 from .util import compare_images
 
 
@@ -82,7 +82,7 @@ def assert_all_sources_bbox(workspace, layer, *, layer_uuid, expected_bbox_3857,
 
     with app.app_context():
         expected_bbox_4326 = bbox_util.transform(expected_bbox_3857, crs_from=crs_def.EPSG_3857, crs_to=crs_def.EPSG_4326, )
-    md_comparison = get_workspace_layer_metadata_comparison(workspace, layer)
+    md_comparison = get_layer_metadata_comparison(layer_uuid)
     csw_prefix = settings.CSW_PROXY_URL
     csw_src_key = get_source_key_from_metadata_comparison(md_comparison, csw_prefix)
     assert csw_src_key is not None

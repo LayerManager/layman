@@ -50,7 +50,7 @@ class TestPublication(base_test.TestSingleRestPublication):
     ])
     def test_x_forwarded_headers(self, headers, exp_url_prefix):
         map = MAP
-        resp = process_client.get_uuid_map_file(map.type, map.uuid, headers=headers)
+        resp = process_client.get_map_file(map.type, map.uuid, headers=headers)
 
         exp_adjusted_urls = [
             ('$.layers[1].url', '/geoserver/ows'),

@@ -297,8 +297,9 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
         # make WFS-T request
         process_client.post_wfst(wfst_data, headers=AUTHN_HEADERS, workspace=GEOSERVER_WFS_WORKSPACE)
         for layer_name, _ in new_attributes:
-            process_client.wait_for_publication_status(workspace, self.publication_type, layer_name,
-                                                       headers=AUTHN_HEADERS)
+            with app.app_context():
+                layer_uuid = get_publication_uuid(workspace, self.publication_type, layer_name)
+            process_client.wait_for_publication_status(layer_uuid, self.publication_type, headers=AUTHN_HEADERS)
             assert_publ_util.is_publication_valid_and_complete(layer)
 
         # assert that new attributes are present
