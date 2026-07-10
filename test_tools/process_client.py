@@ -177,12 +177,12 @@ def upload_file_chunks(uuid, file_paths):
         raise_layman_error(chunk_response)
 
 
-def ensure_publication_by_uuid(publication_type,
-                               uuid,
-                               *,
-                               headers=None,
-                               access_rights=None,
-                               ):
+def ensure_publication(publication_type,
+                       uuid,
+                       *,
+                       headers=None,
+                       access_rights=None,
+                       ):
     headers = headers or {}
     with app.app_context():
         pub_info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['workspace', 'name']})
@@ -198,7 +198,7 @@ def ensure_publication_by_uuid(publication_type,
             if 'write' in access_rights and set(access_rights['write'].split(',')) != set(publication_obj['access_rights']['write']):
                 patch_needed = True
         if patch_needed:
-            result = patch_publication_by_uuid(publication_type, uuid, access_rights=access_rights, headers=headers)
+            result = patch_publication(publication_type, uuid, access_rights=access_rights, headers=headers)
         else:
             result = None
     else:
@@ -206,8 +206,8 @@ def ensure_publication_by_uuid(publication_type,
     return result
 
 
-ensure_layer = partial(ensure_publication_by_uuid, LAYER_TYPE)
-ensure_map = partial(ensure_publication_by_uuid, MAP_TYPE)
+ensure_layer = partial(ensure_publication, LAYER_TYPE)
+ensure_map = partial(ensure_publication, MAP_TYPE)
 
 
 def publish_publication(publication_type,
@@ -336,7 +336,7 @@ def publish_publication(publication_type,
         upload_file_chunks(result['uuid'], file_paths)
 
     if not do_not_upload_chunks:
-        wait_for_publication_status(workspace, publication_type, name, check_response_fn=check_response_fn,
+        wait_for_publication_status(result['uuid'], publication_type, check_response_fn=check_response_fn,
                                     headers=headers, raise_if_not_complete=raise_if_not_complete)
     if temp_dir:
         shutil.rmtree(temp_dir)
@@ -385,7 +385,7 @@ get_maps = partial(get_publications, MAP_TYPE)
 get_layers = partial(get_publications, LAYER_TYPE)
 
 
-def get_publication_by_uuid(publication_type, uuid, headers=None, *, actor_name=None):
+def get_publication(publication_type, uuid, headers=None, *, actor_name=None):
     headers = headers or {}
     if actor_name:
         assert TOKEN_HEADER not in headers
@@ -403,11 +403,11 @@ def get_publication_by_uuid(publication_type, uuid, headers=None, *, actor_name=
     return response.json()
 
 
-get_map = partial(get_publication_by_uuid, MAP_TYPE)
-get_layer = partial(get_publication_by_uuid, LAYER_TYPE)
+get_map = partial(get_publication, MAP_TYPE)
+get_layer = partial(get_publication, LAYER_TYPE)
 
 
-def get_uuid_layer_style(uuid, headers=None, *, actor_name=None):
+def get_layer_style(uuid, headers=None, *, actor_name=None):
     headers = headers or {}
     if actor_name:
         assert TOKEN_HEADER not in headers
@@ -429,7 +429,7 @@ def finish_delete(url, headers, skip_404=False, ):
     return response.json()
 
 
-def delete_publication_by_uuid(publication_type, uuid, *, headers=None, skip_404=False, actor_name=None):
+def delete_publication(publication_type, uuid, *, headers=None, skip_404=False, actor_name=None):
     headers = headers or {}
     if actor_name:
         assert TOKEN_HEADER not in headers
@@ -445,8 +445,8 @@ def delete_publication_by_uuid(publication_type, uuid, *, headers=None, skip_404
     return finish_delete(r_url, headers, skip_404=skip_404)
 
 
-delete_map = partial(delete_publication_by_uuid, MAP_TYPE)
-delete_layer = partial(delete_publication_by_uuid, LAYER_TYPE)
+delete_map = partial(delete_publication, MAP_TYPE)
+delete_layer = partial(delete_publication, LAYER_TYPE)
 
 
 def delete_publications(publication_type, workspace, headers=None, *, actor_name=None, ):
@@ -482,7 +482,7 @@ assert_workspace_layers = partial(assert_workspace_publications, LAYER_TYPE)
 assert_workspace_maps = partial(assert_workspace_publications, MAP_TYPE)
 
 
-def get_workspace_publication_metadata_comparison(publication_type, workspace, name, headers=None, actor_name=None):
+def get_publication_metadata_comparison(publication_type, uuid, headers=None, actor_name=None):
     headers = headers or {}
     if actor_name:
         assert TOKEN_HEADER not in headers
@@ -492,15 +492,14 @@ def get_workspace_publication_metadata_comparison(publication_type, workspace, n
 
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
     with app.app_context():
-        uuid = layman_util.get_publication_uuid(workspace, publication_type, name)
         r_url = url_for(publication_type_def.get_workspace_metadata_comparison_url, uuid=uuid)
     response = requests.get(r_url, headers=headers, timeout=HTTP_TIMEOUT)
     raise_layman_error(response)
     return response.json()
 
 
-get_workspace_layer_metadata_comparison = partial(get_workspace_publication_metadata_comparison, LAYER_TYPE)
-get_workspace_map_metadata_comparison = partial(get_workspace_publication_metadata_comparison, MAP_TYPE)
+get_layer_metadata_comparison = partial(get_publication_metadata_comparison, LAYER_TYPE)
+get_map_metadata_comparison = partial(get_publication_metadata_comparison, MAP_TYPE)
 
 
 def reserve_username(username, headers=None, *, actor_name=None):
@@ -597,11 +596,10 @@ def check_publication_status(response):
     return current_status in {'COMPLETE', 'INCOMPLETE'}
 
 
-def wait_for_publication_status(workspace, publication_type, publication, *, check_response_fn=None, headers=None,
+def wait_for_publication_status(uuid, publication_type, *, check_response_fn=None, headers=None,
                                 raise_if_not_complete=True, sleeping_time=0.5):
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
     with app.app_context():
-        uuid = layman_util.get_publication_uuid(workspace, publication_type, publication)
         url = url_for(publication_type_def.get_publication_url, uuid=uuid)
     check_response_fn = check_response_fn or check_publication_status
     response = wait_for_rest(url, 60, sleeping_time, check_response=check_response_fn, headers=headers)
@@ -615,7 +613,7 @@ def patch_after_feature_change(workspace, publ_type, name):
         layman_util.patch_after_feature_change(workspace, publ_type, name, queue=queue)
 
 
-def get_uuid_map_file(publication_type, uuid, *, headers=None, actor_name=None):
+def get_map_file(publication_type, uuid, *, headers=None, actor_name=None):
     headers = headers or {}
     assert publication_type == MAP_TYPE
     if actor_name:
@@ -631,7 +629,7 @@ def get_uuid_map_file(publication_type, uuid, *, headers=None, actor_name=None):
     return response.json()
 
 
-def get_uuid_publication_thumbnail(publication_type, uuid, *, actor_name=None):
+def get_publication_thumbnail(publication_type, uuid, *, actor_name=None):
     headers = {}
     publication_type_def = PUBLICATION_TYPES_DEF[publication_type]
     if actor_name:
@@ -675,34 +673,34 @@ def ensure_workspace(workspace):
     tmp_layername = 'tmp_layername'
     resp = publish_workspace_layer(workspace, tmp_layername)
     uuid = resp['uuid']
-    delete_publication_by_uuid(LAYER_TYPE, uuid=uuid)
+    delete_publication(LAYER_TYPE, uuid=uuid)
 
 
-def patch_publication_by_uuid(publication_type,
-                              uuid,
-                              *,
-                              file_paths=None,
-                              external_table_uri=None,
-                              headers=None,
-                              actor_name=None,
-                              access_rights=None,
-                              title=None,
-                              description=None,
-                              style_file=None,
-                              check_response_fn=None,
-                              raise_if_not_complete=True,
-                              compress=False,
-                              compress_settings=None,
-                              with_chunks=False,
-                              crs=None,
-                              map_layers=None,
-                              native_extent=None,
-                              overview_resampling=None,
-                              do_not_upload_chunks=False,
-                              time_regex=None,
-                              time_regex_format=None,
-                              skip_asserts=False,
-                              ):
+def patch_publication(publication_type,
+                      uuid,
+                      *,
+                      file_paths=None,
+                      external_table_uri=None,
+                      headers=None,
+                      actor_name=None,
+                      access_rights=None,
+                      title=None,
+                      description=None,
+                      style_file=None,
+                      check_response_fn=None,
+                      raise_if_not_complete=True,
+                      compress=False,
+                      compress_settings=None,
+                      with_chunks=False,
+                      crs=None,
+                      map_layers=None,
+                      native_extent=None,
+                      overview_resampling=None,
+                      do_not_upload_chunks=False,
+                      time_regex=None,
+                      time_regex_format=None,
+                      skip_asserts=False,
+                      ):
     headers = headers or {}
     if actor_name:
         assert TOKEN_HEADER not in headers
@@ -800,10 +798,10 @@ def patch_publication_by_uuid(publication_type,
         upload_file_chunks(uuid, file_paths)
 
     if not do_not_upload_chunks:
-        wait_for_publication_status_by_uuid(uuid, publication_type,
-                                            check_response_fn=check_response_fn,
-                                            headers=headers,
-                                            raise_if_not_complete=raise_if_not_complete)
+        wait_for_publication_status(uuid, publication_type,
+                                    check_response_fn=check_response_fn,
+                                    headers=headers,
+                                    raise_if_not_complete=raise_if_not_complete)
     wfs.clear_cache()
     wms.clear_cache()
     if temp_dir:
@@ -811,18 +809,5 @@ def patch_publication_by_uuid(publication_type,
     return response.json()
 
 
-patch_map = partial(patch_publication_by_uuid, MAP_TYPE)
-patch_layer = partial(patch_publication_by_uuid, LAYER_TYPE)
-
-
-def wait_for_publication_status_by_uuid(uuid, publication_type, *, check_response_fn=None, headers=None,
-                                        raise_if_not_complete=True, sleeping_time=0.5):
-    with app.app_context():
-        pub_info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['workspace', 'name']})
-    workspace = pub_info['_workspace']
-    name = pub_info['name']
-    return wait_for_publication_status(workspace, publication_type, name,
-                                       check_response_fn=check_response_fn,
-                                       headers=headers,
-                                       raise_if_not_complete=raise_if_not_complete,
-                                       sleeping_time=sleeping_time)
+patch_map = partial(patch_publication, MAP_TYPE)
+patch_layer = partial(patch_publication, LAYER_TYPE)

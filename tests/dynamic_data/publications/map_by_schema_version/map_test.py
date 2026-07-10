@@ -69,7 +69,7 @@ class TestPublication(base_test.TestSingleRestPublication):
                    }
 
         uuid = TestPublication.publ_uuids.get(map)
-        resp = process_client.get_uuid_map_file(map.type, uuid, headers=headers)
+        resp = process_client.get_map_file(map.type, uuid, headers=headers)
 
         with open(exp_file, encoding='utf-8') as file:
             exp_json = json.load(file)

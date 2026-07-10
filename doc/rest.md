@@ -835,7 +835,7 @@ Content-Type: `application/json`
 JSON object with following structure:
 - **authenticated**: Boolean. `true` if user is authenticated, `false` if user is anonymous.
 - **claims**: Object. Dictionary of known claims (e.g. name, nickname, preferred_username, or email). Claims are inspired by and have same meaning as [OpenID Connect standard claims](https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims). Some claims are set even if the user is anonymous (e.g. name).
-- *username*: String. [Username](models.md#username) the user reserved within Layman. If not set, it was not reserved yet. To be used as username in some REST API paths (i.e. `/rest/workspaces/<username>/...`)
+- *username*: String. [Username](models.md#username) the user reserved within Layman. If not set, it was not reserved yet.
 
 ### PATCH Current User
 Update information about current user. Currently used only for reserving `username`.

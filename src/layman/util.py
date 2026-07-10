@@ -295,11 +295,6 @@ def get_publication_module(publication_type, use_cache=True):
     return module
 
 
-def get_workspace_publication_url(publication_type, workspace, publication_name, use_cache=True, *, x_forwarded_items=None):
-    publ_module = get_publication_module(publication_type, use_cache=use_cache)
-    return publ_module.get_workspace_publication_url(workspace, publication_name, x_forwarded_items=x_forwarded_items)
-
-
 def get_publication_url(publication_type, uuid, use_cache=True, *, x_forwarded_items=None):
     publ_module = get_publication_module(publication_type, use_cache=use_cache)
     return publ_module.get_publication_url(uuid, x_forwarded_items=x_forwarded_items)

@@ -52,7 +52,7 @@ def ensure_test_data(oauth2_provider_mock, request):
                     data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_write', [None])[0])
                 with app.app_context():
                     uuid = layman_util.get_publication_uuid(workspace, publ_type, publication)
-                process_client.delete_publication_by_uuid(publ_type, uuid=uuid, headers=headers)
+                process_client.delete_publication(publ_type, uuid=uuid, headers=headers)
                 assert_publication_after_delete(workspace, publ_type, publication)
 
 
@@ -81,7 +81,7 @@ def ensure_publication(workspace, publ_type, publication):
                 )
                 uuid = resp["uuid"]
             else:
-                write_method = process_client.patch_publication_by_uuid
+                write_method = process_client.patch_publication
                 write_method(
                     publ_type,
                     uuid=uuid,
@@ -106,7 +106,7 @@ def publish_publications_step(publications_set, step_num):
         data_def = data.PUBLICATIONS[(workspace, publ_type, publication)][data.DEFINITION]
         params = data_def[step_num]
         if step_num > 0:
-            process_client.patch_publication_by_uuid(
+            process_client.patch_publication(
                 publ_type,
                 uuid,
                 **params,
@@ -124,7 +124,9 @@ def publish_publications_step(publications_set, step_num):
         params = data.PUBLICATIONS[(workspace, publ_type, publication)][data.DEFINITION][step_num]
         headers = params.get('headers')
         try:
-            process_client.wait_for_publication_status(workspace, publ_type, publication, headers=headers,
+            with app.app_context():
+                publ_uuid = layman_util.get_publication_uuid(workspace, publ_type, publication)
+            process_client.wait_for_publication_status(publ_uuid, publ_type, headers=headers,
                                                        check_response_fn=check_publication_status)
         except AssertionError as ex:
             print(f"AssertionError in publication {workspace, publ_type, publication}, step_num={step_num}.")

@@ -28,7 +28,7 @@ class TestSoapClass:
         yield
         with app.app_context():
             uuid = layman_util.get_publication_uuid(self.username, self.publication_type, self.publication_name)
-        process_client.delete_publication_by_uuid(self.publication_type, uuid=uuid, headers=self.authz_headers)
+        process_client.delete_publication(self.publication_type, uuid=uuid, headers=self.authz_headers)
 
     @pytest.mark.flaky(reruns=5, reruns_delay=2)
     @pytest.mark.usefixtures('oauth2_provider_mock', 'ensure_layman', 'reserve_username', 'clear_data')
@@ -45,7 +45,7 @@ class TestSoapClass:
         publ_name_prefix = self.publ_name_prefix
         authz_headers = self.authz_headers
         post_method = process_client.publish_publication
-        patch_method = process_client.patch_publication_by_uuid
+        patch_method = process_client.patch_publication
         publ_name = f"{publ_name_prefix}{publ_type.split('.')[-1]}"
         self.publication_type = publ_type
         self.publication_name = publ_name
@@ -88,23 +88,23 @@ def test_get_publication_layman_status(publ_type, error_params):
     resp = process_client.publish_publication(publ_type, workspace, publication, check_response_fn=common.empty_method_returns_true,
                                               raise_if_not_complete=False)
     uuid = resp['uuid']
-    info = process_client.get_publication_by_uuid(publ_type, uuid)
+    info = process_client.get_publication(publ_type, uuid)
     assert 'layman_metadata' in info, f'info={info}'
     assert 'publication_status' in info['layman_metadata'], f'info={info}'
     assert info['layman_metadata']['publication_status'] == 'UPDATING', f'info={info}'
 
-    process_client.wait_for_publication_status_by_uuid(uuid, publ_type)
-    info = process_client.get_publication_by_uuid(publ_type, uuid)
+    process_client.wait_for_publication_status(uuid, publ_type)
+    info = process_client.get_publication(publ_type, uuid)
     assert 'layman_metadata' in info, f'info={info}'
     assert 'publication_status' in info['layman_metadata'], f'info={info}'
     assert info['layman_metadata']['publication_status'] == 'COMPLETE', f'info={info}'
 
     if error_params:
-        process_client.patch_publication_by_uuid(publ_type, uuid, **error_params,
-                                                 raise_if_not_complete=False)
-        info = process_client.get_publication_by_uuid(publ_type, uuid)
+        process_client.patch_publication(publ_type, uuid, **error_params,
+                                         raise_if_not_complete=False)
+        info = process_client.get_publication(publ_type, uuid)
         assert 'layman_metadata' in info, f'info={info}'
         assert 'publication_status' in info['layman_metadata'], f'info={info}'
         assert info['layman_metadata']['publication_status'] == 'INCOMPLETE', f'info={info}'
 
-    process_client.delete_publication_by_uuid(publ_type, uuid)
+    process_client.delete_publication(publ_type, uuid)

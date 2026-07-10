@@ -80,9 +80,9 @@ class TestLayer(base_test.TestSingleRestPublication):
         asserts_publ.geoserver_proxy.is_complete_in_workspace_wms(layer.workspace, layer.type, layer.name,
                                                                   version='1.1.1')
         asserts_publ.geoserver_proxy.wms_legend_url_with_x_forwarded_headers(layer.workspace, layer.type, layer.name, )
-        asserts_publ.metadata.correct_comparison_response_with_x_forwarded_headers(layer.workspace, layer.type, layer.name, )
         with app.app_context():
             prod_layer = Layer(layer_tuple=(layer.workspace, layer.name))
+        asserts_publ.metadata.correct_comparison_response_with_x_forwarded_headers(prod_layer)
         asserts_publ.metadata.correct_values_in_metadata(prod_layer, http_method=rest_method.enum_item.publ_name_part)
 
         gs_url = f'http://{settings.LAYMAN_PROXY_SERVER_NAME}/geoserver/'

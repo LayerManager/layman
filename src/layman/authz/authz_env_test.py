@@ -59,7 +59,7 @@ class TestPublicWorkspaceClass:
             )
 
         def delete_method(uuid, headers=None):
-            return process_client.delete_publication_by_uuid(publication_type, uuid, headers=headers)
+            return process_client.delete_publication(publication_type, uuid, headers=headers)
 
         def can_not_publish(workspace_name,
                             publication_name,

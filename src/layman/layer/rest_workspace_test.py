@@ -66,9 +66,9 @@ MIN_GEOJSON = """
 """
 
 
-def check_metadata(workspace, layername, props_equal, expected_values):
+def check_metadata(uuid, props_equal, expected_values):
     with app.app_context():
-        resp_json = process_client.get_workspace_layer_metadata_comparison(workspace=workspace, name=layername)
+        resp_json = process_client.get_layer_metadata_comparison(uuid)
         assert METADATA_PROPERTIES == set(resp_json['metadata_properties'].keys())
         for key, value in resp_json['metadata_properties'].items():
             assert value['equal_or_null'] == (
@@ -153,7 +153,7 @@ def test_post_layers_simple():
     for key_to_check in keys_to_check:
         assert 'status' in layer_info[key_to_check], f'{key_to_check=}\n{layer_info=}'
 
-    process_client.wait_for_publication_status(workspace=workspace, publication_type=LAYER_TYPE, publication=layername)
+    process_client.wait_for_publication_status(LAYER_UUID_2, LAYER_TYPE)
 
     with app.app_context():
         layer_info = util.get_layer_info(workspace, layername)
@@ -215,7 +215,7 @@ def test_post_layers_simple():
             },
             'title': 'ne_110m_admin_0_countries',
         }
-    check_metadata(workspace, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
+    check_metadata(layeruuid, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
 def test_post_layers_concurrent():
@@ -289,7 +289,7 @@ def test_post_layers_shp():
     chain_info = util.get_layer_chain(workspace, layername)
     assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
     publication_counter.increase()
-    process_client.wait_for_publication_status(workspace=workspace, publication_type=LAYER_TYPE, publication=layername)
+    process_client.wait_for_publication_status(LAYER_UUID_3, LAYER_TYPE)
 
     wms_layername = GeoserverIds(uuid=layeruuid).wms
     wms_url = geoserver_wms.get_wms_url()
@@ -340,7 +340,7 @@ def test_post_layers_complex():
     chain_info = util.get_layer_chain(workspace, layername)
     assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
     publication_counter.increase()
-    process_client.wait_for_publication_status(workspace=workspace, publication_type=LAYER_TYPE, publication=layername)
+    process_client.wait_for_publication_status(LAYER_UUID_4, LAYER_TYPE)
     assert celery_util.is_chain_ready(chain_info)
 
     all_names = GeoserverIds(uuid=layeruuid)
@@ -365,7 +365,7 @@ def test_post_layers_complex():
     ]:
         assert 'status' not in get_response[source]
 
-    tree = process_client.get_uuid_layer_style(layeruuid)
+    tree = process_client.get_layer_style(layeruuid)
     root = tree.getroot()
     assert root.attrib['version'] == '1.0.0'
 
@@ -400,7 +400,7 @@ def test_post_layers_complex():
             },
             'title': "staty",
         }
-    check_metadata(workspace, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
+    check_metadata(layeruuid, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
 def test_uppercase_attr():
@@ -421,7 +421,7 @@ def test_uppercase_attr():
     chain_info = util.get_layer_chain(workspace, layername)
     assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
     publication_counter.increase()
-    process_client.wait_for_publication_status(workspace=workspace, publication_type=LAYER_TYPE, publication=layername)
+    process_client.wait_for_publication_status(publ_uuid, LAYER_TYPE)
     assert celery_util.is_chain_ready(chain_info)
 
     get_response = process_client.get_layer(publ_uuid)
@@ -451,7 +451,7 @@ def test_uppercase_attr():
         th_path = get_layer_thumbnail_path(publ_uuid)
     assert os.path.getsize(th_path) > 5000
 
-    process_client.delete_publication_by_uuid(LAYER_TYPE, uuid=publ_uuid)
+    process_client.delete_publication(LAYER_TYPE, uuid=publ_uuid)
     publication_counter.decrease()
 
     uuid.check_redis_consistency(expected_publ_num_by_type={
@@ -524,7 +524,7 @@ def test_patch_layer_title():
             },
             'title': "New Title of Countries",
         }
-    check_metadata(workspace, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
+    check_metadata(layer_uuid, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': publication_counter.get()
@@ -532,8 +532,6 @@ def test_patch_layer_title():
 
 
 def test_patch_layer_style():
-    workspace = USER
-    layername = LAYERNAME_2
     new_title = 'countries in blue'
 
     sld_path = 'sample/style/generic-blue_sld.xml'
@@ -578,7 +576,7 @@ def test_patch_layer_style():
             },
             'title': 'countries in blue',
         }
-    check_metadata(workspace, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
+    check_metadata(layer_uuid, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
 def test_patch_layer_data():
@@ -600,7 +598,7 @@ def test_patch_layer_data():
     keys_to_check = ['wms', 'thumbnail', 'metadata']
     for key_to_check in keys_to_check:
         assert 'status' in get_incomplete_response[key_to_check], f'{key_to_check=}\n{get_incomplete_response=}'
-    process_client.wait_for_publication_status(workspace, LAYER_TYPE, layername)
+    process_client.wait_for_publication_status(layer_uuid, LAYER_TYPE)
 
     get_response = process_client.get_layer(layer_uuid)
     assert get_response['title'] == new_title
@@ -637,7 +635,7 @@ def test_patch_layer_data():
             'spatial_resolution': None,  # it's point data now and we can't guess scale from point data
             'title': 'populated places',
         }
-    check_metadata(workspace, layername, METADATA_PROPERTIES_EQUAL, expected_md_values)
+    check_metadata(layer_uuid, METADATA_PROPERTIES_EQUAL, expected_md_values)
 
 
 def test_patch_layer_concurrent_and_delete_it():
@@ -668,7 +666,7 @@ def test_patch_layer_concurrent_and_delete_it():
         f'{LAYER_TYPE}': publication_counter.get()
     })
 
-    process_client.delete_publication_by_uuid(LAYER_TYPE, uuid=uuid_str)
+    process_client.delete_publication(LAYER_TYPE, uuid=uuid_str)
     assert not settings.LAYMAN_REDIS.sismember(uuid.UUID_SET_KEY, uuid_str)
     assert not settings.LAYMAN_REDIS.exists(uuid.get_uuid_metadata_key(uuid_str))
     assert not settings.LAYMAN_REDIS.hexists(
@@ -711,7 +709,7 @@ def test_post_layers_long_and_delete_it():
             assert 'status' in layer_info[key_to_check], f'{key_to_check=}\n{layer_info=}'
 
     layer_uuid = post_response['uuid']
-    process_client.delete_publication_by_uuid(LAYER_TYPE, uuid=layer_uuid)
+    process_client.delete_publication(LAYER_TYPE, uuid=layer_uuid)
 
     with pytest.raises(LaymanError) as exc_info:
         process_client.get_layer(layer_uuid)
@@ -724,14 +722,14 @@ def test_post_layers_long_and_delete_it():
 
 def test_delete_layer():
     layer_uuid = LAYER_UUID_2
-    process_client.delete_publication_by_uuid(LAYER_TYPE, uuid=layer_uuid)
+    process_client.delete_publication(LAYER_TYPE, uuid=layer_uuid)
     publication_counter.decrease()
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': publication_counter.get()
     })
 
     with pytest.raises(LaymanError) as exc_info:
-        process_client.delete_publication_by_uuid(LAYER_TYPE, uuid=layer_uuid)
+        process_client.delete_publication(LAYER_TYPE, uuid=layer_uuid)
     assert exc_info.value.http_code == 404
     assert exc_info.value.code == 15
 
@@ -759,7 +757,7 @@ def test_post_layers_zero_length_attribute():
     assert layer_info['db']['status'] == 'FAILURE', f'layer_info={layer_info}'
     assert layer_info['db']['error']['code'] == 28, f'layer_info={layer_info}'
 
-    process_client.delete_publication_by_uuid(LAYER_TYPE, uuid=layer_uuid)
+    process_client.delete_publication(LAYER_TYPE, uuid=layer_uuid)
 
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': publication_counter.get()
@@ -776,9 +774,9 @@ def test_get_layers_testuser2():
 
 
 def test_just_delete_layers():
-    process_client.delete_publication_by_uuid(LAYER_TYPE, uuid=LAYER_UUID_1)
+    process_client.delete_publication(LAYER_TYPE, uuid=LAYER_UUID_1)
     publication_counter.decrease()
-    process_client.delete_publication_by_uuid(LAYER_TYPE, uuid=LAYER_UUID_3)
+    process_client.delete_publication(LAYER_TYPE, uuid=LAYER_UUID_3)
     publication_counter.decrease()
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': publication_counter.get()
@@ -838,4 +836,4 @@ def test_layer_with_different_geometry():
                              timeout=settings.DEFAULT_CONNECTION_TIMEOUT,
                              )
     assert response.status_code == 200, f"HTTP Error {response.status_code}\n{response.text}"
-    process_client.delete_publication_by_uuid(LAYER_TYPE, uuid=layeruuid)
+    process_client.delete_publication(LAYER_TYPE, uuid=layeruuid)

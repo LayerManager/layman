@@ -1561,9 +1561,9 @@ class TestPublication(base_test.TestSingleRestPublication):
                                            name=publication.name,
                                            response=response,
                                            )
-            rest_publication_detail = process_client.get_publication_by_uuid(publication_type=publication.type,
-                                                                             uuid=publication.uuid,
-                                                                             )
+            rest_publication_detail = process_client.get_publication(publication_type=publication.type,
+                                                                     uuid=publication.uuid,
+                                                                     )
             failed_info_key = params[Key.FAILED_INFO_KEY]
             publication_asserts.rest.async_error_in_info_key(rest_publication_detail=rest_publication_detail,
                                                              info_key=failed_info_key,

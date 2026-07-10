@@ -34,13 +34,13 @@ def test_updated_at(publication_type):
     updated_at_db = results[0][0]
     assert timestamp1 < updated_at_db < timestamp2
 
-    info = process_client.get_publication_by_uuid(publication_type, uuid)
+    info = process_client.get_publication(publication_type, uuid)
     updated_at_rest_str = info['updated_at']
     updated_at_rest = parse(updated_at_rest_str)
     assert timestamp1 < updated_at_rest < timestamp2
 
     timestamp3 = datetime.datetime.now(datetime.timezone.utc)
-    process_client.patch_publication_by_uuid(publication_type, uuid, title='Title')
+    process_client.patch_publication(publication_type, uuid, title='Title')
     timestamp4 = datetime.datetime.now(datetime.timezone.utc)
 
     with app.app_context():
@@ -49,12 +49,12 @@ def test_updated_at(publication_type):
     updated_at_db = results[0][0]
     assert timestamp3 < updated_at_db < timestamp4
 
-    info = process_client.get_publication_by_uuid(publication_type, uuid)
+    info = process_client.get_publication(publication_type, uuid)
     updated_at_rest_str = info['updated_at']
     updated_at_rest = parse(updated_at_rest_str)
     assert timestamp3 < updated_at_rest < timestamp4
 
-    process_client.delete_publication_by_uuid(publication_type, uuid=uuid)
+    process_client.delete_publication(publication_type, uuid=uuid)
 
 
 class TestResponsesClass:
@@ -162,7 +162,7 @@ class TestResponsesClass:
             uuids[publication_type] = resp["uuid"]
         yield
         for publication_type, uuid in uuids.items():
-            process_client.delete_publication_by_uuid(publication_type, uuid=uuid)
+            process_client.delete_publication(publication_type, uuid=uuid)
 
     @staticmethod
     def compare_infos(info, expected_info, path):

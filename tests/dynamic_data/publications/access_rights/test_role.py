@@ -67,13 +67,13 @@ class TestPublication(base_test.TestSingleRestPublication):
 
     def test_publication(self, publication, rest_method, rest_args):
         if rest_method.enum_item == base_test_classes.RestMethod.PATCH:
-            info = process_client.get_publication_by_uuid(publication.type, publication.uuid)
+            info = process_client.get_publication(publication.type, publication.uuid)
             assert set(info['access_rights']['read']) == USER_ROLE1_ROLE3_EVERYONE
             assert set(info['access_rights']['write']) == {'EVERYONE'}
 
         rest_method.fn(publication, args=rest_args)
         assert_util.is_publication_valid_and_complete(publication)
-        info = process_client.get_publication_by_uuid(publication.type, publication.uuid, actor_name=USERNAME)
+        info = process_client.get_publication(publication.type, publication.uuid, actor_name=USERNAME)
         for right, exp_rights in [('read', USER_ROLE1_ROLE2),
                                   ('write', USER_ROLE1),
                                   ]:

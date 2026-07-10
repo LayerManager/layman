@@ -9,8 +9,8 @@ def cleanup_publications(request, publications, *, force=False):
             if util.get_publication_exists(publication):
                 headers = util.get_publication_header(publication)
                 uuid = util.get_publication_uuid(publication)
-                process_client.delete_publication_by_uuid(publication.type, uuid=uuid,
-                                                          headers=headers)
+                process_client.delete_publication(publication.type, uuid=uuid,
+                                                  headers=headers)
 
 
 def cleanup_external_tables(request, tables, *, force=False):

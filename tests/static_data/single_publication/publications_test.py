@@ -41,7 +41,7 @@ def test_infos(workspace, publ_type, publication):
     headers = data.HEADERS.get(publ_def[data.TEST_DATA].get('users_can_write', [None])[0])
     with app.app_context():
         uuid = layman_util.get_publication_uuid(workspace, publ_type, publication)
-    rest_detail = process_client.get_publication_by_uuid(publ_type, uuid, headers=headers)
+    rest_detail = process_client.get_publication(publ_type, uuid, headers=headers)
     asserts_rest.same_values_in_detail_and_multi(workspace, publ_type, publication, rest_detail, headers)
     if 'geodata_type' in publ_def[data.TEST_DATA]:
         exp_geodata_type = publ_def[data.TEST_DATA]['geodata_type']
@@ -69,7 +69,7 @@ def test_info(workspace, publ_type, publication):
     headers = data.HEADERS.get(data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_write', [None])[0])
     with app.app_context():
         uuid = layman_util.get_publication_uuid(workspace, publ_type, publication)
-    info = process_client.get_publication_by_uuid(publ_type, uuid, headers=headers)
+    info = process_client.get_publication(publ_type, uuid, headers=headers)
 
     asserts_rest.is_complete_in_rest(info)
     asserts_rest.mandatory_keys_in_rest(info)

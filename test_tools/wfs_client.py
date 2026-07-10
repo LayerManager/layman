@@ -38,4 +38,4 @@ def post_wfst(workspace, publ_type, name,
     process_client.post_wfst(data_xml, headers=request_headers, url=request_url, workspace=request_workspace)
 
     if wait_for_update:
-        process_client.wait_for_publication_status(workspace, publ_type, name, headers=request_headers)
+        process_client.wait_for_publication_status(uuid, publ_type, headers=request_headers)

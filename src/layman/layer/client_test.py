@@ -97,8 +97,8 @@ def test_post_layers_chunk(browser):
     button.click()
 
     try:
-        process_client.wait_for_publication_status_by_uuid(PUBL_UUID,
-                                                           process_client.LAYER_TYPE)
+        process_client.wait_for_publication_status(PUBL_UUID,
+                                                   process_client.LAYER_TYPE)
     except Exception as exc:
         browser.save_screenshot('/code/tmp/artifacts/client-post-layers-2.5.png')
         raise exc
@@ -169,9 +169,8 @@ def test_patch_layer_chunk(browser):
     button.click()
 
     try:
-        process_client.wait_for_publication_status_by_uuid(
-            PUBL_UUID, process_client.LAYER_TYPE
-        )
+        process_client.wait_for_publication_status(PUBL_UUID,
+                                                   process_client.LAYER_TYPE)
     except Exception as exc:
         browser.save_screenshot('/code/tmp/artifacts/client-patch-layers-3.5.png')
         raise exc

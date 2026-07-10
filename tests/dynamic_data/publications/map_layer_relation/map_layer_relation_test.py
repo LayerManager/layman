@@ -234,7 +234,9 @@ class TestPublication(base_test.TestSingleRestPublication):
         rest_method.fn(map, args=rest_args)
         if rest_method.enum_item in [base_test_classes.RestMethodAll.POST, base_test_classes.RestMethodAll.PATCH]:
             assert_util.is_publication_valid_and_complete(map)
-            asserts_publ.metadata.correct_comparison_response_with_x_forwarded_headers(map.workspace, map.type, map.name, )
+            with app.app_context():
+                publication = Map(map_tuple=(map.workspace, map.name))
+            asserts_publ.metadata.correct_comparison_response_with_x_forwarded_headers(publication)
 
         exp = params['exp_after_rest_method']
         http_method = REQUEST_METHOD_PATCH if rest_method.enum_item == base_test_classes.RestMethodAll.PATCH else REQUEST_METHOD_POST

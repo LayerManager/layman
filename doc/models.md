@@ -44,8 +44,7 @@
 - Documented [map publishing](publish-map.md) process 
 - Thumbnail image available
 - Map-related data is named and structured
-  - either by [workspace](#workspace) and layername
-      - [REST API](rest.md): `/rest/workspaces/<workspace_name>/maps/<mapname>` 
+  - by [workspace](#workspace) and map name
   - or by UUID:
       - [filesystem](data-storage.md#filesystem): `/path/to/LAYMAN_DATA_DIR/maps/<UUID>` 
       - [REST API](rest.md): `/rest/maps/<uuid>/thumbnail`
@@ -92,8 +91,7 @@
 - Workspace is folder for [publications](#publication).
 - Each workspace is identified by name that is unique among all workspaces.
 - The name is lower-case, maximum length is 59 characters.
-- Workspace name is sometimes used for structuring publication-related data. For example, it's part of REST API URL (`/rest/workspaces/<workspace_name>/...`).
-- Workspace's REST API consists of all [map and layer endpoints](rest.md) endpoints.
+- Workspace name is used when creating, filtering, and bulk-deleting publications through the [map and layer endpoints](rest.md). Single-publication endpoints use UUID.
 - There are following types of workspaces:
    - [Personal workspace](#personal-workspace)
    - [Public workspace](#public-workspace)

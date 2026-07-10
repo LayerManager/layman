@@ -66,7 +66,7 @@ class TestPublication(base_test.TestSingleRestPublication):
 
     def test_publication(self, layer, rest_method, rest_args):
         # some initial asserts
-        map_info = process_client.get_publication_by_uuid(MAP.type, MAP.uuid)
+        map_info = process_client.get_publication(MAP.type, MAP.uuid)
         assert map_info['access_rights']['write'] == [ROLE, USER]
         exp_thumbnail = os.path.join(DIRECTORY, f"patch_after_feature_change_map_empty.png")
         assert_internal.thumbnail_equals(MAP.workspace, MAP.type, MAP.name, exp_thumbnail, max_diffs=0)
@@ -76,10 +76,10 @@ class TestPublication(base_test.TestSingleRestPublication):
         assert_util.is_publication_valid_and_complete(layer)
 
         # just ensure that patch_after_feature_change on MAP is running
-        map_info = process_client.get_publication_by_uuid(MAP.type, MAP.uuid)
+        map_info = process_client.get_publication(MAP.type, MAP.uuid)
         assert map_info['layman_metadata']['publication_status'] == 'UPDATING'
 
-        process_client.wait_for_publication_status(*MAP)
+        process_client.wait_for_publication_status(MAP.uuid, MAP.type)
 
         # ensure that MAP thumbnail is OK, however MAP is OK even if thumbnail task failed !
         assert_util.is_publication_valid_and_complete(layer)

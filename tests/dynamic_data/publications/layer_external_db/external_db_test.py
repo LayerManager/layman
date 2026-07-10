@@ -257,7 +257,7 @@ class TestLayer(base_test.TestSingleRestPublication):
         gs_asserts.assert_stores(exp_wfs_stores=both_db_stores, exp_wms_stores=exp_wms_stores)
 
         # check metadata properties language and scale_denominator (they are derived from DB)
-        comp = process_client.get_workspace_publication_metadata_comparison(layer.type, layer.workspace, layer.name)
+        comp = process_client.get_publication_metadata_comparison(layer.type, uuid)
         md_lang = comp['metadata_properties']['language']
         assert md_lang['equal'] is True
         assert all(set(langs) == params['exp_languages'] for langs in md_lang['values'].values()), \
