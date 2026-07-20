@@ -33,7 +33,7 @@ jobs:
           cp .env.test .env
           make pull-dev-images
           docker compose -f docker-compose.deps.yml -f docker-compose.test.yml pull redis postgresql nginx-qgis geoserver
-          docker compose -f docker-compose.deps.yml -f docker-compose.test.yml build --parallel qgis micka
+          docker compose -f docker-compose.deps.yml -f docker-compose.test.yml build --parallel qgis micka layman_client_test
 
       - name: Download test data
         run: |
