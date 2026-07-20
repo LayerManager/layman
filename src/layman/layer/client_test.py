@@ -42,7 +42,6 @@ def browser():
 
 @pytest.mark.test_client
 @pytest.mark.usefixtures('ensure_layman', 'clear_country_chunks')
-@pytest.mark.xfail(reason="Need to prepare test client", strict=False)
 def test_post_layers_chunk(browser):
     relative_file_paths = [
         'tmp/naturalearth/10m/cultural/ne_10m_admin_0_countries.geojson',
@@ -98,9 +97,8 @@ def test_post_layers_chunk(browser):
     button.click()
 
     try:
-        process_client.wait_for_publication_status(WORKSPACE,
-                                                   process_client.LAYER_TYPE,
-                                                   LAYERNAME)
+        process_client.wait_for_publication_status_by_uuid(PUBL_UUID,
+                                                           process_client.LAYER_TYPE)
     except Exception as exc:
         browser.save_screenshot('/code/tmp/artifacts/client-post-layers-2.5.png')
         raise exc
@@ -122,7 +120,6 @@ def test_post_layers_chunk(browser):
     assert not settings.LAYMAN_REDIS.exists(total_chunks_key)
 
 
-@pytest.mark.xfail(reason="Need to prepare test client")
 @pytest.mark.test_client
 @pytest.mark.usefixtures('ensure_layman', 'clear_country_chunks')
 def test_patch_layer_chunk(browser):
@@ -153,17 +150,11 @@ def test_patch_layer_chunk(browser):
     button.click()
     browser.save_screenshot('/code/tmp/artifacts/client-patch-layers-2.png')
 
-    user_input = browser.find_elements(By.NAME, 'Workspace')
+    user_input = browser.find_elements(By.NAME, 'uuid')
     assert len(user_input) == 1
     user_input = user_input[0]
     user_input.clear()
-    user_input.send_keys(WORKSPACE)
-
-    layername_input = browser.find_elements(By.NAME, 'name')
-    assert len(layername_input) == 1
-    layername_input = layername_input[0]
-    layername_input.clear()
-    layername_input.send_keys(LAYERNAME)
+    user_input.send_keys(PUBL_UUID)
 
     file_input = browser.find_elements(By.NAME, 'file')
     assert len(file_input) == 1
@@ -178,9 +169,9 @@ def test_patch_layer_chunk(browser):
     button.click()
 
     try:
-        process_client.wait_for_publication_status(WORKSPACE,
-                                                   process_client.LAYER_TYPE,
-                                                   LAYERNAME)
+        process_client.wait_for_publication_status_by_uuid(
+            PUBL_UUID, process_client.LAYER_TYPE
+        )
     except Exception as exc:
         browser.save_screenshot('/code/tmp/artifacts/client-patch-layers-3.5.png')
         raise exc
