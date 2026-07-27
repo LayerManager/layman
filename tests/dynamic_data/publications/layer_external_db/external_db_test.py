@@ -4,6 +4,7 @@ import pytest
 
 from db import util as db_util
 from layman import app, settings
+from layman.layer.layer_class import Layer
 from layman.util import get_publication_info
 from test_tools import process_client, external_db
 from tests import EnumTestTypes, Publication4Test
@@ -229,7 +230,7 @@ class TestLayer(base_test.TestSingleRestPublication):
         # general checks
         assert_util.is_publication_valid_and_complete(layer)
         with app.app_context():
-            publ_info = get_publication_info(layer.workspace, layer.type, layer.name,
+            publ_info = get_publication_info(Layer(layer_tuple=(layer.workspace, layer.name), load=False),
                                              context={'keys': ['table_uri', 'uuid']})
         table_uri = publ_info['_table_uri']
         uuid = publ_info['uuid']
@@ -278,7 +279,7 @@ class TestLayer(base_test.TestSingleRestPublication):
 
         # check there is no information about the layer anymore
         with app.app_context():
-            publ_info = get_publication_info(layer.workspace, layer.type, layer.name)
+            publ_info = get_publication_info(Layer(layer_tuple=(layer.workspace, layer.name), load=False))
         assert not publ_info
 
         # clean up external DB table

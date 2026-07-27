@@ -7,6 +7,7 @@ from layman import app, settings
 from layman.layer import db
 from layman.layer.geoserver import wfs as geoserver_wfs, GEOSERVER_WFS_WORKSPACE, GeoserverIds
 from layman.layer.qgis import util as qgis_util, wms as qgis_wms
+from layman.layer.layer_class import Layer
 from layman.util import get_publication_info, get_publication_uuid
 from test_tools.data import wfs as data_wfs
 from test_tools import process_client, external_db
@@ -269,7 +270,7 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
         for layer_name, attr_names in new_attributes:
             # assert that all attr_names are not yet presented in DB table
             with app.app_context():
-                table_uri = get_publication_info(workspace, process_client.LAYER_TYPE, layer_name,
+                table_uri = get_publication_info(Layer(layer_tuple=(workspace, layer_name), load=False),
                                                  context={'keys': ['table_uri']})['_table_uri']
             table_uris[layer_name] = table_uri
             old_db_attributes[layer_name] = db.get_all_table_column_names(table_uri.schema, table_uri.table,

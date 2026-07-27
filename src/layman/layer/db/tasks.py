@@ -34,7 +34,7 @@ def refresh_table(
 
     if layer.original_data_source == settings.EnumOriginalDataSource.TABLE:
         return
-    publ_info = layman_util.get_publication_info_by_class(layer, context={'keys': ['file']})
+    publ_info = layman_util.get_publication_info(layer, context={'keys': ['file']})
     file_type = publ_info['_file']['file_type']
     if file_type == settings.GEODATA_TYPE_RASTER:
         return

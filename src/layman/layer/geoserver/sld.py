@@ -6,7 +6,7 @@ from layman.common.db import launder_attribute_name
 from layman.layer.layer_class import Layer
 from layman.layer.filesystem import input_style
 from layman.layer.geoserver import GeoserverIds
-from layman.util import url_for, get_publication_info_by_class
+from layman.util import url_for, get_publication_info
 from . import wms
 from .. import LAYER_TYPE
 
@@ -68,7 +68,7 @@ def ensure_custom_sld_file_if_needed(layer: Layer):
         return
     if layer.geodata_type != settings.GEODATA_TYPE_RASTER or layer.style_type != 'sld':
         return
-    info = get_publication_info_by_class(layer, {
+    info = get_publication_info(layer, {
         'keys': ['file'],
         'extra_keys': [
             '_file.normalized_file.stats',

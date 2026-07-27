@@ -34,7 +34,7 @@ def patch_after_feature_change(
     # Sometimes, when delete request run just after other request for the same publication (for example WFS-T),
     # the aborted task keep running and finish after end of delete task for the same source. This part make sure,
     # that in that case we delete it.
-    info = layman_util.get_publication_info_by_class(publication, context={'keys': ['name']})
+    info = layman_util.get_publication_info(publication, context={'keys': ['name']})
     if not info:
         logger.warning(f"layman.layer.micka.soap.patch_after_feature_change: workspace={publication.workspace}, "
                        f"layer={publication.name}, uuid={publication.uuid} Publication does not exist, so we delete it")

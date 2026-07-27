@@ -1,6 +1,7 @@
 import uuid
 import pytest
 
+from layman.layer.layer_class import Layer
 from layman import app, settings, util as layman_util
 from layman.common.prime_db_schema import publications as pubs_util
 from .wfs_wms_status import set_after_restart
@@ -50,7 +51,7 @@ def test_set_after_restart(wfs_wms_status_before, wfs_wms_status_after):
         set_after_restart()
 
     with app.app_context():
-        publ_info = layman_util.get_publication_info(workspace, publ_type, publication_name, {'keys': ['wfs_wms_status']})
+        publ_info = layman_util.get_publication_info(Layer(layer_tuple=(workspace, publication_name), load=False), {'keys': ['wfs_wms_status']})
     wfs_wms_status = publ_info['_wfs_wms_status']
     assert wfs_wms_status == wfs_wms_status_after
 

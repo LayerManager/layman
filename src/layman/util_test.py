@@ -28,9 +28,7 @@ def assert_module_methods(module, methods):
 
 
 @pytest.mark.parametrize('method', [
-    'abort_{name}_chain',
     'delete_{name}',
-    'is_{name}_chain_ready',
 ])
 @pytest.mark.parametrize('publication_type', settings.PUBLICATION_MODULES)
 def test_publication_type_interface_methods(publication_type, method):

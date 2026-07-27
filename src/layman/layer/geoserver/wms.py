@@ -11,7 +11,6 @@ from geoserver import util as gs_util
 from layman import settings, patch_mode, util as layman_util
 from layman.cache import mem_redis
 from layman.common import geoserver as gs_common, empty_method
-from layman.layer.util import is_layer_chain_ready
 from layman.layer import LAYER_TYPE
 from layman.layer.filesystem import gdal
 from layman.layer.layer_class import Layer
@@ -141,7 +140,7 @@ def get_wms_proxy():
     def currently_changing():
         layerinfos = layman_util.get_publication_infos(publ_type=LAYER_TYPE)
         result = any((
-            not is_layer_chain_ready(workspace, layername)
+            not layman_util.is_publication_chain_ready(Layer(layer_tuple=(workspace, layername), load=False))
             for (workspace, _, layername) in layerinfos
         ))
         return result

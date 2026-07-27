@@ -1,10 +1,11 @@
 import copy
 from layman import app, util as layman_util
+from tests.asserts.util import layer_or_map
 
 
 def same_values_in_internal_and_rest(workspace, publ_type, name, rest_publication_detail):
     with app.app_context():
-        publ_info = layman_util.get_publication_info(workspace, publ_type, name)
+        publ_info = layman_util.get_publication_info(layer_or_map(workspace, publ_type, name))
     publ_info = copy.deepcopy(publ_info)
 
     # adjust publ_info, see layman.common.util::clear_publication_info

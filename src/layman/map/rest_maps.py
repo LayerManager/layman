@@ -14,6 +14,7 @@ from layman.util import url_for
 from layman.uuid import register_publication_uuid_to_redis
 from . import util, MAP_TYPE, MAP_REST_PATH_NAME
 from .filesystem import input_file
+from .map_class import Map
 
 bp = Blueprint('rest_maps', __name__)
 
@@ -70,7 +71,7 @@ def post():
         unsafe_mapname = input_file.get_unsafe_mapname(file_json)
     mapname = util.to_safe_map_name(unsafe_mapname)
     util.check_mapname(mapname)
-    info = layman_util.get_publication_info(workspace, MAP_TYPE, mapname)
+    info = layman_util.get_publication_info(Map(map_tuple=(workspace, mapname), load=False))
     if info:
         raise LaymanError(24, {'mapname': mapname})
 
@@ -90,6 +91,7 @@ def post():
 
     redis_util.create_lock(workspace, MAP_TYPE, mapname, request.method)
 
+    map = None
     try:
         map_result = {
             'name': mapname,
@@ -103,13 +105,12 @@ def post():
         }
 
         rest_common.setup_post_access_rights(request.form, kwargs, actor_name)
-        util.pre_publication_action_check(workspace,
-                                          mapname,
-                                          kwargs,
-                                          )
+        map = Map(map_tuple=(workspace, mapname), load=False)
+        util.pre_publication_action_check(map, kwargs)
         # register map uuid
         uuid_str = register_publication_uuid_to_redis(workspace, MAP_TYPE, mapname, input_uuid)
         kwargs['uuid'] = uuid_str
+        map = Map(uuid=uuid_str, map_tuple=(workspace, mapname), load=False)
 
         map_result.update({
             'uuid': uuid_str,
@@ -123,14 +124,13 @@ def post():
         input_file.save_map_files(uuid_str, [file])
 
         util.post_map(
-            workspace,
-            mapname,
+            map,
             kwargs,
             'layman.map.filesystem.input_file'
         )
     except Exception as exception:
         try:
-            if util.is_map_chain_ready(workspace, mapname):
+            if map and layman_util.is_publication_chain_ready(map):
                 redis_util.unlock_publication(workspace, MAP_TYPE, mapname)
         finally:
             redis_util.unlock_publication(workspace, MAP_TYPE, mapname)

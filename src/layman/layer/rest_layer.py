@@ -31,7 +31,7 @@ def get(uuid):
     app.logger.info(f"GET Layer, actor={g.user}")
 
     x_forwarded_items = layman_util.get_x_forwarded_items(request.headers)
-    info = util.get_complete_layer_info(uuid=uuid, x_forwarded_items=x_forwarded_items)
+    info = util.get_complete_layer_info(Layer(uuid=uuid), x_forwarded_items=x_forwarded_items)
 
     return jsonify(info), 200
 
@@ -43,8 +43,8 @@ def patch(uuid):
 
     x_forwarded_items = layman_util.get_x_forwarded_items(request.headers)
 
-    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['title', 'name', 'description', 'table_uri', 'geodata_type', 'style_type',
-                                                                            'original_data_source', 'uuid', '_workspace']})
+    old_layer = Layer(uuid=uuid)
+    info = old_layer.info
     kwargs = {
         'title': info.get('title', info['name']) or '',
         'description': info.get('description'),
@@ -196,7 +196,6 @@ def patch(uuid):
     kwargs['enable_more_main_files'] = enable_more_main_files
     request_method = request.method.lower()
     kwargs['http_method'] = request_method
-    old_layer = Layer(uuid=uuid)
     props_to_refresh = util.get_same_or_missing_prop_names(old_layer)
     kwargs['metadata_properties_to_refresh'] = props_to_refresh
 
@@ -208,7 +207,7 @@ def patch(uuid):
 
     kwargs.update({'actor_name': authn.get_authn_username()})
     rest_util.setup_patch_access_rights(request.form, kwargs)
-    util.pre_publication_action_check_by_uuid(uuid, kwargs)
+    util.pre_publication_action_check(old_layer, kwargs)
 
     if delete_from is not None:
         deleted = util.delete_layer(old_layer, source=delete_from, http_method=request_method)
@@ -265,7 +264,10 @@ def patch(uuid):
 
     app.logger.info('PATCH Layer changes done')
     patch_keys = get_layer_patch_keys()
-    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': patch_keys, 'x_forwarded_items': x_forwarded_items})
+    info = layman_util.get_publication_info(
+        new_layer,
+        context={'keys': patch_keys, 'x_forwarded_items': x_forwarded_items},
+    )
     info['url'] = layman_util.get_publication_url(info['type'], info['uuid'], x_forwarded_items=x_forwarded_items)
     info.update(layer_result)
     info = {key: value for key, value in info.items() if key in patch_keys}
@@ -279,11 +281,9 @@ def delete_layer(uuid):
     app.logger.info(f"DELETE Layer, actor={g.user}")
     x_forwarded_items = layman_util.get_x_forwarded_items(request.headers)
 
-    info = layman_util.get_publication_info_by_uuid(uuid, context={'x_forwarded_items': x_forwarded_items})
-
-    util.abort_layer_chain_by_uuid(uuid)
-
     layer = Layer(uuid=uuid)
+    info = layer.info
+    layman_util.abort_publication_chain(layer)
     util.delete_layer(layer)
 
     app.logger.info('DELETE Layer done')

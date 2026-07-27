@@ -17,7 +17,7 @@ from layman.layer import db
 from layman.layer.geoserver import wms
 from layman.layer.geoserver import wfs
 from layman import settings, patch_mode, LaymanError, common
-from layman.util import url_for, get_publication_info_by_class
+from layman.util import url_for, get_publication_info
 
 logger = logging.getLogger(__name__)
 PATCH_MODE = patch_mode.NO_DELETE
@@ -107,7 +107,7 @@ def csw_insert(publication: Layer):
 def get_template_path_and_values(publication: Layer, *, http_method):
     logger.info(f'get_template_path_and_values start calculating data for {publication.workspace}:{publication.name}')
     assert http_method in [common.REQUEST_METHOD_POST, common.REQUEST_METHOD_PATCH]
-    publ_info = get_publication_info_by_class(publication, context={
+    publ_info = get_publication_info(publication, context={
         'keys': ['wms'],
     })
     title = publication.title

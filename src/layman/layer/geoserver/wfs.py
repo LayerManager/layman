@@ -6,7 +6,6 @@ from layman import settings, patch_mode
 from layman.cache import mem_redis
 from layman.common import geoserver as gs_common, empty_method
 from layman.layer.geoserver import GEOSERVER_WFS_WORKSPACE, GeoserverIds
-from layman.layer.util import is_layer_chain_ready
 from layman import util as layman_util
 from layman.layer import LAYER_TYPE
 from layman.layer.layer_class import Layer
@@ -118,7 +117,7 @@ def get_wfs_proxy():
     def currently_changing():
         layerinfos = layman_util.get_publication_infos(workspace, LAYER_TYPE)
         result = any((
-            not is_layer_chain_ready(workspace, layername)
+            not layman_util.is_publication_chain_ready(Layer(layer_tuple=(workspace, layername), load=False))
             for (_, _, layername) in layerinfos
         ))
         return result

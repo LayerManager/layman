@@ -3,10 +3,11 @@ import pathlib
 import requests
 
 import crs as crs_def
+from layman.layer.layer_class import Layer
 from layman import app, util as layman_util, settings
 from layman.common import bbox as bbox_util
 from layman.layer.geoserver import wfs, wms, GeoserverIds
-from .process_client import LAYER_TYPE, get_layer_metadata_comparison, get_source_key_from_metadata_comparison
+from .process_client import get_layer_metadata_comparison, get_source_key_from_metadata_comparison
 from .util import compare_images
 
 
@@ -63,7 +64,7 @@ def assert_wms_bbox(uuid, expected_bbox, *, expected_bbox_crs='EPSG:3857'):
 
 def assert_all_sources_bbox(workspace, layer, *, layer_uuid, expected_bbox_3857, expected_native_bbox=None, expected_native_crs=None):
     with app.app_context():
-        info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer,
+        info = layman_util.get_publication_info(Layer(layer_tuple=(workspace, layer), load=False),
                                                 context={'key': ['bounding_box', 'native_bounding_box', 'native_crs']})
     bbox_3857 = tuple(info['bounding_box'])
     native_bbox = tuple(info['native_bounding_box'])

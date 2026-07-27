@@ -401,13 +401,25 @@ def merge_infos(target_info, partial_info, *, comment=None):
 
 
 def get_publication_uuid(workspace, publ_type, publ_name):
-    return get_publication_info(workspace, publ_type, publ_name, context={'keys': ['uuid', ]}).get('uuid')
+    return get_publication_info(
+        _layer_or_map(workspace, publ_type, publ_name),
+        context={'keys': ['uuid', ]},
+    ).get('uuid')
 
 
 def _get_publication_by_uuid(uuid):
     from layman.common.prime_db_schema.publications import get_publication_infos as prime_db_schema_get_publication_infos
     prime_db_schema_info = prime_db_schema_get_publication_infos(uuid=uuid)
     return list(prime_db_schema_info.keys())[0] if prime_db_schema_info else None
+
+
+def _layer_or_map(workspace, publ_type, publ_name):
+    from layman.layer import LAYER_TYPE
+    from layman.layer.layer_class import Layer
+    from layman.map.map_class import Map
+    if publ_type == LAYER_TYPE:
+        return Layer(layer_tuple=(workspace, publ_name), load=False)
+    return Map(map_tuple=(workspace, publ_name), load=False)
 
 
 def get_publication_info_by_uuid(uuid, context=None):
@@ -417,18 +429,17 @@ def get_publication_info_by_uuid(uuid, context=None):
     if maybe_tuple is None:
         return {}
     workspace, publ_type, name = maybe_tuple
-    return get_publication_info(workspace=workspace, publ_type=publ_type, publ_name=name, context=context)
+    return get_publication_info(_layer_or_map(workspace, publ_type, name), context=context)
 
 
-def get_publication_info_by_class(publication: Publication, context=None):
-    return get_publication_info(workspace=publication.workspace, publ_type=publication.type, publ_name=publication.name, context=context)
-
-
-def get_publication_info(workspace, publ_type, publ_name, context=None):
+def get_publication_info(publication: Publication, context=None):
     from layman import authz
     from layman.layer import LAYER_TYPE
     from layman.map import MAP_TYPE
     context = context or {}
+    workspace = publication.workspace
+    publ_type = publication.type
+    publ_name = publication.name
 
     assert not ('sources_filter' in context and 'keys' in context)
     sources = get_internal_sources(publ_type)
@@ -519,17 +530,15 @@ def delete_workspace_publication(workspace, publication_type, publication_name, 
 
     util_module_name = f'{publ_type_module["module"]}.util'
     util_module = importlib.import_module(util_module_name)
-    abort_publication_fn = getattr(util_module, f'abort_{publ_type_module["name"]}_chain', None)
     delete_publication_fn = getattr(util_module, f'delete_{publ_type_module["name"]}', None)
-    is_chain_ready_fn = getattr(util_module, f'is_{publ_type_module["name"]}_chain_ready', None)
 
     publication = Publication.create(publ_tuple=(workspace, publication_type, publication_name))
 
     redis.create_lock(workspace, publication_type, publication_name, method)
     try:
-        abort_publication_fn(workspace, publication_name)
+        abort_publication_chain(publication)
         delete_info = delete_publication_fn(publication, x_forwarded_items=x_forwarded_items)
-        if is_chain_ready_fn(workspace, publication_name):
+        if is_publication_chain_ready(publication):
             redis.unlock_publication(workspace, publication_type, publication_name)
         result = {
             'name': delete_info["name"],
@@ -540,7 +549,7 @@ def delete_workspace_publication(workspace, publication_type, publication_name, 
         }
     except Exception as exc:
         try:
-            if is_chain_ready_fn(workspace, publication_name):
+            if is_publication_chain_ready(publication):
                 redis.unlock_publication(workspace, publication_type, publication_name)
         finally:
             redis.unlock_publication(workspace, publication_type, publication_name)
@@ -548,16 +557,16 @@ def delete_workspace_publication(workspace, publication_type, publication_name, 
     return result
 
 
-def patch_publication(publication: Publication, patch_publication_fn, is_chain_ready_fn, task_options, patch_options):
+def patch_publication(publication: Publication, patch_publication_fn, task_options, patch_options):
     redis.create_lock(publication.workspace, publication.type, publication.name, PUBLICATION_LOCK_PATCH)
 
     try:
         patch_publication_fn(publication, task_options=task_options, **patch_options)
-        if is_chain_ready_fn(publication.workspace, publication.name):
+        if is_publication_chain_ready(publication):
             redis.unlock_publication(publication.workspace, publication.type, publication.name)
     except Exception as exc:
         try:
-            if is_chain_ready_fn(publication.workspace, publication):
+            if is_publication_chain_ready(publication):
                 redis.unlock_publication(publication.workspace, publication.type, publication.name)
         finally:
             redis.unlock_publication(publication.workspace, publication.type, publication.name)
@@ -601,6 +610,19 @@ def patch_after_feature_change(workspace, publication_type, publication, *, queu
     patch_chain = tasks_util.get_chain_of_methods(workspace, publication, task_methods, kwargs, 'layername', queue=queue)
     res = patch_chain()
     celery_util.set_publication_chain_info(workspace, publication_type, publication, task_methods, res)
+
+
+def get_publication_chain(publication: Publication):
+    return celery_util.get_publication_chain_info(publication.workspace, publication.type, publication.name)
+
+
+def abort_publication_chain(publication: Publication):
+    celery_util.abort_publication_chain(publication.workspace, publication.type, publication.name)
+
+
+def is_publication_chain_ready(publication: Publication):
+    chain_info = get_publication_chain(publication)
+    return chain_info is None or celery_util.is_chain_ready(chain_info)
 
 
 def is_publication_updating(workspace, publication_type, publication_name):
@@ -718,14 +740,13 @@ def get_x_forwarded_items(request_headers):
     return XForwardedClass.from_headers(request_headers)
 
 
-def get_complete_publication_info(workspace, publication_type, publication_name, *, x_forwarded_items=None,
-                                  complete_info_method):
-    is_updating_before = is_publication_updating(workspace, publication_type, publication_name)
+def get_complete_publication_info(publication: Publication, *, x_forwarded_items=None, complete_info_method):
+    is_updating_before = is_publication_updating(publication.workspace, publication.type, publication.name)
     is_updating_after = None
 
     complete_info = {}
 
-    logger.debug(f"get_complete_publication_info START, publication={workspace, publication_type, publication_name},"
+    logger.debug(f"get_complete_publication_info START, publication={publication.uuid},"
                  f"is_updating_before={is_updating_before}")
 
     # In the result of _get_complete_layer_info, an inconsistency may occur between `status` key of internal sources
@@ -738,13 +759,13 @@ def get_complete_publication_info(workspace, publication_type, publication_name,
         if is_updating_after is not None:
             is_updating_before = is_updating_after
 
-        complete_info = complete_info_method(workspace, publication_name, x_forwarded_items=x_forwarded_items)
+        complete_info = complete_info_method(publication, x_forwarded_items=x_forwarded_items)
 
         publication_status = complete_info['layman_metadata']['publication_status']
         is_updating_after = publication_status == 'UPDATING'
 
         logger.debug(
-            f"get_complete_publication_info, publication={workspace, publication_type, publication_name},"
+            f"get_complete_publication_info, publication={publication.uuid},"
             f"publication_status={publication_status}, is_updating_after={is_updating_after}")
 
     return complete_info
@@ -752,7 +773,10 @@ def get_complete_publication_info(workspace, publication_type, publication_name,
 
 def get_publication_writer(workspace, publication_type, publication_name):
     from layman.authz import is_user
-    info = get_publication_info(workspace, publication_type, publication_name, context={'keys': ['access_rights']})
+    info = get_publication_info(
+        _layer_or_map(workspace, publication_type, publication_name),
+        context={'keys': ['access_rights']},
+    )
     return next((
         user_or_role for user_or_role in info['access_rights']['write']
         if is_user(user_or_role)

@@ -41,7 +41,7 @@ def refresh_wms(
 ):
     layer = Layer(uuid=uuid)
     gs_layername = layer.gs_ids.wms
-    info = layman_util.get_publication_info_by_class(layer, context={'keys': ['file']})
+    info = layman_util.get_publication_info(layer, context={'keys': ['file']})
 
     assert layer.title is not None
     metadata_url = micka_util.get_metadata_url(layer.uuid, url_type=micka_util.RecordUrlType.XML)

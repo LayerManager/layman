@@ -11,7 +11,7 @@ import crs as crs_def
 from layman import common, settings
 from layman.common import language as common_language, empty_method, bbox as bbox_util
 from layman.common.micka import util as common_util, requests as micka_requests, MickaIds
-from layman.layer import LAYER_TYPE
+from layman.layer.layer_class import Layer
 from layman.map.map_class import Map
 from layman.util import url_for, get_publication_info
 
@@ -130,7 +130,7 @@ def map_to_operates_on(publication: Map, operates_on_muuids_filter=None, editor=
                 continue
         else:
             context['actor_name'] = editor
-        publ_info = get_publication_info(layer_workspace, LAYER_TYPE, layername, context=context)
+        publ_info = get_publication_info(Layer(layer_tuple=(layer_workspace, layername), load=False), context=context)
         if not (layer_muuid and publ_info):
             continue
         layer_title = publ_info['title']

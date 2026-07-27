@@ -3,6 +3,7 @@ import os
 
 from layman import app
 from layman.util import get_publication_info
+from layman.map.map_class import Map
 from test_tools import process_client
 from tests import EnumTestTypes, Publication4Test
 from tests.asserts.final import publication as asserts_publ
@@ -82,7 +83,7 @@ class TestPublication(base_test.TestSingleRestPublication):
         assert_util.is_publication_valid_and_complete(map)
 
         with app.app_context():
-            publ_info = get_publication_info(map.workspace, map.type, map.name,
+            publ_info = get_publication_info(Map(map_tuple=(map.workspace, map.name), load=False),
                                              context={'keys': ['map_layers']})
 
         assert publ_info['_map_layers'] == [

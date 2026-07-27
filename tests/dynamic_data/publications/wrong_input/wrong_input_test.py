@@ -13,6 +13,7 @@ from tests import EnumTestTypes, Publication4Test
 from tests.asserts import processing
 from tests.asserts.final import publication as publication_asserts
 from tests.asserts.final.publication import util as assert_utils
+from tests.asserts.util import layer_or_map
 from tests.dynamic_data import base_test
 from tests.dynamic_data.base_test import RestMethod, WithChunksDomain, CompressDomain
 from .util import format_exception
@@ -1540,7 +1541,10 @@ class TestPublication(base_test.TestSingleRestPublication):
         exception = pytest.raises(params[Key.EXCEPTION]) if is_sync else does_not_raise()
         if rest_method.enum_item == base_test.RestMethod.PATCH:
             with app.app_context():
-                publ_info = layman_util.get_publication_info(publication.workspace, publication.type, publication.name, context={'keys': ['file']})
+                publ_info = layman_util.get_publication_info(
+                    layer_or_map(publication.workspace, publication.type, publication.name),
+                    context={'keys': ['file']},
+                )
             file_path = publ_info['_file']['paths']['absolute'][0] if 'absolute' in publ_info['_file']['paths'] else None
             pre_stamp = os.stat(file_path).st_mtime if file_path else None
 
@@ -1571,9 +1575,10 @@ class TestPublication(base_test.TestSingleRestPublication):
                                                              )
             if publication.type == process_client.LAYER_TYPE:
                 with app.app_context():
-                    publ_info = layman_util.get_publication_info(publication.workspace, publication.type, publication.name,
-                                                                 context={'keys': ['wfs_wms_status']})
-
+                    publ_info = layman_util.get_publication_info(
+                        layer_or_map(publication.workspace, publication.type, publication.name),
+                        context={'keys': ['wfs_wms_status']},
+                    )
                 assert publ_info['_wfs_wms_status'] == settings.EnumWfsWmsStatus.NOT_AVAILABLE
 
             publication_asserts.rest.same_values_in_detail_and_multi(workspace=publication.workspace,

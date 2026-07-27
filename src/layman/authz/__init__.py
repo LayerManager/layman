@@ -1,6 +1,6 @@
 import json
 from functools import wraps
-from flask import after_this_request, request
+from flask import after_this_request, g, request
 
 from layman import LaymanError, settings, authn, util as layman_util, common
 from layman.common.prime_db_schema import workspaces, users
@@ -124,16 +124,20 @@ def authorize_uuid_publication_decorator(*, expected_publication_type):
         @wraps(func)
         def decorated_function(*args, **kwargs):
             uuid = request.view_args['uuid']
-            info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['workspace', 'name', 'type']})
-            if info is None or info.get('type') != expected_publication_type:
+            publication_tuple = layman_util._get_publication_by_uuid(uuid)  # pylint: disable=protected-access
+            if publication_tuple is None or publication_tuple[1] != expected_publication_type:
                 publication_not_found_code = {
                     'layman.layer': 15,
                     'layman.map': 26,
                 }[expected_publication_type]
                 raise LaymanError(publication_not_found_code, {'uuid': uuid})
-            workspace = info['_workspace']
-            publication_type = info['type']
-            publication_name = info['name']
+            workspace, publication_type, publication_name = publication_tuple
+            if publication_type == 'layman.layer':
+                from layman.layer.layer_class import Layer
+                g.publication = Layer(uuid=uuid, layer_tuple=(workspace, publication_name), load=False)
+            else:
+                from layman.map.map_class import Map
+                g.publication = Map(uuid=uuid, map_tuple=(workspace, publication_name), load=False)
             actor_name = authn.get_authn_username()
             # raises exception in case of unauthorized request
             authorize(workspace, publication_type, publication_name, request.method, actor_name)

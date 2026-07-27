@@ -2,7 +2,8 @@ import time
 import pytest
 
 from layman import app
-from layman.layer import util as layer_util
+from layman import util as layman_util
+from layman.layer.layer_class import Layer
 from layman.common import empty_method_returns_true
 from test_tools import process_client
 from tests.asserts import processing
@@ -25,6 +26,6 @@ def test_task_abortion():
     time.sleep(2)
     layer_uuid = post_response['uuid']
     with app.app_context():
-        layer_util.abort_layer_chain_by_uuid(layer_uuid)
+        layman_util.abort_publication_chain(Layer(uuid=layer_uuid))
     internal.expected_chain_info_state_by_uuid(layer_uuid, 'ABORTED')
     process_client.delete_layer(layer_uuid)

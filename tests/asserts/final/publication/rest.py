@@ -5,6 +5,7 @@ from celery import states
 from layman import settings, app
 from layman.layer.geoserver import GEOSERVER_WMS_WORKSPACE, GEOSERVER_WFS_WORKSPACE
 from layman.util import XForwardedClass, get_publication_info
+from tests.asserts.util import layer_or_map
 import layman.util as layman_util
 from test_tools import process_client, util as test_util, assert_util
 
@@ -20,7 +21,10 @@ def get_expected_urls_in_rest_response(workspace, publ_type, name, *, rest_metho
     publ_type_directory = f'{publ_type.split(".")[1]}s'
     if uuid is None and rest_method not in ['delete', 'multi_delete']:
         with app.app_context():
-            uuid = get_publication_info(workspace=workspace, publ_type=publ_type, publ_name=name, context={'keys': ['uuid']})['uuid']
+            uuid = get_publication_info(
+                layer_or_map(workspace, publ_type, name),
+                context={'keys': ['uuid']},
+            )['uuid']
     result = {}
     result['url'] = f'{proxy_proto}://{proxy_host}{proxy_prefix}/rest/{publ_type_directory}/{uuid}'
     if rest_method == 'get':

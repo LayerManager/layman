@@ -192,7 +192,6 @@ def delete_user_public_publications(username):
         patch_publication(
             new_publication,
             layer_util.patch_layer if publication_type == LAYER_TYPE else map_util.patch_map,
-            layer_util.is_layer_chain_ready if publication_type == LAYER_TYPE else map_util.is_map_chain_ready,
             kwargs,
             {
                 "stop_sync_at": None,

@@ -2,8 +2,8 @@ from celery.utils.log import get_task_logger
 
 from layman import celery_app, util as layman_util
 from layman.celery import AbortedException
+from layman.layer.layer_class import Layer
 from . import wms
-from .. import LAYER_TYPE
 
 logger = get_task_logger(__name__)
 
@@ -21,7 +21,7 @@ def patch_after_feature_change(
     if self.is_aborted():
         raise AbortedException
 
-    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layer,
+    info = layman_util.get_publication_info(Layer(layer_tuple=(workspace, layer), load=False),
                                             context={'keys': ['style_type', 'uuid']})
     if info['_style_type'] == 'qml':
         wms.save_qgs_file(info['uuid'])
