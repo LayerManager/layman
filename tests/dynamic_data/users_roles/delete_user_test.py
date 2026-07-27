@@ -1,6 +1,7 @@
 import pytest
 from layman import app, util as layman_util
 from layman.http import LaymanError
+from tests.asserts.util import layer_or_map
 from layman_settings import ANONYM_USER, NONAME_USER, RIGHTS_EVERYONE_ROLE
 from test_tools import process_client, role_service, process, external_db
 
@@ -94,7 +95,7 @@ def test_delete_user(setup_users_and_role, publication_type, workspace, _setup_r
 
     # check if publication info exists
     with app.app_context():
-        publication_info = layman_util.get_publication_info(workspace, publication_type, publication)
+        publication_info = layman_util.get_publication_info(layer_or_map(workspace, publication_type, publication))
     assert isinstance(publication_info, dict) and publication_info, "Publication info cannot be empty"
 
     # check if workspace exists
@@ -110,7 +111,7 @@ def test_delete_user(setup_users_and_role, publication_type, workspace, _setup_r
     assert not any(pub.get('name') == publication for pub in publications_after_delete), f"Publication {publications_after_delete} was not deleted"
     # check if publication info was deleted
     with app.app_context():
-        publication_info = layman_util.get_publication_info(username, publication_type, publication)
+        publication_info = layman_util.get_publication_info(layer_or_map(username, publication_type, publication))
     assert isinstance(publication_info, dict) and not publication_info, "Publication info should be empty"
 
     # check if workspace was deleted
@@ -165,7 +166,7 @@ def test_delete_self_with_publications(publication_type, workspace, _setup_role,
     process_client.publish_publication(publication_type, workspace, publication, actor_name=username, access_rights=access_rights)
     process_client.delete_user(username, actor_name=username)
     with app.app_context():
-        publ_info = layman_util.get_publication_info(workspace, publication_type, publication)
+        publ_info = layman_util.get_publication_info(layer_or_map(workspace, publication_type, publication))
     assert not publ_info, f"Publication {publication} in workspace {workspace} was not deleted"
 
 
@@ -192,7 +193,7 @@ def test_delete_user_with_undeletable_publications(publication_type):
     process_client.publish_publication(publication_type, public_workspace, publication, actor_name=username, access_rights=access_rights)
     process_client.delete_user(username, actor_name=username)
     with app.app_context():
-        publ_info = layman_util.get_publication_info(public_workspace, publication_type, publication)
+        publ_info = layman_util.get_publication_info(layer_or_map(public_workspace, publication_type, publication))
     assert publ_info, f"Publication {publication} was deleted unexpectedly"
     access_rights = publ_info.get('access_rights', {})
     assert {tuple(sorted(v)) for v in access_rights.values()} == {tuple(sorted([username2, rolename]))}

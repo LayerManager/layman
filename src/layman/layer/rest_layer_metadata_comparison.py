@@ -21,7 +21,6 @@ def before_request():
 def get(uuid):
     app.logger.info(f"GET Layer Metadata Comparison, actor={g.user}")
 
-    layer = Layer(uuid=uuid)
-    md_props = util.get_metadata_comparison(layer)
+    md_props = util.get_metadata_comparison(Layer(uuid=uuid))
 
     return jsonify(md_props), 200

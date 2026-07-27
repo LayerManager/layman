@@ -3,6 +3,7 @@ import pytest
 
 from layman import app
 from layman.common import REQUEST_METHOD_POST, REQUEST_METHOD_PATCH
+from layman.layer.layer_class import Layer
 from layman.map.map_class import Map
 from layman.util import get_publication_info
 from test_tools import process_client
@@ -169,7 +170,7 @@ class TestPublication(base_test.TestSingleRestPublication):
 
     def assert_exp_map_layers(self, map, exp_map_layers, exp_operates_on, http_method, actor_name):
         with app.app_context():
-            publ_info = get_publication_info(map.workspace, map.type, map.name,
+            publ_info = get_publication_info(Map(map_tuple=(map.workspace, map.name), load=False),
                                              context={'keys': ['map_layers']})
         if exp_map_layers is None:
             assert not publ_info
@@ -209,7 +210,7 @@ class TestPublication(base_test.TestSingleRestPublication):
         with app.app_context():
             found_layer_maps = [
                 (m['workspace'], m['name'])
-                for m in get_publication_info(*layer, context={'keys': ['used_in_maps']})['used_in_maps']
+                for m in get_publication_info(Layer(layer_tuple=(layer.workspace, layer.name), load=False), context={'keys': ['used_in_maps']})['used_in_maps']
                 if m['workspace'] in workspaces_to_check
             ]
         assert found_layer_maps == exp_layer_maps

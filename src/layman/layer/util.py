@@ -70,13 +70,10 @@ def fill_in_partial_info_statuses(info, chain_info):
     return layman_util.get_info_with_statuses(info, chain_info, TASKS_TO_LAYER_INFO_KEYS, item_keys)
 
 
-def get_layer_info(workspace, layername, context=None):
-    partial_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context)
-
-    chain_info = get_layer_chain(workspace, layername)
-
-    filled_partial_info = fill_in_partial_info_statuses(partial_info, chain_info)
-    return filled_partial_info
+def get_layer_info(layer: Layer, context=None):
+    partial_info = layman_util.get_publication_info(layer, context)
+    chain_info = layman_util.get_publication_chain(layer)
+    return fill_in_partial_info_statuses(partial_info, chain_info)
 
 
 def clear_publication_info(layer_info, file_type):
@@ -86,11 +83,11 @@ def clear_publication_info(layer_info, file_type):
     return clear_info
 
 
-def _get_complete_layer_info(workspace, layername, *, x_forwarded_items=None):
-    partial_info = get_layer_info(workspace, layername, context={'x_forwarded_items': x_forwarded_items})
+def _get_complete_layer_info(layer: Layer, *, x_forwarded_items=None):
+    partial_info = get_layer_info(layer, context={'x_forwarded_items': x_forwarded_items})
 
     if not any(partial_info):
-        raise LaymanError(15, {'layername': layername})
+        raise LaymanError(15, {'uuid': layer.uuid})
 
     geodata_type = partial_info['geodata_type']
     original_data_source = partial_info['original_data_source']
@@ -101,9 +98,9 @@ def _get_complete_layer_info(workspace, layername, *, x_forwarded_items=None):
         complete_info[key] = {'status': 'NOT_AVAILABLE'}
 
     complete_info.update({
-        'name': layername,
-        'url': url_for('rest_layer.get', uuid=layman_util.get_publication_uuid(workspace, LAYER_TYPE, layername), x_forwarded_items=x_forwarded_items),
-        'title': layername,
+        'name': layer.name,
+        'url': url_for('rest_layer.get', uuid=layer.uuid, x_forwarded_items=x_forwarded_items),
+        'title': layer.name,
         'description': '',
     })
 
@@ -115,53 +112,38 @@ def _get_complete_layer_info(workspace, layername, *, x_forwarded_items=None):
     complete_info = clear_publication_info(complete_info, geodata_type)
 
     complete_info.pop('layman_metadata')
-    complete_info['layman_metadata'] = {'publication_status': layman_util.get_publication_status(workspace, LAYER_TYPE, layername,
-                                                                                                 complete_info, item_keys)}
+    complete_info['layman_metadata'] = {'publication_status': layman_util.get_publication_status(
+        layer.workspace, layer.type, layer.name, complete_info, item_keys)}
     return complete_info
 
 
-def get_complete_layer_info(workspace=None, layername=None, *, uuid=None, x_forwarded_items=None):
-    if uuid is not None:
-        info = layman_util.get_publication_info_by_uuid(
-            uuid,
-            context={'keys': ['workspace', 'name']},
-        )
-        if not info:
-            return {}
-
-        workspace = info['_workspace']
-        layername = info['name']
-    return layman_util.get_complete_publication_info(workspace, LAYER_TYPE, layername,
-                                                     x_forwarded_items=x_forwarded_items,
-                                                     complete_info_method=_get_complete_layer_info)
+def get_complete_layer_info(layer: Layer, *, x_forwarded_items=None):
+    if not layer:
+        return {}
+    return layman_util.get_complete_publication_info(
+        layer,
+        x_forwarded_items=x_forwarded_items,
+        complete_info_method=_get_complete_layer_info,
+    )
 
 
-def pre_publication_action_check(workspace, layername, task_options):
+def pre_publication_action_check(layer: Layer, task_options):
     # sync processing
     sources = get_sources()
-    call_modules_fn(sources, 'pre_publication_action_check', [workspace, layername], kwargs=task_options)
+    call_modules_fn(sources, 'pre_publication_action_check', [layer.workspace, layer.name], kwargs=task_options)
 
 
-def pre_publication_action_check_by_uuid(uuid, task_options):
-    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['workspace', 'name']})
-    if not info:
-        raise LaymanError(15, {'uuid': uuid})
-    workspace = info['_workspace']
-    layername = info['name']
-    return pre_publication_action_check(workspace, layername, task_options)
-
-
-def post_layer(workspace, layername, task_options, start_async_at):
+def post_layer(layer: Layer, task_options, start_async_at):
     # sync processing
     sources = get_sources()
-    call_modules_fn(sources, 'post_layer', [workspace, layername], kwargs=task_options)
+    call_modules_fn(sources, 'post_layer', [layer.workspace, layer.name], kwargs=task_options)
 
-    post_tasks = tasks_util.get_task_methods(get_layer_type_def(), workspace, layername, task_options, start_async_at)
-    post_chain = tasks_util.get_chain_of_methods(workspace, layername, post_tasks, task_options, 'layername')
+    post_tasks = tasks_util.get_task_methods(get_layer_type_def(), layer.workspace, layer.name, task_options, start_async_at)
+    post_chain = tasks_util.get_chain_of_methods(layer.workspace, layer.name, post_tasks, task_options, 'layername')
     # res = post_chain.apply_async()
     res = post_chain()
 
-    celery_util.set_publication_chain_info(workspace, LAYER_TYPE, layername, post_tasks, res)
+    celery_util.set_publication_chain_info(layer.workspace, layer.type, layer.name, post_tasks, res)
 
 
 def patch_layer(layer: Layer, task_options, stop_sync_at, start_async_at, *, only_sync=False):
@@ -226,35 +208,7 @@ def delete_layer(layer: Layer, source=None, http_method='delete', *, x_forwarded
     return result
 
 
-def get_layer_chain(workspace, layername):
-    chain_info = celery_util.get_publication_chain_info(workspace, LAYER_TYPE, layername)
-    return chain_info
-
-
-def abort_layer_chain(workspace, layername):
-    celery_util.abort_publication_chain(workspace, LAYER_TYPE, layername)
-
-
-def abort_layer_chain_by_uuid(uuid):
-    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['workspace', 'name']})
-    workspace = info['_workspace']
-    layername = info['name']
-    return abort_layer_chain(workspace, layername)
-
-
-def is_layer_chain_ready(workspace, layername):
-    chain_info = get_layer_chain(workspace, layername)
-    return chain_info is None or celery_util.is_chain_ready(chain_info)
-
-
-def is_layer_chain_ready_by_uuid(uuid):
-    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['workspace', 'name']})
-    workspace = info.get('_workspace')
-    layername = info.get('name')
-    return is_layer_chain_ready(workspace, layername)
-
-
-uuid_lock_decorator = redis_util.create_lock_decorator_by_uuid(is_layer_chain_ready_by_uuid)
+uuid_lock_decorator = redis_util.create_lock_decorator_by_uuid(layman_util.is_publication_chain_ready)
 
 
 def layer_info_to_metadata_properties(info):
@@ -275,7 +229,7 @@ def layer_info_to_metadata_properties(info):
 
 
 def get_metadata_comparison(publication: Layer):
-    layman_info = get_complete_layer_info(publication.workspace, publication.name)
+    layman_info = get_complete_layer_info(publication)
     layman_props = layer_info_to_metadata_properties(layman_info)
     all_props = {
         f"{layman_props['layer_endpoint']}": layman_props,
@@ -481,7 +435,7 @@ WHERE
 
 def set_wfs_wms_status_after_fail(workspace, name):
     keys = ['wfs', 'wms', 'style', 'geodata_type']
-    publ_info = layman_util.get_publication_info(workspace, LAYER_TYPE, name, context={'keys': keys})
+    publ_info = layman_util.get_publication_info(Layer(layer_tuple=(workspace, name), load=False), context={'keys': keys})
     keys.remove('geodata_type')
     if publ_info['geodata_type'] == settings.GEODATA_TYPE_RASTER:
         keys.remove('wfs')

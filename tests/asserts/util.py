@@ -1,10 +1,19 @@
 import inspect
 from layman import util as layman_util, settings, app
+from layman.layer.layer_class import Layer
+from layman.map.map_class import Map
+from layman.layer import LAYER_TYPE
 from test_tools import process_client
 from .. import Action, Publication4Test
 
 
 KEY_REPLACE = '__replace__'
+
+
+def layer_or_map(workspace, publ_type, name):
+    if publ_type == LAYER_TYPE:
+        return Layer(layer_tuple=(workspace, name), load=False)
+    return Map(map_tuple=(workspace, name), load=False)
 
 
 def get_publication_writer(publication):
@@ -21,7 +30,9 @@ def get_publication_header(publication):
 
 def get_publication_exists(publication):
     with app.app_context():
-        info = layman_util.get_publication_info(publication.workspace, publication.type, publication.name)
+        info = layman_util.get_publication_info(
+            layer_or_map(publication.workspace, publication.type, publication.name),
+        )
     return bool(info)
 
 

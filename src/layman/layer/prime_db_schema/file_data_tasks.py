@@ -2,6 +2,7 @@ from celery.utils.log import get_task_logger
 
 from layman.celery import AbortedException
 from layman import celery_app, util as layman_util, settings
+from layman.layer.layer_class import Layer
 from .. import LAYER_TYPE
 from ..db import get_bbox as db_get_bbox
 from ...common.prime_db_schema.publications import set_bbox
@@ -22,7 +23,7 @@ def patch_after_feature_change(
     if self.is_aborted():
         raise AbortedException
 
-    info = layman_util.get_publication_info(username, LAYER_TYPE, layername,
+    info = layman_util.get_publication_info(Layer(layer_tuple=(username, layername), load=False),
                                             context={'keys': ['geodata_type', 'native_crs', 'table_uri']})
     geodata_type = info['geodata_type']
     crs = info['native_crs']

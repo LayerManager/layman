@@ -26,7 +26,7 @@ def source_has_its_key_or_it_is_empty(workspace, publ_type, name):
         for source_def in all_items:
             for key in source_def.info_items:
                 context = {'keys': [key]}
-                info = layman_util.get_publication_info(workspace, publ_type, name, context)
+                info = layman_util.get_publication_info(util.layer_or_map(workspace, publ_type, name), context)
                 assert key in info or f'_{key}' in info or not info, info
 
 
@@ -36,7 +36,7 @@ def source_internal_keys_are_subset_of_source_sibling_keys(workspace, publ_type,
         for source_name, source_def in internal_sources.items():
             for key in source_def.info_items:
                 context = {'keys': [key]}
-                info = layman_util.get_publication_info(workspace, publ_type, name, context)
+                info = layman_util.get_publication_info(util.layer_or_map(workspace, publ_type, name), context)
                 all_sibling_keys = set(sibling_key
                                        for item_list in internal_sources.values()
                                        for sibling_key in item_list.info_items
@@ -51,7 +51,7 @@ def source_internal_keys_are_subset_of_source_sibling_keys(workspace, publ_type,
 def same_value_of_key_in_all_sources(workspace, publ_type, name):
     with app.app_context():
         sources = layman_util.get_internal_sources(publ_type)
-        info = layman_util.get_publication_info(workspace, publ_type, name)
+        info = layman_util.get_publication_info(util.layer_or_map(workspace, publ_type, name))
 
     info_method = {
         process_client.LAYER_TYPE: 'get_layer_info',
@@ -73,45 +73,45 @@ def same_value_of_key_in_all_sources(workspace, publ_type, name):
 def mandatory_keys_in_all_sources(workspace, publ_type, name):
     # Items
     with app.app_context():
-        pub_info = layman_util.get_publication_info(workspace, publ_type, name)
+        pub_info = layman_util.get_publication_info(util.layer_or_map(workspace, publ_type, name))
     assert {'name', 'title', 'access_rights', 'uuid', 'metadata', }.issubset(set(pub_info)), pub_info
 
 
 def metadata_key_sources_do_not_contain_other_keys(workspace, publ_type, name):
     with app.app_context():
-        pub_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['metadata']})
+        pub_info = layman_util.get_publication_info(util.layer_or_map(workspace, publ_type, name), {'keys': ['metadata']})
     assert {'metadata', }.issubset(set(pub_info)), pub_info
     assert all(item not in pub_info for item in ('name', 'title', 'access_rights', 'uuid', 'file', )), pub_info
 
 
 def thumbnail_key_sources_do_not_contain_other_keys(workspace, publ_type, name):
     with app.app_context():
-        pub_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['thumbnail']})
+        pub_info = layman_util.get_publication_info(util.layer_or_map(workspace, publ_type, name), {'keys': ['thumbnail']})
     assert {'thumbnail', }.issubset(set(pub_info)), pub_info
     assert all(item not in pub_info for item in ('name', 'title', 'access_rights', 'uuid', 'file', 'metadata', )), pub_info
 
 
 def mandatory_keys_in_primary_db_schema_of_actor(workspace, publ_type, name, actor, ):
     with app.app_context():
-        pub_info = layman_util.get_publication_info(workspace, publ_type, name, {'actor_name': actor, 'keys': []})
+        pub_info = layman_util.get_publication_info(util.layer_or_map(workspace, publ_type, name), {'actor_name': actor, 'keys': []})
     assert {'name', 'title', 'access_rights', 'uuid', }.issubset(set(pub_info)), pub_info
 
 
 def other_keys_not_in_primary_db_schema_of_actor(workspace, publ_type, name, actor, ):
     with app.app_context():
-        pub_info = layman_util.get_publication_info(workspace, publ_type, name, {'actor_name': actor, 'keys': []})
+        pub_info = layman_util.get_publication_info(util.layer_or_map(workspace, publ_type, name), {'actor_name': actor, 'keys': []})
     assert all(item not in pub_info for item in ('metadata', 'file', )), pub_info
 
 
 def mandatory_keys_in_all_sources_of_actor(workspace, publ_type, name, actor, ):
     with app.app_context():
-        pub_info = layman_util.get_publication_info(workspace, publ_type, name, {'actor_name': actor})
+        pub_info = layman_util.get_publication_info(util.layer_or_map(workspace, publ_type, name), {'actor_name': actor})
     assert {'name', 'title', 'access_rights', 'uuid', 'metadata', }.issubset(set(pub_info)), pub_info
 
 
 def all_keys_assigned_to_source(workspace, publ_type, name):
     with app.app_context():
-        info = layman_util.get_publication_info(workspace, publ_type, name)
+        info = layman_util.get_publication_info(util.layer_or_map(workspace, publ_type, name))
         internal_sources = layman_util.get_publication_types()[publ_type]['internal_sources']
     source_keys = set()
     for source_def in internal_sources.values():
@@ -124,7 +124,7 @@ def all_keys_assigned_to_source(workspace, publ_type, name):
 
 def thumbnail_equals(workspace, publ_type, name, exp_thumbnail, *, max_diffs=None):
     with app.app_context():
-        pub_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['thumbnail']})
+        pub_info = layman_util.get_publication_info(util.layer_or_map(workspace, publ_type, name), {'keys': ['thumbnail']})
 
     diffs = test_util.compare_images(exp_thumbnail, pub_info['_thumbnail']['path'])
     max_diffs = max_diffs or 5
@@ -399,9 +399,9 @@ def correct_values_in_detail(workspace, publ_type, name, *,
                              external_table_uri=None):
 
     with app.app_context():
-        pub_info = layman_util.get_publication_info(workspace,
-                                                    publ_type,
-                                                    name)
+        pub_info = layman_util.get_publication_info(
+            util.layer_or_map(workspace, publ_type, name),
+        )
 
     _correct_values_in_detail_common(
         pub_info,
@@ -419,13 +419,13 @@ def correct_values_in_detail(workspace, publ_type, name, *,
 
 def does_not_exist(workspace, publ_type, name, ):
     with app.app_context():
-        pub_info = layman_util.get_publication_info(workspace, publ_type, name)
+        pub_info = layman_util.get_publication_info(util.layer_or_map(workspace, publ_type, name))
     assert not pub_info, pub_info
 
 
 def nodata_preserved_in_normalized_raster(workspace, publ_type, name):
     with app.app_context():
-        publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['geodata_type', 'file']})
+        publ_info = layman_util.get_publication_info(util.layer_or_map(workspace, publ_type, name), {'keys': ['geodata_type', 'file']})
     geodata_type = publ_info['geodata_type']
     if geodata_type == settings.GEODATA_TYPE_RASTER:
         for file_paths in publ_info['_file']['paths'].values():
@@ -437,7 +437,7 @@ def nodata_preserved_in_normalized_raster(workspace, publ_type, name):
 
 def stats_preserved_in_normalized_raster(workspace, publ_type, name):
     with app.app_context():
-        publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['geodata_type', 'file']})
+        publ_info = layman_util.get_publication_info(util.layer_or_map(workspace, publ_type, name), {'keys': ['geodata_type', 'file']})
     geodata_type = publ_info['geodata_type']
     if geodata_type == settings.GEODATA_TYPE_RASTER:
         for file_paths in publ_info['_file']['paths'].values():
@@ -457,7 +457,7 @@ def stats_preserved_in_normalized_raster(workspace, publ_type, name):
 
 def size_and_position_preserved_in_normalized_raster(workspace, publ_type, name):
     with app.app_context():
-        publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['geodata_type', 'file']})
+        publ_info = layman_util.get_publication_info(util.layer_or_map(workspace, publ_type, name), {'keys': ['geodata_type', 'file']})
     geodata_type = publ_info['geodata_type']
     if geodata_type == settings.GEODATA_TYPE_RASTER:
         for file_paths in publ_info['_file']['paths'].values():
@@ -505,7 +505,7 @@ def no_bbox_and_crs(workspace, publ_type, name):
 
 def detail_3857bbox_value(workspace, publ_type, name, *, exp_bbox, precision=0.1, contains=True):
     with app.app_context():
-        publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['bounding_box']})
+        publ_info = layman_util.get_publication_info(util.layer_or_map(workspace, publ_type, name), {'keys': ['bounding_box']})
     bounding_box = publ_info['bounding_box']
 
     assert_util.assert_same_bboxes(exp_bbox, bounding_box, precision)
@@ -517,7 +517,7 @@ def point_coordinates(workspace, publ_type, name, *, point_id, crs, exp_coordina
     assert publ_type == LAYER_TYPE
 
     with app.app_context():
-        publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['table_uri']})
+        publ_info = layman_util.get_publication_info(util.layer_or_map(workspace, publ_type, name), {'keys': ['table_uri']})
     table_uri = publ_info['_table_uri']
 
     query = sql.SQL('''with transformed as (select st_transform(wkb_geometry, %s) point
@@ -543,14 +543,14 @@ def wfs_wms_status_available(workspace, publ_type, name):
     assert publ_type == LAYER_TYPE
 
     with app.app_context():
-        publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['wfs_wms_status']})
+        publ_info = layman_util.get_publication_info(util.layer_or_map(workspace, publ_type, name), {'keys': ['wfs_wms_status']})
     wfs_wms_status = publ_info['_wfs_wms_status']
     assert wfs_wms_status == settings.EnumWfsWmsStatus.AVAILABLE
 
 
 def consistent_internal_map_layers(workspace, publ_type, name, publ_uuid):
     with app.app_context():
-        pub_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['map_layers']})
+        pub_info = layman_util.get_publication_info(util.layer_or_map(workspace, publ_type, name), {'keys': ['map_layers']})
         map_json = map_input_file.get_map_json(publ_uuid)
     layers_from_file = map_util.get_layers_from_json(map_json)
     layers_from_info = [(ml['uuid'], ml['index']) for ml in pub_info['_map_layers']]

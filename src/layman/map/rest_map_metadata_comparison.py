@@ -21,7 +21,6 @@ def before_request():
 def get(uuid):
     app.logger.info(f"GET Map Metadata Comparison, actor={g.user}")
 
-    publication = Map(uuid=uuid)
-    md_props = util.get_metadata_comparison(publication)
+    md_props = util.get_metadata_comparison(Map(uuid=uuid))
 
     return jsonify(md_props), 200

@@ -84,41 +84,30 @@ def fill_in_partial_info_statuses(info, chain_info):
     return layman_util.get_info_with_statuses(info, chain_info, TASKS_TO_MAP_INFO_KEYS, item_keys)
 
 
-def get_map_info(workspace, mapname, context=None):
-    partial_info = layman_util.get_publication_info(workspace, MAP_TYPE, mapname, context)
-
-    chain_info = get_map_chain(workspace, mapname)
-    filled_partial_info = fill_in_partial_info_statuses(partial_info, chain_info)
-    return filled_partial_info
+def get_map_info(map: Map, context=None):
+    partial_info = layman_util.get_publication_info(map, context)
+    chain_info = layman_util.get_publication_chain(map)
+    return fill_in_partial_info_statuses(partial_info, chain_info)
 
 
-def pre_publication_action_check(workspace, mapname, task_options):
+def pre_publication_action_check(map: Map, task_options):
     # sync processing
     sources = get_sources()
-    call_modules_fn(sources, 'pre_publication_action_check', [workspace, mapname], kwargs=task_options)
+    call_modules_fn(sources, 'pre_publication_action_check', [map.workspace, map.name], kwargs=task_options)
 
 
-def pre_publication_action_check_by_uuid(uuid, task_options):
-    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['workspace', 'name']})
-    if not info:
-        raise LaymanError(26, {'uuid': uuid})
-    workspace = info['_workspace']
-    mapname = info['name']
-    return pre_publication_action_check(workspace, mapname, task_options)
-
-
-def post_map(workspace, mapname, task_options, start_at):
+def post_map(map: Map, task_options, start_at):
     # sync processing
     sources = get_sources()
-    call_modules_fn(sources, 'post_map', [workspace, mapname], kwargs=task_options)
+    call_modules_fn(sources, 'post_map', [map.workspace, map.name], kwargs=task_options)
 
     # async processing
-    post_tasks = tasks_util.get_task_methods(get_map_type_def(), workspace, mapname, task_options, start_at)
-    post_chain = tasks_util.get_chain_of_methods(workspace, mapname, post_tasks, task_options, 'mapname')
+    post_tasks = tasks_util.get_task_methods(get_map_type_def(), map.workspace, map.name, task_options, start_at)
+    post_chain = tasks_util.get_chain_of_methods(map.workspace, map.name, post_tasks, task_options, 'mapname')
     # res = post_chain.apply_async()
     res = post_chain()
 
-    celery_util.set_publication_chain_info(workspace, MAP_TYPE, mapname, post_tasks, res)
+    celery_util.set_publication_chain_info(map.workspace, map.type, map.name, post_tasks, res)
 
 
 def patch_map(map: Map, task_options, start_at, *, only_sync=False):
@@ -158,18 +147,18 @@ def clear_publication_info(layer_info):
     return clear_info
 
 
-def _get_complete_map_info(workspace, mapname, *, x_forwarded_items=None):
-    partial_info = get_map_info(workspace, mapname, context={'x_forwarded_items': x_forwarded_items})
+def _get_complete_map_info(map: Map, *, x_forwarded_items=None):
+    partial_info = get_map_info(map, context={'x_forwarded_items': x_forwarded_items})
 
     if not any(partial_info):
-        raise LaymanError(26, {'mapname': mapname})
+        raise LaymanError(26, {'uuid': map.uuid})
 
     item_keys = ['file', 'thumbnail', 'metadata', ]
 
     complete_info = {
-        'name': mapname,
-        'url': url_for('rest_map.get', uuid=layman_util.get_publication_uuid(workspace, MAP_TYPE, mapname), x_forwarded_items=x_forwarded_items),
-        'title': mapname,
+        'name': map.name,
+        'url': url_for('rest_map.get', uuid=map.uuid, x_forwarded_items=x_forwarded_items),
+        'title': map.name,
         'description': '',
     }
 
@@ -178,27 +167,22 @@ def _get_complete_map_info(workspace, mapname, *, x_forwarded_items=None):
 
     complete_info.update(partial_info)
 
-    complete_info['layman_metadata'] = {'publication_status': layman_util.get_publication_status(workspace, MAP_TYPE, mapname,
-                                                                                                 complete_info, item_keys)}
+    complete_info['layman_metadata'] = {'publication_status': layman_util.get_publication_status(
+        map.workspace, map.type, map.name, complete_info, item_keys)}
 
     complete_info = clear_publication_info(complete_info)
 
     return complete_info
 
 
-def get_complete_map_info(workspace, layername, *, x_forwarded_items=None):
-    return layman_util.get_complete_publication_info(workspace, MAP_TYPE, layername,
-                                                     x_forwarded_items=x_forwarded_items,
-                                                     complete_info_method=_get_complete_map_info)
-
-
-def get_complete_map_info_by_uuid(uuid, *, x_forwarded_items=None):
-    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['workspace', 'name'], 'x_forwarded_items': x_forwarded_items})
-    if not info:
+def get_complete_map_info(map: Map, *, x_forwarded_items=None):
+    if not map:
         return {}
-    workspace = info['_workspace']
-    mapname = info['name']
-    return get_complete_map_info(workspace, mapname, x_forwarded_items=x_forwarded_items)
+    return layman_util.get_complete_publication_info(
+        map,
+        x_forwarded_items=x_forwarded_items,
+        complete_info_method=_get_complete_map_info,
+    )
 
 
 def get_composition_schema(url):
@@ -283,34 +267,6 @@ def check_file(file, *, x_forwarded_items=None):
     return file_json
 
 
-def get_map_chain(workspace, mapname):
-    chain_info = celery_util.get_publication_chain_info(workspace, MAP_TYPE, mapname)
-    return chain_info
-
-
-def abort_map_chain(workspace, mapname):
-    celery_util.abort_publication_chain(workspace, MAP_TYPE, mapname)
-
-
-def abort_map_chain_by_uuid(uuid):
-    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['workspace', 'name']})
-    workspace = info['_workspace']
-    mapname = info['name']
-    return abort_map_chain(workspace, mapname)
-
-
-def is_map_chain_ready(workspace, mapname):
-    chain_info = get_map_chain(workspace, mapname)
-    return chain_info is None or celery_util.is_chain_ready(chain_info)
-
-
-def is_map_chain_ready_by_uuid(uuid):
-    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['workspace', 'name']})
-    workspace = info.get('_workspace')
-    mapname = info.get('name')
-    return is_map_chain_ready(workspace, mapname)
-
-
 def get_map_owner_info(username):
     claims = get_authn_info(username).get('claims', {})
     name = claims.get('name', username)
@@ -322,7 +278,7 @@ def get_map_owner_info(username):
     return result
 
 
-uuid_lock_decorator = redis_util.create_lock_decorator_by_uuid(is_map_chain_ready_by_uuid)
+uuid_lock_decorator = redis_util.create_lock_decorator_by_uuid(layman_util.is_publication_chain_ready)
 
 
 get_syncable_prop_names = partial(metadata_common.get_syncable_prop_names, MAP_TYPE)
@@ -367,7 +323,7 @@ def map_file_to_metadata_properties(publication: Map, map_json, operates_on_muui
 
 
 def get_metadata_comparison(publication: Map):
-    layman_info = get_complete_map_info(publication.workspace, publication.name)
+    layman_info = get_complete_map_info(publication)
     publ_uuid = layman_info['uuid']
     layman_props = map_info_to_metadata_properties(layman_info)
     all_props = {

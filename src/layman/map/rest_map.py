@@ -29,7 +29,7 @@ def get(uuid):
     app.logger.info(f"GET Map, actor={g.user}")
 
     x_forwarded_items = layman_util.get_x_forwarded_items(request.headers)
-    info = util.get_complete_map_info_by_uuid(uuid, x_forwarded_items=x_forwarded_items)
+    info = util.get_complete_map_info(Map(uuid=uuid), x_forwarded_items=x_forwarded_items)
 
     return jsonify(info), 200
 
@@ -40,9 +40,8 @@ def patch(uuid):
     app.logger.info(f"PATCH Map, actor={g.user}")
 
     x_forwarded_items = layman_util.get_x_forwarded_items(request.headers)
-    info = layman_util.get_publication_info_by_uuid(uuid, context={})
-
     old_map = Map(uuid=uuid)
+    info = old_map.info
 
     # FILE
     file = None
@@ -68,8 +67,7 @@ def patch(uuid):
     else:
         description = info['description']
 
-    publication = Map(uuid=uuid)
-    props_to_refresh = util.get_same_or_missing_prop_names(publication)
+    props_to_refresh = util.get_same_or_missing_prop_names(old_map)
     metadata_properties_to_refresh = props_to_refresh
     file_changed = file is not None
     kwargs = {
@@ -84,7 +82,7 @@ def patch(uuid):
     }
 
     rest_util.setup_patch_access_rights(request.form, kwargs)
-    util.pre_publication_action_check_by_uuid(uuid, kwargs)
+    util.pre_publication_action_check(old_map, kwargs)
 
     if file is not None:
         thumbnail.delete_map(old_map)
@@ -102,7 +100,10 @@ def patch(uuid):
     )
 
     patch_keys = get_map_patch_keys()
-    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': patch_keys, 'x_forwarded_items': x_forwarded_items})
+    info = layman_util.get_publication_info(
+        new_map,
+        context={'keys': patch_keys, 'x_forwarded_items': x_forwarded_items},
+    )
     info['url'] = layman_util.get_publication_url(info['type'], info['uuid'], x_forwarded_items=x_forwarded_items)
     info = {key: value for key, value in info.items() if key in patch_keys}
 
@@ -115,12 +116,9 @@ def delete_map(uuid):
     app.logger.info(f"DELETE Map, actor={g.user}")
     x_forwarded_items = layman_util.get_x_forwarded_items(request.headers)
 
-    # raise exception if map does not exist
-    info = layman_util.get_publication_info_by_uuid(uuid, context={'x_forwarded_items': x_forwarded_items})
-
-    util.abort_map_chain_by_uuid(uuid)
-
     map = Map(uuid=uuid)
+    info = map.info
+    layman_util.abort_publication_chain(map)
     util.delete_map(map)
 
     app.logger.info('DELETE Map done')

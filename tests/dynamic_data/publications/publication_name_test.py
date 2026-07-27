@@ -71,11 +71,7 @@ class TestPublication(base_test.TestSingleRestPublication):
         rest_method.fn(publication, args=rest_args)
         assert_util.is_publication_valid_and_complete(publication)
         with app.app_context():
-            uuid = layman_util.get_publication_info(
-                publication.workspace, publication.type, publication.name,
-                context={'keys': ['uuid']}
-            )["uuid"]
-
+            uuid = layman_util.get_publication_uuid(publication.workspace, publication.type, publication.name)
         if publication.type == process_client.LAYER_TYPE:
             publ_asserts.internal.correct_values_in_detail(
                 publication.workspace,

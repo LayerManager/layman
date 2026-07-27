@@ -112,7 +112,7 @@ def post():
         unsafe_layername = input_file.get_unsafe_layername(input_files) if input_files else external_table_uri.table
     layername = util.to_safe_layer_name(unsafe_layername)
     util.check_layername(layername)
-    info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername)
+    info = layman_util.get_publication_info(Layer(layer_tuple=(workspace, layername), load=False))
     if info:
         raise LaymanError(17, {'layername': layername})
 
@@ -204,10 +204,8 @@ def post():
         }
 
         rest_common.setup_post_access_rights(request.form, task_options, actor_name)
-        util.pre_publication_action_check(workspace,
-                                          layername,
-                                          task_options,
-                                          )
+        layer = Layer(uuid=uuid_str, layer_tuple=(workspace, layername), load=False)
+        util.pre_publication_action_check(layer, task_options)
     except BaseException as exc:
         delete_publication_uuid_from_redis(workspace, LAYER_TYPE, layername, uuid_str)
         raise exc
@@ -244,14 +242,13 @@ def post():
                 raise exc
 
         util.post_layer(
-            workspace,
-            layername,
+            layer,
             task_options,
             'layman.layer.filesystem.input_chunk' if use_chunk_upload else 'layman.layer.filesystem.input_file'
         )
     except Exception as exc:
         try:
-            if util.is_layer_chain_ready(workspace, layername):
+            if layman_util.is_publication_chain_ready(layer):
                 redis_util.unlock_publication(workspace, LAYER_TYPE, layername)
         finally:
             redis_util.unlock_publication(workspace, LAYER_TYPE, layername)

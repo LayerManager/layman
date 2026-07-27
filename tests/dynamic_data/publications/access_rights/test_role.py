@@ -4,6 +4,7 @@ from geoserver import util as gs_util
 from layman import app, settings, util as layman_util
 from layman.common import geoserver as gs_common
 from layman.layer.geoserver import GeoserverIds
+from layman.layer.layer_class import Layer
 from test_tools import process_client, role_service
 from tests import EnumTestTypes, Publication4Test
 from tests.asserts.final.publication import util as assert_util
@@ -81,7 +82,10 @@ class TestPublication(base_test.TestSingleRestPublication):
 
             if publication.type == process_client.LAYER_TYPE:
                 with app.app_context():
-                    internal_info = layman_util.get_publication_info(publication.workspace, publication.type, publication.name, {'keys': ['geodata_type', 'wms', ]})
+                    internal_info = layman_util.get_publication_info(
+                        Layer(layer_tuple=(publication.workspace, publication.name), load=False),
+                        {'keys': ['geodata_type', 'wms', ]},
+                    )
 
                 geodata_type = internal_info['geodata_type']
                 gs_workspace = internal_info['_wms']['workspace']

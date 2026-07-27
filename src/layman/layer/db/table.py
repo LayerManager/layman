@@ -6,7 +6,6 @@ from db import util as db_util
 from layman import settings, patch_mode, util as layman_util
 from layman.common import empty_method, empty_method_returns_dict
 from layman.http import LaymanError
-from .. import LAYER_TYPE
 from ..layer_class import Layer
 
 logger = logging.getLogger(__name__)
@@ -20,7 +19,7 @@ get_metadata_comparison = empty_method_returns_dict
 
 
 def get_layer_info(workspace, layername,):
-    layer_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['table_uri', 'original_data_source']})
+    layer_info = layman_util.get_publication_info(Layer(layer_tuple=(workspace, layername), load=False), context={'keys': ['table_uri', 'original_data_source']})
     table_uri = layer_info.get('_table_uri')
     result = {}
     if table_uri:

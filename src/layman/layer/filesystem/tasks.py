@@ -9,7 +9,6 @@ from layman.celery import AbortedException
 from layman.common import empty_method_returns_true
 from layman.http import LaymanError
 from . import input_file, input_chunk, thumbnail, gdal
-from .. import LAYER_TYPE
 from ..layer_class import Layer
 
 logger = get_task_logger(__name__)
@@ -67,7 +66,7 @@ def refresh_input_chunk(self, workspace, layername, *, uuid, check_crs=True, ove
                                name_input_file_by_layer=name_input_file_by_layer,
                                skip_timeseries_filename_checks=skip_timeseries_filename_checks)
 
-    publ_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file']})
+    publ_info = layman_util.get_publication_info(Layer(layer_tuple=(workspace, layername), load=False), context={'keys': ['file']})
     main_filepaths = list(path['gdal'] for path in publ_info['_file']['paths'].values())
     input_file.check_main_files(main_filepaths, check_crs=check_crs, overview_resampling=overview_resampling)
 
@@ -75,7 +74,7 @@ def refresh_input_chunk(self, workspace, layername, *, uuid, check_crs=True, ove
     if enable_more_main_files and file_type == settings.GEODATA_TYPE_VECTOR:
         raise LaymanError(48, f'Vector layers are not allowed to be combined with `time_regex` parameter.')
 
-    style_type_for_check = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['style_type']})['_style_type']
+    style_type_for_check = layman_util.get_publication_info(Layer(layer_tuple=(workspace, layername), load=False), context={'keys': ['style_type']})['_style_type']
     if file_type == settings.GEODATA_TYPE_RASTER and style_type_for_check == 'qml':
         raise LaymanError(48, f'Raster layers are not allowed to have QML style.')
 
@@ -110,7 +109,7 @@ def refresh_gdal(self, workspace, layername,
     if original_data_source == settings.EnumOriginalDataSource.TABLE.value:
         return
     layer = Layer(uuid=uuid)
-    layer_info = layman_util.get_publication_info(workspace, LAYER_TYPE, layername, context={'keys': ['file']})
+    layer_info = layman_util.get_publication_info(layer, context={'keys': ['file']})
     file_type = layer_info['_file']['file_type']
     if file_type != settings.GEODATA_TYPE_RASTER:
         return

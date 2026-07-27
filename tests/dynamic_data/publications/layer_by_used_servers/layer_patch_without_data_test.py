@@ -4,6 +4,7 @@ import os
 import pytest
 
 from layman import app, util as layman_util
+from layman.layer.layer_class import Layer
 from test_tools import process_client
 from tests import EnumTestTypes, Publication4Test
 from tests.asserts.final.publication import util as assert_util
@@ -78,7 +79,7 @@ class TestLayer(base_test.TestSingleRestPublication):
 
         assert_util.is_publication_valid_and_complete(layer)
         with app.app_context():
-            publ_info = layman_util.get_publication_info(layer.workspace, layer.type, layer.name,
+            publ_info = layman_util.get_publication_info(Layer(layer_tuple=(layer.workspace, layer.name), load=False),
                                                          {'keys': params[Key.REST_ARGS].keys()})
             for key, item in params[Key.REST_ARGS].items():
                 value = publ_info[key]

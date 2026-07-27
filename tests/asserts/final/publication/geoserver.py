@@ -3,6 +3,7 @@ from urllib import parse
 
 import crs as crs_def
 from geoserver import util as gs_util
+from layman.layer.layer_class import Layer
 from layman import app, settings, util as layman_util
 from layman.common import bbox as bbox_util
 from layman.layer.geoserver import wfs, wms, GEOSERVER_WMS_WORKSPACE, GEOSERVER_WFS_WORKSPACE, GeoserverIds
@@ -32,8 +33,10 @@ def wms_spatial_precision(workspace, publ_type, name, *, crs, extent, img_size, 
     }[wms_version]
 
     with app.app_context():
-        publ_info = layman_util.get_publication_info(workspace, publ_type, name, {'keys': ['native_crs', 'style_type',
-                                                                                           'file', 'uuid']})
+        publ_info = layman_util.get_publication_info(
+            Layer(layer_tuple=(workspace, name), load=False),
+            {'keys': ['native_crs', 'style_type', 'file', 'uuid']},
+        )
     native_crs = publ_info['native_crs']
     style_type = publ_info['_style_type']
     wms_layername = GeoserverIds(uuid=publ_info['uuid'], ).wms

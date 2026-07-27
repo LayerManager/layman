@@ -82,7 +82,7 @@ def image_mosaic_granules_to_wms_time_key(granules_json):
 
 def publish_layer_from_qgis(*, layer: Layer, gs_names, metadata_url, ):
     store_name = wms.get_qgis_store_name(uuid=layer.uuid)
-    info = layman_util.get_publication_info_by_class(layer, context={'keys': ['wms', ]})
+    info = layman_util.get_publication_info(layer, context={'keys': ['wms', ]})
     layer_capabilities_url = info['_wms']['qgis_capabilities_url']
     gs_util.create_wms_store(gs_names.workspace,
                              settings.LAYMAN_GS_AUTH,

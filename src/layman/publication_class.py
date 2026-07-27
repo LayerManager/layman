@@ -50,7 +50,7 @@ class Publication(ABC):
         if hasattr(self, 'uuid'):
             info = util.get_publication_info_by_uuid(uuid=self.uuid, context=context)
         else:
-            info = util.get_publication_info(self.workspace, self.type, self.name, context=context)
+            info = util.get_publication_info(self, context=context)
 
         if info:
             object.__setattr__(self, 'uuid', info['uuid'])
@@ -74,6 +74,12 @@ class Publication(ABC):
 
     def __bool__(self):
         return self.exists
+
+    @property
+    def info(self):
+        if not hasattr(self, '_info'):
+            self.load()
+        return self._info
 
     @abstractmethod
     def clone(self, **kwargs) -> Publication:
