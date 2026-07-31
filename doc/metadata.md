@@ -71,12 +71,12 @@ Shape: Object with keys and values:
 Example: 
 ```
 {
-    "identifier": "http://layman_test_run_1:8000/rest/testuser1/layers/ne_110m_admin_0_countries_shp",
+    "identifier": "http://layman_test_run_1:8000/rest/layers/91147a27-1ff4-4242-ba6d-faffb92224c6",
     "label": "ne_110m_admin_0_countries_shp"
 }
 ```
 
-Example for map with UUID-based URL:
+Example for map:
 ```
 {
     "identifier": "http://layman_test_run_1:8000/rest/maps/91147a27-1ff4-4242-ba6d-faffb92224c6",
@@ -110,7 +110,7 @@ Multiplicity: 1
 
 Shape: String
 
-Example: `"http://layman_test_run_1:8000/rest/workspace1/layers/ne_110m_admin_0_countries_shp"`
+Example: `"http://layman_test_run_1:8000/rest/layers/91147a27-1ff4-4242-ba6d-faffb92224c6"`
 
 Synchronizable: yes
 
@@ -122,7 +122,7 @@ Multiplicity: 1
 
 Shape: String
 
-Example: `"http://layman_test_run_1:8000/rest/workspace1/maps/svet"`
+Example: `"http://layman_test_run_1:8000/rest/maps/91147a27-1ff4-4242-ba6d-faffb92224c6"`
 
 Synchronizable: yes
 
