@@ -14,6 +14,7 @@ from layman.layer.filesystem import gdal, input_file
 from layman.layer.geoserver import GEOSERVER_WFS_WORKSPACE, GEOSERVER_WMS_WORKSPACE
 from layman.map import MAP_TYPE, util as map_util
 from layman.map.filesystem import input_file as map_input_file
+from layman.publication_class import Publication
 from test_tools import process_client, util as test_util, assert_util
 from ... import util
 
@@ -484,7 +485,8 @@ def size_and_position_preserved_in_normalized_raster(workspace, publ_type, name)
 
 
 def expected_chain_info_state(workspace, publ_type, name, state):
-    chain_info = celery.get_publication_chain_info_dict(workspace, publ_type, name)
+    publication = Publication.create(publ_tuple=(workspace, publ_type, name))
+    chain_info = celery.get_publication_chain_info_dict(publication)
     assert chain_info['state'] == state, f'chain_info={chain_info}'
 
 

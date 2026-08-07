@@ -89,8 +89,6 @@ def post():
     else:
         description = file_json.get('abstract', '')
 
-    redis_util.create_lock(workspace, MAP_TYPE, mapname, request.method)
-
     map = None
     try:
         map_result = {
@@ -111,6 +109,7 @@ def post():
         uuid_str = register_publication_uuid_to_redis(workspace, MAP_TYPE, mapname, input_uuid)
         kwargs['uuid'] = uuid_str
         map = Map(uuid=uuid_str, map_tuple=(workspace, mapname), load=False)
+        redis_util.create_lock(map, request.method)
 
         map_result.update({
             'uuid': uuid_str,
@@ -130,10 +129,11 @@ def post():
         )
     except Exception as exception:
         try:
-            if map and layman_util.is_publication_chain_ready(map):
-                redis_util.unlock_publication(workspace, MAP_TYPE, mapname)
+            if map and map.uuid and layman_util.is_publication_chain_ready(map):
+                redis_util.unlock_publication(map)
         finally:
-            redis_util.unlock_publication(workspace, MAP_TYPE, mapname)
+            if map and map.uuid:
+                redis_util.unlock_publication(map)
         raise exception
 
     # app.logger.info('uploaded map '+mapname)

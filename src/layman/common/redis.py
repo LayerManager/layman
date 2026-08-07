@@ -1,70 +1,38 @@
 from functools import wraps
 from flask import g, request, current_app
 
-from layman import settings, celery as celery_util, common, util as layman_util
+from layman import settings, celery as celery_util, common
 from layman import LaymanError
 
 PUBLICATION_LOCKS_KEY = f'{__name__}:PUBLICATION_LOCKS'
 
 
-def create_lock(workspace, publication_type, publication_name, method):
+def create_lock(publication, method):
     method = method.lower()
-    solve_locks(workspace, publication_type, publication_name, method)
-    lock_publication(workspace, publication_type, publication_name, method)
+    solve_locks(publication, method)
+    lock_publication(publication, method)
 
 
-def create_lock_decorator(publication_type, publication_name_key, is_chain_ready_fn):
-    def lock_decorator(func):
-        @wraps(func)
-        def decorated_function(*args, **kwargs):
-            workspace = request.view_args['workspace']
-            publication_name = request.view_args[publication_name_key]
-            create_lock(workspace, publication_type, publication_name, request.method)
-            try:
-                result = func(*args, **kwargs)
-                if is_chain_ready_fn(workspace, publication_name):
-                    unlock_publication(workspace, publication_type, publication_name)
-                    celery_util.run_next_chain(workspace, publication_type, publication_name)
-            except Exception as exception:
-                try:
-                    if is_chain_ready_fn(workspace, publication_name):
-                        unlock_publication(workspace, publication_type, publication_name)
-                        celery_util.run_next_chain(workspace, publication_type, publication_name)
-                finally:
-                    unlock_publication(workspace, publication_type, publication_name)
-                    celery_util.run_next_chain(workspace, publication_type, publication_name)
-                raise exception
-
-            return result
-
-        return decorated_function
-
-    return lock_decorator
-
-
-def create_lock_decorator_by_uuid(is_chain_ready_fn):
+def create_lock_decorator(is_chain_ready_fn):
     def lock_decorator(func):
         @wraps(func)
         def decorated_function(*args, **kwargs):
             publication = g.publication
-            workspace = publication.workspace
-            publication_name = publication.name
-            publication_type = publication.type
 
-            create_lock(workspace, publication_type, publication_name, request.method)
+            create_lock(publication, request.method)
             try:
                 result = func(*args, **kwargs)
                 if is_chain_ready_fn(publication):
-                    unlock_publication(workspace, publication_type, publication_name)
-                    celery_util.run_next_chain(workspace, publication_type, publication_name)
+                    unlock_publication(publication)
+                    celery_util.run_next_chain(publication)
             except Exception as exception:
                 try:
                     if is_chain_ready_fn(publication):
-                        unlock_publication(workspace, publication_type, publication_name)
-                        celery_util.run_next_chain(workspace, publication_type, publication_name)
+                        unlock_publication(publication)
+                        celery_util.run_next_chain(publication)
                 finally:
-                    unlock_publication(workspace, publication_type, publication_name)
-                    celery_util.run_next_chain(workspace, publication_type, publication_name)
+                    unlock_publication(publication)
+                    celery_util.run_next_chain(publication)
                 raise exception
 
             return result
@@ -73,41 +41,32 @@ def create_lock_decorator_by_uuid(is_chain_ready_fn):
     return lock_decorator
 
 
-def get_publication_lock(workspace, publication_type, publication_name):
+def get_publication_lock(publication):
     rds = settings.LAYMAN_REDIS
     key = PUBLICATION_LOCKS_KEY
-    hash = _get_publication_hash(workspace, publication_type, publication_name)
+    hash = publication.uuid
     return rds.hget(key, hash)
 
 
-def lock_publication(workspace, publication_type, publication_name, lock_method):
-    current_app.logger.info(f"Locking {workspace}:{publication_type}:{publication_name} with {lock_method.upper()}")
+def lock_publication(publication, lock_method):
+    current_app.logger.info(f"Locking publication uuid={publication.uuid} with {lock_method.upper()}")
     rds = settings.LAYMAN_REDIS
     key = PUBLICATION_LOCKS_KEY
-    hash = _get_publication_hash(workspace, publication_type, publication_name)
+    hash = publication.uuid
     value = lock_method.lower()
     rds.hset(key, hash, value)
 
 
-def unlock_publication(workspace, publication_type, publication_name):
-    current_app.logger.info(f"Unlocking {workspace}:{publication_type}:{publication_name}")
+def unlock_publication(publication):
+    current_app.logger.info(f"Unlocking publication uuid={publication.uuid}")
     rds = settings.LAYMAN_REDIS
     key = PUBLICATION_LOCKS_KEY
-    hash = _get_publication_hash(workspace, publication_type, publication_name)
+    hash = publication.uuid
     rds.hdel(key, hash)
 
 
-def unlock_publication_by_uuid(uuid):
-    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['workspace', 'name', 'type']})
-    unlock_publication(info['_workspace'], info['type'], info['name'])
-
-
-def solve_locks(workspace, publication_type, publication_name, requested_lock):
-    current_lock = get_publication_lock(
-        workspace,
-        publication_type,
-        publication_name,
-    )
+def solve_locks(publication, requested_lock):
+    current_lock = get_publication_lock(publication)
     if current_lock is None:
         return
     if requested_lock not in [common.PUBLICATION_LOCK_PATCH, common.PUBLICATION_LOCK_DELETE,
@@ -127,10 +86,5 @@ def solve_locks(workspace, publication_type, publication_name, requested_lock):
         if requested_lock == common.PUBLICATION_LOCK_FEATURE_CHANGE:
             raise LaymanError(49, private_data={'can_run_later': True})
         if current_lock == common.PUBLICATION_LOCK_FEATURE_CHANGE and requested_lock in [common.REQUEST_METHOD_PATCH, common.REQUEST_METHOD_POST, ]:
-            celery_util.abort_publication_chain(workspace, publication_type, publication_name)
-            celery_util.push_step_to_run_after_chain(workspace, publication_type, publication_name, 'layman.util::patch_after_feature_change')
-
-
-def _get_publication_hash(workspace, publication_type, publication_name):
-    hash = f"{workspace}:{publication_type}:{publication_name}"
-    return hash
+            celery_util.abort_publication_chain(publication)
+            celery_util.push_step_to_run_after_chain(publication, 'layman.util::patch_after_feature_change')

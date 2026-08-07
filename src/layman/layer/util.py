@@ -113,7 +113,7 @@ def _get_complete_layer_info(layer: Layer, *, x_forwarded_items=None):
 
     complete_info.pop('layman_metadata')
     complete_info['layman_metadata'] = {'publication_status': layman_util.get_publication_status(
-        layer.workspace, layer.type, layer.name, complete_info, item_keys)}
+        layer, complete_info, item_keys)}
     return complete_info
 
 
@@ -143,7 +143,7 @@ def post_layer(layer: Layer, task_options, start_async_at):
     # res = post_chain.apply_async()
     res = post_chain()
 
-    celery_util.set_publication_chain_info(layer.workspace, layer.type, layer.name, post_tasks, res)
+    celery_util.set_publication_chain_info(layer, post_tasks, res)
 
 
 def patch_layer(layer: Layer, task_options, stop_sync_at, start_async_at, *, only_sync=False):
@@ -160,7 +160,7 @@ def patch_layer(layer: Layer, task_options, stop_sync_at, start_async_at, *, onl
         # res = patch_chain.apply_async()
         res = patch_chain()
 
-        celery_util.set_publication_chain_info(layer.workspace, LAYER_TYPE, layer.name, patch_tasks, res)
+        celery_util.set_publication_chain_info(layer, patch_tasks, res)
 
 
 TASKS_TO_LAYER_INFO_KEYS = {
@@ -200,7 +200,7 @@ def delete_layer(layer: Layer, source=None, http_method='delete', *, x_forwarded
             delete_info.update(partial_result)
     if source is None:
         delete_publication_uuid_from_redis(layer.workspace, layer.type, layer.name, layer.uuid)
-    celery_util.delete_publication(layer.workspace, layer.type, layer.name)
+    celery_util.delete_publication(layer)
     result = {
         **delete_info,
         'url': url_for('rest_layer.get', uuid=layer.uuid, x_forwarded_items=x_forwarded_items),
@@ -208,7 +208,7 @@ def delete_layer(layer: Layer, source=None, http_method='delete', *, x_forwarded
     return result
 
 
-uuid_lock_decorator = redis_util.create_lock_decorator_by_uuid(layman_util.is_publication_chain_ready)
+uuid_lock_decorator = redis_util.create_lock_decorator(layman_util.is_publication_chain_ready)
 
 
 def layer_info_to_metadata_properties(info):

@@ -534,12 +534,12 @@ def delete_workspace_publication(workspace, publication_type, publication_name, 
 
     publication = Publication.create(publ_tuple=(workspace, publication_type, publication_name))
 
-    redis.create_lock(workspace, publication_type, publication_name, method)
+    redis.create_lock(publication, method)
     try:
         abort_publication_chain(publication)
         delete_info = delete_publication_fn(publication, x_forwarded_items=x_forwarded_items)
         if is_publication_chain_ready(publication):
-            redis.unlock_publication(workspace, publication_type, publication_name)
+            redis.unlock_publication(publication)
         result = {
             'name': delete_info["name"],
             'title': delete_info["title"],
@@ -550,26 +550,26 @@ def delete_workspace_publication(workspace, publication_type, publication_name, 
     except Exception as exc:
         try:
             if is_publication_chain_ready(publication):
-                redis.unlock_publication(workspace, publication_type, publication_name)
+                redis.unlock_publication(publication)
         finally:
-            redis.unlock_publication(workspace, publication_type, publication_name)
+            redis.unlock_publication(publication)
         raise exc
     return result
 
 
 def patch_publication(publication: Publication, patch_publication_fn, task_options, patch_options):
-    redis.create_lock(publication.workspace, publication.type, publication.name, PUBLICATION_LOCK_PATCH)
+    redis.create_lock(publication, PUBLICATION_LOCK_PATCH)
 
     try:
         patch_publication_fn(publication, task_options=task_options, **patch_options)
         if is_publication_chain_ready(publication):
-            redis.unlock_publication(publication.workspace, publication.type, publication.name)
+            redis.unlock_publication(publication)
     except Exception as exc:
         try:
             if is_publication_chain_ready(publication):
-                redis.unlock_publication(publication.workspace, publication.type, publication.name)
+                redis.unlock_publication(publication)
         finally:
-            redis.unlock_publication(publication.workspace, publication.type, publication.name)
+            redis.unlock_publication(publication)
         raise exc
 
 
@@ -597,27 +597,27 @@ def delete_publications(workspace,
     return jsonify(infos)
 
 
-def patch_after_feature_change(workspace, publication_type, publication, *, queue=None, **kwargs):
+def patch_after_feature_change(workspace, publication_type, publication_name, *, queue=None, **kwargs):
+    publication = Publication.create(publ_tuple=(workspace, publication_type, publication_name))
     try:
-        redis.create_lock(workspace, publication_type, publication, common.PUBLICATION_LOCK_FEATURE_CHANGE)
+        redis.create_lock(publication, common.PUBLICATION_LOCK_FEATURE_CHANGE)
     except LaymanError as exc:
         if exc.code == 49 and exc.private_data.get('can_run_later', False):
-            celery_util.push_step_to_run_after_chain(workspace, publication_type, publication,
-                                                     'layman.util::patch_after_feature_change')
+            celery_util.push_step_to_run_after_chain(publication, 'layman.util::patch_after_feature_change')
             return
         raise exc
     task_methods = tasks_util.get_source_task_methods(get_publication_types()[publication_type], 'patch_after_feature_change')
-    patch_chain = tasks_util.get_chain_of_methods(workspace, publication, task_methods, kwargs, 'layername', queue=queue)
+    patch_chain = tasks_util.get_chain_of_methods(workspace, publication_name, task_methods, kwargs, 'layername', queue=queue)
     res = patch_chain()
-    celery_util.set_publication_chain_info(workspace, publication_type, publication, task_methods, res)
+    celery_util.set_publication_chain_info(publication, task_methods, res)
 
 
 def get_publication_chain(publication: Publication):
-    return celery_util.get_publication_chain_info(publication.workspace, publication.type, publication.name)
+    return celery_util.get_publication_chain_info(publication)
 
 
 def abort_publication_chain(publication: Publication):
-    celery_util.abort_publication_chain(publication.workspace, publication.type, publication.name)
+    celery_util.abort_publication_chain(publication)
 
 
 def is_publication_chain_ready(publication: Publication):
@@ -625,19 +625,15 @@ def is_publication_chain_ready(publication: Publication):
     return chain_info is None or celery_util.is_chain_ready(chain_info)
 
 
-def is_publication_updating(workspace, publication_type, publication_name):
-    chain_info = celery_util.get_publication_chain_info(workspace, publication_type, publication_name)
-    current_lock = redis.get_publication_lock(
-        workspace,
-        publication_type,
-        publication_name,
-    )
+def is_publication_updating(publication: Publication):
+    chain_info = celery_util.get_publication_chain_info(publication)
+    current_lock = redis.get_publication_lock(publication)
 
     return bool((chain_info and not celery_util.is_chain_ready(chain_info)) or current_lock)
 
 
-def get_publication_status(workspace, publication_type, publication_name, complete_info, item_keys, ):
-    if is_publication_updating(workspace, publication_type, publication_name):
+def get_publication_status(publication: Publication, complete_info, item_keys):
+    if is_publication_updating(publication):
         publication_status = 'UPDATING'
     elif any(complete_info.get(v, {}).get('status') for v in item_keys if isinstance(complete_info.get(v, {}), dict)):
         publication_status = 'INCOMPLETE'
@@ -741,7 +737,7 @@ def get_x_forwarded_items(request_headers):
 
 
 def get_complete_publication_info(publication: Publication, *, x_forwarded_items=None, complete_info_method):
-    is_updating_before = is_publication_updating(publication.workspace, publication.type, publication.name)
+    is_updating_before = is_publication_updating(publication)
     is_updating_after = None
 
     complete_info = {}

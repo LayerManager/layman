@@ -218,7 +218,7 @@ def post():
         'uuid': uuid_str,
     }
 
-    redis_util.create_lock(workspace, LAYER_TYPE, layername, request.method)
+    redis_util.create_lock(layer, request.method)
 
     try:
         # save files
@@ -249,9 +249,9 @@ def post():
     except Exception as exc:
         try:
             if layman_util.is_publication_chain_ready(layer):
-                redis_util.unlock_publication(workspace, LAYER_TYPE, layername)
+                redis_util.unlock_publication(layer)
         finally:
-            redis_util.unlock_publication(workspace, LAYER_TYPE, layername)
+            redis_util.unlock_publication(layer)
         raise exc
     # app.logger.info('uploaded layer '+layername)
     return jsonify([layer_result]), 200
