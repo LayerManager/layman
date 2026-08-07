@@ -107,7 +107,7 @@ def post_map(map: Map, task_options, start_at):
     # res = post_chain.apply_async()
     res = post_chain()
 
-    celery_util.set_publication_chain_info(map.workspace, map.type, map.name, post_tasks, res)
+    celery_util.set_publication_chain_info(map, post_tasks, res)
 
 
 def patch_map(map: Map, task_options, start_at, *, only_sync=False):
@@ -122,7 +122,7 @@ def patch_map(map: Map, task_options, start_at, *, only_sync=False):
         # res = patch_chain.apply_async()
         res = patch_chain()
 
-        celery_util.set_publication_chain_info(map.workspace, MAP_TYPE, map.name, patch_tasks, res)
+        celery_util.set_publication_chain_info(map, patch_tasks, res)
 
 
 def delete_map(map: Map, kwargs=None, *, x_forwarded_items=None):
@@ -133,7 +133,7 @@ def delete_map(map: Map, kwargs=None, *, x_forwarded_items=None):
         if partial_result is not None:
             delete_info.update(partial_result)
     delete_publication_uuid_from_redis(map.workspace, map.type, map.name, map.uuid)
-    celery_util.delete_publication(map.workspace, map.type, map.name)
+    celery_util.delete_publication(map)
     result = {
         **delete_info,
         'url': url_for('rest_map.get', uuid=map.uuid, x_forwarded_items=x_forwarded_items),
@@ -168,7 +168,7 @@ def _get_complete_map_info(map: Map, *, x_forwarded_items=None):
     complete_info.update(partial_info)
 
     complete_info['layman_metadata'] = {'publication_status': layman_util.get_publication_status(
-        map.workspace, map.type, map.name, complete_info, item_keys)}
+        map, complete_info, item_keys)}
 
     complete_info = clear_publication_info(complete_info)
 
@@ -278,7 +278,7 @@ def get_map_owner_info(username):
     return result
 
 
-uuid_lock_decorator = redis_util.create_lock_decorator_by_uuid(layman_util.is_publication_chain_ready)
+uuid_lock_decorator = redis_util.create_lock_decorator(layman_util.is_publication_chain_ready)
 
 
 get_syncable_prop_names = partial(metadata_common.get_syncable_prop_names, MAP_TYPE)

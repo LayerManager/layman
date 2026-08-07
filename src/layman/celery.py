@@ -8,7 +8,7 @@ from celery import states
 from celery.contrib.abortable import AbortableAsyncResult, ABORTED
 
 from layman.publication_relation.util import update_related_publications_after_change
-from layman import settings, common, app, util as layman_util
+from layman import settings, common
 from layman.common import redis as redis_util
 
 REDIS_CURRENT_TASK_NAMES = f"{__name__}:CURRENT_TASK_NAMES"
@@ -17,19 +17,31 @@ LAST_TASK_ID_IN_CHAIN_TO_PUBLICATION = f'{__name__}:LAST_TASK_ID_IN_CHAIN_TO_PUB
 RUN_AFTER_CHAIN = f'{__name__}:RUN_AFTER_CHAIN'
 
 
-def task_prerun(workspace, _publication_type, publication_name, _task_id, task_name):
-    current_app.logger.info(f"PRE task={task_name}, workspace={workspace}, publication_name={publication_name}")
+def _get_publication(workspace, publication_type, publication_name):
+    from layman.uuid import get_publication_from_redis
+    return get_publication_from_redis(workspace, publication_type, publication_name)
+
+
+def _get_publication_by_uuid(uuid):
+    from layman.uuid import get_publication_from_redis_by_uuid
+    return get_publication_from_redis_by_uuid(uuid)
+
+
+def task_prerun(workspace, publication_type, publication_name, _task_id, task_name):
+    publication = _get_publication(workspace, publication_type, publication_name)
+    current_app.logger.info(f"PRE task={task_name}, publication_uuid={publication.uuid}")
     rds = settings.LAYMAN_REDIS
     key = REDIS_CURRENT_TASK_NAMES
-    task_hash = _get_task_hash(task_name, workspace, publication_name)
+    task_hash = _get_task_hash(task_name, publication)
     rds.sadd(key, task_hash)
 
 
 def task_postrun(workspace, publication_type, publication_name, task_id, task_name, task_state):
-    current_app.logger.info(f"POST task={task_name}, workspace={workspace}, publication_name={publication_name}")
+    publication = _get_publication(workspace, publication_type, publication_name)
+    current_app.logger.info(f"POST task={task_name}, publication_uuid={publication.uuid}")
     rds = settings.LAYMAN_REDIS
     key = REDIS_CURRENT_TASK_NAMES
-    task_hash = _get_task_hash(task_name, workspace, publication_name)
+    task_hash = _get_task_hash(task_name, publication)
     rds.srem(key, task_hash)
 
     key = LAST_TASK_ID_IN_CHAIN_TO_PUBLICATION
@@ -40,12 +52,12 @@ def task_postrun(workspace, publication_type, publication_name, task_id, task_na
         # 'finish_publication_chain' has to run before 'update_related_publications_after_change' as otherwise deadlock arises.
         finish_publication_chain(task_id, task_state)
         update_related_publications_after_change(workspace, publication_type, publication_name)
-        run_next_chain(workspace, publication_type, publication_name)
+        run_next_chain(publication)
     elif task_state == 'FAILURE':
-        chain_info = get_publication_chain_info_dict(workspace, publication_type, publication_name)
+        chain_info = get_publication_chain_info_dict(publication)
         if chain_info is not None:
             last_task_id = chain_info['last']
-            clear_steps_to_run_after_chain(workspace, publication_type, publication_name)
+            clear_steps_to_run_after_chain(publication)
             finish_publication_chain(last_task_id, task_state)
             from layman.layer import LAYER_TYPE
             if publication_type == LAYER_TYPE:
@@ -53,14 +65,14 @@ def task_postrun(workspace, publication_type, publication_name, task_id, task_na
                 util.set_wfs_wms_status_after_fail(workspace, publication_name, )
 
 
-def _get_task_hash(task_name, workspace, publication_name):
-    return f"{task_name}:{workspace}:{publication_name}"
+def _get_task_hash(task_name, publication):
+    return f"{task_name}:{publication.uuid}"
 
 
-def push_step_to_run_after_chain(workspace, publication_type, publication_name, step_code, ):
+def push_step_to_run_after_chain(publication, step_code):
     rds = settings.LAYMAN_REDIS
     key = RUN_AFTER_CHAIN
-    hash = _get_publication_hash(workspace, publication_type, publication_name)
+    hash = publication.uuid
     val = rds.hget(key, hash)
     queue = json.loads(val) if val is not None else []
     if step_code not in queue:
@@ -68,10 +80,10 @@ def push_step_to_run_after_chain(workspace, publication_type, publication_name, 
         rds.hset(key, hash, json.dumps(queue))
 
 
-def pop_step_to_run_after_chain(workspace, publication_type, publication_name, ):
+def pop_step_to_run_after_chain(publication):
     rds = settings.LAYMAN_REDIS
     key = RUN_AFTER_CHAIN
-    hash = _get_publication_hash(workspace, publication_type, publication_name)
+    hash = publication.uuid
     val = rds.hget(key, hash)
     result = None
     if val:
@@ -82,27 +94,27 @@ def pop_step_to_run_after_chain(workspace, publication_type, publication_name, )
     return result
 
 
-def get_run_after_chain_queue(workspace, publication_type, publication_name, ):
+def get_run_after_chain_queue(publication):
     rds = settings.LAYMAN_REDIS
     key = RUN_AFTER_CHAIN
-    hash = _get_publication_hash(workspace, publication_type, publication_name)
+    hash = publication.uuid
     val = rds.hget(key, hash)
     queue = json.loads(val) if val is not None else []
     return queue
 
 
-def clear_steps_to_run_after_chain(workspace, publication_type, publication_name, ):
+def clear_steps_to_run_after_chain(publication):
     rds = settings.LAYMAN_REDIS
     key = RUN_AFTER_CHAIN
-    hash = _get_publication_hash(workspace, publication_type, publication_name)
+    hash = publication.uuid
     rds.hdel(key, hash)
 
 
-def set_publication_chain_finished(workspace, publication_type, publication_name, state):
-    chain_info = get_publication_chain_info_dict(workspace, publication_type, publication_name)
+def set_publication_chain_finished(publication, state):
+    chain_info = get_publication_chain_info_dict(publication)
     chain_info['finished'] = True
     chain_info['state'] = state
-    set_publication_chain_info_dict(workspace, publication_type, publication_name, chain_info)
+    set_publication_chain_info_dict(publication, chain_info)
 
 
 def finish_publication_chain(last_task_id_in_chain, state):
@@ -112,31 +124,27 @@ def finish_publication_chain(last_task_id_in_chain, state):
     publ_hash = rds.hget(key, hash)
     if publ_hash is None:
         return
-    workspace, publication_type, publication_name = _hash_to_publication(publ_hash)
+    publication = _get_publication_by_uuid(publ_hash)
 
     rds.hdel(key, hash)
-    set_publication_chain_finished(workspace, publication_type, publication_name, state)
+    set_publication_chain_finished(publication, state)
 
-    lock = redis_util.get_publication_lock(workspace, publication_type, publication_name)
+    lock = redis_util.get_publication_lock(publication)
     if lock in [common.REQUEST_METHOD_PATCH, common.REQUEST_METHOD_POST, common.PUBLICATION_LOCK_FEATURE_CHANGE, ]:
-        redis_util.unlock_publication(workspace, publication_type, publication_name)
+        redis_util.unlock_publication(publication)
 
 
-def _hash_to_publication(hash):
-    return hash.split(':')
-
-
-def is_task_running(task_name, workspace, publication_name=None):
+def is_task_running(task_name, publication=None):
     redis = settings.LAYMAN_REDIS
     key = REDIS_CURRENT_TASK_NAMES
-    if publication_name is not None:
-        task_hash = _get_task_hash(task_name, workspace, publication_name)
+    if publication is not None:
+        task_hash = _get_task_hash(task_name, publication)
         result = redis.sismember(key, task_hash)
     else:
         hashes = redis.smembers(key)
         result = any((
             h for h in hashes
-            if h.startswith(f"{task_name}:{workspace}:")
+            if h.startswith(f"{task_name}:")
         ))
     return result
 
@@ -150,33 +158,30 @@ def to_chain_info_with_states(chain_info):
     }
 
 
-def get_publication_chain_info_dict(workspace, publication_type, publication_name):
+def get_publication_chain_info_dict(publication):
     rds = settings.LAYMAN_REDIS
     key = PUBLICATION_CHAIN_INFOS
-    hash = _get_publication_hash(workspace, publication_type, publication_name)
+    hash = publication.uuid
     val = rds.hget(key, hash)
     chain_info = json.loads(val) if val is not None else val
     return chain_info
 
 
 def get_publication_chain_info_dict_by_uuid(uuid):
-    with app.app_context():
-        info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['workspace', 'name', 'type']})
-    workspace = info['_workspace']
-    name = info['name']
-    publication_type = info['type']
-    return get_publication_chain_info_dict(workspace, publication_type, name)
+    rds = settings.LAYMAN_REDIS
+    val = rds.hget(PUBLICATION_CHAIN_INFOS, uuid)
+    return json.loads(val) if val is not None else None
 
 
-def get_publication_chain_info(workspace, publication_type, publication_name):
-    chain_info = get_inconsistent_publication_chain_info(workspace, publication_type, publication_name)
+def get_publication_chain_info(publication):
+    chain_info = get_inconsistent_publication_chain_info(publication)
     if chain_info and chain_info['finished'] is False and is_chain_ready(chain_info):
         # wait for task_postrun to finish all task-related actions and set 'finished' to True
         attempt = 0
         max_attempts = 20
         while chain_info['finished'] is False and attempt < max_attempts:
             time.sleep(0.1)
-            chain_info = get_inconsistent_publication_chain_info(workspace, publication_type, publication_name)
+            chain_info = get_inconsistent_publication_chain_info(publication)
             attempt += 1
             if attempt >= max_attempts:
                 raise Exception(
@@ -185,8 +190,8 @@ def get_publication_chain_info(workspace, publication_type, publication_name):
     return chain_info
 
 
-def get_inconsistent_publication_chain_info(workspace, publication_type, publication_name):
-    chain_info = get_publication_chain_info_dict(workspace, publication_type, publication_name)
+def get_inconsistent_publication_chain_info(publication):
+    chain_info = get_publication_chain_info_dict(publication)
     from layman import celery_app
     if chain_info is not None:
         results = {
@@ -202,15 +207,15 @@ def get_inconsistent_publication_chain_info(workspace, publication_type, publica
     return chain_info
 
 
-def set_publication_chain_info_dict(workspace, publication_type, publication_name, chain_info):
+def set_publication_chain_info_dict(publication, chain_info):
     rds = settings.LAYMAN_REDIS
     val = json.dumps(chain_info)
     key = PUBLICATION_CHAIN_INFOS
-    hash = _get_publication_hash(workspace, publication_type, publication_name)
+    hash = publication.uuid
     rds.hset(key, hash, val)
 
 
-def set_publication_chain_info(workspace, publication_type, publication_name, tasks, task_result):
+def set_publication_chain_info(publication, tasks, task_result):
     if task_result is None:
         return
     chained_results = [task_result]
@@ -227,39 +232,39 @@ def set_publication_chain_info(workspace, publication_type, publication_name, ta
         'finished': False,
         'state': states.PENDING,
     }
-    set_publication_chain_info_dict(workspace, publication_type, publication_name, chain_info)
+    set_publication_chain_info_dict(publication, chain_info)
 
     rds = settings.LAYMAN_REDIS
     key = LAST_TASK_ID_IN_CHAIN_TO_PUBLICATION
-    val = _get_publication_hash(workspace, publication_type, publication_name)
+    val = publication.uuid
     hash = chain_info['last']
     rds.hset(key, hash, val)
 
 
-def wait_for_abort(workspace, publication_type, publication_name):
+def wait_for_abort(publication):
     round = 0
     max_rounds = 20
     while round <= max_rounds:
-        chain_info = get_publication_chain_info_dict(workspace, publication_type, publication_name)
+        chain_info = get_publication_chain_info_dict(publication)
         if chain_info['finished']:
             break
         time.sleep(0.5)
         round += 1
 
 
-def abort_chain(workspace, publication_type, publication_name):
-    chain_info = get_publication_chain_info(workspace, publication_type, publication_name)
+def abort_chain(publication):
+    chain_info = get_publication_chain_info(publication)
     if chain_info is None or is_chain_ready(chain_info):
         return
 
     abort_task_chain(chain_info['by_order'], chain_info['by_name'])
-    wait_for_abort(workspace, publication_type, publication_name)
-    set_publication_chain_finished(workspace, publication_type, publication_name, ABORTED)
+    wait_for_abort(publication)
+    set_publication_chain_finished(publication, ABORTED)
 
 
-def abort_publication_chain(workspace, publication_type, publication_name):
-    abort_chain(workspace, publication_type, publication_name)
-    clear_steps_to_run_after_chain(workspace, publication_type, publication_name)
+def abort_publication_chain(publication):
+    abort_chain(publication)
+    clear_steps_to_run_after_chain(publication)
 
 
 def abort_task_chain(results_by_order, results_by_name=None):
@@ -311,33 +316,28 @@ def is_chain_failed_without_info(chain_info):
         not any(res.state == states.FAILURE for res in chain_info['by_order'])
 
 
-def _get_publication_hash(workspace, publication_type, publication_name):
-    hash = f"{workspace}:{publication_type}:{publication_name}"
-    return hash
-
-
-def delete_publication(workspace, publication_type, publication_name):
-    chain_info = get_publication_chain_info_dict(workspace, publication_type, publication_name)
+def delete_publication(publication):
+    chain_info = get_publication_chain_info_dict(publication)
     if chain_info is None:
         return
     task_id = chain_info['last']
 
     rds = settings.LAYMAN_REDIS
     key = PUBLICATION_CHAIN_INFOS
-    hash = _get_publication_hash(workspace, publication_type, publication_name)
+    hash = publication.uuid
     rds.hdel(key, hash)
 
     key = LAST_TASK_ID_IN_CHAIN_TO_PUBLICATION
     rds.hdel(key, task_id)
 
 
-def run_next_chain(workspace, publ_type, publication):
-    next_task = pop_step_to_run_after_chain(workspace, publ_type, publication)
+def run_next_chain(publication):
+    next_task = pop_step_to_run_after_chain(publication)
     if next_task:
         module_name, method_name = next_task.split('::')
         module = importlib.import_module(module_name)
         method = getattr(module, method_name)
-        method(workspace, publ_type, publication)
+        method(publication.workspace, publication.type, publication.name)
 
 
 class AbortedException(Exception):

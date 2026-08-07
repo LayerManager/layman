@@ -41,7 +41,7 @@ def test_info(workspace, publ_type, publication):
     style = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA]['style_type']
 
     with app.app_context():
-        info_internal = layer_util.get_layer_info(Layer(layer_tuple=(workspace, publication), load=False))
+        info_internal = layer_util.get_layer_info(Layer(layer_tuple=(workspace, publication)))
         uuid = layman_util.get_publication_uuid(workspace, publ_type, publication)
         expected_style_url = url_for('rest_layer_style.get', uuid=uuid, internal=False)
     info = process_client.get_publication(publ_type, uuid, headers=headers)

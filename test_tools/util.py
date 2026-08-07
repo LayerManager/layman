@@ -7,6 +7,7 @@ from requests.exceptions import ConnectionError
 from PIL import Image, ImageChops
 
 from layman import app, celery, settings
+from layman.publication_class import Publication
 from layman.util import url_for as layman_url_for
 
 
@@ -101,7 +102,5 @@ def compress_files(filepaths, *, compress_settings, output_dir):
 
 def abort_publication_chain(workspace, publ_type, name):
     with app.app_context():
-        celery.abort_publication_chain(workspace,
-                                       publ_type,
-                                       name,
-                                       )
+        publication = Publication.create(publ_tuple=(workspace, publ_type, name))
+        celery.abort_publication_chain(publication)

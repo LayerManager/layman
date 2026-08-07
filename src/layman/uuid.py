@@ -97,6 +97,41 @@ def get_workspace_type_names_key(workspace, publication_type):
     )
 
 
+def get_publication_uuid_from_redis(workspace, publication_type, publication_name):
+    return settings.LAYMAN_REDIS.hget(
+        get_workspace_type_names_key(workspace, publication_type),
+        publication_name,
+    )
+
+
+def get_uuid_metadata_from_redis(uuid_str):
+    return settings.LAYMAN_REDIS.hgetall(get_uuid_metadata_key(uuid_str))
+
+
+def get_publication_from_redis(workspace, publication_type, publication_name):
+    uuid = get_publication_uuid_from_redis(workspace, publication_type, publication_name)
+    return _publication_from_identity(uuid, workspace, publication_type, publication_name)
+
+
+def get_publication_from_redis_by_uuid(uuid):
+    metadata = get_uuid_metadata_from_redis(uuid)
+    return _publication_from_identity(
+        uuid,
+        metadata['workspace'],
+        metadata['publication_type'],
+        metadata['publication_name'],
+    )
+
+
+def _publication_from_identity(uuid, workspace, publication_type, publication_name):
+    from layman.layer import LAYER_TYPE
+    from layman.layer.layer_class import Layer
+    from layman.map.map_class import Map
+    if publication_type == LAYER_TYPE:
+        return Layer(uuid=uuid, layer_tuple=(workspace, publication_name), load=False)
+    return Map(uuid=uuid, map_tuple=(workspace, publication_name), load=False)
+
+
 def is_valid_uuid(maybe_uuid_str):
     try:
         UUID(maybe_uuid_str)
@@ -152,28 +187,31 @@ def check_redis_consistency(expected_publ_num_by_type=None):
     chain_infos_len = redis.hlen(celery_util.PUBLICATION_CHAIN_INFOS)
     assert chain_infos_len == len(total_publs), f"task_infos_len={chain_infos_len}, total_publs={total_publs}"
 
-    task_names_tuples = [
-        h.split(':') for h in redis.smembers(celery_util.REDIS_CURRENT_TASK_NAMES)
-    ]
+    task_hashes = redis.smembers(celery_util.REDIS_CURRENT_TASK_NAMES)
 
     for workspace, publ_type_name, pubname in total_publs:
-        chain_info = celery_util.get_publication_chain_info(workspace, publ_type_name, pubname)
+        publication = _publication_from_identity(
+            infos[(workspace, publ_type_name, pubname)]['uuid'],
+            workspace,
+            publ_type_name,
+            pubname,
+        )
+        chain_info = celery_util.get_publication_chain_info(publication)
         is_ready = celery_util.is_chain_ready(chain_info)
         assert chain_info['finished'] is is_ready
         assert (next((
-            t for t in task_names_tuples
-            if t[1] == workspace and t[2] == pubname and t[0].startswith(publ_type_name)
-        ), None) is None) is is_ready, f"{workspace}, {publ_type_name}, {pubname}: {is_ready}, {task_names_tuples}"
+            task_hash for task_hash in task_hashes
+            if task_hash.endswith(f':{publication.uuid}')
+        ), None) is None) is is_ready, f"{workspace}, {publ_type_name}, {pubname}: {is_ready}, {task_hashes}"
         assert (redis.hget(celery_util.LAST_TASK_ID_IN_CHAIN_TO_PUBLICATION, chain_info['last'].task_id) is None) is is_ready
 
     # publication locks
     locks = redis.hgetall(redis_util.PUBLICATION_LOCKS_KEY)
-    assert len(locks) == len(task_names_tuples), f"{locks} != {task_names_tuples}"
+    assert len(locks) == len(task_hashes), f"{locks} != {task_hashes}"
     for k, _ in locks.items():
-        workspace, publication_type, publication_name = k.split(':')
         assert next((
-            t for t in task_names_tuples
-            if t[1] == workspace and t[2] == publication_name and t[0].startswith(publication_type)
+            task_hash for task_hash in task_hashes
+            if task_hash.endswith(f':{k}')
         ), None) is not None
     return total_publs_by_type
 

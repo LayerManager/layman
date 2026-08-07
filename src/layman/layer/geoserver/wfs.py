@@ -117,8 +117,12 @@ def get_wfs_proxy():
     def currently_changing():
         layerinfos = layman_util.get_publication_infos(workspace, LAYER_TYPE)
         result = any((
-            not layman_util.is_publication_chain_ready(Layer(layer_tuple=(workspace, layername), load=False))
-            for (_, _, layername) in layerinfos
+            not layman_util.is_publication_chain_ready(Layer(
+                uuid=info['uuid'],
+                layer_tuple=(workspace, layername),
+                load=False,
+            ))
+            for (_, _, layername), info in layerinfos.items()
         ))
         return result
 

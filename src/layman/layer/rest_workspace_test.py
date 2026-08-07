@@ -145,10 +145,10 @@ def test_post_layers_simple():
                                            do_not_post_name=True,
                                            )
     layername = LAYERNAME_2
-    chain_info = layman_util.get_publication_chain(Layer(layer_tuple=(workspace, layername), load=False))
+    chain_info = layman_util.get_publication_chain(Layer(uuid=LAYER_UUID_2, layer_tuple=(workspace, layername), load=False))
     assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
     with app.app_context():
-        layer_info = util.get_layer_info(Layer(layer_tuple=(workspace, layername), load=False))
+        layer_info = util.get_layer_info(Layer(uuid=LAYER_UUID_2, layer_tuple=(workspace, layername), load=False))
     # keys_to_check = ['db', 'wms', 'wfs', 'thumbnail', 'metadata']
     keys_to_check = ['wms', 'thumbnail', 'metadata']
     for key_to_check in keys_to_check:
@@ -157,7 +157,7 @@ def test_post_layers_simple():
     process_client.wait_for_publication_status(LAYER_UUID_2, LAYER_TYPE)
 
     with app.app_context():
-        layer_info = util.get_layer_info(Layer(layer_tuple=(workspace, layername), load=False))
+        layer_info = util.get_layer_info(Layer(uuid=LAYER_UUID_2, layer_tuple=(workspace, layername), load=False))
     for key_to_check in keys_to_check:
         assert isinstance(layer_info[key_to_check], str) \
             or 'status' not in layer_info[key_to_check]
@@ -229,7 +229,7 @@ def test_post_layers_concurrent():
                                            check_response_fn=empty_method_returns_true,
                                            raise_if_not_complete=False,
                                            )
-    chain_info = layman_util.get_publication_chain(Layer(layer_tuple=(workspace, layername), load=False))
+    chain_info = layman_util.get_publication_chain(Layer(uuid=LAYER_UUID_1, layer_tuple=(workspace, layername), load=False))
     assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
     publication_counter.increase()
 
@@ -287,7 +287,7 @@ def test_post_layers_shp():
                                            raise_if_not_complete=False,
                                            )
     layeruuid = LAYER_UUID_3
-    chain_info = layman_util.get_publication_chain(Layer(layer_tuple=(workspace, layername), load=False))
+    chain_info = layman_util.get_publication_chain(Layer(uuid=layeruuid, layer_tuple=(workspace, layername), load=False))
     assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
     publication_counter.increase()
     process_client.wait_for_publication_status(LAYER_UUID_3, LAYER_TYPE)
@@ -338,7 +338,7 @@ def test_post_layers_complex():
     layeruuid = LAYER_UUID_4
     assert post_response['name'] == layername
 
-    chain_info = layman_util.get_publication_chain(Layer(layer_tuple=(workspace, layername), load=False))
+    chain_info = layman_util.get_publication_chain(Layer(uuid=layeruuid, layer_tuple=(workspace, layername), load=False))
     assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
     publication_counter.increase()
     process_client.wait_for_publication_status(LAYER_UUID_4, LAYER_TYPE)
@@ -419,7 +419,7 @@ def test_uppercase_attr():
                                            raise_if_not_complete=False,
                                            )
 
-    chain_info = layman_util.get_publication_chain(Layer(layer_tuple=(workspace, layername), load=False))
+    chain_info = layman_util.get_publication_chain(Layer(uuid=publ_uuid, layer_tuple=(workspace, layername), load=False))
     assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
     publication_counter.increase()
     process_client.wait_for_publication_status(publ_uuid, LAYER_TYPE)
@@ -497,7 +497,7 @@ def test_patch_layer_title():
                                title=new_title,
                                description=new_description,
                                )
-    chain_info = layman_util.get_publication_chain(Layer(layer_tuple=(workspace, layername), load=False))
+    chain_info = layman_util.get_publication_chain(Layer(uuid=layer_uuid, layer_tuple=(workspace, layername), load=False))
     assert chain_info is not None and celery_util.is_chain_ready(chain_info)
 
     get_response = process_client.get_layer(layer_uuid)
@@ -592,7 +592,7 @@ def test_patch_layer_data():
                                raise_if_not_complete=False,
                                )
 
-    chain_info = layman_util.get_publication_chain(Layer(layer_tuple=(workspace, layername), load=False))
+    chain_info = layman_util.get_publication_chain(Layer(uuid=layer_uuid, layer_tuple=(workspace, layername), load=False))
     assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
     get_incomplete_response = process_client.get_layer(layer_uuid)
     # keys_to_check = ['db', 'wms', 'wfs', 'thumbnail', 'metadata']
@@ -654,7 +654,7 @@ def test_patch_layer_concurrent_and_delete_it():
     uuid.check_redis_consistency(expected_publ_num_by_type={
         f'{LAYER_TYPE}': publication_counter.get()
     })
-    chain_info = layman_util.get_publication_chain(Layer(layer_tuple=(workspace, layername), load=False))
+    chain_info = layman_util.get_publication_chain(Layer(uuid=uuid_str, layer_tuple=(workspace, layername), load=False))
     assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
 
     with pytest.raises(LaymanError) as exc_info:
@@ -697,7 +697,7 @@ def test_post_layers_long_and_delete_it():
 
     time.sleep(1)
 
-    chain_info = layman_util.get_publication_chain(Layer(layer_tuple=(workspace, layername), load=False))
+    chain_info = layman_util.get_publication_chain(Layer(uuid=post_response['uuid'], layer_tuple=(workspace, layername), load=False))
     assert chain_info is not None and not celery_util.is_chain_ready(chain_info)
     with app.app_context():
         layer_info = util.get_complete_layer_info(Layer(uuid=post_response['uuid']))
@@ -754,7 +754,7 @@ def test_post_layers_zero_length_attribute():
                                                         check_response_fn=wait_for_db_finish, raise_if_not_complete=False)['uuid']
 
     with app.app_context():
-        layer_info = util.get_layer_info(Layer(layer_tuple=(workspace, layername), load=False))
+        layer_info = util.get_layer_info(Layer(uuid=layer_uuid, layer_tuple=(workspace, layername), load=False))
     assert layer_info['db']['status'] == 'FAILURE', f'layer_info={layer_info}'
     assert layer_info['db']['error']['code'] == 28, f'layer_info={layer_info}'
 

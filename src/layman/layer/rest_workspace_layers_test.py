@@ -77,7 +77,7 @@ def test_style_correctly_saved(source_style_file_path,
     expected_style_file = expected_style_file_template.format(publ_uuid=publ_uuid) if expected_style_file_template else None
 
     with app.app_context():
-        info = layer_util.get_layer_info(Layer(layer_tuple=(workspace, layer), load=False))
+        info = layer_util.get_layer_info(Layer(layer_tuple=(workspace, layer)))
     assert info['_style_type'] == 'sld'
     assert info['style']['type'] == 'sld', info.get('style')
     assert info['style']['url'], info.get('style')
@@ -87,7 +87,7 @@ def test_style_correctly_saved(source_style_file_path,
     process_client.patch_layer(uuid=publ_uuid, style_file=source_style_file_path)
     assert_style_file(publ_uuid, expected_style_file)
     with app.app_context():
-        info = layer_util.get_layer_info(Layer(layer_tuple=(workspace, layer), load=False))
+        info = layer_util.get_layer_info(Layer(layer_tuple=(workspace, layer)))
     assert info['_style_type'] == expected_style_type
 
     process_client.delete_layer(publ_uuid)

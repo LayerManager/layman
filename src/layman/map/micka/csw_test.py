@@ -19,8 +19,7 @@ from .csw import get_map_info, map_layers_to_operates_on_layers, delete_map
 MICKA_PORT = 8020
 
 
-def wait_till_ready(workspace, mapname):
-    map = Map(map_tuple=(workspace, mapname), load=False)
+def wait_till_ready(map: Map):
     chain_info = layman_util.get_publication_chain(map)
     while chain_info is not None and not celery_util.is_chain_ready(chain_info):
         time.sleep(0.1)
@@ -71,10 +70,12 @@ def provide_map(client):
                 'name': mapname,
             })
         assert response.status_code == 200
+        uuid_str = response.json[0]['uuid']
+        publication = Map(uuid=uuid_str, map_tuple=(workspace, mapname), load=False)
 
-    wait_till_ready(workspace, mapname)
+    wait_till_ready(publication)
     with app.app_context():
-        publication = Map(map_tuple=(workspace, mapname))
+        publication = Map(uuid=uuid_str)
 
     yield publication
 
@@ -84,11 +85,8 @@ def provide_map(client):
         assert response.status_code == 200
 
 
-def patch_map(client):
+def patch_map(client, publication):
     with app.app_context():
-        workspace = TEST_WORKSPACE
-        mapname = TEST_MAP
-        publication = Map(map_tuple=(workspace, mapname))
         rest_path = url_for('rest_map.patch', uuid=publication.uuid)
         file_paths = [
             'sample/layman.map/full.json',
@@ -103,7 +101,7 @@ def patch_map(client):
             })
         assert response.status_code == 200
 
-    wait_till_ready(workspace, mapname)
+    wait_till_ready(publication)
 
 
 @pytest.fixture(scope="module")
@@ -186,7 +184,7 @@ def test_delete_map_no_micka(provide_map):
 def test_patch_map_without_metadata(client, provide_map):
     with app.app_context():
         delete_map(provide_map)
-    patch_map(client)
+    patch_map(client, provide_map)
 
 
 @pytest.mark.usefixtures('ensure_layman')
