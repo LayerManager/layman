@@ -102,12 +102,12 @@ def post_map(map: Map, task_options, start_at):
     call_modules_fn(sources, 'post_map', [map.workspace, map.name], kwargs=task_options)
 
     # async processing
-    post_tasks = tasks_util.get_task_methods(get_map_type_def(), map.workspace, map.name, task_options, start_at)
-    post_chain = tasks_util.get_chain_of_methods(map.workspace, map.name, post_tasks, task_options, 'mapname')
+    post_tasks = tasks_util.get_task_methods(get_map_type_def(), map, task_options, start_at)
+    post_chain = tasks_util.get_chain_of_methods(map, post_tasks, task_options, 'mapname')
     # res = post_chain.apply_async()
     res = post_chain()
 
-    celery_util.set_publication_chain_info(map, post_tasks, res)
+    celery_util.set_publication_chain_info(map.uuid, post_tasks, res)
 
 
 def patch_map(map: Map, task_options, start_at, *, only_sync=False):
@@ -117,12 +117,12 @@ def patch_map(map: Map, task_options, start_at, *, only_sync=False):
 
     if not only_sync:
         # async processing
-        patch_tasks = tasks_util.get_task_methods(get_map_type_def(), map.workspace, map.name, task_options, start_at)
-        patch_chain = tasks_util.get_chain_of_methods(map.workspace, map.name, patch_tasks, task_options, 'mapname')
+        patch_tasks = tasks_util.get_task_methods(get_map_type_def(), map, task_options, start_at)
+        patch_chain = tasks_util.get_chain_of_methods(map, patch_tasks, task_options, 'mapname')
         # res = patch_chain.apply_async()
         res = patch_chain()
 
-        celery_util.set_publication_chain_info(map, patch_tasks, res)
+        celery_util.set_publication_chain_info(map.uuid, patch_tasks, res)
 
 
 def delete_map(map: Map, kwargs=None, *, x_forwarded_items=None):
@@ -133,7 +133,7 @@ def delete_map(map: Map, kwargs=None, *, x_forwarded_items=None):
         if partial_result is not None:
             delete_info.update(partial_result)
     delete_publication_uuid_from_redis(map.workspace, map.type, map.name, map.uuid)
-    celery_util.delete_publication(map)
+    celery_util.delete_publication(map.uuid)
     result = {
         **delete_info,
         'url': url_for('rest_map.get', uuid=map.uuid, x_forwarded_items=x_forwarded_items),

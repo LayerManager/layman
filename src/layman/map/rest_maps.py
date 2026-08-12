@@ -130,10 +130,10 @@ def post():
     except Exception as exception:
         try:
             if map and map.uuid and layman_util.is_publication_chain_ready(map):
-                redis_util.unlock_publication(map)
+                redis_util.unlock_publication(map.uuid)
         finally:
             if map and map.uuid:
-                redis_util.unlock_publication(map)
+                redis_util.unlock_publication(map.uuid)
         raise exception
 
     # app.logger.info('uploaded map '+mapname)

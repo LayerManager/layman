@@ -295,7 +295,7 @@ def proxy(subpath):
         for layer_uuid in wfs_t_layers:
             layer = Layer(uuid=layer_uuid)
             if authz.can_i_edit(uuid=layer_uuid) and layer.geodata_type == settings.GEODATA_TYPE_VECTOR:
-                patch_after_feature_change(layer.workspace, layer.name)
+                patch_after_feature_change(layer.uuid)
 
     excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
     headers = {key: value for (key, value) in response.headers.items() if key.lower() not in excluded_headers}

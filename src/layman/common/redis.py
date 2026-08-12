@@ -10,7 +10,7 @@ PUBLICATION_LOCKS_KEY = f'{__name__}:PUBLICATION_LOCKS'
 def create_lock(publication, method):
     method = method.lower()
     solve_locks(publication, method)
-    lock_publication(publication, method)
+    lock_publication(publication.uuid, method)
 
 
 def create_lock_decorator(is_chain_ready_fn):
@@ -23,16 +23,16 @@ def create_lock_decorator(is_chain_ready_fn):
             try:
                 result = func(*args, **kwargs)
                 if is_chain_ready_fn(publication):
-                    unlock_publication(publication)
-                    celery_util.run_next_chain(publication)
+                    unlock_publication(publication.uuid)
+                    celery_util.run_next_chain(publication.uuid)
             except Exception as exception:
                 try:
                     if is_chain_ready_fn(publication):
-                        unlock_publication(publication)
-                        celery_util.run_next_chain(publication)
+                        unlock_publication(publication.uuid)
+                        celery_util.run_next_chain(publication.uuid)
                 finally:
-                    unlock_publication(publication)
-                    celery_util.run_next_chain(publication)
+                    unlock_publication(publication.uuid)
+                    celery_util.run_next_chain(publication.uuid)
                 raise exception
 
             return result
@@ -41,32 +41,30 @@ def create_lock_decorator(is_chain_ready_fn):
     return lock_decorator
 
 
-def get_publication_lock(publication):
+def get_publication_lock(uuid):
     rds = settings.LAYMAN_REDIS
     key = PUBLICATION_LOCKS_KEY
-    hash = publication.uuid
-    return rds.hget(key, hash)
+    return rds.hget(key, uuid)
 
 
-def lock_publication(publication, lock_method):
-    current_app.logger.info(f"Locking publication uuid={publication.uuid} with {lock_method.upper()}")
+def lock_publication(uuid, lock_method):
+    current_app.logger.info(f"Locking publication uuid={uuid} with {lock_method.upper()}")
     rds = settings.LAYMAN_REDIS
     key = PUBLICATION_LOCKS_KEY
-    hash = publication.uuid
+    hash = uuid
     value = lock_method.lower()
     rds.hset(key, hash, value)
 
 
-def unlock_publication(publication):
-    current_app.logger.info(f"Unlocking publication uuid={publication.uuid}")
+def unlock_publication(uuid):
+    current_app.logger.info(f"Unlocking publication uuid={uuid}")
     rds = settings.LAYMAN_REDIS
     key = PUBLICATION_LOCKS_KEY
-    hash = publication.uuid
-    rds.hdel(key, hash)
+    rds.hdel(key, uuid)
 
 
 def solve_locks(publication, requested_lock):
-    current_lock = get_publication_lock(publication)
+    current_lock = get_publication_lock(publication.uuid)
     if current_lock is None:
         return
     if requested_lock not in [common.PUBLICATION_LOCK_PATCH, common.PUBLICATION_LOCK_DELETE,
@@ -86,5 +84,5 @@ def solve_locks(publication, requested_lock):
         if requested_lock == common.PUBLICATION_LOCK_FEATURE_CHANGE:
             raise LaymanError(49, private_data={'can_run_later': True})
         if current_lock == common.PUBLICATION_LOCK_FEATURE_CHANGE and requested_lock in [common.REQUEST_METHOD_PATCH, common.REQUEST_METHOD_POST, ]:
-            celery_util.abort_publication_chain(publication)
-            celery_util.push_step_to_run_after_chain(publication, 'layman.util::patch_after_feature_change')
+            celery_util.abort_publication_chain(publication.uuid)
+            celery_util.push_step_to_run_after_chain(publication.uuid, 'layman.util::patch_after_feature_change')

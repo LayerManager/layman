@@ -29,10 +29,8 @@ refresh_sld_needed = empty_method_returns_true
 # pylint: disable=unused-argument
 def refresh_wms(
         self,
-        workspace,
-        layername,
-        *,
         uuid,
+        *,
         store_in_geoserver,
         access_rights=None,
         image_mosaic=False,
@@ -116,10 +114,8 @@ def refresh_wms(
 # pylint: disable=unused-argument
 def refresh_wfs(
         self,
-        workspace,
-        layername,
-        *,
         uuid,
+        *,
         access_rights=None,
         original_data_source=settings.EnumOriginalDataSource.FILE.value,
 ):
@@ -164,7 +160,7 @@ def refresh_wfs(
     base=celery_app.AbortableTask
 )
 # pylint: disable=unused-argument
-def refresh_sld(self, workspace, layername, store_in_geoserver, *, uuid):
+def refresh_sld(self, uuid, store_in_geoserver):
     if self.is_aborted():
         raise AbortedException
     layer = Layer(uuid=uuid)

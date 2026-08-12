@@ -18,7 +18,8 @@ def layer_or_map(workspace, publ_type, name):
 
 def get_publication_writer(publication):
     with app.app_context():
-        writer = layman_util.get_publication_writer(publication.workspace, publication.type, publication.name)
+        uuid = publication.uuid or get_publication_uuid(publication)
+        writer = layman_util.get_publication_writer(uuid)
     return writer
 
 

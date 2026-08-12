@@ -23,10 +23,8 @@ refresh_table_needed = empty_method_returns_true
 # pylint: disable=unused-argument
 def refresh_table(
         self,
-        workspace,
-        layername,
+        uuid,
         crs_id=None,
-        uuid=None,
 ):
     layer = Layer(uuid=uuid)
     if self.is_aborted():

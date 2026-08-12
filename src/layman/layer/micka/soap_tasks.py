@@ -16,12 +16,11 @@ logger = get_task_logger(__name__)
 )
 def patch_after_feature_change(
         self,
-        workspace,
-        layer,
+        uuid,
 ):
     if self.is_aborted():
         raise AbortedException
-    publication = Layer(layer_tuple=(workspace, layer))
+    publication = Layer(uuid=uuid)
 
     micka_util.patch_publication_by_soap(publication,
                                          metadata_properties_to_refresh=['extent'],

@@ -23,18 +23,17 @@ refresh_wfs_wms_status_needed = empty_method_returns_true
 )
 def refresh_file_data(
         self,
-        username,
-        layername,
         uuid,
 ):
     if self.is_aborted():
         raise AbortedException
 
-    publ_info = layman_util.get_publication_info(Layer(layer_tuple=(username, layername), load=False), context={'keys': ['geodata_type', 'table_uri']})
+    layer = Layer(uuid=uuid)
+    publ_info = layman_util.get_publication_info(layer, context={'keys': ['geodata_type', 'table_uri']})
     if publ_info['geodata_type'] == settings.GEODATA_TYPE_UNKNOWN:
-        publ_info_file = layman_util.get_publication_info(Layer(layer_tuple=(username, layername), load=False), context={'keys': ['file']})
+        publ_info_file = layman_util.get_publication_info(layer, context={'keys': ['file']})
         geodata_type = publ_info_file['_file']['file_type']
-        set_geodata_type(username, LAYER_TYPE, layername, geodata_type, )
+        set_geodata_type(layer.workspace, LAYER_TYPE, layer.name, geodata_type)
     else:
         geodata_type = publ_info['geodata_type']
 
@@ -42,7 +41,7 @@ def refresh_file_data(
         if not publ_info.get('_table_uri'):
             # We have to set file type into publications table before asking for table_uri,
             # because for compressed files sent with chunks file_type would be UNKNOWN and table_uri not set
-            publ_info = layman_util.get_publication_info(Layer(layer_tuple=(username, layername), load=False), context={'keys': ['table_uri']})
+            publ_info = layman_util.get_publication_info(layer, context={'keys': ['table_uri']})
         table_uri = publ_info['_table_uri']
         bbox = db_get_bbox(table_uri.schema, table_uri.table, uri_str=table_uri.db_uri_str, column=table_uri.geo_column)
         crs = get_table_crs(table_uri.schema, table_uri.table, uri_str=table_uri.db_uri_str, column=table_uri.geo_column, use_internal_srid=True)
@@ -55,7 +54,7 @@ def refresh_file_data(
     if self.is_aborted():
         raise AbortedException
 
-    set_bbox(username, LAYER_TYPE, layername, bbox, crs, )
+    set_bbox(layer.workspace, LAYER_TYPE, layer.name, bbox, crs)
 
     if self.is_aborted():
         raise AbortedException
@@ -68,13 +67,13 @@ def refresh_file_data(
 )
 def refresh_wfs_wms_status(
         self,
-        username,
-        layername,
+        uuid,
 ):
     if self.is_aborted():
         raise AbortedException
 
-    publications.set_wfs_wms_status(username, LAYER_TYPE, layername, settings.EnumWfsWmsStatus.AVAILABLE)
+    layer = Layer(uuid=uuid)
+    publications.set_wfs_wms_status(layer.workspace, LAYER_TYPE, layer.name, settings.EnumWfsWmsStatus.AVAILABLE)
 
     if self.is_aborted():
         raise AbortedException

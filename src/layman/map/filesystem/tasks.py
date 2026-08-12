@@ -16,7 +16,7 @@ refresh_thumbnail_needed = empty_method_returns_true
     base=celery_app.AbortableTask
 )
 # pylint: disable=unused-argument
-def refresh_thumbnail(self, workspace, mapname, uuid, actor_name=None):
+def refresh_thumbnail(self, uuid, actor_name=None):
     if self.is_aborted():
         raise AbortedException
     map = Map(uuid=uuid)

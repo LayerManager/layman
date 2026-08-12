@@ -16,8 +16,8 @@ refresh_soap_needed = empty_method_returns_true
     base=celery_app.AbortableTask
 )
 # pylint: disable=unused-argument
-def refresh_soap(self, workspace, mapname, http_method=common.REQUEST_METHOD_POST, metadata_properties_to_refresh=None,
-                 actor_name=None, access_rights=None, uuid=None):
+def refresh_soap(self, uuid, http_method=common.REQUEST_METHOD_POST, metadata_properties_to_refresh=None,
+                 actor_name=None, access_rights=None):
     if self.is_aborted():
         raise AbortedException
     publication = Map(uuid=uuid)

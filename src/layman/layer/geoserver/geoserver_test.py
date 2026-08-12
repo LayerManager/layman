@@ -34,7 +34,6 @@ def test_geoserver_bbox():
 
     kwargs = {
         'access_rights': None,
-        'uuid': response['uuid'],
     }
     wms_kwargs = {
         **kwargs,
@@ -47,7 +46,7 @@ def test_geoserver_bbox():
             wfs.delete_layer(layer_class)
             publications.set_bbox(workspace, process_client.LAYER_TYPE, layer, bbox, crs, )
             wfs.delete_layer(layer_class)
-            tasks.refresh_wfs.apply(args=[workspace, layer],
+            tasks.refresh_wfs.apply(args=[uuid],
                                     kwargs=kwargs,
                                     )
         assert_util.assert_wfs_bbox(uuid, expected_bbox)
@@ -57,7 +56,7 @@ def test_geoserver_bbox():
         with app.app_context():
             wms.delete_layer(layer_class)
             publications.set_bbox(workspace, process_client.LAYER_TYPE, layer, bbox, crs, )
-            tasks.refresh_wms.apply(args=[workspace, layer],
+            tasks.refresh_wms.apply(args=[uuid],
                                     kwargs=wms_kwargs,
                                     )
         assert_util.assert_wms_bbox(uuid, expected_bbox)
@@ -68,7 +67,7 @@ def test_geoserver_bbox():
             wms.delete_layer(layer_class)
             publications.set_bbox(workspace, process_client.LAYER_TYPE, layer, bbox, crs, )
             wms.delete_layer(layer_class)
-            tasks.refresh_wms.apply(args=[workspace, layer],
+            tasks.refresh_wms.apply(args=[uuid],
                                     kwargs=wms_kwargs,
                                     )
         assert_util.assert_wms_bbox(uuid, expected_bbox)

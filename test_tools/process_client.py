@@ -607,10 +607,10 @@ def wait_for_publication_status(uuid, publication_type, *, check_response_fn=Non
         raise_if_not_complete_status(response)
 
 
-def patch_after_feature_change(workspace, publ_type, name):
+def patch_after_feature_change(uuid):
     queue = LAYMAN_CELERY_QUEUE
     with app.app_context():
-        layman_util.patch_after_feature_change(workspace, publ_type, name, queue=queue)
+        layman_util.patch_after_feature_change(uuid, queue=queue)
 
 
 def get_map_file(publication_type, uuid, *, headers=None, actor_name=None):

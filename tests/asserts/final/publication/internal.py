@@ -486,12 +486,12 @@ def size_and_position_preserved_in_normalized_raster(workspace, publ_type, name)
 
 def expected_chain_info_state(workspace, publ_type, name, state):
     publication = Publication.create(publ_tuple=(workspace, publ_type, name))
-    chain_info = celery.get_publication_chain_info_dict(publication)
+    chain_info = celery.get_publication_chain_info_dict(publication.uuid)
     assert chain_info['state'] == state, f'chain_info={chain_info}'
 
 
 def expected_chain_info_state_by_uuid(uuid, state):
-    chain_info = celery.get_publication_chain_info_dict_by_uuid(uuid)
+    chain_info = celery.get_publication_chain_info_dict(uuid)
     assert chain_info['state'] == state, f'chain_info={chain_info}'
 
 

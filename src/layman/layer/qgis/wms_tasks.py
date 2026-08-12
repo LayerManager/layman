@@ -15,13 +15,12 @@ logger = get_task_logger(__name__)
 )
 def patch_after_feature_change(
         self,
-        workspace,
-        layer,
+        uuid,
 ):
     if self.is_aborted():
         raise AbortedException
 
-    info = layman_util.get_publication_info(Layer(layer_tuple=(workspace, layer), load=False),
+    info = layman_util.get_publication_info(Layer(uuid=uuid),
                                             context={'keys': ['style_type', 'uuid']})
     if info['_style_type'] == 'qml':
         wms.save_qgs_file(info['uuid'])

@@ -8,9 +8,9 @@ del sys.modules['layman']
 
 from layman import app, celery_app
 from layman.layer.filesystem import input_chunk, util as fs_util
+from layman.layer.layer_class import Layer
 from layman import celery as celery_util
 from layman.common import tasks as tasks_util
-from test_tools.mock.layman_classes import LayerMock
 
 MIN_GEOJSON = """
 {
@@ -45,10 +45,14 @@ def test_single_abortable_task():
     layername = 'test_abort_layer'
     with app.app_context():
         input_chunk.save_layer_files_str(publ_uuid, filenames, check_crs)
-    task_chain = chain(*[
-        tasks_util.get_task_signature(workspace, layername, t, task_options, 'layername')
+    layer = Layer(uuid=publ_uuid, layer_tuple=(workspace, layername), load=False)
+    task_signatures = [
+        tasks_util.get_task_signature(layer, t, task_options, 'layername')
         for t in tasks
-    ])
+    ]
+    assert [signature.args for signature in task_signatures] == [(publ_uuid,)]
+    assert all('uuid' not in signature.kwargs for signature in task_signatures)
+    task_chain = chain(*task_signatures)
     task_result = task_chain()
 
     results = [task_result]
@@ -69,7 +73,6 @@ def test_single_abortable_task():
     # first one is failure, because it throws AbortedException
     assert results[0].state == results_copy[0].state == 'FAILURE'
     with app.app_context():
-        layer = LayerMock(uuid=publ_uuid, layer_tuple=(workspace, layername))
         input_chunk.delete_layer(layer)
 
 
@@ -99,10 +102,14 @@ def test_abortable_task_chain():
     layername = 'test_abort_layer2'
     with app.app_context():
         input_chunk.save_layer_files_str(publ_uuid, filenames, check_crs)
-    task_chain = chain(*[
-        tasks_util.get_task_signature(workspace, layername, t, task_options, 'layername')
+    layer = Layer(uuid=publ_uuid, layer_tuple=(workspace, layername), load=False)
+    task_signatures = [
+        tasks_util.get_task_signature(layer, t, task_options, 'layername')
         for t in tasks
-    ])
+    ]
+    assert [signature.args for signature in task_signatures] == [(publ_uuid,)] * len(tasks)
+    assert all('uuid' not in signature.kwargs for signature in task_signatures)
+    task_chain = chain(*task_signatures)
     task_result = task_chain()
 
     results = [task_result]
@@ -135,5 +142,4 @@ def test_abortable_task_chain():
     assert results[1].state == results_copy[1].state == 'FAILURE'
     assert results[2].state == results_copy[2].state == 'FAILURE'
     with app.app_context():
-        layer = LayerMock(uuid=publ_uuid, layer_tuple=(workspace, layername))
         input_chunk.delete_layer(layer)

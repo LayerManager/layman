@@ -138,12 +138,12 @@ def post_layer(layer: Layer, task_options, start_async_at):
     sources = get_sources()
     call_modules_fn(sources, 'post_layer', [layer.workspace, layer.name], kwargs=task_options)
 
-    post_tasks = tasks_util.get_task_methods(get_layer_type_def(), layer.workspace, layer.name, task_options, start_async_at)
-    post_chain = tasks_util.get_chain_of_methods(layer.workspace, layer.name, post_tasks, task_options, 'layername')
+    post_tasks = tasks_util.get_task_methods(get_layer_type_def(), layer, task_options, start_async_at)
+    post_chain = tasks_util.get_chain_of_methods(layer, post_tasks, task_options, 'layername')
     # res = post_chain.apply_async()
     res = post_chain()
 
-    celery_util.set_publication_chain_info(layer, post_tasks, res)
+    celery_util.set_publication_chain_info(layer.uuid, post_tasks, res)
 
 
 def patch_layer(layer: Layer, task_options, stop_sync_at, start_async_at, *, only_sync=False):
@@ -153,14 +153,13 @@ def patch_layer(layer: Layer, task_options, stop_sync_at, start_async_at, *, onl
     sources = sources[:stop_idx]
     call_modules_fn(sources, 'patch_layer', [layer], kwargs=task_options)
     if not only_sync:
-        patch_tasks = tasks_util.get_task_methods(get_layer_type_def(), layer.workspace, layer.name, task_options,
-                                                  start_async_at)
-        patch_chain = tasks_util.get_chain_of_methods(layer.workspace, layer.name, patch_tasks, task_options,
+        patch_tasks = tasks_util.get_task_methods(get_layer_type_def(), layer, task_options, start_async_at)
+        patch_chain = tasks_util.get_chain_of_methods(layer, patch_tasks, task_options,
                                                       'layername')
         # res = patch_chain.apply_async()
         res = patch_chain()
 
-        celery_util.set_publication_chain_info(layer, patch_tasks, res)
+        celery_util.set_publication_chain_info(layer.uuid, patch_tasks, res)
 
 
 TASKS_TO_LAYER_INFO_KEYS = {
@@ -175,8 +174,8 @@ TASKS_TO_LAYER_INFO_KEYS = {
 }
 
 
-def patch_after_feature_change(workspace, layername, **kwargs):
-    layman_util.patch_after_feature_change(workspace, LAYER_TYPE, layername, **kwargs)
+def patch_after_feature_change(uuid, **kwargs):
+    layman_util.patch_after_feature_change(uuid, **kwargs)
 
 
 def delete_layer(layer: Layer, source=None, http_method='delete', *, x_forwarded_items=None):
@@ -200,7 +199,7 @@ def delete_layer(layer: Layer, source=None, http_method='delete', *, x_forwarded
             delete_info.update(partial_result)
     if source is None:
         delete_publication_uuid_from_redis(layer.workspace, layer.type, layer.name, layer.uuid)
-    celery_util.delete_publication(layer)
+    celery_util.delete_publication(layer.uuid)
     result = {
         **delete_info,
         'url': url_for('rest_layer.get', uuid=layer.uuid, x_forwarded_items=x_forwarded_items),

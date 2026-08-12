@@ -17,13 +17,12 @@ headers_json = gs_util.headers_json
 )
 def patch_after_feature_change(
         self,
-        workspace,
-        layer,
+        uuid,
 ):
     if self.is_aborted():
         raise AbortedException
 
-    layer_data = Layer(layer_tuple=(workspace, layer))
+    layer_data = Layer(uuid=uuid)
 
     if layer_data.geodata_type == settings.GEODATA_TYPE_VECTOR:
         bbox = get_layer_bbox(layer=layer_data)
