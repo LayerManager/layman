@@ -103,4 +103,4 @@ def compress_files(filepaths, *, compress_settings, output_dir):
 def abort_publication_chain(workspace, publ_type, name):
     with app.app_context():
         publication = Publication.create(publ_tuple=(workspace, publ_type, name))
-        celery.abort_publication_chain(publication)
+        celery.abort_publication_chain(publication.uuid)

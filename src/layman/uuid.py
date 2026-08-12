@@ -104,23 +104,9 @@ def get_publication_uuid_from_redis(workspace, publication_type, publication_nam
     )
 
 
-def get_uuid_metadata_from_redis(uuid_str):
-    return settings.LAYMAN_REDIS.hgetall(get_uuid_metadata_key(uuid_str))
-
-
 def get_publication_from_redis(workspace, publication_type, publication_name):
     uuid = get_publication_uuid_from_redis(workspace, publication_type, publication_name)
     return _publication_from_identity(uuid, workspace, publication_type, publication_name)
-
-
-def get_publication_from_redis_by_uuid(uuid):
-    metadata = get_uuid_metadata_from_redis(uuid)
-    return _publication_from_identity(
-        uuid,
-        metadata['workspace'],
-        metadata['publication_type'],
-        metadata['publication_name'],
-    )
 
 
 def _publication_from_identity(uuid, workspace, publication_type, publication_name):
@@ -196,7 +182,7 @@ def check_redis_consistency(expected_publ_num_by_type=None):
             publ_type_name,
             pubname,
         )
-        chain_info = celery_util.get_publication_chain_info(publication)
+        chain_info = celery_util.get_publication_chain_info(publication.uuid)
         is_ready = celery_util.is_chain_ready(chain_info)
         assert chain_info['finished'] is is_ready
         assert (next((

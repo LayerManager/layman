@@ -5,12 +5,12 @@ from celery import chain
 from layman import settings
 
 
-def get_task_chain(publ_type, workspace, publ_name, task_options, start_at, publ_param_name):
-    methods = get_task_methods(publ_type, workspace, publ_name, task_options, start_at)
-    return get_chain_of_methods(workspace, publ_name, methods, task_options, publ_param_name)
+def get_task_chain(publ_type, publication, task_options, start_at, publ_param_name):
+    methods = get_task_methods(publ_type, publication, task_options, start_at)
+    return get_chain_of_methods(publication, methods, task_options, publ_param_name)
 
 
-def get_task_methods(publ_type, workspace, publ_name, task_options, start_at):
+def get_task_methods(publ_type, publication, task_options, start_at):
     if start_at is None:
         return []
     internal_sources = list(publ_type['internal_sources'].keys())
@@ -28,7 +28,7 @@ def get_task_methods(publ_type, workspace, publ_name, task_options, start_at):
         if task_method is None:
             continue
         needed_method = getattr(task_module, f"{method_name}_needed")
-        if needed_method(workspace, publ_name, task_options):
+        if needed_method(publication, task_options):
             task_methods.append(task_method)
     return task_methods
 
@@ -49,18 +49,18 @@ def get_source_task_methods(publ_type, method_name):
     return task_methods
 
 
-def get_chain_of_methods(workspace, publ_name, task_methods, task_options, publ_param_name, *, queue=None):
+def get_chain_of_methods(publication, task_methods, task_options, publ_param_name, *, queue=None):
     return chain(*[
-        get_task_signature(workspace, publ_name, t, task_options, publ_param_name, queue=queue)
+        get_task_signature(publication, t, task_options, publ_param_name, queue=queue)
         for t in task_methods
     ])
 
 
-def get_task_signature(workspace, publ_name, task, task_options, publ_param_name, *, queue=None):
+def get_task_signature(publication, task, task_options, publ_param_name, *, queue=None):
     param_names = [
         pname
         for pname in inspect.signature(task).parameters.keys()
-        if pname not in ['username', publ_param_name]
+        if pname not in ['uuid', 'username', publ_param_name]
     ]
     task_opts = {
         key: value
@@ -69,7 +69,7 @@ def get_task_signature(workspace, publ_name, task, task_options, publ_param_name
     }
     queue = queue or settings.LAYMAN_CELERY_QUEUE
     return task.signature(
-        (workspace, publ_name),
+        (publication.uuid,),
         task_opts,
         queue=queue,
         immutable=True,

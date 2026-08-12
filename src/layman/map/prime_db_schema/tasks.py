@@ -6,6 +6,7 @@ from layman.common import empty_method_returns_true
 from layman.util import XForwardedClass
 from .util import ensure_internal_layers
 from .. import util, MAP_TYPE
+from ..map_class import Map
 from ...common.prime_db_schema.publications import set_bbox
 
 logger = get_task_logger(__name__)
@@ -21,10 +22,8 @@ refresh_file_data_needed = empty_method_returns_true
 )
 def refresh_file_data(
         self,
-        workspace,
-        mapname,
-        x_forwarded_headers,
         uuid,
+        x_forwarded_headers,
 ):
     if self.is_aborted():
         raise AbortedException
@@ -32,11 +31,12 @@ def refresh_file_data(
     mapjson = util.get_map_file_json(uuid, adjust_urls=False)
     native_bbox = util.get_native_bbox_from_json(mapjson)
     crs = util.get_crs_from_json(mapjson)
-    set_bbox(workspace, MAP_TYPE, mapname, native_bbox, crs, )
+    map = Map(uuid=uuid)
+    set_bbox(map.workspace, MAP_TYPE, map.name, native_bbox, crs)
 
     x_forwarded_items = XForwardedClass.from_headers(x_forwarded_headers)
     map_layers = util.get_layers_from_json(mapjson, x_forwarded_items=x_forwarded_items)
-    ensure_internal_layers(workspace, mapname, map_layers)
+    ensure_internal_layers(map.workspace, map.name, map_layers)
 
     if self.is_aborted():
         raise AbortedException

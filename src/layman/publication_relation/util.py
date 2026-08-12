@@ -1,16 +1,13 @@
-def update_related_publications_after_change(workspace, publication_type, publication):
+def update_related_publications_after_change(publication):
     from layman.layer import LAYER_TYPE
     from layman.map import MAP_TYPE
-    from layman.layer.layer_class import Layer
-    from layman.util import patch_after_feature_change, get_publication_info
+    from layman.util import patch_after_feature_change, get_publication_uuid
 
-    if publication_type == LAYER_TYPE:
-        maps = get_publication_info(
-            Layer(layer_tuple=(workspace, publication), load=False),
-            context={'keys': ['used_in_maps']},
-        )['used_in_maps']
+    if publication.type == LAYER_TYPE:
+        maps = publication.info['used_in_maps']
         for map_obj in maps:
-            patch_after_feature_change(map_obj['workspace'], MAP_TYPE, map_obj['name'])
+            map_uuid = get_publication_uuid(map_obj['workspace'], MAP_TYPE, map_obj['name'])
+            patch_after_feature_change(map_uuid)
 
 
 def check_no_internal_workspace_name_layer(map_json, *, x_forwarded_items):

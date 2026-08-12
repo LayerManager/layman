@@ -59,19 +59,11 @@ def on_task_prerun(**kwargs):
     from layman.util import get_publication_types
     from layman.celery import task_prerun
     with app.app_context():
-        publication_type = next(
-            (
-                v['type'] for k, v in get_publication_types().items()
-                if task_name.startswith(k)
-            ),
-            None
-        )
-        if publication_type is None:
+        if not any(task_name.startswith(key) for key in get_publication_types()):
             return
-        workspace = kwargs['args'][0]
-        publication_name = kwargs['args'][1]
+        uuid = kwargs['args'][0]
         task_id = kwargs['task_id']
-        task_prerun(workspace, publication_type, publication_name, task_id, task_name)
+        task_prerun(uuid, task_id, task_name)
 
 
 @signals.task_postrun.connect
@@ -81,16 +73,8 @@ def on_task_postrun(**kwargs):
     from layman.util import get_publication_types
     from layman.celery import task_postrun
     with app.app_context():
-        publication_type = next(
-            (
-                v['type'] for k, v in get_publication_types().items()
-                if task_name.startswith(k)
-            ),
-            None
-        )
-        if publication_type is None:
+        if not any(task_name.startswith(key) for key in get_publication_types()):
             return
-        workspace = kwargs['args'][0]
-        publication_name = kwargs['args'][1]
+        uuid = kwargs['args'][0]
         task_id = kwargs['task_id']
-        task_postrun(workspace, publication_type, publication_name, task_id, task_name, kwargs['state'])
+        task_postrun(uuid, task_id, task_name, kwargs['state'])

@@ -20,10 +20,8 @@ refresh_wms_needed = empty_method_returns_true
 # pylint: disable=unused-argument
 def refresh_wms(
         self,
-        workspace,
-        layername,
-        store_in_geoserver,
         uuid,
+        store_in_geoserver,
 ):
     if self.is_aborted():
         raise AbortedException

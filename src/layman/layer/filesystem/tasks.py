@@ -23,7 +23,7 @@ refresh_gdal_needed = empty_method_returns_true
     bind=True,
     base=celery_app.AbortableTask
 )
-def refresh_input_chunk(self, workspace, layername, *, uuid, check_crs=True, overview_resampling='',
+def refresh_input_chunk(self, uuid, *, check_crs=True, overview_resampling='',
                         enable_more_main_files=False, time_regex=None, slugified_time_regex=None,
                         name_input_file_by_layer=None):
     assert (time_regex is None) == (slugified_time_regex is None)
@@ -38,15 +38,14 @@ def refresh_input_chunk(self, workspace, layername, *, uuid, check_crs=True, ove
     logger.debug(f'chunk_info {str(chunk_info)}')
     while not chunk_info[0]:
         if time.time() - last_change > settings.UPLOAD_MAX_INACTIVITY_TIME:
-            logger.info(
-                f'UPLOAD_MAX_INACTIVITY_TIME reached {workspace}.{layername}')
+            logger.info(f'UPLOAD_MAX_INACTIVITY_TIME reached {layer.workspace}.{layer.name}')
             input_file.delete_layer(layer)
             raise LaymanError(22)
         time.sleep(0.5)
         if self.is_aborted():
-            logger.info(f'Aborting for layer {workspace}.{layername}')
+            logger.info(f'Aborting for layer {layer.workspace}.{layer.name}')
             input_file.delete_layer(layer)
-            logger.info(f'Aborted for layer {workspace}.{layername}')
+            logger.info(f'Aborted for layer {layer.workspace}.{layer.name}')
             raise AbortedException
 
         chunk_info = input_chunk.layer_file_chunk_info(uuid)
@@ -56,7 +55,7 @@ def refresh_input_chunk(self, workspace, layername, *, uuid, check_crs=True, ove
             last_change = time.time()
             num_files_saved = chunk_info[1]
             num_chunks_saved = chunk_info[2]
-    logger.info(f'Layer chunks uploaded {workspace}.{layername}')
+    logger.info(f'Layer chunks uploaded {layer.workspace}.{layer.name}')
 
     input_files = input_file.get_layer_input_files(uuid)
     skip_timeseries_filename_checks = not input_files.is_one_archive
@@ -66,7 +65,7 @@ def refresh_input_chunk(self, workspace, layername, *, uuid, check_crs=True, ove
                                name_input_file_by_layer=name_input_file_by_layer,
                                skip_timeseries_filename_checks=skip_timeseries_filename_checks)
 
-    publ_info = layman_util.get_publication_info(Layer(layer_tuple=(workspace, layername), load=False), context={'keys': ['file']})
+    publ_info = layman_util.get_publication_info(layer, context={'keys': ['file']})
     main_filepaths = list(path['gdal'] for path in publ_info['_file']['paths'].values())
     input_file.check_main_files(main_filepaths, check_crs=check_crs, overview_resampling=overview_resampling)
 
@@ -74,7 +73,7 @@ def refresh_input_chunk(self, workspace, layername, *, uuid, check_crs=True, ove
     if enable_more_main_files and file_type == settings.GEODATA_TYPE_VECTOR:
         raise LaymanError(48, f'Vector layers are not allowed to be combined with `time_regex` parameter.')
 
-    style_type_for_check = layman_util.get_publication_info(Layer(layer_tuple=(workspace, layername), load=False), context={'keys': ['style_type']})['_style_type']
+    style_type_for_check = layman_util.get_publication_info(layer, context={'keys': ['style_type']})['_style_type']
     if file_type == settings.GEODATA_TYPE_RASTER and style_type_for_check == 'qml':
         raise LaymanError(48, f'Raster layers are not allowed to have QML style.')
 
@@ -84,8 +83,7 @@ def refresh_input_chunk(self, workspace, layername, *, uuid, check_crs=True, ove
     bind=True,
     base=celery_app.AbortableTask
 )
-def refresh_gdal(self, workspace, layername,
-                 uuid=None,
+def refresh_gdal(self, uuid,
                  crs_id=None,
                  overview_resampling=None,
                  name_normalized_tif_by_layer=True,
@@ -93,9 +91,9 @@ def refresh_gdal(self, workspace, layername,
                  ):
     def finish_gdal_process(process):
         if self.is_aborted():
-            logger.info(f'terminating GDAL process workspace.layer={workspace}.{layername}')
+            logger.info(f'terminating GDAL process workspace.layer={layer.workspace}.{layer.name}')
             process.terminate()
-            logger.info(f'terminated GDAL process workspace.layer={workspace}.{layername}')
+            logger.info(f'terminated GDAL process workspace.layer={layer.workspace}.{layer.name}')
             gdal.delete_layer(layer)
             raise AbortedException
         return_code = process.poll()
@@ -173,7 +171,7 @@ def refresh_gdal(self, workspace, layername,
     base=celery_app.AbortableTask
 )
 # pylint: disable=unused-argument
-def refresh_thumbnail(self, workspace, layername, *, uuid):
+def refresh_thumbnail(self, uuid):
     if self.is_aborted():
         raise AbortedException
     layer = Layer(uuid=uuid)

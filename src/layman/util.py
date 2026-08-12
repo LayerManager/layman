@@ -539,7 +539,7 @@ def delete_workspace_publication(workspace, publication_type, publication_name, 
         abort_publication_chain(publication)
         delete_info = delete_publication_fn(publication, x_forwarded_items=x_forwarded_items)
         if is_publication_chain_ready(publication):
-            redis.unlock_publication(publication)
+            redis.unlock_publication(publication.uuid)
         result = {
             'name': delete_info["name"],
             'title': delete_info["title"],
@@ -550,9 +550,9 @@ def delete_workspace_publication(workspace, publication_type, publication_name, 
     except Exception as exc:
         try:
             if is_publication_chain_ready(publication):
-                redis.unlock_publication(publication)
+                redis.unlock_publication(publication.uuid)
         finally:
-            redis.unlock_publication(publication)
+            redis.unlock_publication(publication.uuid)
         raise exc
     return result
 
@@ -563,13 +563,13 @@ def patch_publication(publication: Publication, patch_publication_fn, task_optio
     try:
         patch_publication_fn(publication, task_options=task_options, **patch_options)
         if is_publication_chain_ready(publication):
-            redis.unlock_publication(publication)
+            redis.unlock_publication(publication.uuid)
     except Exception as exc:
         try:
             if is_publication_chain_ready(publication):
-                redis.unlock_publication(publication)
+                redis.unlock_publication(publication.uuid)
         finally:
-            redis.unlock_publication(publication)
+            redis.unlock_publication(publication.uuid)
         raise exc
 
 
@@ -597,27 +597,27 @@ def delete_publications(workspace,
     return jsonify(infos)
 
 
-def patch_after_feature_change(workspace, publication_type, publication_name, *, queue=None, **kwargs):
-    publication = Publication.create(publ_tuple=(workspace, publication_type, publication_name))
+def patch_after_feature_change(uuid, *, queue=None, **kwargs):
+    publication = Publication.create(publ_tuple=_get_publication_by_uuid(uuid))
     try:
         redis.create_lock(publication, common.PUBLICATION_LOCK_FEATURE_CHANGE)
     except LaymanError as exc:
         if exc.code == 49 and exc.private_data.get('can_run_later', False):
-            celery_util.push_step_to_run_after_chain(publication, 'layman.util::patch_after_feature_change')
+            celery_util.push_step_to_run_after_chain(publication.uuid, 'layman.util::patch_after_feature_change')
             return
         raise exc
-    task_methods = tasks_util.get_source_task_methods(get_publication_types()[publication_type], 'patch_after_feature_change')
-    patch_chain = tasks_util.get_chain_of_methods(workspace, publication_name, task_methods, kwargs, 'layername', queue=queue)
+    task_methods = tasks_util.get_source_task_methods(get_publication_types()[publication.type], 'patch_after_feature_change')
+    patch_chain = tasks_util.get_chain_of_methods(publication, task_methods, kwargs, 'layername', queue=queue)
     res = patch_chain()
-    celery_util.set_publication_chain_info(publication, task_methods, res)
+    celery_util.set_publication_chain_info(publication.uuid, task_methods, res)
 
 
 def get_publication_chain(publication: Publication):
-    return celery_util.get_publication_chain_info(publication)
+    return celery_util.get_publication_chain_info(publication.uuid)
 
 
 def abort_publication_chain(publication: Publication):
-    celery_util.abort_publication_chain(publication)
+    celery_util.abort_publication_chain(publication.uuid)
 
 
 def is_publication_chain_ready(publication: Publication):
@@ -626,8 +626,8 @@ def is_publication_chain_ready(publication: Publication):
 
 
 def is_publication_updating(publication: Publication):
-    chain_info = celery_util.get_publication_chain_info(publication)
-    current_lock = redis.get_publication_lock(publication)
+    chain_info = celery_util.get_publication_chain_info(publication.uuid)
+    current_lock = redis.get_publication_lock(publication.uuid)
 
     return bool((chain_info and not celery_util.is_chain_ready(chain_info)) or current_lock)
 
@@ -767,10 +767,10 @@ def get_complete_publication_info(publication: Publication, *, x_forwarded_items
     return complete_info
 
 
-def get_publication_writer(workspace, publication_type, publication_name):
+def get_publication_writer(uuid):
     from layman.authz import is_user
-    info = get_publication_info(
-        _layer_or_map(workspace, publication_type, publication_name),
+    info = get_publication_info_by_uuid(
+        uuid,
         context={'keys': ['access_rights']},
     )
     return next((

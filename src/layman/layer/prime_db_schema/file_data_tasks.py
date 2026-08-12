@@ -17,13 +17,13 @@ logger = get_task_logger(__name__)
 )
 def patch_after_feature_change(
         self,
-        username,
-        layername,
+        uuid,
 ):
     if self.is_aborted():
         raise AbortedException
 
-    info = layman_util.get_publication_info(Layer(layer_tuple=(username, layername), load=False),
+    layer = Layer(uuid=uuid)
+    info = layman_util.get_publication_info(layer,
                                             context={'keys': ['geodata_type', 'native_crs', 'table_uri']})
     geodata_type = info['geodata_type']
     crs = info['native_crs']
@@ -35,7 +35,7 @@ def patch_after_feature_change(
     if self.is_aborted():
         raise AbortedException
 
-    set_bbox(username, LAYER_TYPE, layername, bbox, crs)
+    set_bbox(layer.workspace, LAYER_TYPE, layer.name, bbox, crs)
 
     if self.is_aborted():
         raise AbortedException
