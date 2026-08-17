@@ -35,13 +35,12 @@ def patch_map(map: Map,
     pubs_util.update_publication(map.workspace, db_info, is_part_of_user_delete)
 
 
-def pre_publication_action_check(workspace,
-                                 layername,
+def pre_publication_action_check(map: Map,
                                  actor_name,
                                  access_rights=None,
                                  ):
-    db_info = {"name": layername,
-               "publ_type_name": MAP_TYPE,
+    db_info = {"name": map.name,
+               "publ_type_name": map.type,
                "access_rights": access_rights,
                "actor_name": actor_name,
                }
@@ -49,30 +48,28 @@ def pre_publication_action_check(workspace,
         old_info = None
         for type in ['read', 'write']:
             if not access_rights.get(type):
-                old_info = old_info or get_map_info(workspace, layername)
+                old_info = old_info or get_map_info(map.workspace, map.name)
                 access_rights[type + '_old'] = old_info['access_rights'][type]
-        pubs_util.check_publication_info(workspace, db_info)
+        pubs_util.check_publication_info(map.workspace, db_info)
 
 
-def post_map(workspace,
-             mapname,
-             uuid,
+def post_map(map: Map,
              title,
              description,
              access_rights,
              actor_name,
              ):
     # store into Layman DB
-    db_info = {"name": mapname,
+    db_info = {"name": map.name,
                "title": title,
                "description": description,
-               "publ_type_name": MAP_TYPE,
-               "uuid": uuid,
+               "publ_type_name": map.type,
+               "uuid": map.uuid,
                "access_rights": access_rights,
                "actor_name": actor_name,
                'image_mosaic': False,
                }
-    pubs_util.insert_publication(workspace, db_info)
+    pubs_util.insert_publication(map.workspace, db_info)
 
 
 def delete_map(map: Map):

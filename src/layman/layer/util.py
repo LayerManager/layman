@@ -130,13 +130,13 @@ def get_complete_layer_info(layer: Layer, *, x_forwarded_items=None):
 def pre_publication_action_check(layer: Layer, task_options):
     # sync processing
     sources = get_sources()
-    call_modules_fn(sources, 'pre_publication_action_check', [layer.workspace, layer.name], kwargs=task_options)
+    call_modules_fn(sources, 'pre_publication_action_check', [layer], kwargs=task_options)
 
 
 def post_layer(layer: Layer, task_options, start_async_at):
     # sync processing
     sources = get_sources()
-    call_modules_fn(sources, 'post_layer', [layer.workspace, layer.name], kwargs=task_options)
+    call_modules_fn(sources, 'post_layer', [layer], kwargs=task_options)
 
     post_tasks = tasks_util.get_task_methods(get_layer_type_def(), layer, task_options, start_async_at)
     post_chain = tasks_util.get_chain_of_methods(layer, post_tasks, task_options, 'layername')

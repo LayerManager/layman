@@ -93,13 +93,13 @@ def get_map_info(map: Map, context=None):
 def pre_publication_action_check(map: Map, task_options):
     # sync processing
     sources = get_sources()
-    call_modules_fn(sources, 'pre_publication_action_check', [map.workspace, map.name], kwargs=task_options)
+    call_modules_fn(sources, 'pre_publication_action_check', [map], kwargs=task_options)
 
 
 def post_map(map: Map, task_options, start_at):
     # sync processing
     sources = get_sources()
-    call_modules_fn(sources, 'post_map', [map.workspace, map.name], kwargs=task_options)
+    call_modules_fn(sources, 'post_map', [map], kwargs=task_options)
 
     # async processing
     post_tasks = tasks_util.get_task_methods(get_map_type_def(), map, task_options, start_at)

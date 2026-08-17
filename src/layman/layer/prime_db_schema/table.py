@@ -55,13 +55,12 @@ def patch_layer(layer: Layer,
     pubs_util.update_publication(layer.workspace, db_info, is_part_of_user_delete)
 
 
-def pre_publication_action_check(workspace,
-                                 layername,
+def pre_publication_action_check(layer: Layer,
                                  actor_name,
                                  access_rights=None,
                                  ):
-    db_info = {"name": layername,
-               "publ_type_name": LAYER_TYPE,
+    db_info = {"name": layer.name,
+               "publ_type_name": layer.type,
                "access_rights": access_rights,
                "actor_name": actor_name,
                }
@@ -69,28 +68,26 @@ def pre_publication_action_check(workspace,
         old_info = None
         for type in ['read', 'write']:
             if not access_rights.get(type):
-                old_info = old_info or get_layer_info(workspace, layername)
+                old_info = old_info or get_layer_info(layer.workspace, layer.name)
                 access_rights[type + '_old'] = old_info['access_rights'][type]
-        pubs_util.check_publication_info(workspace, db_info)
+        pubs_util.check_publication_info(layer.workspace, db_info)
 
 
-def post_layer(workspace,
-               layername,
+def post_layer(layer: Layer,
                access_rights,
                title,
                description,
-               uuid,
                actor_name,
                geodata_type,
                image_mosaic,
                external_table_uri,
                style_type=None,
                ):
-    db_info = {"name": layername,
+    db_info = {"name": layer.name,
                "title": title,
                "description": description,
-               "publ_type_name": LAYER_TYPE,
-               "uuid": uuid,
+               "publ_type_name": layer.type,
+               "uuid": layer.uuid,
                "access_rights": access_rights,
                "actor_name": actor_name,
                "geodata_type": geodata_type,
@@ -99,7 +96,7 @@ def post_layer(workspace,
                'external_table_uri': external_table_uri,
                'wfs_wms_status': settings.EnumWfsWmsStatus.PREPARING.value,
                }
-    pubs_util.insert_publication(workspace, db_info)
+    pubs_util.insert_publication(layer.workspace, db_info)
 
 
 def get_bbox_sphere_size(workspace, layername):

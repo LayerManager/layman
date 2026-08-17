@@ -110,12 +110,11 @@ def unquote_urls(map_json):
     return map_json
 
 
-# pylint: disable=unused-argument
-def post_map(workspace, mapname, uuid, description, title):
-    map_file_path = get_map_file(uuid)
+def post_map(map: Map, description, title):
+    map_file_path = get_map_file(map.uuid)
     with open(map_file_path, 'r', encoding="utf-8") as map_file:
         map_json = json.load(map_file)
-    map_json['name'] = mapname
+    map_json['name'] = map.name
     map_json['title'] = title
     map_json['abstract'] = description
     with open(map_file_path, 'w', encoding="utf-8") as map_file:
@@ -123,4 +122,4 @@ def post_map(workspace, mapname, uuid, description, title):
 
 
 def patch_map(map: Map):
-    post_map(map.workspace, map.name, map.uuid, map.description, map.title)
+    post_map(map, map.description, map.title)

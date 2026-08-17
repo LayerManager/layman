@@ -1,7 +1,6 @@
 from layman import patch_mode, settings
 from layman.common import empty_method, empty_method_returns_dict
 from layman.common.prime_db_schema import publications
-from .. import LAYER_TYPE
 from ..layer_class import Layer
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
@@ -21,5 +20,5 @@ def patch_layer(layer: Layer):
     publications.set_geodata_type(layer.workspace, layer.type, layer.name, layer.geodata_type)
 
 
-def post_layer(workspace, layername, *, geodata_type):
-    publications.set_geodata_type(workspace, LAYER_TYPE, layername, geodata_type, )
+def post_layer(layer: Layer, *, geodata_type):
+    publications.set_geodata_type(layer.workspace, layer.type, layer.name, geodata_type, )
