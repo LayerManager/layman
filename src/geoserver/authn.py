@@ -48,7 +48,7 @@ def get_security(data_dir):
 
 def get_security_filter_group(data_dir, name):
     security_xml = get_security(data_dir)
-    filter_group_el = security_xml.find(f"//filters[@name='{name}']")
+    filter_group_el = security_xml.find(f".//filters[@name='{name}']")
     return filter_group_el
 
 
@@ -68,7 +68,7 @@ def create_security_filter_group(data_dir, name, filter_names):
     for filter_name in filter_names:
         new_filter = ET.SubElement(new_chain, 'filter')
         new_filter.text = filter_name
-    filter_chain = security_xml.find(f"//filterChain")
+    filter_chain = security_xml.find(f".//filterChain")
     filter_chain.insert(0, new_chain)
     security_path = os.path.join(data_dir, 'security/config.xml')
     security_xml.write(security_path)
@@ -78,7 +78,7 @@ def remove_security_filter_groups(data_dir, names):
     security_xml = get_security(data_dir)
 
     for name in names:
-        filter = security_xml.find(f'//filterChain/filters[@name="{name}"]')
+        filter = security_xml.find(f'.//filterChain/filters[@name="{name}"]')
         if filter:
             logger.info(f"  Deleting Authentication Filter groups '{name}'")
             filter.getparent().remove(filter)
