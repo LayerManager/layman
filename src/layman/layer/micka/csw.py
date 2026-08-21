@@ -24,8 +24,8 @@ PATCH_MODE = patch_mode.NO_DELETE
 post_layer = empty_method
 
 
-def get_layer_info(workspace, layername, *, x_forwarded_items=None):
-    layer = Layer(layer_tuple=(workspace, layername))
+def get_layer_info(uuid, *, x_forwarded_items=None):
+    layer = Layer(uuid=uuid, load=False)
     try:
         csw = common_util.create_csw()
         if not layer or csw is None:
@@ -146,7 +146,7 @@ def get_template_path_and_values(publication: Layer, *, http_method):
         wfs_url = wfs.get_wfs_url(external_url=True)
     elif geodata_type == settings.GEODATA_TYPE_RASTER:
         languages = []
-        bbox_sphere_size = prime_db_table.get_bbox_sphere_size(publication.workspace, publication.name)
+        bbox_sphere_size = prime_db_table.get_bbox_sphere_size(publication)
         distance_value = gdal.get_normalized_ground_sample_distance_in_m(publication.uuid, bbox_size=bbox_sphere_size)
         spatial_resolution = {
             'ground_sample_distance': {

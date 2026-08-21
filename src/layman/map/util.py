@@ -383,7 +383,9 @@ def get_map_file_json(publ_uuid, *, adjust_urls=True, x_forwarded_items=None):
 
     if adjust_urls:
         input_file.unquote_urls(map_json)
-        map_layers = layman_util.get_publication_info_by_uuid(publ_uuid, context={'keys': ['map_layers']})['_map_layers']
+        map_layers = layman_util.get_publication_info(
+            Map(uuid=publ_uuid, load=False), context={'keys': ['map_layers']},
+        )['_map_layers']
         ml_indices = {ml['index'] for ml in map_layers}
 
         for ml_idx in ml_indices:

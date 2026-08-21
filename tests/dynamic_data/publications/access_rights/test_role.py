@@ -83,7 +83,7 @@ class TestPublication(base_test.TestSingleRestPublication):
             if publication.type == process_client.LAYER_TYPE:
                 with app.app_context():
                     internal_info = layman_util.get_publication_info(
-                        Layer(layer_tuple=(publication.workspace, publication.name), load=False),
+                        Layer(uuid=publication.uuid, load=False),
                         {'keys': ['geodata_type', 'wms', ]},
                     )
 

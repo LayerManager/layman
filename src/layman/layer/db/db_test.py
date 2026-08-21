@@ -40,7 +40,7 @@ def post_layer(workspace, layername, file_path):
 
     with layman.app_context():
         table_util.delete_layer(layer=layer)
-        publications.delete_publication(workspace, LAYER_TYPE, layername)
+        publications.delete_publication(layer.uuid)
 
 
 @pytest.fixture(scope="function")
@@ -177,7 +177,7 @@ def test_abort_import_layer_vector_file():
     return_code = abort_layer_import()
     assert return_code != 0
     with layman.app_context():
-        publications.delete_publication(workspace, LAYER_TYPE, layername)
+        publications.delete_publication(publ_uuid)
         layerdir = get_layer_dir(publ_uuid)
     shutil.rmtree(layerdir)
 

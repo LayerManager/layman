@@ -52,7 +52,7 @@ class TestGetPublicationInfos:
         yield
         if request.node.session.testsfailed == 0:
             with app.app_context():
-                publications.delete_publication(self.workspace, self.publication_type, self.name)
+                publications.delete_publication(self.uuid)
                 workspaces.delete_workspace(self.workspace)
 
     @pytest.mark.parametrize("query_params, expected_publications", [
@@ -65,6 +65,9 @@ class TestGetPublicationInfos:
         assert len(response) == len(expected_publications), f'{response=}\n{expected_publications=}'
         for idx, pub_key in enumerate(response.keys()):
             assert pub_key == expected_publications[idx], f'{idx=}\n{pub_key=}, {expected_publications[idx]=}\n\n{response=}\n{expected_publications=}'
+
+    def test_get_publication_info_without_uuid(self):
+        assert publications.get_publication_info(None) is None
 
 
 class TestOnlyValidUserNames:
@@ -460,7 +463,7 @@ class TestInsertRights:
                              exp_read_rights,
                              exp_write_rights,
                              )
-        publications.delete_publication(username, publication_info["publ_type_name"], publication_info["name"])
+        publications.delete_publication(publication_info["uuid"])
 
 
 class TestUpdateRights:
@@ -495,8 +498,7 @@ class TestUpdateRights:
         yield
         if request.node.session.testsfailed == 0:
             with app.app_context():
-                publications.delete_publication(self.username, self.publication_insert_info["publ_type_name"],
-                                                self.publication_insert_info["name"])
+                publications.delete_publication(self.publication_insert_info["uuid"])
                 delete_role(self.role1)
                 delete_role(self.role2)
                 users.delete_user(self.username)
@@ -566,7 +568,7 @@ class TestUpdateRights:
             publication_update_info["publ_type_name"] = publication_info_original["publ_type_name"]
         if not publication_update_info.get("name"):
             publication_update_info["name"] = publication_info_original["name"]
-        publications.update_publication(username,
+        publications.update_publication(self.publication_insert_info["uuid"],
                                         publication_update_info,
                                         )
         assert_access_rights(username,
@@ -576,9 +578,8 @@ class TestUpdateRights:
                              exp_write_rights,
                              )
 
-    @pytest.mark.parametrize("username, pre_publication_update_info, publication_update_info", [
+    @pytest.mark.parametrize("pre_publication_update_info, publication_update_info", [
         pytest.param(
-            username,
             {},
             {"access_rights": {"read": {username2, },
                                "write": {username2, },
@@ -587,7 +588,6 @@ class TestUpdateRights:
             id='personal_without_owner',
         ),
         pytest.param(
-            username,
             {},
             {"access_rights": {"read": {username, },
                                },
@@ -595,7 +595,6 @@ class TestUpdateRights:
             id='personal_remove_editor_reading',
         ),
         pytest.param(
-            username,
             {"access_rights": {"read": {username, },
                                "write": {username, },
                                },
@@ -606,7 +605,6 @@ class TestUpdateRights:
             id='personal_add_only_writer',
         ),
         pytest.param(
-            username,
             {"access_rights": {"read": {username, },
                                "write": {username, },
                                },
@@ -617,12 +615,12 @@ class TestUpdateRights:
             id='personal_write_everyone',
         ),
     ])
-    def test_validation(self, username, pre_publication_update_info, publication_update_info):
+    def test_validation(self, pre_publication_update_info, publication_update_info):
         publication_info_original = self.publication_insert_info
         if pre_publication_update_info:
             pre_publication_update_info["publ_type_name"] = publication_info_original["publ_type_name"]
             pre_publication_update_info["name"] = publication_info_original["name"]
-            publications.update_publication(username,
+            publications.update_publication(self.publication_insert_info["uuid"],
                                             pre_publication_update_info,
                                             )
         if not publication_update_info.get("publ_type_name"):
@@ -630,7 +628,7 @@ class TestUpdateRights:
         if not publication_update_info.get("name"):
             publication_update_info["name"] = publication_info_original["name"]
         with pytest.raises(LaymanError) as exc_info:
-            publications.update_publication(username,
+            publications.update_publication(self.publication_insert_info["uuid"],
                                             publication_update_info,
                                             )
         assert exc_info.value.code == 43

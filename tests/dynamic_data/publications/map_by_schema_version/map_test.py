@@ -2,7 +2,7 @@ import json
 import os
 
 from layman import app
-from layman.util import get_publication_info
+from layman.util import get_publication_info, get_publication_uuid
 from layman.map.map_class import Map
 from test_tools import process_client
 from tests import EnumTestTypes, Publication4Test
@@ -69,7 +69,7 @@ class TestPublication(base_test.TestSingleRestPublication):
                    'X-Forwarded-Prefix': '/new-client-proxy',
                    }
 
-        uuid = TestPublication.publ_uuids.get(map)
+        uuid = TestPublication.get_publication_uuid(map)
         resp = process_client.get_map_file(map.type, uuid, headers=headers)
 
         with open(exp_file, encoding='utf-8') as file:
@@ -83,13 +83,14 @@ class TestPublication(base_test.TestSingleRestPublication):
         assert_util.is_publication_valid_and_complete(map)
 
         with app.app_context():
-            publ_info = get_publication_info(Map(map_tuple=(map.workspace, map.name), load=False),
+            map_uuid = get_publication_uuid(map.workspace, map.type, map.name)
+            publ_info = get_publication_info(Map(uuid=map_uuid, load=False),
                                              context={'keys': ['map_layers']})
 
         assert publ_info['_map_layers'] == [
             {'index': 1,
              'name': 'hranice',
-             'uuid': self.publ_uuids[LAYER_HRANICE],
+             'uuid': self.get_publication_uuid(LAYER_HRANICE),
              'workspace': self.workspace},
             {'index': 2,
              'name': None,

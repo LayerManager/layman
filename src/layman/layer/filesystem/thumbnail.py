@@ -3,10 +3,9 @@ import pathlib
 
 from geoserver import util as gs_util
 from layman import settings, LaymanError, patch_mode
-from layman.util import url_for, get_publication_info_by_uuid, get_publication_uuid
+from layman.util import url_for, get_publication_info
 from layman.common import empty_method, empty_method_returns_dict, bbox as bbox_util
 from . import util
-from .. import LAYER_TYPE
 from ..layer_class import Layer
 
 LAYER_SUBDIR = __name__.rsplit('.', maxsplit=1)[-1]
@@ -30,17 +29,12 @@ def ensure_layer_thumbnail_dir(publ_uuid):
     return thumbnail_dir
 
 
-def get_layer_info(workspace, layername, *, x_forwarded_items=None):
-    publ_uuid = get_publication_uuid(workspace, LAYER_TYPE, layername)
-    return get_layer_info_by_uuid(publ_uuid, x_forwarded_items=x_forwarded_items) if publ_uuid else {}
-
-
-def get_layer_info_by_uuid(publ_uuid, *, x_forwarded_items=None):
-    thumbnail_path = get_layer_thumbnail_path(publ_uuid)
+def get_layer_info(uuid, *, x_forwarded_items=None):
+    thumbnail_path = get_layer_thumbnail_path(uuid)
     if os.path.exists(thumbnail_path):
         return {
             'thumbnail': {
-                'url': url_for('rest_layer_thumbnail.get', uuid=publ_uuid,
+                'url': url_for('rest_layer_thumbnail.get', uuid=uuid,
                                x_forwarded_items=x_forwarded_items),
                 'path': os.path.relpath(thumbnail_path, settings.LAYMAN_DATA_DIR)
             },
@@ -64,7 +58,9 @@ def generate_layer_thumbnail(publ_uuid):
     headers = {
         settings.LAYMAN_GS_AUTHN_HTTP_HEADER_ATTRIBUTE: settings.LAYMAN_GS_USER,
     }
-    layer_info = get_publication_info_by_uuid(publ_uuid, context={'keys': ['wms', 'native_bounding_box', 'native_crs', ]})
+    layer_info = get_publication_info(
+        Layer(uuid=publ_uuid, load=False), context={'keys': ['wms', 'native_bounding_box', 'native_crs']},
+    )
     wms_url = layer_info['_wms']['url']
     native_bbox = layer_info['native_bounding_box']
     native_crs = layer_info['native_crs']

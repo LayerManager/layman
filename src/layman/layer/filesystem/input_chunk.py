@@ -11,8 +11,6 @@ from flask import current_app
 from layman import LaymanError
 from layman import settings, patch_mode
 from layman.common import empty_method, empty_method_returns_dict
-from layman.layer import LAYER_TYPE
-from layman.util import get_publication_uuid
 from . import util
 from . import input_file
 from ..layer_class import Layer
@@ -135,13 +133,8 @@ def get_info_json(publ_uuid):
     return result
 
 
-def get_layer_info(workspace, layername):
-    publ_uuid = get_publication_uuid(workspace, LAYER_TYPE, layername)
-    return get_layer_info_by_uuid(publ_uuid) if publ_uuid else {}
-
-
-def get_layer_info_by_uuid(publ_uuid):
-    info = get_info_json(publ_uuid)
+def get_layer_info(uuid):
+    info = get_info_json(uuid)
     result = {}
     if info:
         files_to_upload = info['files_to_upload']

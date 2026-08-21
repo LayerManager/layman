@@ -16,6 +16,7 @@ from geoserver import error as gs_error
 from layman import app, settings, util as layman_util
 from layman.layer.geoserver import wfs, wms, GeoserverIds
 from layman.http import LaymanError
+from layman.publication_class import Publication
 from test_tools.data import map as map_data
 from . import util
 from .util import url_for
@@ -185,7 +186,11 @@ def ensure_publication(publication_type,
                        ):
     headers = headers or {}
     with app.app_context():
-        pub_info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['workspace', 'name']})
+        publication = Publication.create(uuid=uuid, publ_type=publication_type, load=False)
+        pub_info = layman_util.get_publication_info(
+            publication,
+            context={'keys': ['workspace', 'name']},
+        )
     workspace = pub_info.get('_workspace')
     name = pub_info.get('name')
     response = get_publications_response(publication_type, workspace=workspace, headers=headers)

@@ -5,7 +5,7 @@ from layman import app
 from layman.common import REQUEST_METHOD_POST, REQUEST_METHOD_PATCH
 from layman.layer.layer_class import Layer
 from layman.map.map_class import Map
-from layman.util import get_publication_info
+from layman.util import get_publication_info, get_publication_uuid
 from test_tools import process_client
 from tests import EnumTestTypes, Publication4Test
 from tests.asserts.final import publication as asserts_publ
@@ -170,8 +170,11 @@ class TestPublication(base_test.TestSingleRestPublication):
 
     def assert_exp_map_layers(self, map, exp_map_layers, exp_operates_on, http_method, actor_name):
         with app.app_context():
-            publ_info = get_publication_info(Map(map_tuple=(map.workspace, map.name), load=False),
-                                             context={'keys': ['map_layers']})
+            map_uuid = get_publication_uuid(map.workspace, map.type, map.name)
+            publ_info = get_publication_info(
+                Map(uuid=map_uuid, load=False),
+                context={'keys': ['map_layers']},
+            ) if map_uuid else {}
         if exp_map_layers is None:
             assert not publ_info
             assert exp_operates_on is None
@@ -188,13 +191,13 @@ class TestPublication(base_test.TestSingleRestPublication):
 
             exp_operates_on = [
                 {
-                    "xlink:href": f"http://localhost:3080/csw?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID=m-{self.publ_uuids[layer]}#_m-{self.publ_uuids[layer]}",
+                    "xlink:href": f"http://localhost:3080/csw?SERVICE=CSW&VERSION=2.0.2&REQUEST=GetRecordById&OUTPUTSCHEMA=http://www.isotc211.org/2005/gmd&ID=m-{self.get_publication_uuid(layer)}#_m-{self.get_publication_uuid(layer)}",
                     "xlink:title": layer.name,
                 }
                 for layer in exp_operates_on
             ]
             with app.app_context():
-                prod_map = Map(map_tuple=(map.workspace, map.name))
+                prod_map = Map(uuid=self.get_publication_uuid(map))
             asserts_publ.metadata.correct_values_in_metadata(prod_map, http_method=http_method, actor_name=actor_name,
                                                              exp_values={
                                                                  'operates_on': exp_operates_on,
@@ -208,9 +211,10 @@ class TestPublication(base_test.TestSingleRestPublication):
             if layer in operates_on
         ])
         with app.app_context():
+            layer_uuid = get_publication_uuid(layer.workspace, layer.type, layer.name)
             found_layer_maps = [
                 (m['workspace'], m['name'])
-                for m in get_publication_info(Layer(layer_tuple=(layer.workspace, layer.name), load=False), context={'keys': ['used_in_maps']})['used_in_maps']
+                for m in get_publication_info(Layer(uuid=layer_uuid, load=False), context={'keys': ['used_in_maps']})['used_in_maps']
                 if m['workspace'] in workspaces_to_check
             ]
         assert found_layer_maps == exp_layer_maps
@@ -236,7 +240,7 @@ class TestPublication(base_test.TestSingleRestPublication):
         if rest_method.enum_item in [base_test_classes.RestMethodAll.POST, base_test_classes.RestMethodAll.PATCH]:
             assert_util.is_publication_valid_and_complete(map)
             with app.app_context():
-                publication = Map(map_tuple=(map.workspace, map.name))
+                publication = Map(uuid=self.get_publication_uuid(map))
             asserts_publ.metadata.correct_comparison_response_with_x_forwarded_headers(publication)
 
         exp = params['exp_after_rest_method']

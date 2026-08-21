@@ -5,9 +5,8 @@ from urllib.parse import unquote
 
 from layman.common import empty_method, empty_method_returns_dict
 from layman.common.filesystem import input_file as common
-from layman.map import MAP_TYPE
 from layman.map.map_class import Map
-from layman.util import url_for, get_publication_uuid
+from layman.util import url_for
 from layman import settings
 from . import util
 
@@ -38,14 +37,8 @@ def get_map_file(publ_uuid):
     return mapfile_path
 
 
-def get_map_info(workspace, mapname, *, x_forwarded_items=None):
-    publ_uuid = get_publication_uuid(workspace, MAP_TYPE, mapname)
-    return get_map_info_by_uuid(publ_uuid, x_forwarded_items=x_forwarded_items) \
-        if publ_uuid else {}
-
-
-def get_map_info_by_uuid(publ_uuid, *, x_forwarded_items=None):
-    map_file_path_absolute = get_map_file(publ_uuid)
+def get_map_info(uuid, *, x_forwarded_items=None):
+    map_file_path_absolute = get_map_file(uuid)
     if os.path.exists(map_file_path_absolute):
         with open(map_file_path_absolute, 'r', encoding="utf-8") as map_file:
             map_json = json.load(map_file)
@@ -53,13 +46,13 @@ def get_map_info_by_uuid(publ_uuid, *, x_forwarded_items=None):
         return {
             'file': {
                 'path': map_file_path,
-                'url': url_for('rest_map_file.get', uuid=publ_uuid, x_forwarded_items=x_forwarded_items),
+                'url': url_for('rest_map_file.get', uuid=uuid, x_forwarded_items=x_forwarded_items),
             },
             '_file': {
                 'paths': {
                     'absolute': [map_file_path_absolute],
                 },
-                'url': url_for('rest_map_file.get', uuid=publ_uuid, internal=True),
+                'url': url_for('rest_map_file.get', uuid=uuid, internal=True),
             },
             'title': map_json['title'] or '',
             'description': map_json['abstract'] or '',

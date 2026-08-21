@@ -1,13 +1,12 @@
 from db import util as db_util
 from layman import settings
-from layman.map.map_class import Map
-from layman.util import get_publication_info
+from layman.common.prime_db_schema import publications
 
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
 
 
-def ensure_internal_layers(workspace, mapname, layers):
-    map_info = get_publication_info(Map(map_tuple=(workspace, mapname), load=False), context={'keys': ['id', 'map_layers'], })
+def ensure_internal_layers(map_uuid, layers):
+    map_info = publications.get_publication_info(map_uuid)
     map_id = map_info['id']
     db_layers = {(layer_dict['uuid'], layer_dict['index'], ) for layer_dict in map_info['_map_layers']}
 
@@ -31,8 +30,8 @@ def ensure_internal_layers(workspace, mapname, layers):
         db_util.run_statement(delete_query, (map_id, layer_uuid, layer_index,))
 
 
-def delete_internal_layer_relations(workspace, mapname):
-    map_id = get_publication_info(Map(map_tuple=(workspace, mapname), load=False), context={'keys': ['id'], })['id']
+def delete_internal_layer_relations(map_uuid):
+    map_id = publications.get_publication_info(map_uuid)['id']
 
     delete_query = f'''
     delete from {DB_SCHEMA}.map_layer where id_map = %s;

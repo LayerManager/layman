@@ -539,8 +539,14 @@ returning id
     return pub_id
 
 
-def update_publication(workspace_name, info, is_part_of_user_delete=False):
-    id_workspace = workspaces.get_workspace_infos(workspace_name)[workspace_name]["id"]
+def get_publication_info(uuid, pub_type=None):
+    if uuid is None:
+        return None
+    publication_infos = get_publication_infos(pub_type=pub_type, uuid=uuid)
+    return next(iter(publication_infos.values()), None)
+
+
+def update_publication(uuid, info, is_part_of_user_delete=False):
     right_type_list = ['read', 'write']
 
     access_rights_changes = {}
@@ -562,11 +568,9 @@ def update_publication(workspace_name, info, is_part_of_user_delete=False):
     }) if info.get("external_table_uri") else None
 
     if info.get("access_rights") and (info["access_rights"].get("read") or info["access_rights"].get("write")):
-        info_old = get_publication_infos(workspace_name,
-                                         info["publ_type_name"],
-                                         pub_name=info["name"])[(workspace_name,
-                                                                 info["publ_type_name"],
-                                                                 info["name"],)]
+        info_old = get_publication_info(uuid)
+        assert info_old
+        workspace_name = info_old['_workspace']
         for right_type in right_type_list:
             access_rights_changes[right_type]['username_list_old'] = info_old["access_rights"][right_type]
             info["access_rights"][right_type + "_old"] = access_rights_changes[right_type]['username_list_old']
@@ -593,9 +597,7 @@ def update_publication(workspace_name, info, is_part_of_user_delete=False):
     image_mosaic = coalesce(%s, image_mosaic),
     external_table_uri = PGP_SYM_ENCRYPT(%s::text, uuid::text),
     geodata_type = coalesce(%s, geodata_type)
-where id_workspace = %s
-  and name = %s
-  and type = %s
+where uuid = %s
 returning id
 ;'''
 
@@ -607,9 +609,7 @@ returning id
             info.get("image_mosaic"),
             external_table_uri,
             info.get("geodata_type"),
-            id_workspace,
-            info.get("name"),
-            info.get("publ_type_name"),
+            uuid,
             )
     pub_id = db_util.run_query(update_publications_sql, data)[0][0]
 
@@ -620,32 +620,25 @@ returning id
     return pub_id
 
 
-def delete_publication(workspace_name, type, name):
-    workspace_info = workspaces.get_workspace_infos(workspace_name).get(workspace_name)
+def delete_publication(uuid):
     result = {}
-    if workspace_info:
-        publ_info = get_publication_infos(workspace_name, type, pub_name=name).get((workspace_name, type, name), {})
-        if publ_info:
-            rights.delete_rights_for_publication(publ_info["id"])
-            id_workspace = workspace_info["id"]
-            sql = f"""delete from {DB_SCHEMA}.publications p where p.id_workspace = %s and p.name = %s and p.type = %s;"""
-            db_util.run_statement(sql, (id_workspace,
-                                        name,
-                                        type,))
-            result = {
-                'name': publ_info["name"],
-                'title': publ_info.get("title", None),
-                'uuid': publ_info["uuid"],
-                'access_rights': publ_info['access_rights'],
-            }
-        else:
-            logger.warning(f'Deleting NON existing publication. workspace_name={workspace_name}, type={type}, pub_name={name}')
+    publ_info = get_publication_info(uuid)
+    if publ_info:
+        rights.delete_rights_for_publication(publ_info["id"])
+        sql = f"""delete from {DB_SCHEMA}.publications p where p.uuid = %s;"""
+        db_util.run_statement(sql, (uuid,))
+        result = {
+            'name': publ_info["name"],
+            'title': publ_info.get("title", None),
+            'uuid': publ_info["uuid"],
+            'access_rights': publ_info['access_rights'],
+        }
     else:
-        logger.warning(f'Deleting publication for NON existing workspace. workspace_name={workspace_name}, type={type}, pub_name={name}')
+        logger.warning(f'Deleting NON existing publication. uuid={uuid}')
     return result
 
 
-def set_bbox(workspace, publication_type, publication, bbox, crs, ):
+def set_bbox(uuid, bbox, crs, ):
     max_bbox = crs_def.CRSDefinitions[crs].max_bbox if crs else None
     cropped_bbox = (
         min(max(bbox[0], max_bbox[0]), max_bbox[2]),
@@ -657,24 +650,20 @@ def set_bbox(workspace, publication_type, publication, bbox, crs, ):
     query = f'''update {DB_SCHEMA}.publications set
     bbox = ST_MakeBox2D(ST_Point(%s, %s), ST_Point(%s ,%s)),
     srid = %s
-    where type = %s
-      and name = %s
-      and id_workspace = (select w.id from {DB_SCHEMA}.workspaces w where w.name = %s);'''
-    params = cropped_bbox + (srid, publication_type, publication, workspace,)
+    where uuid = %s;'''
+    params = cropped_bbox + (srid, uuid,)
     db_util.run_statement(query, params)
 
 
-def set_geodata_type(workspace, publication_type, publication, geodata_type, ):
+def set_geodata_type(uuid, geodata_type, ):
     query = f'''update {DB_SCHEMA}.publications set
     geodata_type = %s
-    where type = %s
-      and name = %s
-      and id_workspace = (select w.id from {DB_SCHEMA}.workspaces w where w.name = %s);'''
-    params = (geodata_type, publication_type, publication, workspace,)
+    where uuid = %s;'''
+    params = (geodata_type, uuid,)
     db_util.run_statement(query, params)
 
 
-def get_bbox_sphere_size(workspace, publication_type, publication):
+def get_bbox_sphere_size(uuid):
     query = f"""
     select
         ST_DistanceSphere(
@@ -698,20 +687,16 @@ def get_bbox_sphere_size(workspace, publication_type, publication):
             ), srid), 4326)
         ) as y_size
     from {DB_SCHEMA}.publications
-    where type = %s
-      and name = %s
-      and id_workspace = (select w.id from {DB_SCHEMA}.workspaces w where w.name = %s)
+    where uuid = %s
         """
 
-    [x_size, y_size] = db_util.run_query(query, (publication_type, publication, workspace))[0]
+    [x_size, y_size] = db_util.run_query(query, (uuid,))[0]
     return [x_size, y_size]
 
 
-def set_wfs_wms_status(workspace, publication_type, publication, status, ):
+def set_wfs_wms_status(uuid, status, ):
     query = f'''update {DB_SCHEMA}.publications set
     wfs_wms_status = %s
-    where type = %s
-      and name = %s
-      and id_workspace = (select w.id from {DB_SCHEMA}.workspaces w where w.name = %s);'''
-    params = (status.value, publication_type, publication, workspace,)
+    where uuid = %s;'''
+    params = (status.value, uuid,)
     db_util.run_statement(query, params)

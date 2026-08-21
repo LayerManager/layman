@@ -41,8 +41,8 @@ def test_info(workspace, publ_type, publication):
     style = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA]['style_type']
 
     with app.app_context():
-        info_internal = layer_util.get_layer_info(Layer(layer_tuple=(workspace, publication)))
         uuid = layman_util.get_publication_uuid(workspace, publ_type, publication)
+        info_internal = layer_util.get_layer_info(Layer(uuid=uuid, load=False))
         expected_style_url = url_for('rest_layer_style.get', uuid=uuid, internal=False)
     info = process_client.get_publication(publ_type, uuid, headers=headers)
 
@@ -192,7 +192,8 @@ def test_fill_project_template(workspace, publ_type, publication):
     wms_version = '1.3.0'
 
     with app.app_context():
-        layer = Layer(layer_tuple=(workspace, publication))
+        uuid = layman_util.get_publication_uuid(workspace, publ_type, publication)
+        layer = Layer(uuid=uuid)
     table_name = layer.table_uri.table
     table_schema = layer.table_uri.schema
 
@@ -267,7 +268,8 @@ def test_micka_xml(workspace, publ_type, publication):
 
     # assert metadata file is the same as filled template except for UUID
     with app.app_context():
-        layer = Layer(layer_tuple=(workspace, publication))
+        uuid = layman_util.get_publication_uuid(workspace, publ_type, publication)
+        layer = Layer(uuid=uuid)
         template_path, prop_values = csw.get_template_path_and_values(layer, http_method='post')
     xml_file_object = micka_common_util.fill_xml_template_as_pretty_file_object(template_path, prop_values,
                                                                                 csw.METADATA_PROPERTIES)
@@ -303,7 +305,8 @@ def test_layer_attributes_in_db(workspace, publ_type, publication):
     expected_names.update(generated_names)
 
     with app.app_context():
-        layer = Layer(layer_tuple=(workspace, publication))
+        uuid = layman_util.get_publication_uuid(workspace, publ_type, publication)
+        layer = Layer(uuid=uuid)
         table_uri = layer.table_uri
         attr_names = {col.name for col in layer_db.get_all_column_infos(table_uri.schema, table_uri.table)}
     assert attr_names == expected_names

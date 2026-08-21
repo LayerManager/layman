@@ -7,9 +7,8 @@ from ..map_class import Map
 get_metadata_comparison = empty_method_returns_dict
 
 
-def get_map_info(workspace, mapname):
-    maps = pubs_util.get_publication_infos(workspace, MAP_TYPE, pub_name=mapname)
-    info = maps.get((workspace, MAP_TYPE, mapname), {})
+def get_map_info(uuid):
+    info = pubs_util.get_publication_info(uuid, pub_type=MAP_TYPE) or {}
     if info:
         info.pop('_table_uri', None)
         info.pop('_wfs_wms_status', None)
@@ -32,7 +31,7 @@ def patch_map(map: Map,
                }
     if access_rights:
         db_info['access_rights'] = access_rights
-    pubs_util.update_publication(map.workspace, db_info, is_part_of_user_delete)
+    pubs_util.update_publication(map.uuid, db_info, is_part_of_user_delete)
 
 
 def pre_publication_action_check(map: Map,
@@ -48,7 +47,7 @@ def pre_publication_action_check(map: Map,
         old_info = None
         for type in ['read', 'write']:
             if not access_rights.get(type):
-                old_info = old_info or get_map_info(map.workspace, map.name)
+                old_info = old_info or get_map_info(map.uuid)
                 access_rights[type + '_old'] = old_info['access_rights'][type]
         pubs_util.check_publication_info(map.workspace, db_info)
 
@@ -73,5 +72,5 @@ def post_map(map: Map,
 
 
 def delete_map(map: Map):
-    util.delete_internal_layer_relations(map.workspace, map.name, )
-    return pubs_util.delete_publication(map.workspace, map.type, map.name)
+    util.delete_internal_layer_relations(map.uuid)
+    return pubs_util.delete_publication(map.uuid)

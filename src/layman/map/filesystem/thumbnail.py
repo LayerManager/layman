@@ -12,9 +12,8 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from layman import settings, LaymanError
 from layman.authn import is_user_with_name
 from layman.common import empty_method, empty_method_returns_dict
-from layman.util import url_for, get_publication_uuid, get_publication_info_by_uuid
+from layman.util import url_for, get_publication_info
 from . import util
-from .. import MAP_TYPE
 from ..map_class import Map
 
 MAP_SUBDIR = __name__.rsplit('.', maxsplit=1)[-1]
@@ -35,20 +34,14 @@ def ensure_map_thumbnail_dir(publ_uuid):
     return thumbnail_dir
 
 
-def get_map_info(workspace, mapname, *, x_forwarded_items=None):
-    publ_uuid = get_publication_uuid(workspace, MAP_TYPE, mapname)
-    return get_map_info_by_uuid(publ_uuid, x_forwarded_items=x_forwarded_items) \
-        if publ_uuid else {}
-
-
-def get_map_info_by_uuid(publ_uuid, *, x_forwarded_items=None):
-    thumbnail_path = get_map_thumbnail_path(publ_uuid)
+def get_map_info(uuid, *, x_forwarded_items=None):
+    thumbnail_path = get_map_thumbnail_path(uuid)
     if os.path.exists(thumbnail_path):
         return {
             'thumbnail': {
                 'url': url_for(
                     'rest_map_thumbnail.get',
-                    uuid=publ_uuid,
+                    uuid=uuid,
                     x_forwarded_items=x_forwarded_items,
                 ),
                 'path': os.path.relpath(thumbnail_path, settings.LAYMAN_DATA_DIR),
@@ -68,7 +61,7 @@ def get_map_thumbnail_path(publ_uuid):
 
 
 def generate_map_thumbnail(publ_uuid, *, editor):
-    map_info = get_publication_info_by_uuid(publ_uuid, context={'keys': ['file']})
+    map_info = get_publication_info(Map(uuid=publ_uuid, load=False), context={'keys': ['file']})
     map_file_get_url = map_info['_file']['url']
 
     params = urlencode({

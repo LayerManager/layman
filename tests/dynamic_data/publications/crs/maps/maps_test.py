@@ -83,12 +83,12 @@ class TestMap(base_test.TestSingleRestPublication):
                 'name': LAYER_FOR_MAPS.name,
                 'workspace': LAYER_FOR_MAPS.workspace,
                 'index': 1,
-                'uuid': self.publ_uuids[LAYER_FOR_MAPS],
+                'uuid': self.get_publication_uuid(LAYER_FOR_MAPS),
             }],
             **params.get(KEY_INFO_VALUES, {}).get('exp_publication_detail', {})
         }
-        uuid = self.publ_uuids[map]
-        asserts_publ.internal.correct_values_in_detail_uuid(uuid,
+        uuid = self.get_publication_uuid(map)
+        asserts_publ.internal.correct_values_in_detail_uuid(uuid, map.type,
                                                             exp_publication_detail=exp_publication_detail)
         exp_thumbnail = os.path.join(DIRECTORY, f"thumbnail_{map_crs.replace(':', '_').lower()}.png")
         asserts_publ.internal.thumbnail_equals(map.workspace, map.type, map.name, exp_thumbnail, max_diffs=params[KEY_THUMBNAIL_TOLERANCE])

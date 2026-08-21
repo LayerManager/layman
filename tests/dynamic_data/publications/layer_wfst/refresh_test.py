@@ -68,8 +68,7 @@ class TestRefresh(base_test.TestSingleRestPublication):
         thumbnail_style_postfix = parametrization.style_file.publ_name_part
 
         native_crs = SMALL_LAYER_NATIVE_CRS
-        assert_util.assert_all_sources_bbox(layer.workspace, layer.name,
-                                            layer_uuid=layer_uuid,
+        assert_util.assert_all_sources_bbox(layer_uuid,
                                             expected_bbox_3857=SMALL_LAYER_BBOX,
                                             expected_native_bbox=SMALL_LAYER_NATIVE_BBOX,
                                             expected_native_crs=native_crs)
@@ -88,8 +87,7 @@ class TestRefresh(base_test.TestSingleRestPublication):
             process_client.wait_for_publication_status(layer_uuid, process_client.LAYER_TYPE)
             assert_publ_util.is_publication_valid_and_complete(layer)
 
-            assert_util.assert_all_sources_bbox(layer.workspace, layer.name,
-                                                layer_uuid=layer_uuid,
+            assert_util.assert_all_sources_bbox(layer_uuid,
                                                 expected_bbox_3857=exp_bbox,
                                                 expected_native_bbox=exp_native_bbox,
                                                 expected_native_crs=native_crs)

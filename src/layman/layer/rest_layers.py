@@ -112,8 +112,8 @@ def post():
         unsafe_layername = input_file.get_unsafe_layername(input_files) if input_files else external_table_uri.table
     layername = util.to_safe_layer_name(unsafe_layername)
     util.check_layername(layername)
-    info = layman_util.get_publication_info(Layer(layer_tuple=(workspace, layername), load=False))
-    if info:
+    existing_uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layername)
+    if existing_uuid:
         raise LaymanError(17, {'layername': layername})
 
     # Timeseries regex

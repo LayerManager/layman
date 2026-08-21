@@ -239,7 +239,7 @@ def patch(uuid):
                 })
             elif input_files:
                 shutil.move(temp_dir, input_file.get_layer_input_file_dir(info['uuid']))
-        publications.set_wfs_wms_status(info['_workspace'], LAYER_TYPE, info['name'], settings.EnumWfsWmsStatus.PREPARING)
+        publications.set_wfs_wms_status(old_layer.uuid, settings.EnumWfsWmsStatus.PREPARING)
     else:
         delete_from = 'layman.layer.micka.soap'
 

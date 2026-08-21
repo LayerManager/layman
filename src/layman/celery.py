@@ -58,7 +58,7 @@ def task_postrun(uuid, task_id, task_name, task_state):
                 from layman.layer import util
                 from layman.layer.layer_class import Layer
                 layer = Layer(uuid=uuid)
-                util.set_wfs_wms_status_after_fail(layer.workspace, layer.name)
+                util.set_wfs_wms_status_after_fail(layer)
 
 
 def _get_task_hash(task_name, uuid):

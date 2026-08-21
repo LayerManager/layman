@@ -79,8 +79,11 @@ class TestLayer(base_test.TestSingleRestPublication):
 
         assert_util.is_publication_valid_and_complete(layer)
         with app.app_context():
-            publ_info = layman_util.get_publication_info(Layer(layer_tuple=(layer.workspace, layer.name), load=False),
-                                                         {'keys': params[Key.REST_ARGS].keys()})
+            layer_uuid = self.get_publication_uuid(layer)
+            publ_info = layman_util.get_publication_info(
+                Layer(uuid=layer_uuid, load=False),
+                {'keys': params[Key.REST_ARGS].keys()}
+            )
             for key, item in params[Key.REST_ARGS].items():
                 value = publ_info[key]
                 if key == 'access_rights':

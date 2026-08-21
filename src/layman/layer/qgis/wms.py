@@ -3,8 +3,7 @@ from owslib.wms import WebMapService
 
 from layman import patch_mode, settings, util as layman_util
 from layman.common import bbox as bbox_util, empty_method, empty_method_returns_dict
-from layman.util import get_publication_uuid
-from . import util, LAYER_TYPE
+from . import util
 from .. import db, qgis
 from ..layer_class import Layer
 
@@ -17,24 +16,18 @@ post_layer = empty_method
 patch_layer = empty_method
 
 
-def get_layer_info(workspace, layername, *, x_forwarded_items=None):
-    publ_uuid = get_publication_uuid(workspace, LAYER_TYPE, layername)
-    return get_layer_info_by_uuid(publ_uuid, x_forwarded_items=x_forwarded_items, layername=layername) if publ_uuid else {}
-
-
-def get_layer_info_by_uuid(publ_uuid, *, layername, x_forwarded_items=None):
-    input_file_dir = qgis.get_layer_dir(publ_uuid)
+def get_layer_info(uuid, *, x_forwarded_items=None):
+    input_file_dir = qgis.get_layer_dir(uuid)
     result = {}
     if os.path.exists(input_file_dir):
-        url = layman_util.url_for('rest_layer_style.get', uuid=publ_uuid, x_forwarded_items=x_forwarded_items)
+        url = layman_util.url_for('rest_layer_style.get', uuid=uuid, x_forwarded_items=x_forwarded_items)
         result = {
-            'name': layername,
             'style': {
                 'url': url,
                 'type': 'qml',
             },
             '_wms': {
-                'qgis_capabilities_url': get_layer_capabilities_url(publ_uuid),
+                'qgis_capabilities_url': get_layer_capabilities_url(uuid),
             }
         }
     return result

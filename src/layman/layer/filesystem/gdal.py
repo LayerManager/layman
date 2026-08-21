@@ -7,8 +7,6 @@ from lxml import etree as ET
 from osgeo import gdal, gdalconst, osr
 from layman import patch_mode, settings, LaymanError
 from layman.common import empty_method, empty_method_returns_dict
-from layman.layer import LAYER_TYPE
-from layman.util import get_publication_uuid
 from . import input_file, util
 from ..layer_class import Layer
 
@@ -16,21 +14,16 @@ PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 logger = logging.getLogger(__name__)
 
 
-def get_layer_info(workspace, layername, *, extra_keys=None):
-    publ_uuid = get_publication_uuid(workspace, LAYER_TYPE, layername)
-    return get_layer_info_by_uuid(publ_uuid, extra_keys=extra_keys) if publ_uuid else {}
-
-
-def get_layer_info_by_uuid(publ_uuid, *, extra_keys=None):
+def get_layer_info(uuid, *, extra_keys=None):
     extra_keys = extra_keys or []
-    gdal_paths = get_normalized_raster_layer_main_filepaths(publ_uuid)
-    gs_directory = get_normalized_raster_layer_dir(publ_uuid, geoserver=True)
+    gdal_paths = get_normalized_raster_layer_main_filepaths(uuid)
+    gs_directory = get_normalized_raster_layer_dir(uuid, geoserver=True)
     result = {}
     if len(gdal_paths) > 0:
         result = {
             '_file': {
                 'paths': {
-                    os.path.splitext(os.path.basename(gdal_path))[0] if len(gdal_paths) > 1 else publ_uuid:
+                    os.path.splitext(os.path.basename(gdal_path))[0] if len(gdal_paths) > 1 else uuid:
                     {
                         'normalized_absolute': gdal_path,
                         'normalized_geoserver': os.path.join(gs_directory, os.path.basename(gdal_path)),
@@ -40,7 +33,7 @@ def get_layer_info_by_uuid(publ_uuid, *, extra_keys=None):
             }
         }
         file_dict = result['_file']
-        input_file_gdal_path = next(iter(input_file.get_layer_info_by_uuid(publ_uuid)['_file']['paths'].values()))['gdal']
+        input_file_gdal_path = next(iter(input_file.get_layer_info(uuid)['_file']['paths'].values()))['gdal']
         if '_file.color_interpretations' in extra_keys:
             file_dict['color_interpretations'] = get_color_interpretations(input_file_gdal_path)
         if '_file.mask_flags' in extra_keys:

@@ -14,6 +14,7 @@ from .csw import get_layer_info, delete_layer
 MICKA_PORT = 8020
 TEST_WORKSPACE = 'testuser_micka'
 TEST_LAYER = 'ne_110m_admin_0_countries'
+NON_EXISTENT_UUID = '00000000-0000-4000-8000-000000000000'
 
 
 @pytest.fixture(scope='module')
@@ -24,7 +25,7 @@ def provide_layer(ensure_layman_module):
     resp = process_client.publish_workspace_layer(workspace, layername)
     uuid = resp['uuid']
     with app.app_context():
-        layer = Layer(layer_tuple=(workspace, layername))
+        layer = Layer(uuid=uuid)
 
     yield layer
     process.ensure_layman_function(None)
@@ -81,7 +82,7 @@ class TestBrokenMicka:
     @staticmethod
     def test_get_layer_info_broken_micka():
         with app.app_context():
-            layer_info = get_layer_info('abc', 'abcd')
+            layer_info = get_layer_info(NON_EXISTENT_UUID)
         assert layer_info == {}
 
 
@@ -104,7 +105,7 @@ class TestNoMicka:
     @staticmethod
     def test_get_layer_info_no_micka():
         with app.app_context():
-            layer_info = get_layer_info('abc', 'abcd')
+            layer_info = get_layer_info(NON_EXISTENT_UUID)
         assert layer_info == {}
 
 

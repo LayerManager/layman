@@ -11,9 +11,11 @@ KEY_REPLACE = '__replace__'
 
 
 def layer_or_map(workspace, publ_type, name):
+    uuid = layman_util.get_publication_uuid(workspace, publ_type, name)
+    assert uuid is not None
     if publ_type == LAYER_TYPE:
-        return Layer(layer_tuple=(workspace, name), load=False)
-    return Map(map_tuple=(workspace, name), load=False)
+        return Layer(uuid=uuid, load=False)
+    return Map(uuid=uuid, load=False)
 
 
 def get_publication_writer(publication):
@@ -31,10 +33,9 @@ def get_publication_header(publication):
 
 def get_publication_exists(publication):
     with app.app_context():
-        info = layman_util.get_publication_info(
-            layer_or_map(publication.workspace, publication.type, publication.name),
-        )
-    return bool(info)
+        return layman_util.get_publication_uuid(
+            publication.workspace, publication.type, publication.name,
+        ) is not None
 
 
 def get_publication_actor(publication):

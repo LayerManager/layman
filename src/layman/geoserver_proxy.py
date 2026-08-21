@@ -73,7 +73,9 @@ def group_attributes_by_db(attribute_tuples):
 
     attrs_by_db = defaultdict(list)
     for layer_uuid, attrs in attrs_by_layer.items():
-        publ_info = layman_util.get_publication_info_by_uuid(uuid=layer_uuid, context={'keys': ['table_uri']})
+        publ_info = layman_util.get_publication_info(
+            Layer(uuid=layer_uuid, load=False), context={'keys': ['table_uri']},
+        )
         table_uri = publ_info['_table_uri']
         attrs_by_db[table_uri.db_uri_str].extend([
             (layer_uuid, attr, table_uri.schema, table_uri.table) for attr in attrs
@@ -106,8 +108,9 @@ def ensure_wfs_t_attributes(attribs):
         changed_layers = {layer_uuid for layer_uuid, _ in all_created_attributes}
         qgis_changed_layers = {
             layer_uuid for layer_uuid in changed_layers
-            if layman_util.get_publication_info_by_uuid(layer_uuid, context={'keys': ['style_type'], }
-                                                        )['_style_type'] == 'qml'
+            if layman_util.get_publication_info(
+                Layer(uuid=layer_uuid, load=False), context={'keys': ['style_type']},
+            )['_style_type'] == 'qml'
         }
         for layer_uuid in qgis_changed_layers:
             qgis_wms.save_qgs_file(layer_uuid)
@@ -260,8 +263,9 @@ def proxy(subpath):
         fix_params = False
         for geoserver_workspace, layer in layers:
             uuid = geoserver_layername_to_uuid(geoserver_workspace=geoserver_workspace, geoserver_name=layer)
-            publ_info = layman_util.get_publication_info_by_uuid(uuid=uuid, context={'keys': ['native_crs',
-                                                                                              'style_type']})
+            publ_info = layman_util.get_publication_info(
+                Layer(uuid=uuid, load=False), context={'keys': ['native_crs', 'style_type']},
+            )
             if publ_info and publ_info.get('native_crs') == crs_def.EPSG_5514 and publ_info.get('_style_type') == 'sld':
                 fix_params = True
                 break

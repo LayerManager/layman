@@ -39,7 +39,7 @@ def get_flask_proxy_key():
 
 def patch_layer(layer: Layer):
     gs_layer_ids = layer.gs_ids.wms
-    if not get_layer_info_by_uuid(uuid=layer.uuid):
+    if not get_layer_info(layer.uuid):
         return
     geodata_type = layer.geodata_type
     if geodata_type == settings.GEODATA_TYPE_VECTOR:
@@ -178,12 +178,7 @@ def get_timeregex_props(layer_dir):
     return result
 
 
-def get_layer_info(workspace, layername, *, x_forwarded_items=None):
-    uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layername)
-    return get_layer_info_by_uuid(uuid=uuid, x_forwarded_items=x_forwarded_items)
-
-
-def get_layer_info_by_uuid(*, uuid, x_forwarded_items=None):
+def get_layer_info(uuid, *, x_forwarded_items=None):
     gs_layername = GeoserverIds(uuid=uuid, ).wms
     if uuid is None:
         return {}

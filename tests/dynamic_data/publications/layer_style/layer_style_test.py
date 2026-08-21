@@ -59,7 +59,7 @@ class TestLayer(base_test.TestSingleRestPublication):
         })
 
         assert_util.is_publication_valid_and_complete(layer)
-        uuid = self.publ_uuids[layer]
+        uuid = self.get_publication_uuid(layer)
         style = process_client.get_layer_style(uuid)
         root = style.getroot()
         assert root.attrib['version'] == params['exp_version']

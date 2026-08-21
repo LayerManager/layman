@@ -20,7 +20,7 @@ def before_request():
 
 @bp.route(f"/{LAYER_REST_PATH_NAME}/<uuid>/thumbnail", methods=['GET'])
 def get(uuid):
-    thumbnail_info = thumbnail.get_layer_info_by_uuid(uuid)
+    thumbnail_info = thumbnail.get_layer_info(uuid)
     if thumbnail_info:
         thumbnail_path = thumbnail_info['_thumbnail']['path']
         return send_file(thumbnail_path, mimetype='image/png')

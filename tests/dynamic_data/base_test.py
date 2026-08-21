@@ -83,6 +83,10 @@ class TestSingleRestPublication:
 
     publ_uuids = {}
 
+    @staticmethod
+    def publication_key(publication):
+        return publication.workspace, publication.type, publication.name
+
     @classmethod
     @final
     def parametrize_test_cases(cls) -> [TestCaseType]:
@@ -184,10 +188,6 @@ class TestSingleRestPublication:
     def post_publication(cls, publication, args=None, scope='function'):
         args = args or {}
         assert scope in {'function', 'class'}
-        if scope == 'class':
-            cls.publications_to_cleanup_on_class_end.add(publication)
-        else:
-            cls.publications_to_cleanup_on_function_end.add(publication)
         final_args = {
             'uuid': publication.uuid,
             **args,
@@ -198,14 +198,35 @@ class TestSingleRestPublication:
         if isinstance(resp, dict):
             maybe_uuid = resp.get('uuid', None)
             if maybe_uuid:
-                cls.publ_uuids[publication] = maybe_uuid
+                if publication.uuid is None:
+                    publication.set_uuid(maybe_uuid)
+                cls.publ_uuids[cls.publication_key(publication)] = maybe_uuid
+        if scope == 'class':
+            cls.publications_to_cleanup_on_class_end.add(publication)
+        else:
+            cls.publications_to_cleanup_on_function_end.add(publication)
         return resp
 
     @classmethod
     def ensure_publication(cls, publication, args=None, scope='function'):
         publ_set = cls.publications_to_cleanup_on_class_end if scope == 'class' else cls.publications_to_cleanup_on_function_end
-        if publication not in publ_set:
+        publication_exists = any(
+            cls.publication_key(item) == cls.publication_key(publication)
+            for item in publ_set
+        )
+        if not publication_exists:
             cls.post_publication(publication, args=args, scope=scope)
+
+    @classmethod
+    def get_publication_uuid(cls, publication):
+        uuid = publication.uuid or cls.publ_uuids.get(cls.publication_key(publication))
+        assert uuid is not None
+        return uuid
+
+    @classmethod
+    def remove_publication_uuids(cls, publications):
+        for publication in publications:
+            cls.publ_uuids.pop(cls.publication_key(publication), None)
 
     @classmethod
     def import_external_table(cls, file_path, args=None, scope='function'):
@@ -219,12 +240,12 @@ class TestSingleRestPublication:
 
     @classmethod
     def patch_publication(cls, publication, args=None):
-        uuid = cls.publ_uuids.get(publication, publication.uuid)
+        uuid = cls.get_publication_uuid(publication)
         return process_client.patch_publication(publication.type, uuid=uuid, **args)
 
     @classmethod
     def delete_publication(cls, publication, args=None):
-        uuid = cls.publ_uuids.get(publication, publication.uuid)
+        uuid = cls.get_publication_uuid(publication)
         return process_client.delete_publication(publication.type, uuid=uuid, **args)
 
     @classmethod
@@ -256,6 +277,7 @@ class TestSingleRestPublication:
     def class_cleanup(self, request):
         yield
         cleanup.cleanup_publications(request, self.publications_to_cleanup_on_class_end)
+        self.remove_publication_uuids(self.publications_to_cleanup_on_class_end)
         self.publications_to_cleanup_on_class_end.clear()
         cleanup.cleanup_external_tables(request, self.external_tables_to_cleanup_on_class_end)
         self.external_tables_to_cleanup_on_class_end.clear()
@@ -266,6 +288,7 @@ class TestSingleRestPublication:
     def function_cleanup(self, request):
         yield
         cleanup.cleanup_publications(request, self.publications_to_cleanup_on_function_end)
+        self.remove_publication_uuids(self.publications_to_cleanup_on_function_end)
         self.publications_to_cleanup_on_function_end.clear()
         cleanup.cleanup_external_tables(request, self.external_tables_to_cleanup_on_function_end)
         self.external_tables_to_cleanup_on_function_end.clear()

@@ -59,7 +59,8 @@ def same_value_of_key_in_all_sources(workspace, publ_type, name):
         process_client.MAP_TYPE: 'get_map_info',
     }[publ_type]
     with app.app_context():
-        partial_infos = layman_util.call_modules_fn(sources, info_method, [workspace, name])
+        publication = util.layer_or_map(workspace, publ_type, name)
+        partial_infos = layman_util.call_modules_fn(sources, info_method, [publication.uuid])
 
     for source, source_info in partial_infos.items():
         for key, value in source_info.items():
@@ -360,7 +361,7 @@ def _correct_values_in_detail_common(
                                                 )
 
 
-def correct_values_in_detail_uuid(uuid, *,
+def correct_values_in_detail_uuid(uuid, publ_type, *,
                                   exp_publication_detail,
                                   publ_type_detail=None,
                                   full_comparison=True,
@@ -372,7 +373,8 @@ def correct_values_in_detail_uuid(uuid, *,
                                   external_table_uri=None):
 
     with app.app_context():
-        pub_info = layman_util.get_publication_info_by_uuid(uuid)
+        publication = Publication.create(uuid=uuid, publ_type=publ_type, load=False)
+        pub_info = layman_util.get_publication_info(publication)
 
     _correct_values_in_detail_common(
         pub_info,

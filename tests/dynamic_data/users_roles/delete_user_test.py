@@ -1,5 +1,6 @@
 import pytest
 from layman import app, util as layman_util
+from layman.common.prime_db_schema import publications as prime_db_publications
 from layman.http import LaymanError
 from tests.asserts.util import layer_or_map
 from layman_settings import ANONYM_USER, NONAME_USER, RIGHTS_EVERYONE_ROLE
@@ -95,7 +96,8 @@ def test_delete_user(setup_users_and_role, publication_type, workspace, _setup_r
 
     # check if publication info exists
     with app.app_context():
-        publication_info = layman_util.get_publication_info(layer_or_map(workspace, publication_type, publication))
+        publication_uuid = layman_util.get_publication_uuid(workspace, publication_type, publication)
+        publication_info = prime_db_publications.get_publication_info(publication_uuid)
     assert isinstance(publication_info, dict) and publication_info, "Publication info cannot be empty"
 
     # check if workspace exists
@@ -111,8 +113,10 @@ def test_delete_user(setup_users_and_role, publication_type, workspace, _setup_r
     assert not any(pub.get('name') == publication for pub in publications_after_delete), f"Publication {publications_after_delete} was not deleted"
     # check if publication info was deleted
     with app.app_context():
-        publication_info = layman_util.get_publication_info(layer_or_map(username, publication_type, publication))
-    assert isinstance(publication_info, dict) and not publication_info, "Publication info should be empty"
+        deleted_publication_uuid = layman_util.get_publication_uuid(username, publication_type, publication)
+        publication_info = prime_db_publications.get_publication_info(publication_uuid)
+    assert deleted_publication_uuid is None
+    assert publication_info is None, "Publication info should be empty"
 
     # check if workspace was deleted
     if username == workspace:
@@ -164,9 +168,11 @@ def test_delete_self_with_publications(publication_type, workspace, _setup_role,
         workspace = workspace(username)
     process_client.reserve_username(username, actor_name=username)
     process_client.publish_publication(publication_type, workspace, publication, actor_name=username, access_rights=access_rights)
+    with app.app_context():
+        publication_uuid = layman_util.get_publication_uuid(workspace, publication_type, publication)
     process_client.delete_user(username, actor_name=username)
     with app.app_context():
-        publ_info = layman_util.get_publication_info(layer_or_map(workspace, publication_type, publication))
+        publ_info = prime_db_publications.get_publication_info(publication_uuid)
     assert not publ_info, f"Publication {publication} in workspace {workspace} was not deleted"
 
 

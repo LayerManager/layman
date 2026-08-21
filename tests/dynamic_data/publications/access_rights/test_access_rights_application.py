@@ -361,7 +361,7 @@ class TestAccessRights:
     def test_wfst_positive(self, publication, rest_method, rest_args, params):
         attr_names = params.get('new_attributes', [])
         with app.app_context():
-            layer = Layer(layer_tuple=(publication.workspace, publication.name))
+            layer = Layer(uuid=publication.uuid)
             table_uri = layer.table_uri
             old_db_attributes = db.get_all_table_column_names(table_uri.schema, table_uri.table)
         for attr_name in attr_names:
