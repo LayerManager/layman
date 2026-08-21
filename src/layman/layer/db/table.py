@@ -18,8 +18,10 @@ patch_layer = empty_method
 get_metadata_comparison = empty_method_returns_dict
 
 
-def get_layer_info(workspace, layername,):
-    layer_info = layman_util.get_publication_info(Layer(layer_tuple=(workspace, layername), load=False), context={'keys': ['table_uri', 'original_data_source']})
+def get_layer_info(uuid):
+    layer_info = layman_util.get_publication_info(
+        Layer(uuid=uuid, load=False), context={'keys': ['table_uri', 'original_data_source']},
+    )
     table_uri = layer_info.get('_table_uri')
     result = {}
     if table_uri:

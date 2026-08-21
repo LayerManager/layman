@@ -11,7 +11,7 @@ from .. import static_data as data, Publication4Test
 from ..asserts import util as test_util
 
 
-def assert_publication_after_delete(workspace, publ_type, publication):
+def assert_publication_after_delete(workspace, publ_type, publication, publication_uuid):
     publication_dir_name = publ_type.split('.')[-1] + 's'
     workspace_directory = f'{settings.LAYMAN_QGIS_DATA_DIR}/workspaces/{workspace}'
     publication_directory = f'{workspace_directory}/{publication_dir_name}/{publication}'
@@ -19,7 +19,7 @@ def assert_publication_after_delete(workspace, publ_type, publication):
 
     if publ_type == process_client.LAYER_TYPE:
         with app.app_context():
-            assert wms.get_layer_info(workspace, publication) == {}
+            assert wms.get_layer_info(publication_uuid) == {}
 
 
 def assert_publication_before_post(workspace, publ_type, publication):
@@ -53,7 +53,7 @@ def ensure_test_data(oauth2_provider_mock, request):
                 with app.app_context():
                     uuid = layman_util.get_publication_uuid(workspace, publ_type, publication)
                 process_client.delete_publication(publ_type, uuid=uuid, headers=headers)
-                assert_publication_after_delete(workspace, publ_type, publication)
+                assert_publication_after_delete(workspace, publ_type, publication, uuid)
 
 
 def ensure_all_users():

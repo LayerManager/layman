@@ -401,35 +401,10 @@ def merge_infos(target_info, partial_info, *, comment=None):
 
 
 def get_publication_uuid(workspace, publ_type, publ_name):
-    return get_publication_info(
-        _layer_or_map(workspace, publ_type, publ_name),
-        context={'keys': ['uuid', ]},
-    ).get('uuid')
-
-
-def _get_publication_by_uuid(uuid):
-    from layman.common.prime_db_schema.publications import get_publication_infos as prime_db_schema_get_publication_infos
-    prime_db_schema_info = prime_db_schema_get_publication_infos(uuid=uuid)
-    return list(prime_db_schema_info.keys())[0] if prime_db_schema_info else None
-
-
-def _layer_or_map(workspace, publ_type, publ_name):
-    from layman.layer import LAYER_TYPE
-    from layman.layer.layer_class import Layer
-    from layman.map.map_class import Map
-    if publ_type == LAYER_TYPE:
-        return Layer(layer_tuple=(workspace, publ_name), load=False)
-    return Map(map_tuple=(workspace, publ_name), load=False)
-
-
-def get_publication_info_by_uuid(uuid, context=None):
-    if uuid is None:
-        return {}
-    maybe_tuple = _get_publication_by_uuid(uuid)
-    if maybe_tuple is None:
-        return {}
-    workspace, publ_type, name = maybe_tuple
-    return get_publication_info(_layer_or_map(workspace, publ_type, name), context=context)
+    from layman.common.prime_db_schema import publications
+    infos = publications.get_publication_infos(workspace, publ_type, pub_name=publ_name)
+    info = infos.get((workspace, publ_type, publ_name), {})
+    return info.get('uuid')
 
 
 def get_publication_info(publication: Publication, context=None):
@@ -437,9 +412,12 @@ def get_publication_info(publication: Publication, context=None):
     from layman.layer import LAYER_TYPE
     from layman.map import MAP_TYPE
     context = context or {}
-    workspace = publication.workspace
-    publ_type = publication.type
-    publ_name = publication.name
+    publication_uuid = getattr(publication, 'uuid', None)
+    publ_type = getattr(publication, 'type', publication._class_publication_type_for_create)  # pylint: disable=protected-access
+    if publication_uuid is None:
+        publication_uuid = get_publication_uuid(publication.workspace, publ_type, publication.name)
+        if publication_uuid is None:
+            return {}
 
     assert not ('sources_filter' in context and 'keys' in context)
     sources = get_internal_sources(publ_type)
@@ -465,7 +443,7 @@ def get_publication_info(publication: Publication, context=None):
         LAYER_TYPE: 'get_layer_info',
         MAP_TYPE: 'get_map_info',
     }[publ_type]
-    partial_infos = call_modules_fn(sources, info_method, [workspace, publ_name], kwargs={
+    partial_infos = call_modules_fn(sources, info_method, [publication_uuid], kwargs={
         'extra_keys': context.get('extra_keys', []),
         'x_forwarded_items': context.get('x_forwarded_items'),
     })
@@ -598,7 +576,9 @@ def delete_publications(workspace,
 
 
 def patch_after_feature_change(uuid, *, queue=None, **kwargs):
-    publication = Publication.create(publ_tuple=_get_publication_by_uuid(uuid))
+    from layman.common.prime_db_schema import publications
+    publication_info = publications.get_publication_info(uuid)
+    publication = Publication.create(uuid=uuid, publ_type=publication_info['type'])
     try:
         redis.create_lock(publication, common.PUBLICATION_LOCK_FEATURE_CHANGE)
     except LaymanError as exc:
@@ -769,10 +749,8 @@ def get_complete_publication_info(publication: Publication, *, x_forwarded_items
 
 def get_publication_writer(uuid):
     from layman.authz import is_user
-    info = get_publication_info_by_uuid(
-        uuid,
-        context={'keys': ['access_rights']},
-    )
+    from layman.common.prime_db_schema import publications
+    info = publications.get_publication_info(uuid)
     return next((
         user_or_role for user_or_role in info['access_rights']['write']
         if is_user(user_or_role)
@@ -783,8 +761,8 @@ def get_publication_workspace(uuid):
     if uuid is None:
         return None
 
-    publication_info = _get_publication_by_uuid(uuid)
+    from layman.common.prime_db_schema import publications
+    publication_info = publications.get_publication_info(uuid)
     if publication_info is None:
         return None
-    workspace, _, _ = publication_info
-    return workspace
+    return publication_info['_workspace']

@@ -12,9 +12,7 @@ from layman import settings, patch_mode
 from layman.common import empty_method, empty_method_returns_dict
 from layman.common.filesystem import input_file as common
 from . import util, gdal as fs_gdal
-from .. import LAYER_TYPE
 from ..layer_class import Layer
-from ...util import get_publication_uuid
 
 LAYER_SUBDIR = __name__.rsplit('.', maxsplit=1)[-1]
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
@@ -55,13 +53,8 @@ def get_layer_input_files(publ_uuid):
     return util.InputFiles(saved_paths=filepaths)
 
 
-def get_layer_info(workspace, layername):
-    publ_uuid = get_publication_uuid(workspace, LAYER_TYPE, layername)
-    return get_layer_info_by_uuid(publ_uuid) if publ_uuid else {}
-
-
-def get_layer_info_by_uuid(publ_uuid):
-    input_files = get_layer_input_files(publ_uuid)
+def get_layer_info(uuid):
+    input_files = get_layer_input_files(uuid)
 
     if input_files.saved_paths:
         # input_files.raw_or_archived_main_file_path is None if user sent ZIP file by chunks without main file inside
@@ -76,7 +69,7 @@ def get_layer_info_by_uuid(publ_uuid):
             '_file': {
                 'file_type': file_type,
                 'paths': {
-                    slugify_timeseries_filename(os.path.splitext(os.path.basename(main_file))[0]) if len(main_files) > 1 else publ_uuid:
+                    slugify_timeseries_filename(os.path.splitext(os.path.basename(main_file))[0]) if len(main_files) > 1 else uuid:
                     {
                         'absolute': main_file,
                         'gdal': main_file if input_files.archive_type is None

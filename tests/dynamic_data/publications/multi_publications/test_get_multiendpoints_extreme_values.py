@@ -16,13 +16,14 @@ class TestWorldBboxFilter:
     def provide_data(self):
         for crs, values in crs_def.CRSDefinitions.items():
             layer = self.layer_prefix + '_' + crs.split(':')[1]
-            prime_db_schema_client.post_workspace_publication(LAYER_TYPE, self.workspace, layer,
-                                                              geodata_type=settings.GEODATA_TYPE_VECTOR,
-                                                              wfs_wms_status=settings.EnumWfsWmsStatus.AVAILABLE.value,
-                                                              )
+            layer_uuid = prime_db_schema_client.post_workspace_publication(
+                LAYER_TYPE, self.workspace, layer,
+                geodata_type=settings.GEODATA_TYPE_VECTOR,
+                wfs_wms_status=settings.EnumWfsWmsStatus.AVAILABLE.value,
+            )
             bbox = values.max_bbox or values.default_bbox
             with app.app_context():
-                publications.set_bbox(self.workspace, LAYER_TYPE, layer, bbox, crs)
+                publications.set_bbox(layer_uuid, bbox, crs)
         yield
         prime_db_schema_client.clear_workspace(self.workspace)
 
@@ -69,10 +70,11 @@ class TestExtremeCoordinatesFilter:
     @pytest.mark.parametrize('crs, crs_values', crs_def.CRSDefinitions.items())
     def test_default_bbox_corner_filter(self, crs, crs_values, layer_suffix, x_coord_idx, y_coord_idx):
         name = self.name_prefix + '_' + crs.split(':')[1] + '_' + layer_suffix
-        prime_db_schema_client.post_workspace_publication(self.publ_type, self.workspace, name,
-                                                          geodata_type=settings.GEODATA_TYPE_VECTOR,
-                                                          wfs_wms_status=settings.EnumWfsWmsStatus.AVAILABLE.value,
-                                                          )
+        publication_uuid = prime_db_schema_client.post_workspace_publication(
+            self.publ_type, self.workspace, name,
+            geodata_type=settings.GEODATA_TYPE_VECTOR,
+            wfs_wms_status=settings.EnumWfsWmsStatus.AVAILABLE.value,
+        )
         default_bbox = crs_values.default_bbox
         point_bbox = (
             default_bbox[x_coord_idx],
@@ -81,7 +83,7 @@ class TestExtremeCoordinatesFilter:
             default_bbox[y_coord_idx]
         )
         with app.app_context():
-            publications.set_bbox(self.workspace, LAYER_TYPE, name, point_bbox, crs)
+            publications.set_bbox(publication_uuid, point_bbox, crs)
 
             publication_infos = publications.get_publication_infos(workspace_name=self.workspace,
                                                                    pub_type=self.publ_type,
@@ -115,4 +117,4 @@ class TestExtremeCoordinatesFilter:
             assert (self.workspace, self.publ_type, name) in [(publication['workspace'], f'layman.{publication["publication_type"]}', publication['name']) for publication in publication_infos]
 
         with app.app_context():
-            publications.delete_publication(self.workspace, self.publ_type, name,)
+            publications.delete_publication(publication_uuid)

@@ -33,8 +33,9 @@ def wms_spatial_precision(workspace, publ_type, name, *, crs, extent, img_size, 
     }[wms_version]
 
     with app.app_context():
+        uuid = layman_util.get_publication_uuid(workspace, publ_type, name)
         publ_info = layman_util.get_publication_info(
-            Layer(layer_tuple=(workspace, name), load=False),
+            Layer(uuid=uuid, load=False),
             {'keys': ['native_crs', 'style_type', 'file', 'uuid']},
         )
     native_crs = publ_info['native_crs']

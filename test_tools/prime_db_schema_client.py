@@ -53,14 +53,14 @@ def post_workspace_publication(publication_type, workspace, name, *, actor=None,
             'wfs_wms_status': wfs_wms_status,
         })
         if bbox:
-            publications.set_bbox(workspace, publication_type, name, bbox, crs)
+            publications.set_bbox(publ_uuid, bbox, crs)
+    return publ_uuid
 
 
 def clear_workspace(workspace):
     with app.app_context():
-        for _, publication_type, name in publications.get_publication_infos(workspace_name=workspace,
-                                                                            ):
-            publications.delete_publication(workspace, publication_type, name)
+        for publication_info in publications.get_publication_infos(workspace_name=workspace).values():
+            publications.delete_publication(publication_info['uuid'])
 
 
 def clear_workspaces(workspaces):

@@ -29,7 +29,7 @@ def get_flask_proxy_key():
 
 def patch_layer(layer: Layer):
     gs_layer_ids = layer.gs_ids.wfs
-    if not get_layer_info_by_uuid(uuid=layer.uuid):
+    if not get_layer_info(layer.uuid):
         return
     geodata_type = layer.geodata_type
     if geodata_type != settings.GEODATA_TYPE_VECTOR:
@@ -136,19 +136,18 @@ def clear_cache():
     mem_redis.delete(key)
 
 
-def get_layer_info(workspace, layername, *, x_forwarded_items=None):
-    uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layername)
-    return get_layer_info_by_uuid(uuid=uuid, x_forwarded_items=x_forwarded_items)
-
-
-def get_layer_info_by_uuid(*, uuid, x_forwarded_items=None):
-    gs_layername = GeoserverIds(uuid=uuid, ).wfs
+def get_layer_info(uuid, *, x_forwarded_items=None):
     if uuid is None:
         return {}
-    wfs_proxy_url = get_wfs_url(external_url=True, x_forwarded_items=x_forwarded_items)
 
-    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['original_data_source']})
+    info = layman_util.get_publication_info(
+        Layer(uuid=uuid, load=False), context={'keys': ['original_data_source']},
+    )
+    if not info:
+        return {}
     original_data_source = info['original_data_source']
+    gs_layername = GeoserverIds(uuid=uuid, ).wfs
+    wfs_proxy_url = get_wfs_url(external_url=True, x_forwarded_items=x_forwarded_items)
     data_store_name = get_db_store_name(uuid=uuid, original_data_source=original_data_source)
     feature_type = gs_util.get_feature_type(gs_layername.workspace, data_store_name, gs_layername.name)
     if not feature_type:

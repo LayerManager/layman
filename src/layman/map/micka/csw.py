@@ -18,8 +18,8 @@ from layman.util import url_for, get_publication_info
 post_map = empty_method
 
 
-def get_map_info(workspace, mapname, *, x_forwarded_items=None):
-    publication = Map(map_tuple=(workspace, mapname))
+def get_map_info(uuid, *, x_forwarded_items=None):
+    publication = Map(uuid=uuid, load=False)
     try:
         csw = common_util.create_csw()
         if not publication or csw is None:
@@ -121,8 +121,6 @@ def map_to_operates_on(publication: Map, operates_on_muuids_filter=None, editor=
     operates_on = []
     csw_url = settings.CSW_PROXY_URL
     for internal_layer in operates_on_layers:
-        layer_workspace = internal_layer['workspace']
-        layername = internal_layer['name']
         layer_muuid = MickaIds(uuid=internal_layer['uuid']).id
         context = {'keys': ['title']}
         if operates_on_muuids_filter is not None:
@@ -130,7 +128,7 @@ def map_to_operates_on(publication: Map, operates_on_muuids_filter=None, editor=
                 continue
         else:
             context['actor_name'] = editor
-        publ_info = get_publication_info(Layer(layer_tuple=(layer_workspace, layername), load=False), context=context)
+        publ_info = get_publication_info(Layer(uuid=internal_layer['uuid'], load=False), context=context)
         if not (layer_muuid and publ_info):
             continue
         layer_title = publ_info['title']

@@ -48,11 +48,11 @@ from ..filesystem import thumbnail
 @pytest.mark.usefixtures('ensure_layman')
 def test_geometry_types(layername, exp_db_types, qml_geometry_dict, qml_version):
     workspace = 'test_geometry_types_workspace'
-    process_client.publish_workspace_layer(
+    resp = process_client.publish_workspace_layer(
         workspace, layername, file_paths=[f'/code/sample/data/geometry-types/{layername}.geojson']
     )
     with app.app_context():
-        layer = Layer(layer_tuple=(workspace, layername))
+        layer = Layer(uuid=resp['uuid'])
         table_uri = layer.table_uri
         db_types = db.get_geometry_types(table_uri.schema, table_uri.table)
     assert set(db_types) == exp_db_types

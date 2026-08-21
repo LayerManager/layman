@@ -5,6 +5,7 @@ from flask import after_this_request, g, request
 from layman import LaymanError, settings, authn, util as layman_util, common
 from layman.common.prime_db_schema import workspaces, users
 from layman.common.rest import parse_request_path
+from layman.publication_class import Publication
 from . import role_service
 
 
@@ -88,14 +89,15 @@ def can_user_create_public_workspace(username):
     return is_user_in_access_rule(username, settings.GRANT_CREATE_PUBLIC_WORKSPACE)
 
 
-def can_user_write_publication(*, username, uuid):
-    publ_info = layman_util.get_publication_info_by_uuid(uuid=uuid, context={'keys': ['access_rights']})
+def can_user_write_publication(*, username, publication):
+    publ_info = layman_util.get_publication_info(publication, context={'keys': ['access_rights']})
     return publ_info and is_user_in_access_rule(username, publ_info['access_rights']['write'])
 
 
 def can_i_edit(*, uuid):
+    from layman.layer.layer_class import Layer
     actor_name = authn.get_authn_username()
-    return can_user_write_publication(username=actor_name, uuid=uuid)
+    return can_user_write_publication(username=actor_name, publication=Layer(uuid=uuid, load=False))
 
 
 def authorize_workspace_publications_decorator(func):
@@ -124,23 +126,17 @@ def authorize_uuid_publication_decorator(*, expected_publication_type):
         @wraps(func)
         def decorated_function(*args, **kwargs):
             uuid = request.view_args['uuid']
-            publication_tuple = layman_util._get_publication_by_uuid(uuid)  # pylint: disable=protected-access
-            if publication_tuple is None or publication_tuple[1] != expected_publication_type:
+            publication = Publication.create(uuid=uuid, publ_type=expected_publication_type)
+            if not publication:
                 publication_not_found_code = {
                     'layman.layer': 15,
                     'layman.map': 26,
                 }[expected_publication_type]
                 raise LaymanError(publication_not_found_code, {'uuid': uuid})
-            workspace, publication_type, publication_name = publication_tuple
-            if publication_type == 'layman.layer':
-                from layman.layer.layer_class import Layer
-                g.publication = Layer(uuid=uuid, layer_tuple=(workspace, publication_name), load=False)
-            else:
-                from layman.map.map_class import Map
-                g.publication = Map(uuid=uuid, map_tuple=(workspace, publication_name), load=False)
+            g.publication = publication
             actor_name = authn.get_authn_username()
             # raises exception in case of unauthorized request
-            authorize(workspace, publication_type, publication_name, request.method, actor_name)
+            authorize(publication.workspace, publication.type, publication.name, request.method, actor_name)
             return func(*args, **kwargs)
         return decorated_function
 

@@ -94,7 +94,7 @@ class TestWfst(base_test.TestSingleRestPublication):
         }, scope='class')
 
     def test_proxy_raises(self, layer: Publication4Test, params):
-        layer_uuid = self.publ_uuids[layer]
+        layer_uuid = self.get_publication_uuid(layer)
         gs_layer_wfs = GeoserverIds(uuid=layer_uuid, ).wfs
         data_xml = params['wfst_data_method'](gs_layer_wfs.workspace, gs_layer_wfs.name, *params['wfst_data_args'])
 

@@ -10,4 +10,4 @@ get_metadata_comparison = empty_method
 
 
 def delete_map(map: Map):
-    publications.set_bbox(map.workspace, map.type, map.name, bbox=(None, None, None, None, ), crs=None)
+    publications.set_bbox(map.uuid, bbox=(None, None, None, None, ), crs=None)

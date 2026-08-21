@@ -82,6 +82,7 @@ class TestPublication(base_test.TestSingleRestPublication):
         else:
             publ_asserts.internal.correct_values_in_detail_uuid(
                 uuid,
+                publication.type,
                 **publ_def.info_values
             )
         if publ_def.thumbnail:

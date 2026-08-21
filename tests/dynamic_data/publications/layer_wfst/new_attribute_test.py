@@ -270,7 +270,8 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
         for layer_name, attr_names in new_attributes:
             # assert that all attr_names are not yet presented in DB table
             with app.app_context():
-                table_uri = get_publication_info(Layer(layer_tuple=(workspace, layer_name), load=False),
+                layer_uuid = get_publication_uuid(workspace, self.publication_type, layer_name)
+                table_uri = get_publication_info(Layer(uuid=layer_uuid, load=False),
                                                  context={'keys': ['table_uri']})['_table_uri']
             table_uris[layer_name] = table_uri
             old_db_attributes[layer_name] = db.get_all_table_column_names(table_uri.schema, table_uri.table,
@@ -290,7 +291,7 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
             if style_type == 'qml':
                 # assert that all attr_names are not yet presented in QML
                 with app.app_context():
-                    assert qgis_wms.get_layer_info(workspace, layer_name)
+                    assert qgis_wms.get_layer_info(layer_uuid)
                     old_qgis_attributes = qgis_util.get_layer_attribute_names(layer_uuid)
                 assert all(attr_name not in old_qgis_attributes
                            for attr_name in attr_names), (attr_names, old_qgis_attributes)
@@ -327,13 +328,13 @@ class TestNewAttribute(base_test.TestSingleRestPublication):
             if style_type == 'qml':
                 # assert that exactly all attr_names are present also in QML
                 with app.app_context():
-                    assert qgis_wms.get_layer_info(workspace, layer_name)
+                    assert qgis_wms.get_layer_info(layer_uuid)
                     new_qgis_attributes = qgis_util.get_layer_attribute_names(layer_uuid)
                 assert all(attr_name in new_qgis_attributes for attr_name in attr_names), \
                     (attr_names, new_qgis_attributes)
             else:
                 with app.app_context():
-                    assert not qgis_wms.get_layer_info(workspace, layer_name)
+                    assert not qgis_wms.get_layer_info(layer_uuid)
 
     @staticmethod
     def prepare_wfst_data_and_new_attributes(layer, layer2, params):

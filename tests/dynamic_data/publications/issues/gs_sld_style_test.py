@@ -19,7 +19,7 @@ def test_issue_738():
                                               )
     uuid = resp['uuid']
     with app.app_context():
-        layer = Layer(layer_tuple=(workspace, layername))
+        layer = Layer(uuid=uuid)
     style_name = layer.gs_ids.sld
 
     response = gs_util.get_workspace_style_response(geoserver_workspace=style_name.workspace,

@@ -3,7 +3,6 @@ from celery.utils.log import get_task_logger
 from layman.celery import AbortedException
 from layman import celery_app, util as layman_util, settings
 from layman.layer.layer_class import Layer
-from .. import LAYER_TYPE
 from ..db import get_bbox as db_get_bbox
 from ...common.prime_db_schema.publications import set_bbox
 
@@ -35,7 +34,7 @@ def patch_after_feature_change(
     if self.is_aborted():
         raise AbortedException
 
-    set_bbox(layer.workspace, LAYER_TYPE, layer.name, bbox, crs)
+    set_bbox(layer.uuid, bbox, crs)
 
     if self.is_aborted():
         raise AbortedException

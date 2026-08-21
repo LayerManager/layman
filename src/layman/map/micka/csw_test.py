@@ -17,6 +17,7 @@ from test_tools.mock.micka import run
 from .csw import get_map_info, map_layers_to_operates_on_layers, delete_map
 
 MICKA_PORT = 8020
+NON_EXISTENT_UUID = '00000000-0000-4000-8000-000000000000'
 
 
 def wait_till_ready(map: Map):
@@ -162,13 +163,13 @@ def test_delete_map_broken_micka(provide_map):
 
 @pytest.mark.usefixtures('app_context', 'broken_micka_url')
 def test_get_map_info_broken_micka():
-    map_info = get_map_info('abc', 'abcd')
+    map_info = get_map_info(NON_EXISTENT_UUID)
     assert map_info == {}
 
 
 @pytest.mark.usefixtures('app_context', 'no_micka_url')
 def test_get_map_info_no_micka():
-    map_info = get_map_info('abc', 'abcd')
+    map_info = get_map_info(NON_EXISTENT_UUID)
     assert map_info == {}
 
 

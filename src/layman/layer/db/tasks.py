@@ -71,7 +71,7 @@ def refresh_table(
             table.delete_layer(layer=layer)
             raise AbortedException
         if return_code != 0 or stdout or stderr:
-            info = table.get_layer_info(layer.workspace, layer.name)
+            info = table.get_layer_info(layer.uuid)
             if not info:
                 str_error = str(stderr)
                 str_out = str(stdout)

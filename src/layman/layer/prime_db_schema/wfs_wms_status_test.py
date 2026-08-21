@@ -51,12 +51,9 @@ def test_set_after_restart(wfs_wms_status_before, wfs_wms_status_after):
         set_after_restart()
 
     with app.app_context():
-        publ_info = layman_util.get_publication_info(Layer(layer_tuple=(workspace, publication_name), load=False), {'keys': ['wfs_wms_status']})
+        publ_info = layman_util.get_publication_info(Layer(uuid=uuid_str, load=False), {'keys': ['wfs_wms_status']})
     wfs_wms_status = publ_info['_wfs_wms_status']
     assert wfs_wms_status == wfs_wms_status_after
 
     with app.app_context():
-        pubs_util.delete_publication(workspace_name=workspace,
-                                     type=publ_type,
-                                     name=publication_name,
-                                     )
+        pubs_util.delete_publication(uuid_str)

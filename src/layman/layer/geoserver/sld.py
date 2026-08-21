@@ -1,6 +1,6 @@
 import os
 from geoserver import util as gs_util
-from layman import settings, patch_mode, util as layman_util
+from layman import settings, patch_mode
 from layman.common import empty_method, empty_method_returns_dict
 from layman.common.db import launder_attribute_name
 from layman.layer.layer_class import Layer
@@ -8,7 +8,6 @@ from layman.layer.filesystem import input_style
 from layman.layer.geoserver import GeoserverIds
 from layman.util import url_for, get_publication_info
 from . import wms
-from .. import LAYER_TYPE
 
 PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
@@ -41,12 +40,7 @@ def delete_layer(layer: Layer):
     return result
 
 
-def get_layer_info(workspace, layername, *, x_forwarded_items=None):
-    uuid = layman_util.get_publication_uuid(workspace, LAYER_TYPE, layername)
-    return get_layer_info_by_uuid(uuid=uuid, x_forwarded_items=x_forwarded_items)
-
-
-def get_layer_info_by_uuid(uuid, x_forwarded_items=None):
+def get_layer_info(uuid, x_forwarded_items=None):
     response = get_style_response(uuid=uuid, headers=gs_util.headers_sld['1.0.0'], auth=settings.LAYMAN_GS_AUTH)
     if response and response.status_code == 200:
         url = url_for('rest_layer_style.get', uuid=uuid, x_forwarded_items=x_forwarded_items)

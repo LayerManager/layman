@@ -11,14 +11,14 @@ get_metadata_comparison = empty_method_returns_dict
 
 
 def delete_layer(layer: Layer):
-    publications.set_bbox(layer.workspace, layer.type, layer.name, bbox=(None, None, None, None, ), crs=None)
+    publications.set_bbox(layer.uuid, bbox=(None, None, None, None, ), crs=None)
     if layer.original_data_source == settings.EnumOriginalDataSource.FILE:
-        publications.set_geodata_type(layer.workspace, layer.type, layer.name, settings.GEODATA_TYPE_UNKNOWN, )
+        publications.set_geodata_type(layer.uuid, settings.GEODATA_TYPE_UNKNOWN, )
 
 
 def patch_layer(layer: Layer):
-    publications.set_geodata_type(layer.workspace, layer.type, layer.name, layer.geodata_type)
+    publications.set_geodata_type(layer.uuid, layer.geodata_type)
 
 
 def post_layer(layer: Layer, *, geodata_type):
-    publications.set_geodata_type(layer.workspace, layer.type, layer.name, geodata_type, )
+    publications.set_geodata_type(layer.uuid, geodata_type, )

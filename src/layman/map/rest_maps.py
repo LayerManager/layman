@@ -71,8 +71,8 @@ def post():
         unsafe_mapname = input_file.get_unsafe_mapname(file_json)
     mapname = util.to_safe_map_name(unsafe_mapname)
     util.check_mapname(mapname)
-    info = layman_util.get_publication_info(Map(map_tuple=(workspace, mapname), load=False))
-    if info:
+    existing_uuid = layman_util.get_publication_uuid(workspace, MAP_TYPE, mapname)
+    if existing_uuid:
         raise LaymanError(24, {'mapname': mapname})
 
     # TITLE

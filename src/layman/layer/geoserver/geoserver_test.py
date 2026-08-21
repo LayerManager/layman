@@ -44,7 +44,7 @@ def test_geoserver_bbox():
     for bbox, expected_bbox in expected_bboxes:
         with app.app_context():
             wfs.delete_layer(layer_class)
-            publications.set_bbox(workspace, process_client.LAYER_TYPE, layer, bbox, crs, )
+            publications.set_bbox(uuid, bbox, crs, )
             wfs.delete_layer(layer_class)
             tasks.refresh_wfs.apply(args=[uuid],
                                     kwargs=kwargs,
@@ -55,7 +55,7 @@ def test_geoserver_bbox():
     for bbox, expected_bbox in expected_bboxes:
         with app.app_context():
             wms.delete_layer(layer_class)
-            publications.set_bbox(workspace, process_client.LAYER_TYPE, layer, bbox, crs, )
+            publications.set_bbox(uuid, bbox, crs, )
             tasks.refresh_wms.apply(args=[uuid],
                                     kwargs=wms_kwargs,
                                     )
@@ -65,7 +65,7 @@ def test_geoserver_bbox():
     for bbox, expected_bbox in expected_bboxes:
         with app.app_context():
             wms.delete_layer(layer_class)
-            publications.set_bbox(workspace, process_client.LAYER_TYPE, layer, bbox, crs, )
+            publications.set_bbox(uuid, bbox, crs, )
             wms.delete_layer(layer_class)
             tasks.refresh_wms.apply(args=[uuid],
                                     kwargs=wms_kwargs,

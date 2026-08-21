@@ -1552,7 +1552,10 @@ class TestPublication(base_test.TestSingleRestPublication):
             rest_args.pop('uuid', None)
         with exception as exception_info:
             response = rest_method.fn(publication, args=rest_args)
-        publication = dataclasses.replace(publication, uuid=self.publ_uuids.get(publication))
+        publication = dataclasses.replace(
+            publication,
+            uuid=self.publ_uuids.get(self.publication_key(publication)),
+        )
         format_exception(exp_exception, publication, parametrization)
         if is_sync:
             processing.exception.response_exception(expected=exp_exception, thrown=exception_info)

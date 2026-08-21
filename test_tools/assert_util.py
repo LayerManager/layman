@@ -62,9 +62,9 @@ def assert_wms_bbox(uuid, expected_bbox, *, expected_bbox_crs='EPSG:3857'):
         assert_same_bboxes(expected_bbox_4326, wgs84_bbox, 0.00001)
 
 
-def assert_all_sources_bbox(workspace, layer, *, layer_uuid, expected_bbox_3857, expected_native_bbox=None, expected_native_crs=None):
+def assert_all_sources_bbox(layer_uuid, *, expected_bbox_3857, expected_native_bbox=None, expected_native_crs=None):
     with app.app_context():
-        info = layman_util.get_publication_info(Layer(layer_tuple=(workspace, layer), load=False),
+        info = layman_util.get_publication_info(Layer(uuid=layer_uuid, load=False),
                                                 context={'key': ['bounding_box', 'native_bounding_box', 'native_crs']})
     bbox_3857 = tuple(info['bounding_box'])
     native_bbox = tuple(info['native_bounding_box'])

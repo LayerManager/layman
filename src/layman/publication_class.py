@@ -47,10 +47,7 @@ class Publication(ABC):
 
     def load(self):
         context = {'keys': ['id']}
-        if hasattr(self, 'uuid'):
-            info = util.get_publication_info_by_uuid(uuid=self.uuid, context=context)
-        else:
-            info = util.get_publication_info(self, context=context)
+        info = util.get_publication_info(self, context=context)
 
         if info:
             object.__setattr__(self, 'uuid', info['uuid'])
@@ -95,9 +92,15 @@ class Publication(ABC):
             object.__setattr__(other_publication, k, kwargs.get(k, getattr(self, k)))
 
     @classmethod
-    def create(cls, *, publ_tuple: Tuple[str, str, str] = None) -> Publication:
+    def create(cls, *, uuid: str = None, publ_type: str = None, publ_tuple: Tuple[str, str, str] = None,
+               load: bool = True) -> Publication:
+        assert (uuid is None) != (publ_tuple is None)
+        if uuid is not None:
+            return cls._subclasses[publ_type](uuid=uuid, load=load)
+
         sub_class = cls._subclasses[publ_tuple[1]]
         return sub_class(**{
             # pylint: disable=protected-access
-            sub_class._class_init_tuple_name: (publ_tuple[0], publ_tuple[2])
+            sub_class._class_init_tuple_name: (publ_tuple[0], publ_tuple[2]),
+            'load': load,
         })

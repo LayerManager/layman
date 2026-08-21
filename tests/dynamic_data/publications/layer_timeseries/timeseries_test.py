@@ -346,7 +346,7 @@ class TestLayer(base_test.TestSingleRestPublication):
 
         if params['do_complex_test']:
             with app.app_context():
-                prod_layer = Layer(uuid=self.publ_uuids[layer])
+                prod_layer = Layer(uuid=self.get_publication_uuid(layer))
             time_snaps = [time_snap[:10] for time_snap in params['detail_values']['exp_publication_detail']['wms']['time']['values']]
             for time in time_snaps:
                 exp_wms = os.path.join(DIRECTORY, f"wms_{time}.png")
@@ -374,7 +374,7 @@ class TestLayer(base_test.TestSingleRestPublication):
 
             asserts_publ.metadata.correct_values_in_metadata(prod_layer, http_method=http_method)
 
-            uuid = self.publ_uuids[layer]
+            uuid = self.get_publication_uuid(layer)
             process_client.patch_layer(uuid=uuid,
                                        title='Title: ' + layer.name)
             asserts_util.is_publication_valid_and_complete(layer)

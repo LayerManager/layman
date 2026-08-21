@@ -223,10 +223,11 @@ class TestPublication(base_test.TestSingleRestPublication):
     def test_publication(self, publication: Publication4Test, rest_method, rest_args, params):
         rest_method.fn(publication, args=rest_args)
         assert_util.is_publication_valid_and_complete(publication)
-        uuid = self.publ_uuids[publication]
+        uuid = self.get_publication_uuid(publication)
         if params[Key.EXP_INFO] is not None:
             asserts_publ.internal.correct_values_in_detail_uuid(
                 uuid,
+                publication.type,
                 **params[Key.EXP_INFO],
             )
 

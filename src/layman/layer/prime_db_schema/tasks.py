@@ -5,7 +5,6 @@ from layman.common import empty_method_returns_true
 from layman.common.prime_db_schema import publications
 from layman import celery_app, util as layman_util, settings
 from layman.layer.layer_class import Layer
-from .. import LAYER_TYPE
 from ..db import get_bbox as db_get_bbox, get_table_crs
 from ..filesystem.gdal import get_bbox as gdal_get_bbox, get_crs as gdal_get_crs
 from ...common.prime_db_schema.publications import set_bbox, set_geodata_type
@@ -33,7 +32,7 @@ def refresh_file_data(
     if publ_info['geodata_type'] == settings.GEODATA_TYPE_UNKNOWN:
         publ_info_file = layman_util.get_publication_info(layer, context={'keys': ['file']})
         geodata_type = publ_info_file['_file']['file_type']
-        set_geodata_type(layer.workspace, LAYER_TYPE, layer.name, geodata_type)
+        set_geodata_type(layer.uuid, geodata_type)
     else:
         geodata_type = publ_info['geodata_type']
 
@@ -54,7 +53,7 @@ def refresh_file_data(
     if self.is_aborted():
         raise AbortedException
 
-    set_bbox(layer.workspace, LAYER_TYPE, layer.name, bbox, crs)
+    set_bbox(layer.uuid, bbox, crs)
 
     if self.is_aborted():
         raise AbortedException
@@ -73,7 +72,7 @@ def refresh_wfs_wms_status(
         raise AbortedException
 
     layer = Layer(uuid=uuid)
-    publications.set_wfs_wms_status(layer.workspace, LAYER_TYPE, layer.name, settings.EnumWfsWmsStatus.AVAILABLE)
+    publications.set_wfs_wms_status(layer.uuid, settings.EnumWfsWmsStatus.AVAILABLE)
 
     if self.is_aborted():
         raise AbortedException

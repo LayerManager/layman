@@ -24,7 +24,7 @@ def before_request():
 def get(uuid):
     app.logger.info(f"GET Layer Style, actor={g.user}")
 
-    info = layman_util.get_publication_info_by_uuid(uuid, context={'keys': ['style_type']})
+    info = layman_util.get_publication_info(g.publication, context={'keys': ['style_type']})
 
     if not info:
         raise LaymanError(15, {'uuid': uuid})

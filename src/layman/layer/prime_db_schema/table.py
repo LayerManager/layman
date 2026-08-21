@@ -10,9 +10,8 @@ PATCH_MODE = patch_mode.DELETE_IF_DEPENDANT
 get_metadata_comparison = empty_method_returns_dict
 
 
-def get_layer_info(workspace, layername):
-    layers = pubs_util.get_publication_infos(workspace, LAYER_TYPE, pub_name=layername)
-    info = layers.get((workspace, LAYER_TYPE, layername), {})
+def get_layer_info(uuid):
+    info = pubs_util.get_publication_info(uuid, pub_type=LAYER_TYPE) or {}
     if info:
         uuid = info['uuid']
         db_names = DbIds(uuid=uuid)
@@ -30,7 +29,7 @@ def get_layer_info(workspace, layername):
 
 
 def delete_layer(layer: Layer):
-    return pubs_util.delete_publication(layer.workspace, layer.type, layer.name)
+    return pubs_util.delete_publication(layer.uuid)
 
 
 def patch_layer(layer: Layer,
@@ -52,7 +51,7 @@ def patch_layer(layer: Layer,
         db_info['style_type'] = layer.style_type
     if access_rights:
         db_info['access_rights'] = access_rights
-    pubs_util.update_publication(layer.workspace, db_info, is_part_of_user_delete)
+    pubs_util.update_publication(layer.uuid, db_info, is_part_of_user_delete)
 
 
 def pre_publication_action_check(layer: Layer,
@@ -68,7 +67,7 @@ def pre_publication_action_check(layer: Layer,
         old_info = None
         for type in ['read', 'write']:
             if not access_rights.get(type):
-                old_info = old_info or get_layer_info(layer.workspace, layer.name)
+                old_info = old_info or get_layer_info(layer.uuid)
                 access_rights[type + '_old'] = old_info['access_rights'][type]
         pubs_util.check_publication_info(layer.workspace, db_info)
 
@@ -99,5 +98,5 @@ def post_layer(layer: Layer,
     pubs_util.insert_publication(layer.workspace, db_info)
 
 
-def get_bbox_sphere_size(workspace, layername):
-    return pubs_util.get_bbox_sphere_size(workspace, LAYER_TYPE, layername)
+def get_bbox_sphere_size(layer: Layer):
+    return pubs_util.get_bbox_sphere_size(layer.uuid)
