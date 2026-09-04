@@ -17,6 +17,7 @@
 
 ### Changes
 - Add `sed` command to Dockerfile files to change HTTP to HTTPS in apt sources.list.
+- Layman supports import of layers in EPSG:9377, EPSG:32718 using [LAYMAN_INPUT_SRS_LIST](doc/env-settings.md#LAYMAN_INPUT_SRS_LIST)
 - [#1126](https://github.com/LayerManager/layman/issues/1126) Endpoint [GET Workspace Map Thumbnail](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-map-thumbnail) was removed and replaced with endpoint [GET Map Thumbnail](doc/rest.md#get-map-thumbnail) endpoint to use UUID-based URL `/rest/maps/{uuid}/thumbnail` instead of workspace&name-based URL.
 - [#1126](https://github.com/LayerManager/layman/issues/1126) Endpoint [GET Workspace Layer Thumbnail](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-layer-thumbnail) was removed and replaced with endpoint [GET Layer Thumbnail](doc/rest.md#get-layer-thumbnail) endpoint to use UUID-based URL `/rest/layers/{uuid}/thumbnail` instead of workspace&name-based URL.
 - [#1126](https://github.com/LayerManager/layman/issues/1126) Endpoint [GET Workspace Map File](https://github.com/LayerManager/layman/blob/v2.1.0/doc/rest.md#get-workspace-map-file) was removed and replaced with endpoint [GET Map File](doc/rest.md#get-map-file) to use UUID-based URL `/rest/map/{uuid}/file` instead of workspace&name-based URL.

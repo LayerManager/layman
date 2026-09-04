@@ -30,6 +30,36 @@ EXP_LATVIA_FEATURE_COORDINATES = [
 ]
 
 
+EXP_COLOMBIA_9377_BBOXES = {
+    'detail_3857': ([-8248279.570477128, 521380.073788664, -8248279.570477128, 521380.073788664], 1),
+    'wfs_bbox': ([-74.09555605850406, 4.678429401413592, -74.09555605850406, 4.678429401413592], 0.0001),
+    'wms_geographic_bbox': ([-74.09555605850406, 4.678429401413592, -74.09555605850406, 4.678429401413592], 0.0001),
+}
+
+
+EXP_COLOMBIA_9377_FEATURE_COORDINATES = [
+    # feature_id, out_crs, exp_coordinates, precision
+    (1, crs_def.EPSG_4326, (-74.09555605850406, 4.678429401413592), 0.0001),
+    (1, crs_def.EPSG_9377, (4878536.78062931, 2075055.86836814), 1),
+    (1, crs_def.EPSG_32718, (600313.0156696279, 10517183.12427732), 1),
+]
+
+
+EXP_COLOMBIA_32718_BBOXES = {
+    'detail_3857': ([-8248279.570477128, 521380.0737886627, -8248279.570477128, 521380.0737886627], 1),
+    'wfs_bbox': ([-74.09555605850406, 4.678429401413585, -74.09555605850406, 4.678429401413585], 0.0001),
+    'wms_geographic_bbox': ([-74.09555605850406, 4.678429401413585, -74.09555605850406, 4.678429401413585], 0.0001),
+}
+
+
+EXP_COLOMBIA_32718_FEATURE_COORDINATES = [
+    # feature_id, out_crs, exp_coordinates, precision
+    (1, crs_def.EPSG_4326, (-74.09555605850406, 4.678429401413585), 0.0001),
+    (1, crs_def.EPSG_32718, (600313.0156696279, 10517183.12427732), 1),
+    (1, crs_def.EPSG_9377, (4878536.78062931, 2075055.86836814), 1),
+]
+
+
 TEST_CASES = {
     'epsg_4326_shp': {
         'filename': 'small_layer_4326',
@@ -130,6 +160,63 @@ TEST_CASES = {
         'thumbnail_tolerance': 5,
         'exp_bboxes': EXP_LATVIA_BBOXES,
         'exp_feature_coordinates': EXP_LATVIA_FEATURE_COORDINATES,
+    },
+    'colombia_4326': {
+        'filename': 'sample_point_co_4326',
+        'rest_args': {
+            'style_file': f'{DIRECTORY}/vectors/sample_point_cz.sld',
+        },
+        'correct_values_in_detail_params': {
+            'exp_publication_detail': {
+                'bounding_box': [-8248279.570477128, 521380.073788664, -8248279.570477128, 521380.073788664],
+                'native_crs': 'EPSG:4326',
+                'native_bounding_box': [-74.09555605850406, 4.678429401413592, -74.09555605850406, 4.678429401413592],
+            },
+            'file_extension': 'shp',
+            'publ_type_detail': ('vector', 'sld'),
+        },
+        'exp_thumbnail': f'{DIRECTORY}/sample_point_co_4326_thumbnail.png',
+        'thumbnail_tolerance': 5,
+        'exp_bboxes': EXP_COLOMBIA_9377_BBOXES,
+        'exp_feature_coordinates': EXP_COLOMBIA_9377_FEATURE_COORDINATES,
+    },
+    'colombia_9377': {
+        'filename': 'sample_point_co_9377',
+        'rest_args': {
+            'style_file': f'{DIRECTORY}/vectors/sample_point_cz.sld',
+        },
+        'correct_values_in_detail_params': {
+            'exp_publication_detail': {
+                'bounding_box': [-8248279.570477128, 521380.073788664, -8248279.570477128, 521380.073788664],
+                'native_crs': 'EPSG:9377',
+                'native_bounding_box': [4878536.78062931, 2075055.86836814, 4878536.78062931, 2075055.86836814],
+            },
+            'file_extension': 'shp',
+            'publ_type_detail': ('vector', 'sld'),
+        },
+        'exp_thumbnail': f'{DIRECTORY}/sample_point_co_9377_thumbnail.png',
+        'thumbnail_tolerance': 5,
+        'exp_bboxes': EXP_COLOMBIA_9377_BBOXES,
+        'exp_feature_coordinates': EXP_COLOMBIA_9377_FEATURE_COORDINATES,
+    },
+    'colombia_32718': {
+        'filename': 'sample_point_co_32718',
+        'rest_args': {
+            'style_file': f'{DIRECTORY}/vectors/sample_point_cz.sld',
+        },
+        'correct_values_in_detail_params': {
+            'exp_publication_detail': {
+                'bounding_box': [-8248279.570477128, 521380.0737886627, -8248279.570477128, 521380.0737886627],
+                'native_crs': 'EPSG:32718',
+                'native_bounding_box': [600313.0156696279, 10517183.12427732, 600313.0156696279, 10517183.12427732],
+            },
+            'file_extension': 'shp',
+            'publ_type_detail': ('vector', 'sld'),
+        },
+        'exp_thumbnail': f'{DIRECTORY}/sample_point_co_32718_thumbnail.png',
+        'thumbnail_tolerance': 5,
+        'exp_bboxes': EXP_COLOMBIA_32718_BBOXES,
+        'exp_feature_coordinates': EXP_COLOMBIA_32718_FEATURE_COORDINATES,
     },
 }
 
