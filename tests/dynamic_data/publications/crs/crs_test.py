@@ -60,6 +60,52 @@ EXP_COLOMBIA_32718_FEATURE_COORDINATES = [
 ]
 
 
+EXP_ARGENTINA_32719_BBOXES = {
+    'detail_3857': ([-7665975.547337632, -3889189.55878793, -7665902.741994568, -3889119.5343617746], 1),
+    'wfs_bbox': ([-68.86462982708407, -32.95392215239278, -68.8639763224129, -32.95339523913035], 0.0001),
+    'wms_geographic_bbox': ([-68.86462982708407, -32.95392215239278, -68.8639763224129, -32.95339523913035], 0.0001),
+}
+
+
+EXP_ARGENTINA_4326_BBOXES = {
+    'detail_3857': ([-7665975.526018278, -3889189.4956680667, -7665902.778211051, -3889119.5934383334], 1),
+    'wfs_bbox': ([-68.86462982708407, -32.95392215239278, -68.8639763224129, -32.95339523913035], 0.0001),
+    'wms_geographic_bbox': ([-68.86462982708407, -32.95392215239278, -68.8639763224129, -32.95339523913035], 0.0001),
+}
+
+
+EXP_ARGENTINA_32719_FEATURE_COORDINATES = [
+    # feature_id, out_crs, exp_coordinates, precision
+    (0, crs_def.EPSG_4326, (-68.86441977201119, -32.953605072221876), 0.0001),
+    (0, crs_def.EPSG_32719, (512671.9694055275, 6353848.227434449), 1),
+    (3, crs_def.EPSG_4326, (-68.8639763224129, -32.95370952228616), 0.0001),
+    (3, crs_def.EPSG_32719, (512713.4013810588, 6353836.59472584), 1),
+]
+
+
+EXP_UKRAINE_32635_BBOXES = {
+    'detail_3857': ([3402258.486546582, 6520449.908907397, 3402271.3474339517, 6520505.819691758], 1),
+    'wfs_bbox': ([30.563031819098, 50.42639422231104, 30.563099691411708, 50.4267141923843], 0.0001),
+    'wms_geographic_bbox': ([30.563031819098, 50.42639422231104, 30.563099691411708, 50.4267141923843], 0.0001),
+}
+
+
+EXP_UKRAINE_4326_BBOXES = {
+    'detail_3857': ([3402261.139200607, 6520449.908907397, 3402268.694712008, 6520505.819691761], 1),
+    'wfs_bbox': ([30.563031819098, 50.42639422231104, 30.563099691411708, 50.4267141923843], 0.0001),
+    'wms_geographic_bbox': ([30.563031819098, 50.42639422231104, 30.563099691411708, 50.4267141923843], 0.0001),
+}
+
+
+EXP_UKRAINE_32635_FEATURE_COORDINATES = [
+    # feature_id, out_crs, exp_coordinates, precision
+    (0, crs_def.EPSG_4326, (30.5630318191, 50.4267141924), 0.0001),
+    (0, crs_def.EPSG_32635, (753054.1838285355, 5592145.0112518147), 1),
+    (1, crs_def.EPSG_4326, (30.5630996914, 50.4263942223), 0.0001),
+    (1, crs_def.EPSG_32635, (753060.7101284470, 5592109.6771470010), 1),
+]
+
+
 TEST_CASES = {
     'epsg_4326_shp': {
         'filename': 'small_layer_4326',
@@ -217,6 +263,82 @@ TEST_CASES = {
         'thumbnail_tolerance': 5,
         'exp_bboxes': EXP_COLOMBIA_32718_BBOXES,
         'exp_feature_coordinates': EXP_COLOMBIA_32718_FEATURE_COORDINATES,
+    },
+    'argentina_32719': {
+        'filename': 'sample_point_arg_32719',
+        'rest_args': {
+            'style_file': f'{DIRECTORY}/vectors/sample_point_cz.sld',
+        },
+        'correct_values_in_detail_params': {
+            'exp_publication_detail': {
+                'bounding_box': [-7665975.547337632, -3889189.55878793, -7665902.741994568, -3889119.5343617746],
+                'native_crs': 'EPSG:32719',
+                'native_bounding_box': [512652.3486082188, 6353813.048549168, 512713.4013810588, 6353871.485392559],
+            },
+            'file_extension': 'shp',
+            'publ_type_detail': ('vector', 'sld'),
+        },
+        'exp_thumbnail': f'{DIRECTORY}/sample_point_arg_32719_thumbnail.png',
+        'thumbnail_tolerance': 5,
+        'exp_bboxes': EXP_ARGENTINA_32719_BBOXES,
+        'exp_feature_coordinates': EXP_ARGENTINA_32719_FEATURE_COORDINATES,
+    },
+    'argentina_4326': {
+        'filename': 'sample_point_arg_4326',
+        'rest_args': {
+            'style_file': f'{DIRECTORY}/vectors/sample_point_cz.sld',
+        },
+        'correct_values_in_detail_params': {
+            'exp_publication_detail': {
+                'bounding_box': [-7665975.526018278, -3889189.4956680667, -7665902.778211051, -3889119.5934383334],
+                'native_crs': 'EPSG:4326',
+                'native_bounding_box': [-68.86462982708407, -32.95392215239278, -68.8639763224129, -32.95339523913035],
+            },
+            'file_extension': 'shp',
+            'publ_type_detail': ('vector', 'sld'),
+        },
+        'exp_thumbnail': f'{DIRECTORY}/sample_point_arg_4326_thumbnail.png',
+        'thumbnail_tolerance': 5,
+        'exp_bboxes': EXP_ARGENTINA_4326_BBOXES,
+        'exp_feature_coordinates': EXP_ARGENTINA_32719_FEATURE_COORDINATES,
+    },
+    'ukraine_32635': {
+        'filename': 'sample_point_ua_32635',
+        'rest_args': {
+            'style_file': f'{DIRECTORY}/vectors/sample_point_cz.sld',
+        },
+        'correct_values_in_detail_params': {
+            'exp_publication_detail': {
+                'bounding_box': [3402258.486546582, 6520449.908907397, 3402271.3474339517, 6520505.819691758],
+                'native_crs': 'EPSG:32635',
+                'native_bounding_box': [753054.1838285355, 5592109.677147001, 753060.710128447, 5592145.011251815],
+            },
+            'file_extension': 'shp',
+            'publ_type_detail': ('vector', 'sld'),
+        },
+        'exp_thumbnail': f'{DIRECTORY}/sample_point_ua_32635_thumbnail.png',
+        'thumbnail_tolerance': 5,
+        'exp_bboxes': EXP_UKRAINE_32635_BBOXES,
+        'exp_feature_coordinates': EXP_UKRAINE_32635_FEATURE_COORDINATES,
+    },
+    'ukraine_4326': {
+        'filename': 'sample_point_ua_4326',
+        'rest_args': {
+            'style_file': f'{DIRECTORY}/vectors/sample_point_cz.sld',
+        },
+        'correct_values_in_detail_params': {
+            'exp_publication_detail': {
+                'bounding_box': [3402261.139200607, 6520449.908907397, 3402268.694712008, 6520505.819691761],
+                'native_crs': 'EPSG:4326',
+                'native_bounding_box': [30.563031819098, 50.42639422231103, 30.563099691411708, 50.42671419238431],
+            },
+            'file_extension': 'shp',
+            'publ_type_detail': ('vector', 'sld'),
+        },
+        'exp_thumbnail': f'{DIRECTORY}/sample_point_ua_4326_thumbnail.png',
+        'thumbnail_tolerance': 5,
+        'exp_bboxes': EXP_UKRAINE_4326_BBOXES,
+        'exp_feature_coordinates': EXP_UKRAINE_32635_FEATURE_COORDINATES,
     },
 }
 

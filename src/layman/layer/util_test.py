@@ -19,7 +19,7 @@ def ensure_tables():
         ('schema_name', 'no_primary_key', 'geo_wkb_column', [], [], 4326),
         ('schema_name', 'table_with_unsafe_column_name', 'geo_wkb_column', ['my_id'], ['name-with-dashes'], 4326),
         ('schema_name', 'table_without_geo_column', None, ['my_id'], [], 4326),
-        ('schema_name', 'table_name_32635', 'geo_wkb_column', ['my_id'], [], 32635),
+        ('schema_name', 'table_name_32638', 'geo_wkb_column', ['my_id'], [], 32638),
     ]
     for schema, table, geo_column, primary_key_columns, other_columns, srid in tables:
         external_db.ensure_table(schema, table, geo_column, primary_key_columns=primary_key_columns,
@@ -425,17 +425,17 @@ def test_parse_external_table_uri_str(external_table_uri_str, exp_result):
             },
         }, id='table_without_geo_column'),
     pytest.param(
-        'postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=table_name_32635',
+        'postgresql://docker:docker@postgresql:5432/external_test_db?schema=schema_name&table=table_name_32638',
         {
             'http_code': 400,
             'code': 2,
             'data': {
                 'parameter': 'external_table_uri',
                 'message': 'Unsupported CRS of table data.',
-                'found': 'EPSG:32635',
+                'found': 'EPSG:32638',
                 'supported_values': settings.INPUT_SRS_LIST,
             },
-        }, id='table_in_crs_32635'),
+        }, id='table_in_crs_32638'),
 ])
 def test_validate_external_table_uri_str(external_table_uri_str, exp_error):
     with pytest.raises(LaymanError) as exc_info:
