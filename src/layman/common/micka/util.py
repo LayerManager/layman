@@ -265,19 +265,20 @@ def soap_insert(template_values):
     return muuid
 
 
-def soap_insert_record(record, is_public):
+def soap_insert_record(record, is_public, create_user):
     muuid = soap_insert({
         'public': '1' if is_public else '0',
         'record': record,
         'edit_user': settings.CSW_BASIC_AUTHN[0],
         'read_user': settings.CSW_BASIC_AUTHN[0],
+        'create_user': create_user,
     })
     return muuid
 
 
-def soap_insert_record_from_template(template_path, prop_values, metadata_properties, is_public):
+def soap_insert_record_from_template(template_path, prop_values, metadata_properties, is_public, create_user):
     record = fill_xml_template_as_pretty_str(template_path, prop_values, metadata_properties)
-    return soap_insert_record(record, is_public)
+    return soap_insert_record(record, is_public, create_user=create_user)
 
 
 def parse_md_properties(file_obj, property_names, publ_properties):
