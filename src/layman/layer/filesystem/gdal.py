@@ -33,7 +33,9 @@ def get_layer_info(uuid, *, extra_keys=None):
             }
         }
         file_dict = result['_file']
-        input_file_gdal_path = next(iter(input_file.get_layer_info(uuid)['_file']['paths'].values()))['gdal']
+        input_file_info = input_file.get_layer_info(uuid)
+        result['_file']['file_type'] = input_file_info['_file']['file_type']
+        input_file_gdal_path = next(iter(input_file_info['_file']['paths'].values()))['gdal']
         if '_file.color_interpretations' in extra_keys:
             file_dict['color_interpretations'] = get_color_interpretations(input_file_gdal_path)
         if '_file.mask_flags' in extra_keys:
@@ -63,7 +65,9 @@ post_layer = empty_method
 patch_layer = empty_method
 
 
-def delete_layer(layer: Layer):
+def delete_layer(layer: Layer, preserve_input_files=False):
+    if preserve_input_files:
+        return
     try:
         shutil.rmtree(get_normalized_raster_layer_dir(layer.uuid))
     except FileNotFoundError:
