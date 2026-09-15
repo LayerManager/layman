@@ -16,6 +16,7 @@
 - [#1126](https://github.com/LayerManager/layman/issues/1126) Migrate graphic URLs in layer metadata from workspace&name-based format to UUID-based format.
 
 ### Changes
+- [#1168](https://github.com/LayerManager/layman/issues/1168) Extend [PATCH Layer](doc/rest.md#patch-layer) with ability of appending data to existing time-series layer.
 - Add `sed` command to Dockerfile files to change HTTP to HTTPS in apt sources.list.
 - Layman supports import of layers in EPSG:9377, EPSG:32718 using [LAYMAN_INPUT_SRS_LIST](doc/env-settings.md#LAYMAN_INPUT_SRS_LIST)
 - [#1173](https://github.com/LayerManager/layman/issues/1173) Layman supports import of layers in EPSG:32719, EPSG:32635, EPSG:32636, EPSG:32637 using [LAYMAN_INPUT_SRS_LIST](doc/env-settings.md#LAYMAN_INPUT_SRS_LIST)
