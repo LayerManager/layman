@@ -22,7 +22,9 @@ MIN_UPGRADEABLE_VERSION = {
 
 MIGRATIONS = {
     consts.MIGRATION_TYPE_SCHEMA: [
-        ((3, 0, 0), [lambda: logger.info("3.0.0 schema – no structural changes"),]),
+        ((3, 0, 0), [
+            upgrade_v3_0.adjust_db_for_file_path,
+        ]),
     ],
     consts.MIGRATION_TYPE_DATA: [
         ((3, 0, 0), [

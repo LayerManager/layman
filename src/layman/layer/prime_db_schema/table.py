@@ -81,6 +81,7 @@ def post_layer(layer: Layer,
                image_mosaic,
                external_table_uri,
                style_type=None,
+               file_path=None,
                ):
     db_info = {"name": layer.name,
                "title": title,
@@ -93,6 +94,7 @@ def post_layer(layer: Layer,
                'style_type': style_type.code if style_type else None,
                'image_mosaic': image_mosaic,
                'external_table_uri': external_table_uri,
+               'file_path': file_path,
                'wfs_wms_status': settings.EnumWfsWmsStatus.PREPARING.value,
                }
     pubs_util.insert_publication(layer.workspace, db_info)

@@ -11,6 +11,7 @@ from layman.http import LaymanError
 from layman import settings, patch_mode
 from layman.common import empty_method, empty_method_returns_dict
 from layman.common.filesystem import input_file as common
+from layman.common.prime_db_schema import publications as pubs_util
 from . import util, gdal as fs_gdal
 from ..layer_class import Layer
 
@@ -55,7 +56,59 @@ def get_layer_input_files(publ_uuid):
     return util.InputFiles(saved_paths=filepaths)
 
 
+def is_file_path_layer(publ_uuid):
+    if not publ_uuid:
+        return False
+    infos = pubs_util.get_publication_infos(uuid=publ_uuid)
+    if not infos:
+        return False
+    info = list(infos.values())[0]
+    return info.get('file_path') is not None
+
+
+def get_file_path_info(publ_uuid):
+    from .. import util as layer_util
+
+    if not publ_uuid:
+        return None
+    infos = pubs_util.get_publication_infos(uuid=publ_uuid)
+    if not infos:
+        return None
+    info = list(infos.values())[0]
+    file_path_relative = info.get('file_path')
+    if not file_path_relative:
+        return None
+
+    abs_path = os.path.join(settings.GEOSERVER_DATADIR, file_path_relative)
+
+    if not os.path.isdir(abs_path):
+        raise LaymanError(2, {
+            'parameter': 'file_path',
+            'message': 'Path is not a directory',
+            'expected': 'Relative path to directory containing raster files',
+            'found': file_path_relative,
+        })
+
+    tifs = layer_util.get_geotiff_files(abs_path)
+    if not tifs:
+        return None
+    return [{'absolute': tif, 'gdal': tif, 'file_path': file_path_relative} for tif in tifs]
+
+
 def get_layer_info(uuid):
+    file_path_info_list = get_file_path_info(uuid)
+    if file_path_info_list:
+        return {
+            'file': {'paths': [os.path.relpath(info['gdal'], settings.GEOSERVER_DATADIR) for info in file_path_info_list]},
+            '_file': {
+                'file_type': get_file_type(file_path_info_list[0]['gdal']),
+                'paths': {
+                    os.path.basename(info['gdal']): {'absolute': info['absolute'], 'gdal': info['gdal']}
+                    for info in file_path_info_list
+                },
+            },
+        }
+
     input_files = get_layer_input_files(uuid)
 
     if input_files.saved_paths:
