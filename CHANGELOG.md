@@ -11,11 +11,14 @@
   ```
 ### Migrations and checks
 #### Schema migrations
+- [#1185](https://github.com/LayerManager/layman/issues/1185) Add new text column `file_path` in `publications` table in prime DB schema. Add constraint that `file_path` can be non-null only when `geodata_type` is `raster`.
 #### Data migrations
 - [#1126](https://github.com/LayerManager/layman/issues/1126) Migrate graphic URLs and map file endpoint URLs in map metadata from workspace&name-based format to UUID-based format.
 - [#1126](https://github.com/LayerManager/layman/issues/1126) Migrate graphic URLs in layer metadata from workspace&name-based format to UUID-based format.
 
 ### Changes
+- [#1185](https://github.com/LayerManager/layman/issues/1185) POST [Layers](doc/rest.md#post-layers) supports import of raster layers from an existing server-side directory via the file_path parameter, including ImageMosaic timeseries layers.
+- [#1185](https://github.com/LayerManager/layman/issues/1185) [GET Layer](doc/rest.md#get-layer) returns `file_path` key for raster layers published using this parameter.
 - [#1168](https://github.com/LayerManager/layman/issues/1168) Extend [PATCH Layer](doc/rest.md#patch-layer) with ability of appending data to existing time-series layer.
 - Add `sed` command to Dockerfile files to change HTTP to HTTPS in apt sources.list.
 - Layman supports import of layers in EPSG:9377, EPSG:32718 using [LAYMAN_INPUT_SRS_LIST](doc/env-settings.md#LAYMAN_INPUT_SRS_LIST)

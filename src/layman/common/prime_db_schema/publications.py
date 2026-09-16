@@ -173,6 +173,7 @@ select p.id as id_publication,
        ST_YMAX(p.bbox) as ymax,
        p.srid as srid,
        PGP_SYM_DECRYPT(p.external_table_uri, p.uuid::text)::json external_table_uri,
+       p.file_path,
        (select rtrim(concat(case when u.id is not null then w.name || ',' end,
                             string_agg(COALESCE(w2.name, r.role_name), ',' ORDER BY COALESCE(w2.name, r.role_name)) || ',',
                             case when p.everyone_can_read then %s || ',' end
@@ -308,10 +309,11 @@ from {DB_SCHEMA}.workspaces w inner join
                                    'used_in_maps': layer_maps or [],
                                    '_wfs_wms_status': settings.EnumWfsWmsStatus(wfs_wms_status) if wfs_wms_status else None,
                                    '_is_public_workspace': is_public_workspace,
+                                   'file_path': file_path,
                                    }
              for id_publication, workspace_name, publication_type, publication_name, title, description, uuid,
              geodata_type, style_type, image_mosaic, updated_at, created_at, xmin, ymin, xmax, ymax,
-             srid, external_table_uri, read_users_roles, write_users_roles, map_layers, layer_maps, wfs_wms_status, is_public_workspace, _
+             srid, external_table_uri, file_path, read_users_roles, write_users_roles, map_layers, layer_maps, wfs_wms_status, is_public_workspace, _
              in values}
 
     infos = {key: {**value,
@@ -501,8 +503,8 @@ def insert_publication(workspace_name, info):
     check_publication_info(workspace_name, info)
 
     insert_publications_sql = f'''insert into {DB_SCHEMA}.publications as p
-        (id_workspace, name, title, description, type, uuid, style_type, geodata_type, everyone_can_read, everyone_can_write, updated_at, image_mosaic, external_table_uri, wfs_wms_status) values
-        (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, current_timestamp, %s, PGP_SYM_ENCRYPT(%s::text, %s::text), %s )
+        (id_workspace, name, title, description, type, uuid, style_type, geodata_type, everyone_can_read, everyone_can_write, updated_at, image_mosaic, external_table_uri, file_path, wfs_wms_status) values
+        (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, current_timestamp, %s, PGP_SYM_ENCRYPT(%s::text, %s::text), %s, %s )
 returning id
 ;'''
 
@@ -527,6 +529,7 @@ returning id
             info.get("image_mosaic"),
             external_table_uri,
             info.get("uuid"),
+            info.get("file_path"),
             info.get("wfs_wms_status")
             )
     pub_id = db_util.run_query(insert_publications_sql, data)[0][0]
@@ -601,6 +604,7 @@ def update_publication(uuid, info, is_part_of_user_delete=False):
     updated_at =  current_timestamp,
     image_mosaic = coalesce(%s, image_mosaic),
     external_table_uri = PGP_SYM_ENCRYPT(%s::text, uuid::text),
+    file_path = coalesce(%s, file_path),
     geodata_type = coalesce(%s, geodata_type)
 where uuid = %s
 returning id
@@ -613,6 +617,7 @@ returning id
             access_rights_changes['write']['EVERYONE'],
             info.get("image_mosaic"),
             external_table_uri,
+            info.get("file_path"),
             info.get("geodata_type"),
             uuid,
             )
@@ -662,9 +667,10 @@ def set_bbox(uuid, bbox, crs, ):
 
 def set_geodata_type(uuid, geodata_type, ):
     query = f'''update {DB_SCHEMA}.publications set
-    geodata_type = %s
+    geodata_type = %s,
+    file_path = CASE WHEN %s = %s THEN NULL ELSE file_path END
     where uuid = %s;'''
-    params = (geodata_type, uuid,)
+    params = (geodata_type, geodata_type, settings.GEODATA_TYPE_UNKNOWN, uuid,)
     db_util.run_statement(query, params)
 
 
