@@ -17,7 +17,7 @@
 - [#1126](https://github.com/LayerManager/layman/issues/1126) Migrate graphic URLs in layer metadata from workspace&name-based format to UUID-based format.
 
 ### Changes
-- [#1185](https://github.com/LayerManager/layman/issues/1185) POST [Layers](doc/rest.md#post-layers) supports import of raster layers from an existing server-side directory via the file_path parameter, including ImageMosaic timeseries layers.
+- [#1185](https://github.com/LayerManager/layman/issues/1185) POST [Layers](doc/rest.md#post-layers) supports import of raster layers from existing server-side data via `file_path` (directory for ImageMosaic timeseries layers, or direct GeoTIFF file path).
 - [#1185](https://github.com/LayerManager/layman/issues/1185) [GET Layer](doc/rest.md#get-layer) returns `file_path` key for raster layers published using this parameter.
 - [#1168](https://github.com/LayerManager/layman/issues/1168) Extend [PATCH Layer](doc/rest.md#patch-layer) with ability of appending data to existing time-series layer.
 - Add `sed` command to Dockerfile files to change HTTP to HTTPS in apt sources.list.
