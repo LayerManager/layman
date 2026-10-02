@@ -72,7 +72,13 @@ def get_db_store_name(*, uuid, original_data_source):
 
 
 def image_mosaic_granules_to_wms_time_key(granules_json):
-    values = sorted(set(feature['properties']['ingestion'] for feature in granules_json['features']))
+    values = sorted(set(
+        feature.get('properties', {}).get('ingestion')
+        for feature in granules_json.get('features', [])
+        if feature.get('properties', {}).get('ingestion')
+    ))
+    if not values:
+        return {}
     return {
         'units': 'ISO8601',
         'values': values,

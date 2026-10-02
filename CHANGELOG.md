@@ -19,6 +19,7 @@
 ### Changes
 - [#1185](https://github.com/LayerManager/layman/issues/1185) POST [Layers](doc/rest.md#post-layers) supports import of raster layers from existing server-side data via `file_path` (directory for ImageMosaic timeseries layers, or direct GeoTIFF file path).
 - [#1185](https://github.com/LayerManager/layman/issues/1185) [GET Layer](doc/rest.md#get-layer) returns `file_path` key for raster layers published using this parameter.
+- [#1195](https://github.com/LayerManager/layman/issues/1195) Allow publishing multiple raster granules as a single non-time series ImageMosaic layer (via `file` upload or `file_path` directory).
 - [#1168](https://github.com/LayerManager/layman/issues/1168) Extend [PATCH Layer](doc/rest.md#patch-layer) with ability of appending data to existing time-series layer.
 - Add `sed` command to Dockerfile files to change HTTP to HTTPS in apt sources.list.
 - Layman supports import of layers in EPSG:9377, EPSG:32718 using [LAYMAN_INPUT_SRS_LIST](doc/env-settings.md#LAYMAN_INPUT_SRS_LIST)
