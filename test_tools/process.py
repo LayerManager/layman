@@ -82,6 +82,8 @@ def oauth2_provider_mock():
                 'geoserver_proxy_wfs_authz_test_user': None,
                 'geoserver_proxy_wfs_authz_test_user_2': None,
                 'test_uuid_map_thumbnail': None,
+                'test_wcs_access_owner': None,
+                'test_wcs_access_other': None,
             },
         },
         'host': '0.0.0.0',

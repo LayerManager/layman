@@ -1,7 +1,14 @@
+import json
+from urllib.parse import urljoin
+
 import pytest
+import requests
 from lxml import etree as ET
 
+from geoserver import GS_REST_WORKSPACES
 from layman import app, settings, common
+from layman.layer.geoserver import GeoserverIds
+from layman.layer.geoserver import wms
 from layman.common.micka import util as common_util, requests as micka_requests
 from layman.map.map_class import Map
 from layman.layer.layer_class import Layer
@@ -48,6 +55,55 @@ def update_metadata_values(publication, *, metadata_properties_to_refresh=None, 
         'muuid': muuid,
         'record': record,
     }, timeout=timeout)
+
+
+@pytest.mark.usefixtures('ensure_layman')
+def test_ensure_raster_coverage_wcs_formats():
+    workspace = 'test_wcs_formats_upgrade_workspace'
+    name = 'test_wcs_formats_upgrade_layer'
+    published = process_client.publish_workspace_layer(
+        workspace,
+        name,
+        file_paths=['sample/layman.layer/sample_tif_rgb.tif'],
+    )
+    publ_uuid = published['uuid']
+    gs_layername = GeoserverIds(uuid=publ_uuid).wms
+    coverage_store = wms.get_geotiff_store_name(uuid=publ_uuid)
+    coverage_url = urljoin(
+        GS_REST_WORKSPACES,
+        f'{gs_layername.workspace}/coveragestores/{coverage_store}/coverages/{gs_layername.name}',
+    )
+
+    try:
+        response = requests.put(
+            coverage_url,
+            data=json.dumps({
+                'coverage': {
+                    'supportedFormats': {
+                        'string': ['ArcGrid', 'GEOTIFF'],
+                    },
+                },
+            }),
+            headers=upgrade_v3_0.gs_util.headers_json,
+            auth=settings.LAYMAN_GS_AUTH,
+            timeout=upgrade_v3_0.gs_util.GS_REST_TIMEOUT,
+        )
+        response.raise_for_status()
+
+        upgrade_v3_0.ensure_raster_coverage_wcs_formats()
+
+        response = requests.get(
+            coverage_url + '.json',
+            headers=upgrade_v3_0.gs_util.headers_json,
+            auth=settings.LAYMAN_GS_AUTH,
+            timeout=upgrade_v3_0.gs_util.GS_REST_TIMEOUT,
+        )
+        response.raise_for_status()
+        formats = response.json()['coverage']['supportedFormats']['string']
+        assert formats[0] == 'ArcGrid'
+        assert set(upgrade_v3_0.gs_util.COVERAGE_SUPPORTED_FORMATS).issubset(formats)
+    finally:
+        process_client.delete_layer(publ_uuid, skip_404=True)
 
 
 @pytest.mark.parametrize('class_type,process_func,url_endpoint,test_uuid,publ_type,csw_module,migrate_func,delete_func', [

@@ -637,7 +637,7 @@ def get_info_with_statuses(info, chain_info, task_to_layer_info_keys, item_keys)
             if task_name not in task_to_layer_info_keys:
                 continue
             for layerinfo_key in task_to_layer_info_keys[task_name]:
-                if layerinfo_key not in filled_info:
+                if layerinfo_key in item_keys and layerinfo_key not in filled_info:
                     filled_info[layerinfo_key] = source_state
 
         return filled_info

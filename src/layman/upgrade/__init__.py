@@ -30,6 +30,7 @@ MIGRATIONS = {
         ((3, 0, 0), [
             upgrade_v3_0.migrate_map_metadata_urls,
             upgrade_v3_0.migrate_layer_metadata_urls,
+            upgrade_v3_0.ensure_raster_coverage_wcs_formats,
         ]),
     ],
 }
