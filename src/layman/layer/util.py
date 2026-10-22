@@ -174,7 +174,7 @@ TASKS_TO_LAYER_INFO_KEYS = {
     'layman.layer.filesystem.gdal.refresh': ['file'],
     'layman.layer.db.table.refresh': ['db'],
     'layman.layer.geoserver.wfs.refresh': ['wfs'],
-    'layman.layer.geoserver.wms.refresh': ['wms'],
+    'layman.layer.geoserver.wms.refresh': ['wms', 'wcs'],
     'layman.layer.geoserver.sld.refresh': ['style'],
     'layman.layer.filesystem.thumbnail.refresh': ['thumbnail'],
     'layman.layer.micka.soap.refresh': ['metadata'],
@@ -231,6 +231,7 @@ def layer_info_to_metadata_properties(info):
         'graphic_url': info.get('thumbnail', {}).get('url', None),
         'wms_url': info.get('wms', {}).get('url', None),
         'wfs_url': info.get('wfs', {}).get('url', None),
+        'wcs_url': info.get('wcs', {}).get('url', None),
         'layer_endpoint': info['url'],
         'temporal_extent': info.get('wms', {}).get('time', {}).get('values'),
     }

@@ -27,6 +27,7 @@ IS_LAYER_COMPLETE_AND_CONSISTENT = [
     Action(geoserver.is_complete_in_internal_workspace_wms, {}),
     Action(geoserver_proxy.is_complete_in_workspace_wms_1_3_0, {}),
     Action(geoserver_proxy.workspace_wfs_2_0_0_capabilities_available_if_vector, {}),
+    Action(geoserver_proxy.workspace_wcs_1_0_0_available_if_raster, {}),
 ]
 
 IS_MAP_COMPLETE_AND_CONSISTENT = [

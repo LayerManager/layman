@@ -16,6 +16,7 @@ from layman.layer.filesystem import gdal
 from layman.layer import db
 from layman.layer.geoserver import wms
 from layman.layer.geoserver import wfs
+from layman.layer.geoserver import wcs
 from layman import settings, patch_mode, LaymanError, common
 from layman.util import url_for, get_publication_info
 
@@ -144,6 +145,7 @@ def get_template_path_and_values(publication: Layer, *, http_method):
             'scale_denominator': scale_denominator,
         }
         wfs_url = wfs.get_wfs_url(external_url=True)
+        wcs_url = None
     elif geodata_type == settings.GEODATA_TYPE_RASTER:
         languages = []
         bbox_sphere_size = prime_db_table.get_bbox_sphere_size(publication)
@@ -155,6 +157,7 @@ def get_template_path_and_values(publication: Layer, *, http_method):
             }
         }
         wfs_url = None
+        wcs_url = wcs.get_wcs_url(external_url=True)
     else:
         raise NotImplementedError(f"Unknown geodata type: {geodata_type}")
 
@@ -181,6 +184,7 @@ def get_template_path_and_values(publication: Layer, *, http_method):
         'temporal_extent': temporal_extent,
         'wms_url': f"{wms.add_capabilities_params_to_url(wms.get_wms_url(external_url=True))}&LAYERS={wms_name}",
         'wfs_url': f"{wfs.add_capabilities_params_to_url(wfs_url)}&LAYERS={wfs_name}" if wfs_url else None,
+        'wcs_url': f"{wcs.add_capabilities_params_to_url(wcs_url)}&COVERAGE={wms_name}" if wcs_url else None,
         'layer_endpoint': url_for('rest_layer.get', uuid=publication.uuid),
         'spatial_resolution': spatial_resolution,
         'language': languages,
@@ -328,6 +332,15 @@ METADATA_PROPERTIES = {
                                            resource_protocol=f'OGC:WFS-{wfs.VERSION}-http-get-capabilities',
                                            online_function='download'),
     },
+    'wcs_url': {
+        'xpath_parent': '/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions',
+        'xpath_property': f'./gmd:onLine[gmd:CI_OnlineResource/gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/OGC:WCS-{wcs.VERSION}-http-get-capabilities"]',
+        'xpath_extract': './gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()',
+        'xpath_extract_fn': lambda vals: vals[0] if vals else None,
+        'adjust_property_element': partial(common_util.adjust_online_url,
+                                           resource_protocol=f'OGC:WCS-{wcs.VERSION}-http-get-capabilities',
+                                           online_function='download'),
+    },
     'layer_endpoint': {
         'xpath_parent': '/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions',
         'xpath_property': './gmd:onLine[gmd:CI_OnlineResource/gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/WWW:LINK-1.0-http--link"]',
@@ -366,6 +379,7 @@ def get_metadata_comparison(layer: Layer):
         'title',
         'wfs_url',
         'wms_url',
+        'wcs_url',
     ], METADATA_PROPERTIES)
     # current_app.logger.info(f"props:\n{json.dumps(props, indent=2)}")
     # current_app.logger.info(f"csw.request={csw.request}")

@@ -10,6 +10,7 @@
 - Published layer can be accessed by standardized OGC interfaces
   - [Web Map Service (WMS)](https://www.ogc.org/standards/wms/)
   - [Web Feature Service (WFS)](https://www.ogc.org/standards/wfs/)
+  - [Web Coverage Service (WCS)](https://www.ogc.org/standards/wcs/)
   - [Catalogue Service](https://www.ogc.org/standards/cat/)
 - Thumbnail image available
 - Layer-related data is named and structured by UUID:
@@ -17,6 +18,7 @@
       - [PostgreSQL](data-storage.md#postgresql): `db=LAYMAN_PG_DBNAME, schema=layers, table=layer_<UUID>` 
       - [GeoServer WFS](data-storage.md#geoserver): `/geoserver/layman/ows, layer=l_<UUID>`
       - [GeoServer WMS](data-storage.md#geoserver): `/geoserver/layman_wms/ows, layer=l_<UUID>, style=<UUID>`
+      - [GeoServer WCS](data-storage.md#geoserver): `/geoserver/layman_wms/wcs, coverage=l_<UUID>`
       - Micka: `/record/basic/m-<UUID>`
       - [REST API](rest.md): `/rest/layers/<uuid>/thumbnail`
 - Simple rules

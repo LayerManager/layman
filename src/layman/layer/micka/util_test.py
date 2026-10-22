@@ -9,7 +9,7 @@ del sys.modules['layman']
 from layman import app, settings, util as layman_util
 from layman.common.micka import util as common_util, MickaIds
 from layman.common.metadata import PROPERTIES as COMMON_PROPERTIES, prop_equals
-from layman.layer.geoserver import wms, wfs
+from layman.layer.geoserver import wms, wfs, wcs
 from test_tools.util import url_for
 from . import csw as csw_util
 
@@ -63,6 +63,7 @@ def test_fill_template():
                                                                                               '2022-03-19T00:00:00.000Z', ],
                                                                           'wms_url': f"{wms.add_capabilities_params_to_url('http://www.env.cz/corine/data/download.zip')}&LAYERS=l_{layer_uuid}",
                                                                           'wfs_url': f"{wfs.add_capabilities_params_to_url('http://www.env.cz/corine/data/download.zip')}&LAYERS=l_{layer_uuid}",
+                                                                          'wcs_url': f"{wcs.add_capabilities_params_to_url('http://www.env.cz/corine/data/download.zip')}&COVERAGE=l_{layer_uuid}",
                                                                           'layer_endpoint': layman_util.url_for(
                                                                               'rest_layer.get',
                                                                               uuid=layer_uuid),
@@ -106,6 +107,7 @@ def test_parse_md_properties():
             'title',
             'wfs_url',
             'wms_url',
+            'wcs_url',
         ], csw_util.METADATA_PROPERTIES)
     with app.app_context():
         expected = {
@@ -130,6 +132,7 @@ def test_parse_md_properties():
             'extent': [11.87, 48.12, 19.13, 51.59],
             'wms_url': 'http://www.env.cz/corine/data/download.zip',
             'wfs_url': 'http://www.env.cz/corine/data/download.zip',
+            'wcs_url': 'http://www.env.cz/corine/data/download.zip',
             'layer_endpoint': url_for('rest_layer.get', uuid=layer_uuid,
                                       internal=False),
         }
@@ -168,6 +171,7 @@ def test_fill_xml_template():
                                                                               'extent': [11.87, 48.12, 19.13, 51.59],
                                                                               'wms_url': 'https://example.com/wms',
                                                                               'wfs_url': 'https://example.com/wfs',
+                                                                              'wcs_url': 'https://example.com/wcs',
                                                                               'layer_endpoint': 'https://example.com/layer_endpoint',
                                                                           }, csw_util.METADATA_PROPERTIES)
 

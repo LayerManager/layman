@@ -291,6 +291,10 @@ def _correct_values_in_detail_common(
                                        {
                                            '_file': {'file_type': 'raster'},
                                            '_table_uri': None,
+                                           'wcs': {
+                                               'name': f'l_{uuid}',
+                                               'url': f'{settings.LAYMAN_GS_PROXY_BASE_URL}{GEOSERVER_WMS_WORKSPACE}/wcs',
+                                           },
                                        })
             if is_file_path_layer:
                 file_paths = file_path_input_file_info.get('_file', {}).get('paths', {})

@@ -76,6 +76,7 @@ PUBLICATION_TYPES = {
             ('layman.layer.qgis.wms', InternalSourceTypeDef(info_items=['style', 'wms', ]),),
             ('layman.layer.geoserver.wfs', InternalSourceTypeDef(info_items=['wfs', ]),),
             ('layman.layer.geoserver.wms', InternalSourceTypeDef(info_items=['wms', ]),),
+            ('layman.layer.geoserver.wcs', InternalSourceTypeDef(info_items=['wcs', ]),),
             ('layman.layer.geoserver.sld', InternalSourceTypeDef(info_items=['style', ]),),
             ('layman.layer.prime_db_schema.wfs_wms_status', InternalSourceTypeDef(info_items=[]),),
             ('layman.layer.filesystem.thumbnail', InternalSourceTypeDef(info_items=['thumbnail', ]),),
@@ -110,6 +111,7 @@ PUBLICATION_TYPES = {
                 'title',
                 'wfs_url',
                 'wms_url',
+                'wcs_url',
             }
         },
         'info_keys': {
@@ -124,8 +126,8 @@ PUBLICATION_TYPES = {
                 'original_data_source', 'geodata_type', 'used_in_maps',
             },
             settings.GEODATA_TYPE_RASTER: {
-                'name', 'uuid', 'layman_metadata', 'url', 'title', 'description', 'updated_at', 'wms', 'thumbnail', 'file', 'metadata',
-                'style', 'access_rights', 'bounding_box', 'native_crs', 'native_bounding_box', 'image_mosaic',
+                'name', 'uuid', 'layman_metadata', 'url', 'title', 'description', 'updated_at', 'wms', 'wcs', 'thumbnail', 'file',
+                'metadata', 'style', 'access_rights', 'bounding_box', 'native_crs', 'native_bounding_box', 'image_mosaic',
                 'original_data_source', 'geodata_type', 'used_in_maps', 'file_path',
             },
             settings.GEODATA_TYPE_UNKNOWN: {

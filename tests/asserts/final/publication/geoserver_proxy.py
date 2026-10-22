@@ -3,7 +3,14 @@ from layman import app, settings, util as layman_util
 from layman.layer.geoserver import util as gs_util, GeoserverIds
 from layman.util import XForwardedClass
 from test_tools import util as test_util, process_client, geoserver_client
-from . import geoserver_util
+from . import geoserver_util, geoserver_wcs
+
+workspace_wcs_1_0_0_available_if_raster = geoserver_wcs.workspace_wcs_1_0_0_available_if_raster
+workspace_wcs_1_0_0_available_in_output_crs = geoserver_wcs.workspace_wcs_1_0_0_available_in_output_crs
+workspace_wcs_1_0_0_matches_source_raster = geoserver_wcs.workspace_wcs_1_0_0_matches_source_raster
+workspace_wcs_1_0_0_timeseries_matches_wms_time = geoserver_wcs.workspace_wcs_1_0_0_timeseries_matches_wms_time
+workspace_wcs_1_0_0_coverage_absent = geoserver_wcs.workspace_wcs_1_0_0_coverage_absent
+workspace_wcs_1_0_0_forbidden_without_read = geoserver_wcs.workspace_wcs_1_0_0_forbidden_without_read
 
 
 def is_complete_in_workspace_wms(workspace, publ_type, name, *, version, headers=None):
@@ -20,7 +27,6 @@ def is_complete_in_workspace_wms(workspace, publ_type, name, *, version, headers
 
 def is_complete_in_workspace_wms_1_3_0(workspace, publ_type, name, headers=None, *, actor_name=None):
     headers = headers or {}
-    assert headers is not None or actor_name is not None
     if actor_name:
         assert process_client.TOKEN_HEADER not in headers
     if actor_name and actor_name != settings.ANONYM_USER:
@@ -31,7 +37,6 @@ def is_complete_in_workspace_wms_1_3_0(workspace, publ_type, name, headers=None,
 
 def workspace_wfs_2_0_0_capabilities_available_if_vector(workspace, publ_type, name, headers=None, *, actor_name=None):
     headers = headers or {}
-    assert headers is not None or actor_name is not None
     if actor_name:
         assert process_client.TOKEN_HEADER not in headers
     if actor_name and actor_name != settings.ANONYM_USER:

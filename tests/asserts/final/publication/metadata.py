@@ -23,6 +23,7 @@ LAYER_METADATA_PROPERTIES = {
     'title',
     'wfs_url',
     'wms_url',
+    'wcs_url',
 }
 
 MAP_METADATA_PROPERTIES = {
