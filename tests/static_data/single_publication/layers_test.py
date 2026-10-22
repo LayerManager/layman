@@ -37,6 +37,7 @@ def test_info(workspace, publ_type, publication):
     ensure_publication(workspace, publ_type, publication)
     wms_url = f"http://localhost:8000/geoserver/{GEOSERVER_WMS_WORKSPACE}/ows"
     wfs_url = f"http://localhost:8000/geoserver/{GEOSERVER_WFS_WORKSPACE}/wfs"
+    wcs_url = f"http://localhost:8000/geoserver/{GEOSERVER_WMS_WORKSPACE}/wcs"
     headers = data.HEADERS.get(data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA].get('users_can_write', [None])[0])
     style = data.PUBLICATIONS[(workspace, publ_type, publication)][data.TEST_DATA]['style_type']
 
@@ -56,6 +57,12 @@ def test_info(workspace, publ_type, publication):
     assert 'url' in info['wms'], f'info={info}'
     if 'wfs' in info:
         assert info['wfs'].get('url') == wfs_url, f'r_json={info}, wfs_url={wfs_url}'
+    if file_type == settings.GEODATA_TYPE_RASTER:
+        assert 'wcs' in info, f'raster must expose wcs, info={info}'
+        assert info['wcs'].get('url') == wcs_url, f'r_json={info}, wcs_url={wcs_url}'
+        assert info['wcs'].get('name') == f'l_{uuid}', f'info={info}'
+    else:
+        assert 'wcs' not in info, f'vector must not expose wcs, info={info}'
 
     assert info_internal['_style_type'] == style, f'info_internal={info_internal}'
     assert info['style']['type'] == style, info.get('style')
@@ -71,6 +78,7 @@ def test_geoserver_workspace(workspace, publ_type, publication):
 
     publ_asserts.geoserver_proxy.is_complete_in_workspace_wms_1_3_0(workspace, publ_type, publication, headers)
     publ_asserts.geoserver_proxy.workspace_wfs_2_0_0_capabilities_available_if_vector(workspace, publ_type, publication, headers)
+    publ_asserts.geoserver_proxy.workspace_wcs_1_0_0_available_if_raster(workspace, publ_type, publication, headers)
 
 
 @pytest.mark.parametrize('workspace, publ_type, publication', data.LIST_LAYERS)

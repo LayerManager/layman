@@ -54,6 +54,7 @@ METADATA_PROPERTIES = {
     'title',
     'wfs_url',
     'wms_url',
+    'wcs_url',
 }
 
 METADATA_PROPERTIES_EQUAL = METADATA_PROPERTIES

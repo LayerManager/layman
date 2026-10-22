@@ -82,6 +82,10 @@ PROPERTIES = {
         'upper_mp': '1',
         'equals_fn': lambda a, b: strip_capabilities_and_layers_params(a) == strip_capabilities_and_layers_params(b),
     },
+    'wcs_url': {
+        'upper_mp': '1',
+        'equals_fn': lambda a, b: strip_capabilities_and_layers_params(a) == strip_capabilities_and_layers_params(b),
+    },
     'layer_endpoint': {
         'upper_mp': '1',
     },
@@ -139,7 +143,7 @@ def prop_equals_strict(values, equals_fn=None):
 
 def strip_capabilities_and_layers_params(url):
     from layman.layer.geoserver.wms import strip_params_from_url
-    return strip_params_from_url(url, ['SERVICE', 'REQUEST', 'VERSION', 'LAYERS'])
+    return strip_params_from_url(url, ['SERVICE', 'REQUEST', 'VERSION', 'LAYERS', 'COVERAGE'])
 
 
 def transform_metadata_props_to_comparison(all_props):

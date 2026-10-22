@@ -1,6 +1,14 @@
-import pytest
+import json
+from urllib.parse import urljoin
 
+import pytest
+import requests
+
+from geoserver import GS_REST_WORKSPACES
+from geoserver.util import GS_REST_TIMEOUT, headers_json
 from layman import settings, app, util as layman_util
+from layman.layer.geoserver import GeoserverIds
+from layman.layer.geoserver.wms import get_geotiff_store_name
 from layman.layer.qgis import util as qgis_util, wms as qgis_wms
 from test_tools import process, process_client, geoserver_client
 from test_tools.mock.layman_classes import LayerMock
@@ -74,6 +82,17 @@ def test_custom_srs_list(ensure_layer):
         assert_qgis_output_srs_list(uuid_qgis1, settings.LAYMAN_OUTPUT_SRS_LIST)
         assert_qgis_wms_output_srs_list(qgis1_layer.qgis_ids.name, uuid_qgis1, settings.LAYMAN_OUTPUT_SRS_LIST)
 
+    raster_name = 'test_custom_srs_list_raster'
+    extra_crs = 'EPSG:3006'
+    assert extra_crs not in output_crs_list
+    raster_uuid = ensure_layer(
+        workspace,
+        raster_name,
+        file_paths=['sample/layman.layer/sample_tif_rgb.tif'],
+    )['uuid']
+    coverage_url = get_coverage_url(raster_uuid)
+    put_coverage_srs(coverage_url, [extra_crs])
+
     process.ensure_layman_function({
         'LAYMAN_OUTPUT_SRS_LIST': ','.join([str(code) for code in OUTPUT_SRS_LIST])
     })
@@ -95,6 +114,50 @@ def test_custom_srs_list(ensure_layer):
             assert_wfs_output_srs_list(wfs_name_qgis.workspace, wfs_name_qgis.name, output_epsg_codes_set)
             assert_qgis_output_srs_list(uuid_qgis1, output_crs_list)
             assert_qgis_wms_output_srs_list(qgis1_layer.qgis_ids.name, uuid_qgis1, output_crs_list)
+
+    coverage = get_coverage(coverage_url)
+    request_srs = coverage['requestSRS']['string']
+    assert request_srs[0] == extra_crs
+    assert request_srs == coverage['responseSRS']['string']
+    assert coverage['srs'] in request_srs
+    assert output_crs_list.issubset(request_srs)
+    assert len(request_srs) == len(set(request_srs))
+
+
+def get_coverage_url(publ_uuid):
+    gs_layername = GeoserverIds(uuid=publ_uuid).wms
+    coverage_store = get_geotiff_store_name(uuid=publ_uuid)
+    return urljoin(
+        GS_REST_WORKSPACES,
+        f'{gs_layername.workspace}/coveragestores/{coverage_store}/coverages/{gs_layername.name}',
+    )
+
+
+def put_coverage_srs(coverage_url, crs_values):
+    response = requests.put(
+        coverage_url,
+        data=json.dumps({
+            'coverage': {
+                'requestSRS': {'string': crs_values},
+                'responseSRS': {'string': crs_values},
+            },
+        }),
+        headers=headers_json,
+        auth=settings.LAYMAN_GS_AUTH,
+        timeout=GS_REST_TIMEOUT,
+    )
+    response.raise_for_status()
+
+
+def get_coverage(coverage_url):
+    response = requests.get(
+        coverage_url + '.json',
+        headers=headers_json,
+        auth=settings.LAYMAN_GS_AUTH,
+        timeout=GS_REST_TIMEOUT,
+    )
+    response.raise_for_status()
+    return response.json()['coverage']
 
 
 def assert_gs_wms_output_srs_list(workspace, layername, expected_output_crs_list):

@@ -15,8 +15,13 @@
 #### Data migrations
 - [#1126](https://github.com/LayerManager/layman/issues/1126) Migrate graphic URLs and map file endpoint URLs in map metadata from workspace&name-based format to UUID-based format.
 - [#1126](https://github.com/LayerManager/layman/issues/1126) Migrate graphic URLs in layer metadata from workspace&name-based format to UUID-based format.
+- Existing raster metadata records receive their WCS URL.
+- Ensure GeoServer raster coverages in `layman_wms` have WCS `supportedFormats` (GEOTIFF/PNG/JPEG/TIFF). Existing coverages published before WCS support would otherwise keep an empty format list and fail GetCoverage while Layman already exposes WCS URLs.
+- Ensure GeoServer raster coverages in `layman_wms` advertise their native CRS and all CRSs in `LAYMAN_OUTPUT_SRS_LIST` for WCS GetCoverage.
+- Add `/**/wcs` to the Layman GeoServer authentication filter path.
 
 ### Changes
+- Expose OGC [WCS](doc/endpoints.md#web-coverage-service) for raster layers: [GET Layer](doc/rest.md#get-layer) returns `wcs: { name, url }` pointing to `/geoserver/layman_wms/wcs` (WCS 1.0.0), Micka metadata includes `wcs_url`, and GeoServer auth filter path includes `/**/wcs`. Vector layers do not expose WCS. On startup, existing raster coverages gain any CRS from `LAYMAN_OUTPUT_SRS_LIST` that they do not already advertise.
 - [#1185](https://github.com/LayerManager/layman/issues/1185) POST [Layers](doc/rest.md#post-layers) supports import of raster layers from existing server-side data via `file_path` (directory for ImageMosaic timeseries layers, or direct GeoTIFF file path).
 - [#1185](https://github.com/LayerManager/layman/issues/1185) [GET Layer](doc/rest.md#get-layer) returns `file_path` key for raster layers published using this parameter.
 - [#1195](https://github.com/LayerManager/layman/issues/1195) Allow publishing multiple raster granules as a single non-time series ImageMosaic layer (via `file` upload or `file_path` directory).
