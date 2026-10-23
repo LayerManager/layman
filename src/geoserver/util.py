@@ -23,6 +23,7 @@ WFS_VERSION = '2.0.0'
 
 COVERAGESTORE_GEOTIFF = 'GeoTIFF'
 COVERAGESTORE_IMAGEMOSAIC = 'ImageMosaic'
+COVERAGE_SUPPORTED_FORMATS = ['GEOTIFF', 'PNG', 'JPEG', 'TIFF']
 
 RESERVED_ROLE_NAMES = [
     'ROLE_ADMINISTRATOR',
@@ -514,6 +515,124 @@ def delete_db_store(geoserver_workspace, auth, *, store_name):
         response.raise_for_status()
 
 
+def _coverage_supported_formats_payload(formats=None):
+    return {
+        "string": list(formats if formats is not None else COVERAGE_SUPPORTED_FORMATS),
+    }
+
+
+def _normalize_coverage_supported_formats(coverage):
+    formats = coverage.get('supportedFormats') if coverage else None
+    if not formats:
+        return []
+    if isinstance(formats, dict):
+        strings = formats.get('string', [])
+        if isinstance(strings, str):
+            return [strings]
+        return list(strings or [])
+    if isinstance(formats, list):
+        return list(formats)
+    return []
+
+
+def _merge_coverage_supported_formats(existing_formats):
+    """Union of existing formats and required WCS formats; preserves existing order."""
+    merged = list(existing_formats)
+    present = set(existing_formats)
+    for fmt in COVERAGE_SUPPORTED_FORMATS:
+        if fmt not in present:
+            merged.append(fmt)
+            present.add(fmt)
+    return merged
+
+
+def get_coverage_store_names(workspace, auth):
+    response = requests.get(
+        urljoin(GS_REST_WORKSPACES, f'{workspace}/coveragestores.json'),
+        headers=headers_json,
+        auth=auth,
+        timeout=GS_REST_TIMEOUT,
+    )
+    response.raise_for_status()
+    stores = response.json().get('coverageStores')
+    if not stores:
+        return []
+    store_list = stores.get('coverageStore', [])
+    if isinstance(store_list, dict):
+        store_list = [store_list]
+    return [store['name'] for store in store_list]
+
+
+def get_coverage_names(workspace, coverage_store, auth):
+    response = requests.get(
+        urljoin(GS_REST_WORKSPACES, f'{workspace}/coveragestores/{coverage_store}/coverages.json'),
+        headers=headers_json,
+        auth=auth,
+        timeout=GS_REST_TIMEOUT,
+    )
+    response.raise_for_status()
+    coverages = response.json().get('coverages')
+    if not coverages:
+        return []
+    coverage_list = coverages.get('coverage', [])
+    if isinstance(coverage_list, dict):
+        coverage_list = [coverage_list]
+    return [coverage['name'] for coverage in coverage_list]
+
+
+def ensure_coverage_supported_formats(workspace, coverage_store, coverage_name, auth):
+    """Add missing required WCS formats; keep any extra formats already configured. Returns True if updated."""
+    response = requests.get(
+        urljoin(
+            GS_REST_WORKSPACES,
+            f'{workspace}/coveragestores/{coverage_store}/coverages/{coverage_name}.json',
+        ),
+        headers=headers_json,
+        auth=auth,
+        timeout=GS_REST_TIMEOUT,
+    )
+    response.raise_for_status()
+    coverage = response.json()['coverage']
+    current_list = _normalize_coverage_supported_formats(coverage)
+    current = set(current_list)
+    expected = set(COVERAGE_SUPPORTED_FORMATS)
+    if expected.issubset(current):
+        return False
+
+    merged = _merge_coverage_supported_formats(current_list)
+    body = {
+        "coverage": {
+            "supportedFormats": _coverage_supported_formats_payload(merged),
+        }
+    }
+    put_response = requests.put(
+        urljoin(
+            GS_REST_WORKSPACES,
+            f'{workspace}/coveragestores/{coverage_store}/coverages/{coverage_name}',
+        ),
+        data=json.dumps(body),
+        headers=headers_json,
+        auth=auth,
+        timeout=GS_REST_TIMEOUT,
+    )
+    put_response.raise_for_status()
+    return True
+
+
+def ensure_workspace_coverages_supported_formats(workspace, auth):
+    """Ensure all coverages in workspace have WCS supportedFormats. Returns update count."""
+    updated = 0
+    for store_name in get_coverage_store_names(workspace, auth):
+        for coverage_name in get_coverage_names(workspace, store_name, auth):
+            if ensure_coverage_supported_formats(workspace, store_name, coverage_name, auth):
+                updated += 1
+                logger.info(
+                    f"Updated supportedFormats for coverage "
+                    f"{workspace}:{store_name}/{coverage_name}"
+                )
+    return updated
+
+
 def patch_coverage(geoserver_workspace, layer, coverage_store, *, title=None, description=None, bbox=None, crs=None,
                    auth, lat_lon_bbox=None):
     assert (bbox is None) == (crs is None), f'bbox={bbox}, crs={crs}'
@@ -538,18 +657,21 @@ def patch_coverage(geoserver_workspace, layer, coverage_store, *, title=None, de
         coverage['latLonBoundingBox'] = bbox_to_dict(lat_lon_bbox, 'CRS:84')
 
     coverage = {k: v for k, v in coverage.items() if v is not None}
-    body = {
-        "coverage": coverage
-    }
-    response = requests.put(
-        urljoin(GS_REST_WORKSPACES,
-                geoserver_workspace + f'/coveragestores/{coverage_store}/coverages/{layer}'),
-        data=json.dumps(body),
-        headers=headers_json,
-        auth=auth,
-        timeout=GS_REST_TIMEOUT,
-    )
-    response.raise_for_status()
+    if coverage:
+        body = {
+            "coverage": coverage
+        }
+        response = requests.put(
+            urljoin(GS_REST_WORKSPACES,
+                    geoserver_workspace + f'/coveragestores/{coverage_store}/coverages/{layer}'),
+            data=json.dumps(body),
+            headers=headers_json,
+            auth=auth,
+            timeout=GS_REST_TIMEOUT,
+        )
+        response.raise_for_status()
+    # Merge-add required WCS formats without replacing any extras already on the coverage.
+    ensure_coverage_supported_formats(geoserver_workspace, coverage_store, layer, auth)
 
 
 def create_coverage_store(geoserver_workspace, auth, name, file_or_dir, *, coverage_type=None):
@@ -607,6 +729,7 @@ def publish_coverage(geoserver_workspace, auth, coverage_store, layer, title, de
             'nativeBoundingBox': native_bbox,
             "latLonBoundingBox": bbox_to_dict(lat_lon_bbox, 'CRS:84'),
             "nativeFormat": "GeoTIFF",
+            "supportedFormats": _coverage_supported_formats_payload(),
             "srs": crs,
             "store": {
                 "@class": "coverageStore",

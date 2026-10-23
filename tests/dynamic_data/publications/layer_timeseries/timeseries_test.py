@@ -347,6 +347,9 @@ class TestLayer(base_test.TestSingleRestPublication):
         if params['do_complex_test']:
             with app.app_context():
                 prod_layer = Layer(uuid=self.get_publication_uuid(layer))
+            asserts_publ.geoserver_proxy.workspace_wcs_1_0_0_timeseries_matches_wms_time(
+                layer.workspace, layer.type, layer.name,
+            )
             time_snaps = [time_snap[:10] for time_snap in params['detail_values']['exp_publication_detail']['wms']['time']['values']]
             for time in time_snaps:
                 exp_wms = os.path.join(DIRECTORY, f"wms_{time}.png")
@@ -393,3 +396,8 @@ class TestLayer(base_test.TestSingleRestPublication):
                                                            file_extension='geojson',
                                                            publ_type_detail=('vector', 'sld'),
                                                            )
+            vector_info = process_client.get_publication(layer.type, uuid)
+            assert 'wcs' not in vector_info, vector_info
+            asserts_publ.geoserver_proxy.workspace_wcs_1_0_0_coverage_absent(
+                layer.workspace, layer.type, layer.name,
+            )

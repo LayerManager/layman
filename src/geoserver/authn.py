@@ -60,7 +60,7 @@ def create_security_filter_group(data_dir, name, filter_names):
     new_chain.attrib['class'] = 'org.geoserver.security.ServiceLoginFilterChain'
     new_chain.attrib['interceptorName'] = 'interceptor'
     new_chain.attrib['exceptionTranslationName'] = 'exception'
-    new_chain.attrib['path'] = '/**/wfs,/**/wms,/**/ows'
+    new_chain.attrib['path'] = '/**/wfs,/**/wms,/**/ows,/**/wcs'
     new_chain.attrib['disabled'] = 'false'
     new_chain.attrib['allowSessionCreation'] = 'false'
     new_chain.attrib['ssl'] = 'false'
@@ -92,6 +92,21 @@ def ensure_security_filter_group(data_dir, name, filter_names):
         create_security_filter_group(data_dir, name, filter_names)
     group_created = not group_exists
     return group_created
+
+
+def ensure_security_filter_group_path(data_dir, name, path):
+    security_xml = get_security(data_dir)
+    filter_el = security_xml.find(f".//filters[@name='{name}']")
+    if filter_el is None:
+        return False
+    current_path = filter_el.attrib.get('path')
+    if current_path == path:
+        return False
+    logger.info(f"  Updating Authentication Filter group '{name}' path from '{current_path}' to '{path}'")
+    filter_el.attrib['path'] = path
+    security_path = os.path.join(data_dir, 'security/config.xml')
+    security_xml.write(security_path)
+    return True
 
 
 def setup_authn(datadir,
@@ -128,3 +143,4 @@ def setup_authn(datadir,
             'anonymous',
         ]
     )
+    ensure_security_filter_group_path(datadir, filter_name, '/**/wfs,/**/wms,/**/ows,/**/wcs')

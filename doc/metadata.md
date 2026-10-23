@@ -334,6 +334,20 @@ Synchronizable: yes
 XPath for Layer: `/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine[gmd:CI_OnlineResource/gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/OGC:WMS-1.3.0-http-get-capabilities"]/gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()`
 
 
+### wcs_url
+It contains standard SERVICE, REQUEST, and VERSION parameters and COVERAGE parameter that holds name of the coverage at given WCS instance. It is filled for raster layers, not vector ones. Primary version is WCS 1.0.0.
+
+Multiplicity: 1
+
+Shape: String
+
+Example: `"http://localhost:8600/geoserver/layman_wms/wcs?SERVICE=WCS&REQUEST=GetCapabilities&VERSION=1.0.0&COVERAGE=l_ca238200-8200-1a23-9399-42c9fca53542"`
+
+Synchronizable: yes
+
+XPath for Layer: `/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine[gmd:CI_OnlineResource/gmd:protocol/gmx:Anchor/@xlink:href="https://services.cuzk.cz/registry/codelist/OnlineResourceProtocolValue/OGC:WCS-1.0.0-http-get-capabilities"]/gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()`
+
+
 ## Metadata properties unknown to Layman
 
 ### md_organisation_name

@@ -1,6 +1,7 @@
 import logging
 import traceback
 from db import util as db_util
+from geoserver import util as gs_util
 from layman import app, util as layman_util, settings
 from layman.map import MAP_TYPE
 from layman.layer import LAYER_TYPE
@@ -8,6 +9,7 @@ from layman.map.micka import csw
 from layman.layer.micka import csw as layer_csw
 from layman.map.map_class import Map
 from layman.layer.layer_class import Layer
+from layman.layer.geoserver import GEOSERVER_WMS_WORKSPACE
 
 logger = logging.getLogger(__name__)
 DB_SCHEMA = settings.LAYMAN_PRIME_SCHEMA
@@ -69,3 +71,21 @@ def migrate_map_metadata_urls():
 
 def migrate_layer_metadata_urls():
     migrate_metadata_urls(LAYER_TYPE)
+
+
+def ensure_raster_coverage_wcs_formats():
+    logger.info('Ensuring WCS supportedFormats on existing raster coverages in GeoServer')
+    try:
+        updated = gs_util.ensure_workspace_coverages_supported_formats(
+            GEOSERVER_WMS_WORKSPACE,
+            settings.LAYMAN_GS_AUTH,
+        )
+    except BaseException:
+        logger.error(
+            f'Error ensuring WCS supportedFormats on raster coverages: {traceback.format_exc()}'
+        )
+        raise
+    logger.info(
+        f'WCS supportedFormats ensure completed, updated {updated} coverage(s) '
+        f'in workspace {GEOSERVER_WMS_WORKSPACE}'
+    )

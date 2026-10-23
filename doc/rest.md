@@ -325,6 +325,11 @@ JSON object with following structure:
   - *url*: String. URL of WFS endpoint. It points to WFS endpoint of appropriate GeoServer workspace.
   - *status*: Status information about GeoServer import and availability of WFS feature type. See [GET Layer](#get-layer) **wms** property for meaning.
   - *error*: If status is FAILURE, this may contain error object.
+- *wcs*, available only for raster layers
+  - *name*: String. Name of the coverage on GeoServer in WMS workspace (`layman_wms`), same as WMS layer name (`l_<uuid>`).
+  - *url*: String. URL of WCS endpoint. It points to `/geoserver/layman_wms/wcs`. Primary documented version is WCS 1.0.0 (see [endpoints](endpoints.md#web-coverage-service)).
+  - *status*: Status information about GeoServer coverage availability. See [GET Layer](#get-layer) **wms** property for meaning.
+  - *error*: If status is FAILURE, this may contain error object.
 - **thumbnail**
   - *url*: String. URL of layer thumbnail. It points to [GET Layer Thumbnail](#get-layer-thumbnail).
   - *path*: String. Path to layer thumbnail. Path is relative to [LAYMAN_DATA_DIR](env-settings.md#LAYMAN_DATA_DIR).
