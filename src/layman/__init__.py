@@ -107,6 +107,14 @@ with settings.LAYMAN_REDIS.pipeline() as pipe:
                         from . import upgrade
                         upgrade.upgrade()
 
+                        logger.info('Ensure WCS output SRS list for raster coverages')
+                        from .layer.geoserver import GEOSERVER_WMS_WORKSPACE
+                        crs_updated = gs_util.ensure_workspace_coverages_supported_crs(  # pylint: disable=invalid-name
+                            GEOSERVER_WMS_WORKSPACE,
+                            settings.LAYMAN_GS_AUTH,
+                        )
+                        logger.info(f'WCS output SRS list ensured, updated {crs_updated} coverage(s)')
+
                         logger.info(f'Loading Redis database')
                         from .uuid import import_uuids_to_redis
 

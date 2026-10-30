@@ -32,5 +32,21 @@ For layers in `EPSG:5514` and WFS requests in `CRS:84`, the features may have wr
 
 For layers with QML style, there is precision error about 3.2 meters in some WMS GetMap requests. The error appears if either data CRS or WMS GetMap CRS is `EPSG:5514` and the other one is not.
 
+## Web Coverage Service
+[Web Coverage Service (WCS)](https://www.ogc.org/standards/wcs/) endpoint is implemented using combination of Layman's authentication proxy and [GeoServer](https://docs-archive.geoserver.org/2.26.x/en/user/services/wcs/reference.html).
+
+WCS is available **only for raster layers**. Coverages are the same GeoServer resources that Layman already publishes in the `layman_wms` workspace for WMS (`l_<UUID>`). Canonical service URL is `/geoserver/layman_wms/wcs`.
+
+The authentication proxy understands same [authentication credentials](security.md#authentication) as Layman REST API and passes the request to GeoServer with credentials understandable by GeoServer. Filter path includes `/**/wcs` in addition to `wfs`/`wms`/`ows`.
+
+Layman documents and tests primarily **WCS 1.0.0** (QGIS native support). GeoServer may also answer WCS 2.0 requests; that is not the primary Layman client target.
+
+WCS respects [publication access rights](security.md#publication-access-rights). Without read access, the coverage is not available to the actor (same model as WMS).
+
+`GetCoverage` accepts the coverage native CRS and every CRS configured in `LAYMAN_OUTPUT_SRS_LIST`.
+
+### Timeseries
+For timeseries ImageMosaic coverages, time dimension is already enabled on the GeoServer coverage. Clients discover available times from WCS 1.0 GetCapabilities / DescribeCoverage and request a slice with `&TIME=<ISO8601>`. Without `TIME`, GeoServer returns the default (MAXIMUM) slice, consistent with WMS. Layman REST exposes times under `wms.time` (no separate `wcs.time` in MVP).
+
 ## Catalogue Service
 [Catalogue Service (CSW)](https://www.ogc.org/standards/cat/) is implemented using [Micka](https://github.com/hsrs-cz/Micka).
